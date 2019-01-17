@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Python tools
+.coverage
+venv
+
+# Python & distutils
+__pycache__
+*.egg-info
+.eggs
+
+# Editors & tooling
+*.orig
+*~
+.*rc
