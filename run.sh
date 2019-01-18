@@ -30,5 +30,5 @@ if [[ $error > 0 ]]; then
 fi
 
 # Run
-npm run start &
+npm run dev &
 flask run
