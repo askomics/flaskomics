@@ -3,7 +3,7 @@
 
 FlaskOmics is the future of [AskOmics](https://github.com/askomics/askomics).
 
-## Requirments
+## Requirements
 
 Python3, Python3 virtual env and npm
 
@@ -22,4 +22,4 @@ sudo apt install python3 python3-venv npm
 ./run.sh
 ```
 
-FlaskOmics is available at (http://localhost:5000)
+FlaskOmics is available at http://localhost:5000
