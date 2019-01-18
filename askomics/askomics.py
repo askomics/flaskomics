@@ -26,6 +26,6 @@ def hello():
         json = request.get_json()
         data = {'message': 'Hello {}!'.format(json['name'])}
     else:
-        data = {'message': 'hello!'}
+        data = {'message': 'Welcome to FlaskOmics!'}
 
     return jsonify(data)

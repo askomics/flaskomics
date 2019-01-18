@@ -13,7 +13,7 @@ export default class Home extends Component {
     let requestUrl = '/api/hello'
     axios.get(requestUrl)
     .then(response => {
-        console.log("response", response.data);
+        console.log("response", response.data)
         this.setState({
             'isLoading': false,
             'error': false,
@@ -22,7 +22,7 @@ export default class Home extends Component {
         })
     })
     .catch( (error) => {
-        console.log(error);
+        console.log(error)
     });
 
   }
@@ -31,7 +31,6 @@ export default class Home extends Component {
     return (
       <div className="container">
           <h1>Hello</h1>
-          <p>Welcome to AskOmics</p>
           <p>{this.state.message}</p>
         </div>
     );
