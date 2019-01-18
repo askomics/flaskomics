@@ -14,5 +14,8 @@ module.exports = {
     output: {
         path: __dirname + '/askomics/static/js',
         filename: 'askomics.js'
+    },
+    resolve: {
+        extensions: ['.js', '.jsx'],
     }
 };
