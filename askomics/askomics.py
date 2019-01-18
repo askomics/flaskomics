@@ -13,7 +13,7 @@ app.iniconfig = FlaskIni()
 with app.app_context():
     app.iniconfig.read('config/askomics.ini')
 
-app.secret_key = app.iniconfig.get('app', 'secret_key')
+app.secret_key = app.iniconfig.get('flask', 'secret_key')
 
 @app.route('/')
 def home():
