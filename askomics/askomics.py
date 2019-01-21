@@ -29,3 +29,8 @@ def hello():
         data = {'message': 'Welcome to FlaskOmics!'}
 
     return jsonify(data)
+
+@app.route('/api/user', methods=['GET'])
+def user():
+
+    return jsonify({"username": "xgarnier"})
