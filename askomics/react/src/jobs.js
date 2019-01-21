@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import Navbar from './navbar'
 
-export default class Home extends Component {
+export default class Jobs extends Component {
 
   constructor(props) {
     super(props)
@@ -33,10 +33,11 @@ export default class Home extends Component {
       <div>
         <Navbar />
         <div className="container">
-          <h1>Hello</h1>
+          <h1>Jobs</h1>
           <p>{this.state.message}</p>
         </div>
       </div>
     );
   }
 }
+
