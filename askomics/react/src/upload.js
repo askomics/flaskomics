@@ -1,7 +1,5 @@
-import React, { Component } from "react";
+import React, { Component } from "react"
 import axios from 'axios'
-
-import Navbar from './navbar'
 
 export default class Upload extends Component {
 
@@ -25,18 +23,17 @@ export default class Upload extends Component {
     })
     .catch( (error) => {
       console.log(error)
-    });
+    })
   }
 
   render() {
     return (
       <div>
-        <Navbar />
         <div className="container">
           <h1>Upload</h1>
           <p>{this.state.message}</p>
         </div>
       </div>
-    );
+    )
   }
 }
