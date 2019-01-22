@@ -4,14 +4,14 @@ import axios from 'axios'
 import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from './routes'
-import Navbar from './navbar'
+import AskoNavbar from './navbar'
 
 class App extends React.Component {
   render() {
     return (
       <Router>
         <div>
-          <Navbar />
+          <AskoNavbar />
           <Routes />
         </div>
       </Router>

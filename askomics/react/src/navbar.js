@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-
+import { Collapse, Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap';
 import axios from 'axios'
 
-class Navbar extends React.Component {
+class AskoNavbar extends React.Component {
 
   constructor(props) {
     super(props)
@@ -24,7 +24,7 @@ class Navbar extends React.Component {
         'error': false,
         'errorMessage': null,
         'username': response.data.username,
-        'logged': true
+        'logged': response.data.logged
       })
     })
     .catch( (error) => {
@@ -50,36 +50,34 @@ class Navbar extends React.Component {
 
     return (
       <div>
-        <nav className="navbar navbar-expand-md navbar-dark bg-dark">
+        <Navbar color="dark" dark expand="md">
           <div className="container">
-            <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-              <a className="navbar-brand" href="/">AskOmics</a>
-            </div>
-            <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
-              <ul className="navbar-nav ml-auto">
-                <li className="nav-item">
+            <NavbarBrand href="/">AskOmics</NavbarBrand>
+            <Collapse navbar>
+              <Nav className="ml-auto" navbar>
+                <NavItem>
                   <Link className="nav-link" to="/ask"><i className="fas fa-play"></i> Ask!</Link>
-                </li>
-                <li className="nav-item">
+                </NavItem>
+                <NavItem>
                   {jobs_link}
-                </li>
-                <li className="nav-item">
+                </NavItem>
+                <NavItem>
                   {upload_link}
-                </li>
-                <li className="nav-item">
+                </NavItem>
+                <NavItem>
                   {datasets_link}
-                </li>
-                <li className="nav-item">
+                </NavItem>
+                <NavItem>
                   {login_link}
-                </li>
-              </ul>
-            </div>
+                </NavItem>
+              </Nav>
+            </Collapse>
           </div>
-        </nav>
+        </Navbar>
         <br />
       </div>
     )
   }
 }
 
-export default Navbar;
+export default AskoNavbar

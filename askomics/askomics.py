@@ -33,4 +33,15 @@ def hello():
 @app.route('/api/user', methods=['GET'])
 def user():
 
-    return jsonify({"username": "xgarnier"})
+    json = {
+        "username": None,
+        "logged": False
+    }
+
+    if 'username' in session:
+        json = {
+            "username": session['username'],
+            "logged": True
+        }
+
+    return jsonify(json)
