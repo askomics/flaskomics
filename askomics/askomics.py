@@ -19,12 +19,11 @@ app.secret_key = app.iniconfig.get('flask', 'secret_key')
 def home():
     return render_template('index.html', project="AskOmics")
 
-@app.route('/api/hello', methods=['GET', 'POST'])
+@app.route('/api/hello', methods=['GET'])
 def hello():
 
-    if request.method == 'POST':
-        json = request.get_json()
-        data = {'message': 'Hello {}!'.format(json['name'])}
+    if 'username' in session:
+        data = {'message': 'Hello {}, welcome to FlaskOmics!'.format(session['username'])}
     else:
         data = {'message': 'Welcome to FlaskOmics!'}
 
@@ -45,3 +44,24 @@ def user():
         }
 
     return jsonify(json)
+
+@app.route('/api/login', methods=['POST'])
+def login():
+
+    data = request.get_json()
+
+    if data['login'] == 'imx' and data['password'] == 'imx' :
+        session['username'] = 'Xavier Garnier'
+        app.logger.debug(session['username'])
+        return jsonify({'username': session["username"]})
+
+@app.route('/api/logout', methods=['GET'])
+def logout():
+
+    session.pop('username', None)
+    return jsonify({'username': '', 'logged': False})
+
+
+@app.route('/<path:path>')
+def catch_all(path):
+    return redirect(url_for('home'))

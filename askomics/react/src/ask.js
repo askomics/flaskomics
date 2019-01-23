@@ -5,7 +5,12 @@ export default class Ask extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {'isLoading': true, error: false, 'errorMessage': null}
+    this.state = {
+      error: false,
+      errorMessage: null,
+      logged: props.logged,
+      username: props.username
+    }
   }
 
   componentDidMount() {
@@ -13,11 +18,8 @@ export default class Ask extends Component {
     let requestUrl = '/api/hello'
     axios.get(requestUrl)
     .then(response => {
-      console.log("response", response.data)
+      console.log('Ask', requestUrl, response.data)
       this.setState({
-        'isLoading': false,
-        'error': false,
-        'errorMessage': null,
         'message': response.data.message
       })
     })
@@ -26,13 +28,15 @@ export default class Ask extends Component {
     })
   }
 
+  componentWillUnmount() {
+    console.log('unmount ask')
+  }
+
   render() {
     return (
-      <div>
-        <div className="container">
-          <h1>Ask!</h1>
-          <p>{this.state.message}</p>
-        </div>
+      <div className="container">
+        <h1>Ask!</h1>
+        <p>{this.state.message}</p>
       </div>
     )
   }
