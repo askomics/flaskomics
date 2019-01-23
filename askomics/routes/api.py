@@ -1,7 +1,7 @@
 from flask import jsonify, request, redirect, escape, session, url_for
 from functools import wraps
 from askomics import app
-from askomics.lib.Start import Start
+from askomics.libaskomics.Start import Start
 
 def login_required(f):
     @wraps(f)
