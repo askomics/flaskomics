@@ -8,6 +8,6 @@ with app.app_context():
 
 app.secret_key = app.iniconfig.get('flask', 'secret_key')
 
-import askomics.view
-import askomics.api
-import askomics.catch_url
+import askomics.routes.view
+import askomics.routes.api
+import askomics.routes.catch_url

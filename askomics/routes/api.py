@@ -1,6 +1,7 @@
 from flask import jsonify, request, redirect, escape, session, url_for
 from functools import wraps
 from askomics import app
+from askomics.lib.Start import Start
 
 def login_required(f):
     @wraps(f)
@@ -22,6 +23,9 @@ def hello():
 
 @app.route('/api/start', methods=['GET'])
 def start():
+
+    starter = Start(app, session)
+    starter.start()
 
     json = {
         "username": None,
