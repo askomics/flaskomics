@@ -1,3 +1,5 @@
+"""Handle Database class
+"""
 import logging
 import sqlite3
 import urllib.parse
@@ -8,17 +10,43 @@ from askomics.libaskomics.Params import Params
 class Database(Params):
     """
     Manage Database connection
+    Attributes
+    ----------
+    database_path : str
+        Path to the database file
     """
 
     def __init__(self, app, session):
+        """Store the database path
 
+        Parameters
+        ----------
+        app :
+            flask app
+        session :
+            flask session
+        """
         Params.__init__(self, app, session)
 
         self.database_path = self.settings.get('askomics', 'database_path')
 
-    def execute_sql_query(self, query, variables=None, get_id=False):
+    def execute_sql_query(self, query, variables=[], get_id=False):
         """
-        execute a sql query
+        Execute an sql query to the database
+
+        Parameters
+        ----------
+        query : str
+            The sql query
+        variables : List, optional
+            Sql variables
+        get_id : bool, optional
+            Return the last row id
+
+        Returns
+        -------
+        List
+            Result of the query, or last row id
         """
 
         connection = sqlite3.connect("file:" + self.database_path, uri=True)
@@ -38,7 +66,8 @@ class Database(Params):
         return rows
 
     def init_database(self):
-
+        """Create all tables
+        """
         self.create_user_table()
         self.create_galaxy_table()
         self.create_integration_table()
@@ -46,7 +75,8 @@ class Database(Params):
         self.create_endpoints_table()
 
     def create_user_table(self):
-
+        """Create the user table
+        """
         query = '''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,7 +93,8 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_galaxy_table(self):
-
+        """Create the galaxy table
+        """
         query = '''
         CREATE TABLE IF NOT EXISTS galaxy_accounts (
             galaxy_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,7 +107,8 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_integration_table(self):
-
+        """Create the integration table
+        """
         query = '''
         CREATE TABLE IF NOT EXISTS integration (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,7 +124,8 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_query_table(self):
-
+        """Create the query table
+        """
         query = '''
         CREATE TABLE IF NOT EXISTS query (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,7 +146,8 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_endpoints_table(self):
-
+        """Create the endpoints table
+        """
         query = '''
         CREATE TABLE IF NOT EXISTS endpoints (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

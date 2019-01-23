@@ -1,7 +1,29 @@
 class Params(object):
 
-    def __init__(self, app, session):
+    """Mother of all libaskomics classes
 
+    Attributes
+    ----------
+    app :
+        flask app
+    log :
+        flask logger
+    session :
+        flask session
+    settings :
+        askomics settings (from ini)
+    """
+
+    def __init__(self, app, session):
+        """Store the logger, settings, session and app
+
+        Parameters
+        ----------
+        app :
+            flask app
+        session :
+            flask session
+        """
         self.log = app.logger
         self.settings = app.iniconfig
         self.session = session
