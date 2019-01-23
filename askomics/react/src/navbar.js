@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { Component } from "react"
 import { Link } from "react-router-dom";
 import { Collapse, Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap';
-import axios from 'axios'
 
-export default  class AskoNavbar extends React.Component {
+export default  class AskoNavbar extends Component {
 
   constructor(props) {
     super(props)

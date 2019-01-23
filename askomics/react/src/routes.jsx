@@ -11,6 +11,7 @@ import Datasets from './datasets'
 import Login from './login'
 import Logout from './logout'
 import AskoNavbar from './navbar'
+import AskoFooter from './footer'
 
 const history = createBrowserHistory()
 
@@ -28,7 +29,7 @@ export default class Routes extends Component {
 
   componentDidMount() {
 
-    let requestUrl = '/api/user'
+    let requestUrl = '/api/start'
     axios.get(requestUrl)
     .then(response => {
       console.log('Routes', requestUrl, response.data)
@@ -36,7 +37,9 @@ export default class Routes extends Component {
         error: false,
         errorMessage: null,
         username: response.data.username,
-        logged: response.data.logged
+        logged: response.data.logged,
+        version: response.data.version,
+        footerMessage: response.data.footer_message
       })
     })
     .catch( (error) => {
@@ -56,6 +59,7 @@ export default class Routes extends Component {
             <Route path="/login" exact component={() => (<Login setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
           </Switch>
+          <AskoFooter version={this.state.version} message={this.state.footerMessage} />
         </div>
       </Router>
     )

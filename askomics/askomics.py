@@ -29,19 +29,19 @@ def hello():
 
     return jsonify(data)
 
-@app.route('/api/user', methods=['GET'])
-def user():
+@app.route('/api/start', methods=['GET'])
+def start():
 
     json = {
         "username": None,
-        "logged": False
+        "logged": False,
+        "version": app.iniconfig.get('askomics', 'version'),
+        "footer_message": app.iniconfig.get('askomics', 'footer_message')
     }
 
     if 'username' in session:
-        json = {
-            "username": session['username'],
-            "logged": True
-        }
+        json['username'] = session['username']
+        json['logged'] = True
 
     return jsonify(json)
 
