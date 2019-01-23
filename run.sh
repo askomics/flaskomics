@@ -10,7 +10,7 @@ error=0
 
 # Exports
 export FLASK_ENV=development
-export FLASK_APP=$dir_askomics/askomics/askomics.py
+export FLASK_APP=$dir_askomics/askomics
 
 if [[ -f $activate ]]; then
     echo "Sourcing Python virtual environment ..."

@@ -1,23 +1,14 @@
-from flask import Flask
-from flask import render_template
-from flask import jsonify
-from flask import request
-from flask import redirect
-from flask import escape
-from flask import session
-from flask import url_for
-from flask_ini import FlaskIni
+from flask import jsonify, request, redirect, escape, session, url_for
+from functools import wraps
+from askomics import app
 
-app = Flask(__name__)
-app.iniconfig = FlaskIni()
-with app.app_context():
-    app.iniconfig.read('config/askomics.ini')
-
-app.secret_key = app.iniconfig.get('flask', 'secret_key')
-
-@app.route('/')
-def home():
-    return render_template('index.html', project="AskOmics")
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return jsonify({"error": True, "errorMessage": "Login required"})
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
@@ -60,8 +51,3 @@ def logout():
 
     session.pop('username', None)
     return jsonify({'username': '', 'logged': False})
-
-
-@app.route('/<path:path>')
-def catch_all(path):
-    return redirect(url_for('home'))
