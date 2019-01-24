@@ -28,10 +28,6 @@ export default class Ask extends Component {
     })
   }
 
-  componentWillUnmount() {
-    console.log('unmount ask')
-  }
-
   render() {
     return (
       <div className="container">

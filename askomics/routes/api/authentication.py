@@ -25,7 +25,7 @@ def signup():
 
     return jsonify({
         'error': error,
-        'errorMessage': '\n'.join(messages),
+        'errorMessage': messages,
         'user': user
         })
 
@@ -48,7 +48,7 @@ def login():
 
     return jsonify({
         'error': authentication['error'],
-        'errorMessage': '\n'.join(authentication['error_messages']),
+        'errorMessage': authentication['error_messages'],
         'user': authentication['user']
         })
 

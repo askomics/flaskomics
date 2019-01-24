@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Button, Form, FormGroup, Label, Input } from 'reactstrap'
+import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
 import { Redirect} from 'react-router'
 import { Link } from "react-router-dom";
 
@@ -10,7 +10,7 @@ export default class Signup extends Component {
     super(props)
     this.state = {isLoading: true,
                   error: false,
-                  errorMessage: null,
+                  errorMessage: [],
                   fname: '',
                   lname: '',
                   username: '',
@@ -65,12 +65,14 @@ export default class Signup extends Component {
         error: response.data.error,
         errorMessage: response.data.errorMessage,
         user: response.data.user,
-        logged: true
+        logged: !response.data.error
       })
-      this.props.setStateNavbar({
-        user: this.state.user,
-        logged: this.state.logged
-      })
+      if (!this.state.error) {
+        this.props.setStateNavbar({
+          user: this.state.user,
+          logged: this.state.logged
+        })
+      }
     })
     .catch( (error) => {
       console.log(error)
@@ -80,6 +82,17 @@ export default class Signup extends Component {
 
   render() {
     let html = <Redirect to="/" />
+    let errorDiv
+    if (this.state.error) {
+      errorDiv = (
+        <Alert color="danger">
+        {this.state.errorMessage.map((item, index) => (
+          <div><i className="fas fa-exclamation-circle"></i> {item}</div>
+        ))}
+        </Alert>
+      )
+    }
+
     if (!this.state.logged) {
       html = (
         <div className="container">
@@ -114,6 +127,7 @@ export default class Signup extends Component {
               <Button disabled={!this.validateForm()}>Signup</Button>
               <p>(Or <Link to="/login"> login</Link>)</p>
             </Form>
+            {errorDiv}
           </div>
         </div>
       )

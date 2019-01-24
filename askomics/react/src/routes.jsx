@@ -33,7 +33,7 @@ export default class Routes extends Component {
     let requestUrl = '/api/start'
     axios.get(requestUrl)
     .then(response => {
-      console.log('Routes', requestUrl, response.data)
+      console.log(requestUrl, response.data)
       this.setState({
         error: false,
         errorMessage: null,
@@ -49,8 +49,6 @@ export default class Routes extends Component {
   }
 
   render() {
-    console.log('rendering routes')
-    console.log('routes state', this.state)
     return (
       <Router history={history}>
         <div>

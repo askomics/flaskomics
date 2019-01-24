@@ -258,6 +258,7 @@ class LocalAuth(Params):
             }
         else:
             error = True
+            error_messages.append('Wrong username')
 
         return {'error': error, 'error_messages': error_messages, 'user': user}
 
