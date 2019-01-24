@@ -1,3 +1,5 @@
+"""Api routes
+"""
 from flask import jsonify, request, redirect, escape, session, url_for
 from functools import wraps
 from askomics import app
@@ -6,6 +8,8 @@ from askomics.libaskomics.Start import Start
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        """Login required decorator
+        """
         if 'username' not in session:
             return jsonify({"error": True, "errorMessage": "Login required"})
         return f(*args, **kwargs)
@@ -13,7 +17,13 @@ def login_required(f):
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
+    """Dummy routes
 
+    Returns
+    -------
+    json
+        A welcome message
+    """
     if 'username' in session:
         data = {'message': 'Hello {}, welcome to FlaskOmics!'.format(session['username'])}
     else:
@@ -23,7 +33,13 @@ def hello():
 
 @app.route('/api/start', methods=['GET'])
 def start():
+    """Starting route
 
+    Returns
+    -------
+    json Information about a eventualy logged user, and the AskOmics version
+        and a footer message
+    """
     starter = Start(app, session)
     starter.start()
 
@@ -42,7 +58,13 @@ def start():
 
 @app.route('/api/login', methods=['POST'])
 def login():
+    """Log a user
 
+    Returns
+    -------
+    json
+        Information about the logged user
+    """
     data = request.get_json()
 
     if data['login'] == 'imx' and data['password'] == 'imx' :
@@ -52,6 +74,12 @@ def login():
 
 @app.route('/api/logout', methods=['GET'])
 def logout():
+    """Logout the current user
 
+    Returns
+    -------
+    json
+        no username and logged false
+    """
     session.pop('username', None)
     return jsonify({'username': '', 'logged': False})

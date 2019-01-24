@@ -1,4 +1,4 @@
-"""Handle Database class
+"""Contain the Database class
 """
 import logging
 import sqlite3

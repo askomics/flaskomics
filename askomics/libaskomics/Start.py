@@ -1,4 +1,4 @@
-"""Handle Start classe
+"""Contain the Start classe
 """
 import os
 

@@ -1,3 +1,5 @@
+"""Define a Flask app
+"""
 from flask import Flask
 from flask_ini import FlaskIni
 

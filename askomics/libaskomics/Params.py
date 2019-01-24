@@ -1,3 +1,6 @@
+"""Contain the Params class
+"""
+
 class Params(object):
 
     """Mother of all libaskomics classes
