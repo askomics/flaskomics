@@ -61,6 +61,7 @@ export default class Routes extends Component {
             <Route path="/signup" exact component={() => (<Signup setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
           </Switch>
+          <br />
           <AskoFooter version={this.state.version} message={this.state.footerMessage} />
         </div>
       </Router>
