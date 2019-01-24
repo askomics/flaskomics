@@ -35,7 +35,8 @@ export default class Ask extends Component {
   render() {
     return (
       <div className="container">
-        <h1>Ask!</h1>
+        <h2>Ask!</h2>
+        <hr />
         <p>{this.state.message}</p>
       </div>
     )

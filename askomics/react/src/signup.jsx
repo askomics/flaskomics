@@ -83,7 +83,8 @@ export default class Signup extends Component {
     if (!this.state.logged) {
       html = (
         <div className="container">
-          <h1>Signup</h1>
+          <h2>Signup</h2>
+          <hr />
           <div className="col-md-4">
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
