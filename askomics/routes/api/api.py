@@ -44,14 +44,14 @@ def start():
     starter.start()
 
     json = {
-        "username": None,
+        "user": None,
         "logged": False,
         "version": app.iniconfig.get('askomics', 'version'),
         "footer_message": app.iniconfig.get('askomics', 'footer_message')
     }
 
-    if 'username' in session:
-        json['username'] = session['username']
+    if 'user' in session:
+        json['user'] = session['user']
         json['logged'] = True
 
     return jsonify(json)

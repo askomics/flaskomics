@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input } from 'reactstrap'
 import { Redirect} from 'react-router'
+import { Link } from "react-router-dom";
 
 export default class Login extends Component {
 
@@ -12,8 +13,7 @@ export default class Login extends Component {
                   errorMessage: null,
                   login: '',
                   password: '',
-                  logged: false,
-                  username: null
+                  logged: false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -39,16 +39,16 @@ export default class Login extends Component {
 
     axios.post(requestUrl, data)
     .then(response => {
-      console.log('Login', requestUrl, response.data)
+      console.log(requestUrl, response.data)
       this.setState({
         isLoading: false,
-        error: false,
-        errorMessage: null,
-        username: response.data.username,
+        error: response.data.error,
+        errorMessage: response.data.errorMessage,
+        user: response.data.user,
         logged: true
       })
       this.props.setStateNavbar({
-        username: this.state.username,
+        user: this.state.user,
         logged: this.state.logged
       })
     })
@@ -67,7 +67,7 @@ export default class Login extends Component {
           <div className="col-md-4">
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
-                <Label for="login">Email</Label>
+                <Label for="login">Login (username or email)</Label>
                 <Input type="text" name="login" id="login" placeholder="login" value={this.state.login} onChange={this.handleChange} />
               </FormGroup>
               <FormGroup>
@@ -75,6 +75,7 @@ export default class Login extends Component {
                 <Input type="password" name="password" id="password" placeholder="password" value={this.state.password} onChange={this.handleChange} />
               </FormGroup>
               <Button disabled={!this.validateForm()}>Login</Button>
+              <p>(Or <Link to="/signup"> signup</Link>)</p>
             </Form>
           </div>
         </div>

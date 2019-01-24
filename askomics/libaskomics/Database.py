@@ -1,9 +1,6 @@
 """Contain the Database class
 """
-import logging
 import sqlite3
-import urllib.parse
-import itertools
 
 from askomics.libaskomics.Params import Params
 
@@ -81,6 +78,8 @@ class Database(Params):
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             ldap boolean,
+            fname text,
+            lname text,
             username text,
             email text,
             password text,

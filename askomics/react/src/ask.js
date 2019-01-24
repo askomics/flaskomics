@@ -9,7 +9,7 @@ export default class Ask extends Component {
       error: false,
       errorMessage: null,
       logged: props.logged,
-      username: props.username
+      user: props.user
     }
   }
 

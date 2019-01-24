@@ -12,6 +12,9 @@ error=0
 export FLASK_ENV=development
 export FLASK_APP=$dir_askomics/askomics
 
+echo "Remoing python cache ..."
+find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+
 if [[ -f $activate ]]; then
     echo "Sourcing Python virtual environment ..."
     source ${dir_venv}/bin/activate
