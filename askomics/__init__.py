@@ -3,6 +3,7 @@
 from flask import Flask, session, jsonify
 from flask_ini import FlaskIni
 from functools import wraps
+from datetime import timedelta
 
 app = Flask(__name__)
 app.iniconfig = FlaskIni()
@@ -38,6 +39,11 @@ def admin_required(f):
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=60)
 
 import askomics.routes.views.view
 import askomics.routes.api.api
