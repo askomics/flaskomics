@@ -11,6 +11,7 @@ import Datasets from './datasets'
 import Signup from './signup'
 import Login from './login'
 import Logout from './logout'
+import Account from './account'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
 
@@ -58,7 +59,9 @@ export default class Routes extends Component {
             <Route path="/login" exact component={() => (<Login setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/signup" exact component={() => (<Signup setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
           </Switch>
+          <br />
           <br />
           <AskoFooter version={this.state.version} message={this.state.footerMessage} />
         </div>

@@ -208,7 +208,7 @@ class LocalAuth(Params):
         Parameters
         ----------
         inputs : dict
-            username and password
+            login and password
 
         Returns
         -------
@@ -262,6 +262,95 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_messages': error_messages, 'user': user}
 
+    def update_profile(self, inputs, user):
+
+        error = False
+        error_message = ''
+
+        database = Database(self.app, self.session)
+
+        update = []
+        values = []
+
+        new_fname = user['fname']
+        new_lname = user['lname']
+        new_email = user['email']
+
+        if inputs['newFname']:
+            update.append('fname=?')
+            values.append(inputs['newFname'])
+            new_fname = inputs['newFname']
+        if inputs['newLname']:
+            update.append('lname=?')
+            values.append(inputs['newLname'])
+            new_lname = inputs['newLname']
+        if inputs['newEmail']:
+            update.append('email=?')
+            values.append(inputs['newEmail'])
+            new_email = inputs['newEmail']
+
+        update_str = ', '.join(update)
+
+        query = '''
+        UPDATE users SET
+        {}
+        WHERE username=?
+        '''.format(update_str)
+
+        self.log.debug(query)
+
+        database.execute_sql_query(query, tuple(values) + (user['username'], ))
+
+
+        user = {
+            'id': user['id'],
+            'ldap': user['ldap'],
+            'fname': new_fname,
+            'lname': new_lname,
+            'username': user['username'],
+            'email': new_email,
+            'admin': user['admin'],
+            'blocked': user['blocked'],
+            'apikey': user['apikey']
+        }
+
+        return {'error': error, 'error_message': error_message, 'user': user}
+
+    def update_password(self, inputs, user):
+
+        error = False
+        error_message = ''
+
+        database = Database(self.app, self.session)
+
+        # check if new passwords are identicals
+        password_identical = (inputs['newPassword'] == inputs['confPassword'])
+
+        if password_identical:
+            # Try to authenticate the user with his old password
+            credentials = {'login': user['username'], 'password': inputs['oldPassword']}
+            authentication = self.authenticate_user(credentials)
+            if not authentication['error']:
+                # Update the password
+                salt = self.get_random_string(20)
+                salted_pw = self.settings.get('askomics', 'password_salt') + inputs['newPassword'] + salt
+                sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
+
+                query = '''
+                UPDATE users SET
+                password=?, salt=?
+                WHERE username=?
+                '''
+
+                database.execute_sql_query(query, (sha512_pw, salt, user['username']))
+            else:
+                error = True
+                error_message = 'Incorrect old password'
+        else:
+            error = True
+            error_message = 'New passwords are not identical'
+
+        return {'error': error, 'error_message': error_message, 'user': user}
 
     @staticmethod
     def get_random_string(number):
