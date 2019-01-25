@@ -1,19 +1,8 @@
 """Api routes
 """
 from flask import jsonify, session
-from functools import wraps
-from askomics import app
+from askomics import app, login_required
 from askomics.libaskomics.Start import Start
-
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        """Login required decorator
-        """
-        if 'username' not in session:
-            return jsonify({"error": True, "errorMessage": "Login required"})
-        return f(*args, **kwargs)
-    return decorated_function
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
