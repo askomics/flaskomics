@@ -43,7 +43,7 @@ def admin_required(f):
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=60)
+    app.permanent_session_lifetime = timedelta(minutes=int(app.iniconfig.get('flask', 'session_timeout')))
 
 import askomics.routes.views.view
 import askomics.routes.api.api
