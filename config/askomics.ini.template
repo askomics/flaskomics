@@ -14,4 +14,4 @@ database_path = /tmp/flaskomics/database.db
 
 # Authentication
 password_salt = 4sk0mIcs
-default_locked_account = True
+default_locked_account = true

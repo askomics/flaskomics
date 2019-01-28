@@ -21,7 +21,7 @@ def login_required(f):
         if 'user' in session:
             if not session['user']['blocked']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
+            return jsonify({"error": True, "errorMessage": "Blocked account"})
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
@@ -35,7 +35,7 @@ def admin_required(f):
         if 'user' in session:
             if not session['user']['admin']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Admin required"}), 401
+            return jsonify({"error": True, "errorMessage": "Admin required"})
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function

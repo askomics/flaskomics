@@ -123,7 +123,19 @@ class LocalAuth(Params):
 
     def persist_user(self, inputs, ldap=False):
         """
-        Persist all user infos in the TS
+        Persist user in the TS
+
+        Parameters
+        ----------
+        inputs : dict
+            User infos
+        ldap : bool, optional
+            If True, user is ldap
+
+        Returns
+        -------
+        dict
+            The user
         """
 
         database = Database(self.app, self.session)
@@ -135,7 +147,7 @@ class LocalAuth(Params):
 
         else:
             admin = False
-            blocked = self.settings.get('askomics', 'default_locked_account')
+            blocked = self.settings.getboolean('askomics', 'default_locked_account')
 
         api_key = self.get_random_string(20)
 
