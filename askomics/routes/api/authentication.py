@@ -59,14 +59,14 @@ def update_profile():
     data = request.get_json()
 
     local_auth = LocalAuth(app, session)
-    updated_profile = local_auth.update_profile(data, session['user'])
+    updated_user = local_auth.update_profile(data, session['user'])
 
-    session['user'] = updated_profile['user']
+    session['user'] = updated_user['user']
 
     return jsonify({
-        'error': updated_profile['error'],
-        'errorMessage': updated_profile['error_message'],
-        'user': updated_profile['user']
+        'error': updated_user['error'],
+        'errorMessage': updated_user['error_message'],
+        'user': updated_user['user']
         })
 
 @app.route('/api/update_password', methods=['POST'])
@@ -76,13 +76,28 @@ def update_password():
     data = request.get_json()
 
     local_auth = LocalAuth(app, session)
-    updated_password = local_auth.update_password(data, session['user'])
+    updated_user = local_auth.update_password(data, session['user'])
 
 
     return jsonify({
-        'error': updated_password['error'],
-        'errorMessage': updated_password['error_message'],
-        'user': updated_password['user']
+        'error': updated_user['error'],
+        'errorMessage': updated_user['error_message'],
+        'user': updated_user['user']
+        })
+
+@app.route('/api/update_apikey', methods=['GET'])
+@login_required
+def update_apikey():
+
+    local_auth = LocalAuth(app, session)
+    updated_user = local_auth.update_apikey(session['user'])
+
+    session['user'] = updated_user['user']
+
+    return jsonify({
+        'error': updated_user['error'],
+        'errorMessage': updated_user['error_message'],
+        'user': updated_user['user']
         })
 
 
@@ -96,4 +111,7 @@ def logout():
         no username and logged false
     """
     session.pop('user', None)
+
+
+    app.logger.debug(session)
     return jsonify({'user': {}, 'logged': False})

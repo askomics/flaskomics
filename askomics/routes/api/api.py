@@ -13,8 +13,12 @@ def hello():
     json
         A welcome message
     """
-    if 'username' in session:
-        data = {'message': 'Hello {}, welcome to FlaskOmics!'.format(session['username'])}
+    if 'user' in session:
+        data = {
+            'message':
+            'Hello {} {}, welcome to FlaskOmics!'.format(session['user']['fname'],
+                                                         session['user']['lname'])
+        }
     else:
         data = {'message': 'Welcome to FlaskOmics!'}
 

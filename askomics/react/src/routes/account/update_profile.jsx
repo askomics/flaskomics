@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
+import ErrorDiv from "../error/error"
 
 export default class UpdateProfile extends Component {
 
@@ -72,15 +73,6 @@ export default class UpdateProfile extends Component {
   }
 
   render() {
-    let errorDiv
-    if (this.state.error) {
-      errorDiv = (
-        <Alert color="danger">
-          <div><i className="fas fa-exclamation-circle"></i> {this.state.errorMessage}</div>
-        </Alert>
-      )
-    }
-
     let successTick
     if (this.state.success) {
       successTick = <i color="success" className="fas fa-check"></i>
@@ -110,7 +102,8 @@ export default class UpdateProfile extends Component {
           </FormGroup>
           <Button disabled={!this.validateForm()}>Update profile {successTick}</Button>
         </Form>
-        {errorDiv}
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </Col>
     )
   }

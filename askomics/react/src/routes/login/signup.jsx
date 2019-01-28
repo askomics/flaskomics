@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
 import { Redirect} from 'react-router'
 import { Link } from "react-router-dom";
+import ErrorDiv from "../error/error"
 
 export default class Signup extends Component {
 
@@ -74,25 +75,26 @@ export default class Signup extends Component {
         })
       }
     })
-    .catch( (error) => {
-      console.log(error)
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        success: !response.data.error,
+        fname: '',
+        lname: '',
+        username: '',
+        email: '',
+        password: '',
+        passwordconf:''
+      })
     })
     event.preventDefault()
   }
 
   render() {
     let html = <Redirect to="/" />
-    let errorDiv
-    if (this.state.error) {
-      errorDiv = (
-        <Alert color="danger">
-        {this.state.errorMessage.map((item, index) => (
-          <div><i className="fas fa-exclamation-circle"></i> {item}</div>
-        ))}
-        </Alert>
-      )
-    }
-
     if (!this.state.logged) {
       html = (
         <div className="container">
@@ -127,7 +129,7 @@ export default class Signup extends Component {
               <Button disabled={!this.validateForm()}>Signup</Button>
               <p>(Or <Link to="/login"> login</Link>)</p>
             </Form>
-            {errorDiv}
+            <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
           </div>
         </div>
       )

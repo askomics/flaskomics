@@ -263,6 +263,20 @@ class LocalAuth(Params):
         return {'error': error, 'error_messages': error_messages, 'user': user}
 
     def update_profile(self, inputs, user):
+        """Update the profile of a user
+
+        Parameters
+        ----------
+        inputs : dict
+            fields to update
+        user : dict
+            The current user
+
+        Returns
+        -------
+        dict
+            error, error message and updated user
+        """
 
         error = False
         error_message = ''
@@ -301,23 +315,27 @@ class LocalAuth(Params):
 
         database.execute_sql_query(query, tuple(values) + (user['username'], ))
 
-
-        user = {
-            'id': user['id'],
-            'ldap': user['ldap'],
-            'fname': new_fname,
-            'lname': new_lname,
-            'username': user['username'],
-            'email': new_email,
-            'admin': user['admin'],
-            'blocked': user['blocked'],
-            'apikey': user['apikey']
-        }
+        user['fname'] = new_fname
+        user['lname'] = new_lname
+        user['email'] = new_email
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
     def update_password(self, inputs, user):
+        """Update the password of a user
 
+        Parameters
+        ----------
+        inputs : dict
+            Curent password and the new one (and confirmation)
+        user : dict
+            The current user
+
+        Returns
+        -------
+        dict
+            error, error message and updated user
+        """
         error = False
         error_message = ''
 
@@ -352,10 +370,54 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
+    def update_apikey(self, user):
+        """Create a new api key and store in the database
+
+        Parameters
+        ----------
+        user : dict
+            The current user
+
+        Returns
+        -------
+        dict
+            error, error message and updated user
+        """
+        error = False
+        error_message = ''
+
+        database = Database(self.app, self.session)
+
+        # get a new api key
+        new_apikey = self.get_random_string(20)
+
+        query = '''
+        UPDATE users SET
+        apikey=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (new_apikey, user['username']))
+
+        user['apikey'] = new_apikey
+
+        return {'error': error, 'error_message': error_message, 'user': user}
+
     @staticmethod
     def get_random_string(number):
-        """return a random string of n character"""
-        # self.log.debug('get_random_key')
+        """return a random string of n character
+
+        Parameters
+        ----------
+        number : int
+            number of character of the random string
+
+        Returns
+        -------
+        str
+            a random string of n chars
+        """
+
 
         alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         return ''.join(random.choice(alpabet) for i in range(number))

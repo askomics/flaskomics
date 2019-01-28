@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import axios from 'axios'
 import { Alert } from 'reactstrap';
 import { Redirect} from 'react-router'
+import ErrorDiv from "../error/error"
 
 export default class Ask extends Component {
 
@@ -59,7 +60,7 @@ export default class Ask extends Component {
         <h2>Ask!</h2>
         <hr />
         <p>{this.state.message}</p>
-        {errorDiv}
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }
