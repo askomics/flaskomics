@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
+import { Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon } from 'reactstrap'
 import ErrorDiv from "../error/error"
 
 export default class UpdateApiKey extends Component {
@@ -52,15 +52,14 @@ export default class UpdateApiKey extends Component {
 
     return (
       <Col md={4}>
-      <h4>Update api key</h4>
+        <h4>Manage API key</h4>
         <Form onSubmit={this.handleSubmit}>
-          <Row form>
-          </Row>
-          <FormGroup>
-            <Label for="apikey">Api key</Label>
-            <Input type="apikey" name="apikey" id="apikey" value={this.props.user.apikey} disabled />
-          </FormGroup>
-          <Button >Update api key {successTick}</Button>
+          <InputGroup>
+            <Input value={this.props.user.apikey} />
+            <InputGroupAddon addonType="append">
+              <Button >Create new</Button>
+            </InputGroupAddon>
+          </InputGroup>
         </Form>
         <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
