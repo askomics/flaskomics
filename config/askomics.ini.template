@@ -4,12 +4,14 @@ secret_key = askomics_secret_key
 session_timeout = 60
 
 [askomics]
+# AskOmics configuration
 version = 19.01
 footer_message = Welcome to AskOmics!
 
+# data directory
 data_directory = /tmp/flaskomics
 database_path = /tmp/flaskomics/database.db
 
-default_locked_account = True
-
+# Authentication
 password_salt = 4sk0mIcs
+default_locked_account = True

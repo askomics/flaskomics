@@ -1,3 +1,6 @@
+### AskOmics ###
+config/askomics.ini
+
 ### Flask ###
 instance/*
 !instance/.gitignore

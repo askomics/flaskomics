@@ -12,7 +12,7 @@ error=0
 export FLASK_ENV=development
 export FLASK_APP=$dir_askomics/askomics
 
-echo "Remoing python cache ..."
+echo "Removing python cache ..."
 find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
 
 if [[ -f $activate ]]; then
@@ -29,7 +29,14 @@ if [[ ! -d $dir_node_modules ]]; then
 fi
 
 if [[ $error > 0 ]]; then
-    exit 0
+    exit 1
+fi
+
+# Create config file
+config_template_path="$dir_askomics/config/askomics.ini.template"
+config_path="$dir_askomics/config/askomics.ini"
+if [[ ! -f $config_path ]]; then
+    cp $config_template_path $config_path
 fi
 
 # Run
