@@ -415,6 +415,34 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
+    def get_user(self, username):
+
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT *
+        FROM users
+        WHERE username=?
+        '''
+
+        rows = database.execute_sql_query(query, (username, ))
+
+        user = {}
+        user['id'] = rows[0][0],
+        user['ldap'] = rows[0][1]
+        user['fname'] = rows[0][2]
+        user['lname'] = rows[0][3]
+        user['username'] = rows[0][4]
+        user['email'] = rows[0][5]
+        user['admin'] = rows[0][9]
+        user['blocked'] = rows[0][10]
+        user['apikey'] = rows[0][8]
+
+        self.log.debug(user)
+
+        return user
+
     def get_all_users(self):
 
         database = Database(self.app, self.session)
@@ -439,8 +467,6 @@ class LocalAuth(Params):
                 user['admin'] = row[6]
                 user['blocked'] = row[7]
                 users.append(user)
-
-        self.log.debug(users)
 
         return users
 

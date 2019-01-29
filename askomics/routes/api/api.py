@@ -3,6 +3,7 @@
 from flask import jsonify, session
 from askomics import app, login_required
 from askomics.libaskomics.Start import Start
+from askomics.libaskomics.LocalAuth import LocalAuth
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
@@ -44,7 +45,10 @@ def start():
     }
 
     if 'user' in session:
-        json['user'] = session['user']
+        local_auth = LocalAuth(app, session)
+        user = local_auth.get_user(session['user']['username'])
+        session['user'] = user
+        json['user'] = user
         json['logged'] = True
 
     return jsonify(json)
