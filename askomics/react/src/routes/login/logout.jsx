@@ -9,7 +9,7 @@ export default class logout extends Component {
   }
 
   componentDidMount() {
-    let requestUrl = '/api/logout'
+    let requestUrl = '/api/auth/logout'
     axios.get(requestUrl)
     .then(response => {
       console.log(requestUrl, response.data)

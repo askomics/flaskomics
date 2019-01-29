@@ -48,7 +48,7 @@ export default class Signup extends Component {
 
   handleSubmit(event) {
 
-    let requestUrl = '/api/signup'
+    let requestUrl = '/api/auth/signup'
     let data = {
       fname: this.state.fname,
       lname: this.state.lname,

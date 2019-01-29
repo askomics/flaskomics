@@ -11,8 +11,12 @@ import Signup from './routes/login/signup'
 import Login from './routes/login/login'
 import Logout from './routes/login/logout'
 import Account from './routes/account/account'
+import Admin from './routes/admin/admin'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
+
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const history = createBrowserHistory()
 
@@ -59,6 +63,7 @@ export default class Routes extends Component {
             <Route path="/signup" exact component={() => (<Signup setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/admin" exact component={() => (<Admin user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
           </Switch>
           <br />
           <br />

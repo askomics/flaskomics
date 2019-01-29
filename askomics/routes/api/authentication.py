@@ -1,10 +1,10 @@
 """Authentication routes
 """
 from flask import jsonify, request, session
-from askomics import app, login_required
+from askomics import app, login_required, admin_required
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-@app.route('/api/signup', methods=['POST'])
+@app.route('/api/auth/signup', methods=['POST'])
 def signup():
     """Register a new user
 
@@ -29,7 +29,7 @@ def signup():
         'user': user
         })
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/api/auth/login', methods=['POST'])
 def login():
     """Log a user
 
@@ -52,10 +52,16 @@ def login():
         'user': authentication['user']
         })
 
-@app.route('/api/update_profile', methods=['POST'])
+@app.route('/api/auth/profile', methods=['POST'])
 @login_required
 def update_profile():
+    """Update user profile (names and email)
 
+    Returns
+    -------
+    json
+        The updated user
+    """
     data = request.get_json()
 
     local_auth = LocalAuth(app, session)
@@ -69,10 +75,16 @@ def update_profile():
         'user': updated_user['user']
         })
 
-@app.route('/api/update_password', methods=['POST'])
+@app.route('/api/auth/password', methods=['POST'])
 @login_required
 def update_password():
+    """Update the user passord
 
+    Returns
+    -------
+    json
+        The user
+    """
     data = request.get_json()
 
     local_auth = LocalAuth(app, session)
@@ -85,10 +97,16 @@ def update_password():
         'user': updated_user['user']
         })
 
-@app.route('/api/update_apikey', methods=['GET'])
+@app.route('/api/auth/apikey', methods=['GET'])
 @login_required
 def update_apikey():
+    """Update the user apikey
 
+    Returns
+    -------
+    json
+        The user with his new apikey
+    """
     local_auth = LocalAuth(app, session)
     updated_user = local_auth.update_apikey(session['user'])
 
@@ -101,7 +119,7 @@ def update_apikey():
         })
 
 
-@app.route('/api/logout', methods=['GET'])
+@app.route('/api/auth/logout', methods=['GET'])
 def logout():
     """Logout the current user
 

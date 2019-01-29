@@ -36,7 +36,7 @@ export default class UpdateProfile extends Component {
 
   handleSubmit(event) {
 
-    let requestUrl = '/api/update_profile'
+    let requestUrl = '/api/auth/profile'
     let data = {
       newFname: this.state.newFname,
       newLname: this.state.newLname,

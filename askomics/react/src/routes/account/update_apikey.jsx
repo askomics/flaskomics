@@ -13,7 +13,7 @@ export default class UpdateApiKey extends Component {
 
   handleSubmit(event) {
 
-    let requestUrl = '/api/update_apikey'
+    let requestUrl = '/api/auth/apikey'
 
     axios.get(requestUrl)
     .then(response => {

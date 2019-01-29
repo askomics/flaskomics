@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom";
-import { Collapse, Navbar, NavbarBrand, Nav, NavItem, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap';
+import { Collapse, Navbar, NavbarBrand, Nav, NavItem, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap'
 
 export default  class AskoNavbar extends Component {
 

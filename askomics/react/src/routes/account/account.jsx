@@ -7,7 +7,7 @@ import UpdateProfile from "./update_profile"
 import UpdatePassword from "./update_password"
 import UpdateApiKey from "./update_apikey"
 
-export default class Login extends Component {
+export default class Account extends Component {
 
   constructor(props) {
     super(props)

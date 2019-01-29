@@ -33,7 +33,7 @@ export default class UpdateProfile extends Component {
 
   handleSubmit(event) {
 
-    let requestUrl = '/api/update_password'
+    let requestUrl = '/api/auth/password'
     let data = {
       oldPassword: this.state.oldPassword,
       newPassword: this.state.newPassword,

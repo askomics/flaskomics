@@ -415,6 +415,60 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
+    def get_all_users(self):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT user_id, ldap, fname, lname, username, email, admin, blocked
+        FROM users
+        '''
+
+        rows = database.execute_sql_query(query)
+
+        users = []
+
+        if rows:
+            for row in rows:
+                user = {}
+                user['ldap'] = row[1]
+                user['fname'] = row[2]
+                user['lname'] = row[3]
+                user['username'] = row[4]
+                user['email'] = row[5]
+                user['admin'] = row[6]
+                user['blocked'] = row[7]
+                users.append(user)
+
+        self.log.debug(users)
+
+        return users
+
+    def set_admin(self, new_status, username):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE users
+        SET admin=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (new_status, username))
+
+    def set_blocked(self, new_status, username):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE users
+        SET blocked=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (new_status, username))
+
+
     @staticmethod
     def get_random_string(number):
         """return a random string of n character

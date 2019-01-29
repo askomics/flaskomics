@@ -32,7 +32,7 @@ export default class Login extends Component {
 
   handleSubmit(event) {
 
-    let requestUrl = '/api/login'
+    let requestUrl = '/api/auth/login'
     let data = {
       login: this.state.login,
       password: this.state.password

@@ -1,4 +1,4 @@
-module.exports = {
+let config = {
     entry: [
         './askomics/react/src/index.jsx'
     ],
@@ -8,6 +8,10 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: ['babel-loader']
+            },
+            {
+                test: /\.css$/,
+                loader: ['style-loader', 'css-loader']
             }
         ]
     },
@@ -19,3 +23,5 @@ module.exports = {
         extensions: ['.js', '.jsx'],
     }
 };
+
+module.exports = config;

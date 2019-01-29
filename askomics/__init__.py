@@ -33,7 +33,7 @@ def admin_required(f):
         """
 
         if 'user' in session:
-            if not session['user']['admin']:
+            if session['user']['admin']:
                 return f(*args, **kwargs)
             return jsonify({"error": True, "errorMessage": "Admin required"})
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
@@ -48,4 +48,5 @@ def make_session_permanent():
 import askomics.routes.views.view
 import askomics.routes.api.api
 import askomics.routes.api.authentication
+import askomics.routes.api.admin
 import askomics.routes.views.catch_url
