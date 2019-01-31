@@ -31,7 +31,8 @@ def start():
 
     Returns
     -------
-    json Information about a eventualy logged user, and the AskOmics version
+    json
+        Information about a eventualy logged user, and the AskOmics version
         and a footer message
     """
     starter = Start(app, session)

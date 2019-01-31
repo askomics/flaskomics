@@ -1,3 +1,4 @@
 Flask
 Flask-ini
 validate_email
+gunicorn

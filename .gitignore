@@ -1,5 +1,6 @@
 ### AskOmics ###
 config/askomics.ini
+askomics/static/js/askomics.js
 
 ### Flask ###
 instance/*

@@ -8,8 +8,43 @@ activate="$dir_venv/bin/activate"
 
 error=0
 
+function usage() {
+    echo "Usage: $0 (-d { dev | prod })"
+    echo "    -d     deployment mode (default: production)"
+}
+
+while getopts "hd:" option; do
+    case $option in
+        h)
+            usage
+            exit 0
+        ;;
+
+        d)
+            depmode=$OPTARG
+        ;;
+    esac
+done
+
+case $depmode in
+    prod|production|"")
+        flask_depmod="production"
+        npm_depmode="prod"
+        flask_command="gunicorn -b localhost:5000 askomics:app"
+    ;;
+    dev|development)
+        flask_depmod="development"
+        npm_depmode="dev"
+        flask_command="flask run"
+    ;;
+    *)
+        echo "-d $depmode: wrong deployment mode"
+        usage
+        exit 1
+esac
+
 # Exports
-export FLASK_ENV=development
+export FLASK_ENV=$flask_depmod
 export FLASK_APP=$dir_askomics/askomics
 
 echo "Removing python cache ..."
@@ -40,5 +75,7 @@ if [[ ! -f $config_path ]]; then
 fi
 
 # Run
-npm run dev &
-flask run
+echo "Building JS ..."
+npm run $npm_depmode &
+echo "Starting server ..."
+$flask_command

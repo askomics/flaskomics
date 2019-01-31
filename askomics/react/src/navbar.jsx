@@ -20,8 +20,6 @@ export default  class AskoNavbar extends Component {
 
   render() {
 
-    console.log('User', this.props.user)
-
     let links = (
       <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
     )

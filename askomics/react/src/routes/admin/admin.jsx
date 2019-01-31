@@ -132,6 +132,10 @@ export default class Admin extends Component {
       formatter: (cell, row) => {return row.fname + " " + row.lname},
       sort: true
     }, {
+      dataField: 'username',
+      text: 'Username',
+      sort: true
+    }, {
       dataField: 'email',
       text: 'Email',
       formatter: (cell, row) => {return <a href={"mailto:" + cell}>{cell}</a>},

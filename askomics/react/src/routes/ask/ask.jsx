@@ -21,7 +21,7 @@ export default class Ask extends Component {
     let requestUrl = '/api/hello'
     axios.get(requestUrl)
     .then(response => {
-      console.log('Ask', requestUrl, response.data)
+      console.log(requestUrl, response.data)
       this.setState({
         'message': response.data.message
       })
