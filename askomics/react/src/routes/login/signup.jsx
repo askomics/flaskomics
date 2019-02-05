@@ -18,10 +18,28 @@ export default class Signup extends Component {
                   email: '',
                   password: '',
                   passwordconf:'',
+                  usernameFirstChar: '',
+                  usernameLastChars: '',
                   logged: false
     }
     this.handleChange = this.handleChange.bind(this)
+    this.handleChangeFname = this.handleChangeFname.bind(this)
+    this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+  handleChangeFname(event) {
+    this.setState({
+      username: event.target.value.charAt(0).toLowerCase(),
+      fname: event.target.value
+    })
+  }
+
+  handleChangeLname(event) {
+    this.setState({
+      username: this.state.fname.charAt(0).toLowerCase() + event.target.value.toLowerCase(),
+      lname: event.target.value
+    })
   }
 
   handleChange(event) {
@@ -104,11 +122,11 @@ export default class Signup extends Component {
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
                 <Label for="fname">First name</Label>
-                <Input type="text" name="fname" id="fname" placeholder="first name" value={this.state.fname} onChange={this.handleChange} />
+                <Input type="text" name="fname" id="fname" placeholder="first name" value={this.state.fname} onChange={this.handleChangeFname} />
               </FormGroup>
               <FormGroup>
                 <Label for="lname">Last name</Label>
-                <Input type="text" name="lname" id="lname" placeholder="last name" value={this.state.lname} onChange={this.handleChange} />
+                <Input type="text" name="lname" id="lname" placeholder="last name" value={this.state.lname} onChange={this.handleChangeLname} />
               </FormGroup>
               <FormGroup>
                 <Label for="email">Email</Label>

@@ -215,7 +215,7 @@ class LocalAuth(Params):
             os.makedirs(directory_path)
         except FileExistsError:
             self.log.debug("{} already exist").format(directory_path)
-        except PermissionError as:
+        except PermissionError:
             self.error = True
             self.error_message.append(
                 "Impossible to create directory {}, permission denied.").format(
