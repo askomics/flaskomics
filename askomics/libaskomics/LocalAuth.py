@@ -1,5 +1,6 @@
 """Contain the Database class
 """
+import os
 import random
 import hashlib
 from validate_email import validate_email
@@ -209,7 +210,7 @@ class LocalAuth(Params):
         self.create_directory(results_path)
 
 
-    def create_directory(directory_path):
+    def create_directory(self, directory_path):
 
         try:
             os.makedirs(directory_path)
