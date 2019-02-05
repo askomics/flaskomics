@@ -25,47 +25,41 @@ class LocalAuth(Params):
         inputs : dict
             User inputs
 
-        Returns
-        -------
-        dict
-            Errors of inputs
         """
-        error = False
-        error_messages = []
 
         if not inputs['fname']:
-            error = True
-            error_messages.append('First name empty')
+            self.error = True
+            self.error_message.append('First name empty')
 
         if not inputs['lname']:
-            error = True
-            error_messages.append('Last name empty')
+            self.error = True
+            self.error_message.append('Last name empty')
 
         if not inputs['username']:
-            error = True
-            error_messages.append('Username name empty')
+            self.error = True
+            self.error_message.append('Username name empty')
 
         if not validate_email(inputs['email']):
-            error = True
-            error_messages.append('Not a valid email')
+            self.error = True
+            self.error_message.append('Not a valid email')
 
         if not inputs['password']:
-            error = True
-            error_messages.append('Password empty')
+            self.error = True
+            self.error_message.append('Password empty')
 
         if inputs['password'] != inputs['passwordconf']:
-            error = True
-            error_messages.append("Passwords doesn't match")
+            self.error = True
+            self.error_message.append("Passwords doesn't match")
 
         if self.is_username_in_db(inputs['username']):
-            error = True
-            error_messages.append('Username already registered')
+            self.error = True
+            self.error_message.append('Username already registered')
 
         if self.is_email_in_db(inputs['email']):
-            error = True
-            error_messages.append('Email already registered')
+            self.error = True
+            self.error_message.append('Email already registered')
 
-        return error, error_messages
+
 
     def is_username_in_db(self, username):
         """
@@ -195,6 +189,37 @@ class LocalAuth(Params):
             'blocked': blocked,
             'apikey': api_key
         }
+
+
+    def create_user_directories(self, user_id, username):
+
+        userdir_path = "{}/{}_{}".format(
+            self.settings.get("askomics", "data_directory"),
+            user_id,
+            username
+        )
+
+        upload_path = "{}/{}".format(userdir_path, "upload")
+        ttl_path = "{}/{}".format(userdir_path, "ttl")
+        results_path = "{}/{}".format(userdir_path, "results")
+
+        self.create_directory(userdir_path)
+        self.create_directory(upload_path)
+        self.create_directory(ttl_path)
+        self.create_directory(results_path)
+
+
+    def create_directory(directory_path):
+
+        try:
+            os.makedirs(directory_path)
+        except FileExistsError:
+            self.log.debug("{} already exist").format(directory_path)
+        except PermissionError as:
+            self.error = True
+            self.error_message.append(
+                "Impossible to create directory {}, permission denied.").format(
+                    directory_path)
 
 
     def get_number_of_users(self):

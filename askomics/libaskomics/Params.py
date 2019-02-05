@@ -31,3 +31,14 @@ class Params(object):
         self.settings = app.iniconfig
         self.session = session
         self.app = app
+
+        self.error = False
+        self.error_message = []
+
+    def get_error(self):
+
+        return self.error
+
+    def get_error_message(self):
+
+        return self.error_message

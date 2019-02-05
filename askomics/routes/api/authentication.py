@@ -13,21 +13,24 @@ def signup():
     json
         Info about the user
     """
+
+    user = {}
+
     data = request.get_json()
 
     local_auth = LocalAuth(app, session)
-    error, messages = local_auth.check_inputs(data)
+    local_auth.check_inputs(data)
 
-    user = {}
-    if not error:
+    if not local_auth.get_error():
         user = local_auth.persist_user(data)
+        local_auth.create_user_directories(user['id'], user['username'])
         session['user'] = user
 
     return jsonify({
-        'error': error,
-        'errorMessage': messages,
+        'error': local_auth.get_error(),
+        'errorMessage': local_auth.get_error_message(),
         'user': user
-        })
+    })
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
