@@ -49,4 +49,5 @@ import askomics.routes.views.view
 import askomics.routes.api.api
 import askomics.routes.api.authentication
 import askomics.routes.api.admin
+import askomics.routes.api.file
 import askomics.routes.views.catch_url

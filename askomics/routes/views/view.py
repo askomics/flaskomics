@@ -12,5 +12,5 @@ def home():
     html
         Html code of AskOmics
     """
-    return render_template('index.html', project="AskOmics")
+    return render_template('index.html', project="FlAskOmics")
 

@@ -64,6 +64,7 @@ export default class Routes extends Component {
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/upload" exact component={() => (<Upload user={this.state.user} logged={this.state.logged} />)} />
           </Switch>
           <br />
           <br />

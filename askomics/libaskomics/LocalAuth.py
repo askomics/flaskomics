@@ -5,6 +5,7 @@ import random
 import hashlib
 from validate_email import validate_email
 
+from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
 
@@ -144,7 +145,7 @@ class LocalAuth(Params):
             admin = False
             blocked = self.settings.getboolean('askomics', 'default_locked_account')
 
-        api_key = self.get_random_string(20)
+        api_key = Utils.get_random_string(20)
 
         query = '''
         INSERT INTO users VALUES(
@@ -167,7 +168,7 @@ class LocalAuth(Params):
 
         if not ldap:
             # Create a salt
-            salt = self.get_random_string(20)
+            salt = Utils.get_random_string(20)
             # Concat askomics_salt + user_password + salt
             salted_pw = self.settings.get('askomics', 'password_salt') + inputs['password'] + salt
             # hash
@@ -349,8 +350,6 @@ class LocalAuth(Params):
         WHERE username=?
         '''.format(update_str)
 
-        self.log.debug(query)
-
         database.execute_sql_query(query, tuple(values) + (user['username'], ))
 
         user['fname'] = new_fname
@@ -388,7 +387,7 @@ class LocalAuth(Params):
             authentication = self.authenticate_user(credentials)
             if not authentication['error']:
                 # Update the password
-                salt = self.get_random_string(20)
+                salt = Utils.get_random_string(20)
                 salted_pw = self.settings.get('askomics', 'password_salt') + inputs['newPassword'] + salt
                 sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
 
@@ -427,7 +426,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         # get a new api key
-        new_apikey = self.get_random_string(20)
+        new_apikey = Utils.get_random_string(20)
 
         query = '''
         UPDATE users SET
@@ -455,7 +454,7 @@ class LocalAuth(Params):
         rows = database.execute_sql_query(query, (username, ))
 
         user = {}
-        user['id'] = rows[0][0],
+        user['id'] = rows[0][0]
         user['ldap'] = rows[0][1]
         user['fname'] = rows[0][2]
         user['lname'] = rows[0][3]
@@ -464,8 +463,6 @@ class LocalAuth(Params):
         user['admin'] = rows[0][9]
         user['blocked'] = rows[0][10]
         user['apikey'] = rows[0][8]
-
-        self.log.debug(user)
 
         return user
 
@@ -519,23 +516,3 @@ class LocalAuth(Params):
         '''
 
         database.execute_sql_query(query, (new_status, username))
-
-
-    @staticmethod
-    def get_random_string(number):
-        """return a random string of n character
-
-        Parameters
-        ----------
-        number : int
-            number of character of the random string
-
-        Returns
-        -------
-        str
-            a random string of n chars
-        """
-
-
-        alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        return ''.join(random.choice(alpabet) for i in range(number))

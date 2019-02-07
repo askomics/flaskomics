@@ -70,6 +70,7 @@ class Database(Params):
         self.create_integration_table()
         self.create_query_table()
         self.create_endpoints_table()
+        self.create_files_table()
 
     def create_user_table(self):
         """Create the user table
@@ -155,6 +156,22 @@ class Database(Params):
             auth text,
             enable boolean,
             message text
+        )
+        '''
+        self.execute_sql_query(query)
+
+    def create_files_table(self):
+        """Create the files table
+        """
+        query = '''
+        CREATE TABLE IF NOT EXISTS files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name text,
+            type text,
+            path text,
+            size int,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
         self.execute_sql_query(query)
