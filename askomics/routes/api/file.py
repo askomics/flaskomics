@@ -13,7 +13,7 @@ def get_files():
 
     return jsonify({'files': files})
 
-@app.route('/api/file/upload', methods=['POST'])
+@app.route('/api/files/upload', methods=['POST'])
 @login_required
 def upload():
 
@@ -24,3 +24,16 @@ def upload():
     uploaded_files = files.persist_files()
 
     return jsonify({'uploadedFiles': uploaded_files})
+
+@app.route('/api/files/delete', methods=['POST'])
+@login_required
+def delete_files():
+
+    data = request.get_json()
+
+    files = Files(app, session)
+    remaining_files = files.delete_files(data['filesIdToDelete'])
+
+    return jsonify({
+        'files': remaining_files
+    })

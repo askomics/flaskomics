@@ -27,7 +27,7 @@ export default class UploadForm extends Component {
 
     event.preventDefault()
 
-    let requestUrl = '/api/file/upload'
+    let requestUrl = '/api/files/upload'
     let data = new FormData()
 
     for (let i = this.state.new_files.length - 1; i >= 0; i--) {

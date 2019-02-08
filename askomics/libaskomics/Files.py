@@ -78,4 +78,42 @@ class Files(Params):
 
         return files
 
+    def delete_files(self, files_id):
 
+        for fid in files_id:
+            file_path = self.get_file_path(fid)
+            self.delete_file_from_fs(file_path)
+            self.delete_file_from_db(fid)
+
+        return self.get_files()
+
+
+    def delete_file_from_db(self, file_id):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        DELETE FROM files
+        WHERE id=? AND user_id=?
+        '''
+
+        database.execute_sql_query(query, (file_id, self.session['user']['id']))
+
+    def delete_file_from_fs(self, file_path):
+
+        os.remove(file_path)
+
+    def get_file_path(self, file_id):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT path
+        FROM files
+        WHERE id=?
+        '''
+
+        row = database.execute_sql_query(query, (file_id, ))
+
+
+        return row[0][0]

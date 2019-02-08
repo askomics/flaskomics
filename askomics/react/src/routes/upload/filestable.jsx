@@ -2,12 +2,13 @@ import React, { Component } from "react"
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-
 export default class FilesTable extends Component {
 
 
   constructor(props) {
     super(props)
+    this.handleSelection = this.handleSelection.bind(this)
+    this.handleSelectionAll = this.handleSelectionAll.bind(this)
   }
 
   humanFileSize(bytes, si) {
@@ -22,7 +23,32 @@ export default class FilesTable extends Component {
       ++u
     } while(Math.abs(bytes) >= thresh && u < units.length -1)
     return bytes.toFixed(1) + ' ' + units[u]
-}
+  }
+
+  handleSelection(row, isSelect) {
+    if (isSelect) {
+      this.props.setStateUpload(() => ({
+        selected: [...this.props.selected, row.id]
+      }))
+    } else {
+      this.props.setStateUpload(() => ({
+        selected: this.props.selected.filter(x => x !== row.id)
+      }))
+    }
+  }
+
+  handleSelectionAll(isSelect, rows) {
+    const ids = rows.map(r => r.id)
+    if (isSelect) {
+      this.props.setStateUpload(() => ({
+        selected: ids
+      }));
+    } else {
+      this.props.setStateUpload(() => ({
+        selected: []
+      }))
+    }
+  }
 
 
   render() {
@@ -47,8 +73,28 @@ export default class FilesTable extends Component {
       order: 'asc'
     }]
 
+    let selectRow = {
+      mode: 'checkbox',
+      selected: this.props.selected,
+      onSelect: this.handleSelection,
+      onSelectAll: this.handleSelectionAll
+    }
+
     return (
-      <BootstrapTable keyField='id' data={this.props.files} columns={columns} defaultSorted={defaultSorted} pagination={paginationFactory()} />
+      <div>
+        <BootstrapTable
+          selectRow={ { mode: 'checkbox' } }
+          tabIndexCell
+          bootstrap4
+          keyField='id'
+          data={this.props.files}
+          columns={columns}
+          defaultSorted={defaultSorted}
+          pagination={paginationFactory()}
+          noDataIndication="No file uploaded"
+          selectRow={ selectRow }
+        />
+      </div>
     )
   }
 }

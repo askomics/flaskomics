@@ -177,7 +177,7 @@ export default class Admin extends Component {
       <div className="container">
       <h2>Admin</h2>
       <hr />
-        <BootstrapTable keyField='id' data={this.state.users} columns={columns} defaultSorted={defaultSorted} pagination={paginationFactory()} />
+        <BootstrapTable bootstrap4 keyField='id' data={this.state.users} columns={columns} defaultSorted={defaultSorted} pagination={paginationFactory()} />
       </div>
     )
   }
