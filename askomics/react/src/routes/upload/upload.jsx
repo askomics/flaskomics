@@ -51,15 +51,17 @@ export default class Upload extends Component {
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
-        files: response.data.files
+        files: response.data.files,
+        selected: []
       })
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
       this.setState({
         error: true,
-        'errorMessage': error.response.data.errorMessage,
-        'status': error.response.status
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        selected: []
       })
     })
   }
