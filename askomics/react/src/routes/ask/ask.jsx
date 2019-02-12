@@ -14,12 +14,13 @@ export default class Ask extends Component {
       logged: props.logged,
       user: props.user
     }
+    this.cancelRequest
   }
 
   componentDidMount() {
 
     let requestUrl = '/api/hello'
-    axios.get(requestUrl)
+    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -34,6 +35,10 @@ export default class Ask extends Component {
         'status': error.response.status
       })
     })
+  }
+
+  componentWillUnmount() {
+    this.cancelRequest()
   }
 
   render() {
