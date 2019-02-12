@@ -9,6 +9,7 @@ export default class Ask extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      waiting: true,
       error: false,
       errorMessage: null,
       logged: props.logged,
@@ -24,15 +25,17 @@ export default class Ask extends Component {
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
-        'message': response.data.message
+        message: response.data.message,
+        waiting: false
       })
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
       this.setState({
-        'error': true,
-        'errorMessage': error.response.data.errorMessage,
-        'status': error.response.status
+        waiting: false,
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status
       })
     })
   }
@@ -59,11 +62,21 @@ export default class Ask extends Component {
       )
     }
 
+    let waitingDiv
+    if (this.state.waiting) {
+      waitingDiv = (
+        <div>
+          <i className="fas fa-spinner fa-spin"></i>
+        </div>
+      )
+    }
+
     return (
       <div className="container">
         {redirectLogin}
         <h2>Ask!</h2>
         <hr />
+        {waitingDiv}
         <p>{this.state.message}</p>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
