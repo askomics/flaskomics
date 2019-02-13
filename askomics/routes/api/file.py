@@ -50,11 +50,6 @@ def get_preview():
         app.logger.debug(file.preview)
         app.logger.debug(file.columns_type)
 
-
-
-
-
-
     return jsonify({})
 
 @app.route('/api/files/delete', methods=['POST'])
