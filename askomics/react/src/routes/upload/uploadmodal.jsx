@@ -24,9 +24,9 @@ export default class UploadModal extends Component {
 
       <div>
         <ButtonGroup>
-          <Button color="secondary" onClick={this.toggleModal}><i class="fas fa-upload"></i> Computer</Button>
-          <Button color="secondary"><i class="fas fa-upload"></i> URL</Button>
-          <Button color="secondary"><i class="fas fa-upload"></i> Galaxy</Button>
+          <Button color="secondary" onClick={this.toggleModal}><i className="fas fa-upload"></i> Computer</Button>
+          <Button color="secondary"><i className="fas fa-upload"></i> URL</Button>
+          <Button color="secondary"><i className="fas fa-upload"></i> Galaxy</Button>
         </ButtonGroup>
 
         <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
