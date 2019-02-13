@@ -54,17 +54,61 @@ class Files(Params):
 
         return self.get_files()
 
-    def get_files(self):
+
+    def get_files_with_path(self, files_id):
 
         database = Database(self.app, self.session)
 
+        subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
+
         query = '''
-        SELECT id, name, type, size
+        SELECT id, name, type, size, path
         FROM files
         WHERE user_id = ?
-        '''
+        AND {}
+        '''.format(subquery_str)
 
-        rows = database.execute_sql_query(query, (self.session['user']['id'], ))
+        rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_id))
+
+        files = []
+        for row in rows:
+            file = {
+                'id': row[0],
+                'name': row[1],
+                'type': row[2],
+                'size': row[3],
+                'path': row[4]
+            }
+            files.append(file)
+
+        return files
+
+
+    def get_files(self, files_id=None):
+
+        database = Database(self.app, self.session)
+
+        if files_id:
+            subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
+
+            query = '''
+            SELECT id, name, type, size
+            FROM files
+            WHERE user_id = ?
+            AND {}
+            '''.format(subquery_str)
+
+            rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_id))
+
+        else:
+
+            query = '''
+            SELECT id, name, type, size
+            FROM files
+            WHERE user_id = ?
+            '''
+
+            rows = database.execute_sql_query(query, (self.session['user']['id'], ))
 
         files = []
         for row in rows:
