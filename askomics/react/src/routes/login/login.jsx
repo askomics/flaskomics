@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
-import { Redirect} from 'react-router'
+import { Redirect} from 'react-router-dom'
 import { Link } from "react-router-dom";
 import ErrorDiv from "../error/error"
 

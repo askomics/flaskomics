@@ -1,11 +1,12 @@
 import React, { Component } from "react"
-import { Router, Route, Switch } from "react-router"
+import { Router, Route, Switch } from "react-router-dom"
 import createBrowserHistory from 'history/createBrowserHistory'
 import axios from 'axios'
 
 import Ask from './routes/ask/ask'
 import Jobs from './routes/jobs/jobs'
 import Upload from './routes/upload/upload'
+import Integration from './routes/integration/integration'
 import Datasets from './routes/datasets/datasets'
 import Signup from './routes/login/signup'
 import Login from './routes/login/login'
@@ -65,6 +66,7 @@ export default class Routes extends Component {
             <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/upload" exact component={() => (<Upload user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/integration" exact component={Integration} />
           </Switch>
           <br />
           <br />
