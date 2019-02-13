@@ -1,8 +1,9 @@
 import React, { Component } from "react"
 import axios from 'axios'
 import { Alert } from 'reactstrap';
-import { Redirect} from 'react-router'
+import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
+import WaitingDiv from "../../components/waiting"
 
 export default class Ask extends Component {
 
@@ -62,21 +63,12 @@ export default class Ask extends Component {
       )
     }
 
-    let waitingDiv
-    if (this.state.waiting) {
-      waitingDiv = (
-        <div>
-          <i className="fas fa-spinner fa-spin"></i>
-        </div>
-      )
-    }
-
     return (
       <div className="container">
         {redirectLogin}
         <h2>Ask!</h2>
         <hr />
-        {waitingDiv}
+        <WaitingDiv waiting={this.state.waiting} center />
         <p>{this.state.message}</p>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>

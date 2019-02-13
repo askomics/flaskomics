@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import WaitingDiv from "../../components/waiting"
 
 export default class FilesTable extends Component {
 
@@ -80,6 +81,11 @@ export default class FilesTable extends Component {
       onSelectAll: this.handleSelectionAll
     }
 
+    let noDataIndication = "No file uploaded"
+    if (this.props.waiting) {
+      noDataIndication = <WaitingDiv waiting={this.props.waiting} />
+    }
+
     return (
       <div>
         <BootstrapTable
@@ -91,7 +97,7 @@ export default class FilesTable extends Component {
           columns={columns}
           defaultSorted={defaultSorted}
           pagination={paginationFactory()}
-          noDataIndication="No file uploaded"
+          noDataIndication={noDataIndication}
           selectRow={ selectRow }
         />
       </div>
