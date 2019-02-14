@@ -24,3 +24,17 @@
   top:50%;
   left:50%; 
 }
+
+.preview-table {
+  width: auto;
+  white-space: nowrap;
+  table-layout: auto;
+}
+
+.preview-table-div {
+    width: auto;
+    display: block;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 350px;
+}

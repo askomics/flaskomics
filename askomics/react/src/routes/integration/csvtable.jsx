@@ -23,14 +23,16 @@ export default class CsvTable extends Component {
 
     return (
       <div>
-        <h3>{this.props.file.name}</h3>
-        <hr />
-        <BootstrapTable
-          bootstrap4
-          keyField='id'
-          data={this.props.file.preview}
-          columns={columns}
-        />
+        <h4>{this.props.file.name}</h4>
+        <div className="preview-table-div">
+          <BootstrapTable
+            wrapperClasses="preview-table"
+            bootstrap4
+            keyField='id'
+            data={this.props.file.preview}
+            columns={columns}
+          />
+        </div>
         <br />
       </div>
     )
