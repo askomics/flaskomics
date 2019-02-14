@@ -11,6 +11,20 @@ class CsvFile(File):
         self.preview = []
         self.columns_type = []
 
+    def set_preview(self):
+
+        self.set_preview_and_header()
+        self.set_columns_type()
+
+    def get_preview(self):
+
+        return {
+            'header': self.header,
+            'preview': self.preview,
+            'columns_type': self.columns_type,
+            'name': self.name,
+            'type': self.type
+        }
 
     def set_preview_and_header(self, preview_limit=30):
 
@@ -22,23 +36,25 @@ class CsvFile(File):
             self.header = [h.strip() for h in header]
 
             # Loop on lines 
-            data = [[] for x in range(len(header))]
+            preview = []
             for row in reader:
-                for i, val in enumerate(row):
-                    data[i].append(val)
+                res_row = {}
+                for i, cell in enumerate(row):
+                    res_row[self.header[i]] = cell
+                preview.append(res_row)
 
-                    # Stop after x lines
-                    if preview_limit:
-                        count += 1
-                        if count > preview_limit:
-                            break
+                # Stop after x lines
+                if preview_limit:
+                    count += 1
+                    if count > preview_limit:
+                        break
 
-        self.preview = data
+        self.preview = preview
 
     def set_columns_type(self):
 
         index = 0
-        for col in self.preview:
+        for col in self.transposed_preview:
             self.columns_type.append(self.guess_column_type(col, index))
             index += 1
 
@@ -98,7 +114,6 @@ class CsvFile(File):
 
         return "text" # default
 
- 
     @staticmethod
     def is_decimal(value):
 
@@ -112,6 +127,15 @@ class CsvFile(File):
                 return True
             except ValueError:
                 return False
+
+    @property
+    def transposed_preview(self):
+
+        data = [[] for x in range(len(self.header))]
+        for row in self.preview:
+            for key, value in row.items():
+                data[self.header.index(key)].append(value)
+        return data
 
 
     @cached_property

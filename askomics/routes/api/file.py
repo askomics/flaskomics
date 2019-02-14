@@ -43,14 +43,15 @@ def get_preview():
 
     files_handler = FilesHandler(app, session, files_infos)
 
+    results = []
     for file in files_handler.files:
-        file.set_preview_and_header()
-        file.set_columns_type()
-        app.logger.debug(file.header)
-        app.logger.debug(file.preview)
-        app.logger.debug(file.columns_type)
+        file.set_preview()
+        res = file.get_preview()
+        results.append(res)
 
-    return jsonify({})
+    return jsonify({
+        'previewFiles': results
+    })
 
 @app.route('/api/files/delete', methods=['POST'])
 @login_required

@@ -4,6 +4,7 @@ import { Alert, Input, Button, ButtonGroup } from 'reactstrap'
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
+import CsvTable from "./csvtable"
 
 export default class Upload extends Component {
 
@@ -15,8 +16,10 @@ export default class Upload extends Component {
       errorMessage: null,
       logged: this.props.location.state.logged,
       user: this.props.location.state.user,
-      filesId: this.props.location.state.filesId
+      filesId: this.props.location.state.filesId,
+      previewFiles: []
     }
+    this.cancelRequest
   }
 
   componentDidMount() {
@@ -29,7 +32,7 @@ export default class Upload extends Component {
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
-        files: response.data.files,
+        previewFiles: response.data.previewFiles,
         waiting: false
       })
     })
@@ -44,6 +47,9 @@ export default class Upload extends Component {
     })
   }
 
+  componentWillUnmount() {
+    this.cancelRequest()
+  }
 
   render() {
 
@@ -52,15 +58,17 @@ export default class Upload extends Component {
       redirectLogin = <Redirect to="/login" />
     }
 
-
     return (
       <div className="container">
         {redirectLogin}
         <h2>Integrate</h2>
         <hr />
 
-
-
+        {
+          this.state.previewFiles.map(file => {
+            return <CsvTable key={file.name} file={file} />
+          })
+        }
 
         <WaitingDiv waiting={this.state.waiting} center="center" />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
