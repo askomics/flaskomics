@@ -66,7 +66,7 @@ class CsvFile(File):
 
         # First col is entity start
         if header_index == 0:
-            return "entity_start"
+            return "start_entity"
 
         # if name contain @, this is a relation
         if self.header[header_index].find("@") > 0:
@@ -74,7 +74,7 @@ class CsvFile(File):
 
         special_types = {
             'organism': ('organism', 'taxon', 'species'),
-            'chromosom': ('chrom', ),
+            'chromosome': ('chrom', ),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
@@ -95,7 +95,7 @@ class CsvFile(File):
                     if stype == 'strand' and len(set(values)) != 2:
                         break
                     # Test if date respect a date format
-                    if stype == 'date' and not all(date_regex.match(val) for val in values):
+                    if stype == 'datetime' and not all(date_regex.match(val) for val in values):
                         break
                     return stype
 
