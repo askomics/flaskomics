@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, FormGroup, FormText, Label, Input, Button } from 'reactstrap'
+import { Form, FormGroup, FormText, Label, Input, Button, CustomInput } from 'reactstrap'
 import axios from 'axios'
 
 
@@ -9,7 +9,8 @@ export default class UploadForm extends Component {
 
     this.state = {
       files: [],
-      new_files: []
+      new_files: [],
+      label: "Browse files"
     }
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -18,8 +19,16 @@ export default class UploadForm extends Component {
 
 
   handleChange(event) {
+
+    let nselected = event.target.files.length
+    let label = nselected + " file selected"
+    if (nselected > 1) {
+      label = nselected + " files selected"
+    }
+
     this.setState({
-      new_files: event.target.files
+      new_files: event.target.files,
+      label: label
     })
   }
 
@@ -65,7 +74,7 @@ export default class UploadForm extends Component {
       <div>
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <Input type="file" name="file" id="files" onChange={this.handleChange} multiple/>
+            <CustomInput type="file" id="files" name="file" label={this.state.label} onChange={this.handleChange} multiple/>
             <FormText color="muted">
               <p>Supported files: CSV/TSV, GFF and TTL</p>
               <p>The maximum file size is 4GB</p>
