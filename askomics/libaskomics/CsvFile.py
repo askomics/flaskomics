@@ -23,7 +23,8 @@ class CsvFile(File):
             'preview': self.preview,
             'columns_type': self.columns_type,
             'name': self.name,
-            'type': self.type
+            'type': self.type,
+            'id': self.id
         }
 
     def set_preview_and_header(self, preview_limit=30):

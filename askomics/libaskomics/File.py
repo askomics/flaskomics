@@ -8,4 +8,5 @@ class File(Params):
         self.path = file_info['path']
         self.type = file_info['type']
         self.size = file_info['size']
+        self.id = file_info['id']
 

@@ -32,9 +32,13 @@
 }
 
 .preview-table-div {
-    width: auto;
-    display: block;
-    overflow-x: auto;
-    overflow-y: auto;
-    max-height: 350px;
+  width: auto;
+  display: block;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.center-div {
+  text-align: center;
 }

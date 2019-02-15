@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import BootstrapTable from 'react-bootstrap-table-next'
-import { CustomInput, Input, FormGroup } from 'reactstrap'
+import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 
 export default class CsvTable extends Component {
@@ -9,12 +9,14 @@ export default class CsvTable extends Component {
     super(props)
     this.state = {
       name: props.file.name,
+      id: props.file.id,
       header: props.file.header,
       types: props.file.columns_type,
       integrated: false
     }
     this.headerFormatter = this.headerFormatter.bind(this)
     this.handleChangeType = this.handleChangeType.bind(this)
+    this.integrate = this.integrate.bind(this)
   }
 
   handleChangeType(index, event) {
@@ -69,6 +71,12 @@ export default class CsvTable extends Component {
     )
   }
 
+  integrate(event) {
+    console.log('id', this.state.id)
+    console.log('types', this.state.types)
+    console.log('public', event.target.value == 'public' ? true : false)
+  }
+
 
   render() {
 
@@ -95,7 +103,13 @@ export default class CsvTable extends Component {
             columns={columns}
           />
         </div>
-        <br />
+        <br /><br />
+        <div className="center-div">
+          <ButtonGroup>
+            <Button onClick={this.integrate} public="private" color="secondary"><i className="fas fa-lock"></i> Integrate (private dataset)</Button>
+            <Button onClick={this.integrate} public="public" color="secondary"><i className="fas fa-globe-europe"></i> Integrate (public dataset)</Button>
+          </ButtonGroup>
+        </div>
       </div>
     )
   }
