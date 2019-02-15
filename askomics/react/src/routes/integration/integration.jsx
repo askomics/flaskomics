@@ -33,7 +33,9 @@ export default class Upload extends Component {
       console.log(requestUrl, response.data)
       this.setState({
         previewFiles: response.data.previewFiles,
-        waiting: false
+        waiting: false,
+        error: response.data.error,
+        errorMessage: response.data.errorMessage,
       })
     })
     .catch(error => {

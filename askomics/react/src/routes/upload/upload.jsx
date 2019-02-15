@@ -39,9 +39,9 @@ export default class Upload extends Component {
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
       this.setState({
-        'error': true,
-        'errorMessage': error.response.data.errorMessage,
-        'status': error.response.status,
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
         waiting: false
       })
     })
@@ -61,7 +61,9 @@ export default class Upload extends Component {
       console.log(requestUrl, response.data)
       this.setState({
         files: response.data.files,
-        selected: []
+        selected: [],
+        error: response.data.error,
+        errorMessage: response.data.errorMessage
       })
     })
     .catch(error => {

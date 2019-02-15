@@ -2,7 +2,6 @@
 """
 from flask import jsonify, session, request
 from askomics import app, login_required
-from askomics.libaskomics.Files import Files
 from askomics.libaskomics.FilesHandler import FilesHandler
 
 @app.route('/api/files', methods=['GET', 'POST'])
@@ -12,25 +11,43 @@ def get_files():
     files_id = None
     if request.method == 'POST':
         data = request.get_json()
-        app.logger.debug(data)
         files_id = data['filesId']
 
-    files_handler = Files(app, session)
-    files = files_handler.get_files(files_id=files_id)
+    try:
+        files_handler = FilesHandler(app, session)
+        files = files_handler.get_files_infos(files_id=files_id)
+    except Exception as e:
+        return jsonify({
+            'error': True,
+            'errorMessage': e
+        })
 
-    return jsonify({'files': files})
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
 
 @app.route('/api/files/upload', methods=['POST'])
 @login_required
 def upload():
 
-
     inputs = request.files
 
-    files = Files(app, session, new_files=inputs)
-    uploaded_files = files.persist_files()
+    try:
+        files = FilesHandler(app, session)
+        uploaded_files = files.persist_files(inputs)
+    except Exception as e:
+        return jsonify({
+            'error': True,
+            'errorMessage': e
+        })
 
-    return jsonify({'uploadedFiles': uploaded_files})
+    return jsonify({
+        'uploadedFiles': uploaded_files,
+        'error': False,
+        'errorMessage': ''
+    })
 
 @app.route('/api/files/preview', methods=['POST'])
 @login_required
@@ -38,19 +55,25 @@ def get_preview():
 
     data = request.get_json()
 
-    database_files = Files(app, session)
-    files_infos = database_files.get_files_with_path(data['filesId'])
+    try:
+        files_handler = FilesHandler(app, session)
+        files_handler.handle_files(data['filesId'])
 
-    files_handler = FilesHandler(app, session, files_infos)
-
-    results = []
-    for file in files_handler.files:
-        file.set_preview()
-        res = file.get_preview()
-        results.append(res)
+        results = []
+        for file in files_handler.files:
+            file.set_preview()
+            res = file.get_preview()
+            results.append(res)
+    except Exception as e:
+        return jsonify({
+            'error': True,
+            'errorMessage': e
+        })
 
     return jsonify({
         'previewFiles': results
+        'error': False,
+        'errorMessage': ''
     })
 
 @app.route('/api/files/delete', methods=['POST'])
@@ -59,9 +82,23 @@ def delete_files():
 
     data = request.get_json()
 
-    files = Files(app, session)
-    remaining_files = files.delete_files(data['filesIdToDelete'])
+    try:
+        files = Files(app, session)
+        remaining_files = files.delete_files(data['filesIdToDelete'])
+    except Exception as e:
+        return jsonify({
+            'error': True,
+            'errorMessage': e
+        })
 
     return jsonify({
         'files': remaining_files
+        'error': False,
+        'errorMessage': ''
     })
+
+@app.route('/api/files/integrate', methods=['POST'])
+@login_required
+def integrate():
+
+    data = request.get_json()
