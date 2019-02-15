@@ -17,9 +17,11 @@ def get_files():
         files_handler = FilesHandler(app, session)
         files = files_handler.get_files_infos(files_id=files_id)
     except Exception as e:
+        app.logger.error(str(e))
         return jsonify({
+            'files': [],
             'error': True,
-            'errorMessage': e
+            'errorMessage': str(e)
         })
 
     return jsonify({
@@ -38,9 +40,11 @@ def upload():
         files = FilesHandler(app, session)
         uploaded_files = files.persist_files(inputs)
     except Exception as e:
+        app.logger.error(str(e))
         return jsonify({
+            'uploadedFiles': [],
             'error': True,
-            'errorMessage': e
+            'errorMessage': str(e)
         })
 
     return jsonify({
@@ -65,13 +69,15 @@ def get_preview():
             res = file.get_preview()
             results.append(res)
     except Exception as e:
+        app.logger.error(str(e))
         return jsonify({
+            'previewFiles': [],
             'error': True,
-            'errorMessage': e
+            'errorMessage': str(e)
         })
 
     return jsonify({
-        'previewFiles': results
+        'previewFiles': results,
         'error': False,
         'errorMessage': ''
     })
@@ -83,16 +89,18 @@ def delete_files():
     data = request.get_json()
 
     try:
-        files = Files(app, session)
+        files = FilesHandler(app, session)
         remaining_files = files.delete_files(data['filesIdToDelete'])
     except Exception as e:
+        app.logger.error(str(e))
         return jsonify({
+            'files': [],
             'error': True,
-            'errorMessage': e
+            'errorMessage': str(e)
         })
 
     return jsonify({
-        'files': remaining_files
+        'files': remaining_files,
         'error': False,
         'errorMessage': ''
     })

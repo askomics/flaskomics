@@ -123,7 +123,7 @@ class FilesHandler(Params):
             self.delete_file_from_fs(file_path)
             self.delete_file_from_db(fid)
 
-        return self.get_files()
+        return self.get_files_infos()
 
     def delete_file_from_db(self, file_id):
 
