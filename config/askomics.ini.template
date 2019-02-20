@@ -3,6 +3,10 @@ debug = true
 secret_key = askomics_secret_key
 session_timeout = 60
 
+[celery]
+broker_url = redis://localhost:6379
+result_backend = redis://localhost:6379
+
 [askomics]
 # AskOmics configuration
 version = 19.01
@@ -15,3 +19,14 @@ database_path = /tmp/flaskomics/database.db
 # Authentication
 password_salt = 4sk0mIcs
 default_locked_account = true
+
+[triplestore]
+endpoint = http://localhost:8890/sparql
+updatepoint = http://localhost:8890/sparql
+# load_url = 
+upload_method = load
+
+default_graph = urn:sparql:askomics
+users_graph = urn:sparql:askomics:users
+prefix = http://www.semanticweb.org/user/ontologies/2018/1#
+namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#
