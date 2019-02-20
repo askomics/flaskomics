@@ -1,7 +1,11 @@
-from askomics.libaskomics.File import File
-from askomics.libaskomics.Utils import cached_property
 import csv
 import re
+import rdflib
+
+from urllib.parse import quote
+
+from askomics.libaskomics.File import File
+from askomics.libaskomics.Utils import cached_property
 
 class CsvFile(File):
 
@@ -10,6 +14,7 @@ class CsvFile(File):
         self.header = []
         self.preview = []
         self.columns_type = []
+        self.category_values = {}
 
     def set_preview(self):
 
@@ -19,13 +24,19 @@ class CsvFile(File):
     def get_preview(self):
 
         return {
-            'header': self.header,
-            'preview': self.preview,
-            'columns_type': self.columns_type,
-            'name': self.name,
             'type': self.type,
-            'id': self.id
+            'id': self.id,
+            'name': self.name,
+            'csv_data': {
+                'header': self.header,
+                'content_preview': self.preview,
+                'columns_type': self.columns_type
+            }
         }
+
+    def force_columns_type(self, forced_columns_type):
+
+        self.columns_type = forced_columns_type
 
     def set_preview_and_header(self, preview_limit=30):
 
@@ -151,3 +162,187 @@ class CsvFile(File):
             contents = tabfile.readline()
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
+
+
+    def integrate(self, forced_columns_type):
+
+        self.set_preview_and_header()
+        self.force_columns_type(forced_columns_type)
+        ttl = ''
+        for chunk in self.generate_rdf_content():
+            ttl += chunk.serialize(format='turtle').decode('utf-8')
+        ttl += self.get_rdf_abstraction().serialize(format='turtle').decode('utf-8')
+        ttl += self.get_rdf_domain_knowledge().serialize(format='turtle').decode('utf-8')
+
+        self.log.debug(ttl)
+
+    def get_rdf_domain_knowledge(self):
+
+        rdf_graph = rdflib.Graph()
+
+        for index, attribute in enumerate(self.header):
+
+            if self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
+                s = self.askomics_namespace["{}Category".format(quote(attribute))]
+                p = self.askomics_namespace["category"]
+                for value in self.category_values[self.header[index]]:
+                    o = self.askomics_namespace[quote(value)]
+                    rdf_graph.add((s, p, o))
+                    rdf_graph.add((o, rdflib.RDF.type, self.askomics_namespace["{}CategoryValue".format(quote(self.header[index]))]))
+                    rdf_graph.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
+
+        return rdf_graph
+
+    def get_rdf_abstraction(self):
+
+        rdf_graph = rdflib.Graph()
+
+        # Entity
+        entity = self.askomics_prefix[quote(self.header[0])]
+
+        rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
+        rdf_graph.add((entity, rdflib.RDF.type, self.askomics_namespace['entity']))
+        if self.columns_type[0] == 'start_entity':
+            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_namespace['startPoint']))
+
+        # Attributes and relations
+        for index, attribute_name in enumerate(self.header):
+
+            # Skip entity
+            if index == 0:
+                continue
+
+            # Relation
+            if self.columns_type[index] in ('general_relation', ):
+                splitted = split(attribute_name, '@')
+
+                attribute = self.askomics_namespace[quote(splitted[0])]
+                label = rdflib.Literal(splitted[0])
+                rdf_range = self.askomics_prefix[quote(splitted[1])]
+                rdf_type = rdflib.OWL.ObjectProperty
+
+            # Category
+            elif self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
+                attribute = self.askomics_namespace[quote(attribute_name)]
+                label = rdflib.Literal(attribute_name)
+                rdf_range = self.askomics_namespace["{}Category".format(quote(attribute_name))]
+                rdf_type = rdflib.OWL.DatatypeProperty
+
+            # Numeric
+            elif self.columns_type[index] in ('numeric', 'start', 'end'):
+                attribute = self.askomics_namespace[quote(attribute_name)]
+                label = rdflib.Literal(attribute_name)
+                rdf_range = rdflib.XSD.decimal
+                rdf_type = rdflib.OWL.DatatypeProperty
+
+            #TODO: datetime
+
+            # Text (default)
+            else:
+                attribute = self.askomics_namespace[quote(attribute_name)]
+                label = rdflib.Literal(attribute_name)
+                rdf_range = rdflib.XSD.string
+                rdf_type = rdflib.OWL.DatatypeProperty
+
+            rdf_graph.add((attribute, rdflib.RDF.type, rdf_type))
+            rdf_graph.add((attribute, rdflib.RDFS.label, label))                
+            rdf_graph.add((attribute, rdflib.RDFS.domain, entity))            
+            rdf_graph.add((attribute, rdflib.RDFS.range, rdf_range))
+
+        return rdf_graph
+
+
+    def generate_rdf_content(self):
+
+        rdf_graph = rdflib.Graph()
+
+        with open(self.path, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file, dialect=self.dialect)
+
+            # Skip header
+            next(reader)
+
+            # Entity
+            entity_type = self.askomics_prefix[quote(self.header[0])]
+
+            # Faldo?
+            is_faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
+
+
+            # Loop on lines
+            for row_number, row in enumerate(reader):
+
+                # skip blank lines
+                if not row:
+                    continue
+
+                # Entity
+                entity = self.askomics_prefix[quote(row[0])]
+                rdf_graph.add((entity, rdflib.RDF.type, entity_type))
+
+                # For attributes, loop on cell
+                for column_number, cell in enumerate(row):
+                    current_type = self.columns_type[column_number]
+                    current_header = self.header[column_number]
+
+                    # Skip entity and blank cells
+                    if column_number == 0 or not cell:
+                        continue
+
+                    # Relation
+                    if current_type == 'general_relation':
+                        splitted = current_header.split('@')
+                        relation = self.askomics_namespace[quote(splitted[0])]
+                        attribute = self.askomics_prefix[quote(cell)]
+
+                    # Category
+                    elif current_type in ('category', 'organism', 'chromosome', 'strand'):
+                        if current_header not in self.category_values.keys():
+                            # Add the category in dict, and the first value in a set
+                            self.category_values[current_header] = {cell, }
+                        else:
+                            # add the cell in the set
+                            self.category_values[current_header].add(cell)
+                        relation = self.askomics_namespace[quote(current_header)]
+                        attribute = rdflib.Literal(self.convert_type(cell))
+
+                    # Numeric
+                    elif current_type in ('numeric', 'start', 'end'):
+                        relation = self.askomics_namespace[quote(current_header)]
+                        attribute = rdflib.Literal(self.convert_type(cell))
+
+
+                    #TODO: datetime
+
+                    # default is text
+                    else:
+                        relation = self.askomics_namespace[quote(current_header)]
+                        attribute = rdflib.Literal(self.convert_type(cell))
+
+                    rdf_graph.add((entity, relation, attribute))
+
+                yield rdf_graph
+
+
+    def convert_type(self, value):
+        """Convert a value to a int or float or text
+
+        Parameters
+        ----------
+        value : string
+            The value to convert
+
+        Returns
+        -------
+        string/float/int
+            the converted value
+        """
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+
+        return value

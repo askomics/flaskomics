@@ -66,9 +66,13 @@ export default class Upload extends Component {
         <h2>Integrate</h2>
         <hr />
 
+
         {
           this.state.previewFiles.map(file => {
-            return <CsvTable key={file.name} file={file} />
+            console.log(file)
+            if (file.type == 'csv/tsv') {
+              return <CsvTable key={file.name} file={file} />
+            }
           })
         }
 

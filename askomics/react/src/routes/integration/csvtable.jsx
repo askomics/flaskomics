@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
@@ -10,18 +11,20 @@ export default class CsvTable extends Component {
     this.state = {
       name: props.file.name,
       id: props.file.id,
-      header: props.file.header,
-      types: props.file.columns_type,
+      header: props.file.csv_data.header,
+      columns_type: props.file.csv_data.columns_type,
       integrated: false
     }
+    this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
     this.handleChangeType = this.handleChangeType.bind(this)
     this.integrate = this.integrate.bind(this)
   }
 
   handleChangeType(index, event) {
+
     this.setState({
-      types: this.state.types.map((elem, i) => i == index ? event.target.value : elem)
+      columns_type: this.columns_type.types.map((elem, i) => i == index ? event.target.value : elem)
     })
   }
 
@@ -34,7 +37,7 @@ export default class CsvTable extends Component {
       <div>
         <FormGroup>
             <p>{this.state.header[colIndex]}</p>
-            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.types[colIndex]} onChange={boundChangeType}>
+            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
               <option value="start_entity" >Start entity</option>
               <option value="entity" >Entity</option>
             </CustomInput>
@@ -47,7 +50,7 @@ export default class CsvTable extends Component {
       <div>
         <FormGroup>
           <p>{this.state.header[colIndex]}</p>
-            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.types[colIndex]} onChange={boundChangeType}>
+            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
             <optgroup label="Attributes">
               <option value="numeric" >Numeric</option>
               <option value="text" >Text</option>
@@ -72,11 +75,34 @@ export default class CsvTable extends Component {
   }
 
   integrate(event) {
-    console.log('id', this.state.id)
-    console.log('types', this.state.types)
-    console.log('public', event.target.value == 'public' ? true : false)
-  }
 
+    let requestUrl = '/api/files/integrate'
+    let data = {
+      fileId: this.state.id,
+      columns_type: this.state.columns_type,
+      public: event.target.value == 'public' ? true : false,
+      type: 'csv'
+    }
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+      // this.setState({
+      //   files: response.data.files,
+      //   waiting: false
+      // })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+
+
+  }
 
   render() {
 
@@ -87,7 +113,7 @@ export default class CsvTable extends Component {
         sort: false,
         headerFormatter: this.headerFormatter,
         index: index,
-        selectedType: this.state.types[index]
+        selectedType: this.state.columns_type[index]
       })
     })
 
@@ -99,7 +125,7 @@ export default class CsvTable extends Component {
             wrapperClasses="preview-table"
             bootstrap4
             keyField={this.state.header[0]}
-            data={this.props.file.preview}
+            data={this.props.file.csv_data.content_preview}
             columns={columns}
           />
         </div>

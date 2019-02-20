@@ -12,6 +12,9 @@ class FilesHandler(Params):
         Params.__init__(self, app, session)
         self.files = []
 
+    def integrate_files(self, files_id=None):
+        pass
+
 
     def handle_files(self, files_id):
 

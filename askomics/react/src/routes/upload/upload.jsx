@@ -32,7 +32,7 @@ export default class Upload extends Component {
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
-        'files': response.data.files,
+        files: response.data.files,
         waiting: false
       })
     })

@@ -1,3 +1,4 @@
+from rdflib.namespace import Namespace
 from askomics.libaskomics.Params import Params
 
 class File(Params):
@@ -9,4 +10,7 @@ class File(Params):
         self.type = file_info['type']
         self.size = file_info['size']
         self.id = file_info['id']
+
+        self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
+        self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
 
