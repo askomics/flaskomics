@@ -21,10 +21,14 @@ password_salt = 4sk0mIcs
 default_locked_account = true
 
 [triplestore]
+virtuoso = true
 endpoint = http://localhost:8890/sparql
 updatepoint = http://localhost:8890/sparql
+username = dba
+password = dba
 # load_url = 
 upload_method = load
+chunk_size = 4000
 
 default_graph = urn:sparql:askomics
 users_graph = urn:sparql:askomics:users

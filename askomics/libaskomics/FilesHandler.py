@@ -7,10 +7,11 @@ from askomics.libaskomics.Database import Database
 
 class FilesHandler(Params):
 
-    def __init__(self, app, session):
+    def __init__(self, app, session, host_url=None):
         
         Params.__init__(self, app, session)
         self.files = []
+        self.host_url = host_url
 
     def integrate_files(self, files_id=None):
         pass
@@ -22,7 +23,7 @@ class FilesHandler(Params):
 
         for file in files_infos:
             if file['type'] == 'csv/tsv':
-                self.files.append(CsvFile(self.app, self.session, file))
+                self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url))
 
 
     def get_files_infos(self, files_id=None, return_path=False):

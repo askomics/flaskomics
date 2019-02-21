@@ -9,8 +9,8 @@ from askomics.libaskomics.Utils import cached_property
 
 class CsvFile(File):
 
-    def __init__(self, app, session, file_info):
-        File.__init__(self, app, session, file_info)
+    def __init__(self, app, session, file_info, host_url=None):
+        File.__init__(self, app, session, file_info, host_url)
         self.header = []
         self.preview = []
         self.columns_type = []
@@ -168,17 +168,12 @@ class CsvFile(File):
 
         self.set_preview_and_header()
         self.force_columns_type(forced_columns_type)
-        ttl = ''
-        for chunk in self.generate_rdf_content():
-            ttl += chunk.serialize(format='turtle').decode('utf-8')
-        ttl += self.get_rdf_abstraction().serialize(format='turtle').decode('utf-8')
-        ttl += self.get_rdf_domain_knowledge().serialize(format='turtle').decode('utf-8')
-
-        self.log.debug(ttl)
+        File.integrate(self)
 
     def get_rdf_domain_knowledge(self):
 
-        rdf_graph = rdflib.Graph()
+        rdf_graph = self.rdf_graph()
+
 
         for index, attribute in enumerate(self.header):
 
@@ -195,7 +190,7 @@ class CsvFile(File):
 
     def get_rdf_abstraction(self):
 
-        rdf_graph = rdflib.Graph()
+        rdf_graph = self.rdf_graph()
 
         # Entity
         entity = self.askomics_prefix[quote(self.header[0])]
@@ -245,8 +240,8 @@ class CsvFile(File):
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             rdf_graph.add((attribute, rdflib.RDF.type, rdf_type))
-            rdf_graph.add((attribute, rdflib.RDFS.label, label))                
-            rdf_graph.add((attribute, rdflib.RDFS.domain, entity))            
+            rdf_graph.add((attribute, rdflib.RDFS.label, label))
+            rdf_graph.add((attribute, rdflib.RDFS.domain, entity))
             rdf_graph.add((attribute, rdflib.RDFS.range, rdf_range))
 
         return rdf_graph
@@ -254,7 +249,6 @@ class CsvFile(File):
 
     def generate_rdf_content(self):
 
-        rdf_graph = rdflib.Graph()
 
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
@@ -271,6 +265,8 @@ class CsvFile(File):
 
             # Loop on lines
             for row_number, row in enumerate(reader):
+
+                rdf_graph = self.rdf_graph()
 
                 # skip blank lines
                 if not row:
