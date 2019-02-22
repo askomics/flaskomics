@@ -1,8 +1,9 @@
 """Api routes
 """
-from flask import jsonify, session, request
+from flask import jsonify, session, request, send_from_directory
 from askomics import app, login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.File import File
 
 @app.route('/api/files', methods=['GET', 'POST'])
 @login_required
@@ -110,3 +111,35 @@ def delete_files():
 def integrate():
 
     data = request.get_json()
+    app.logger.debug(data)
+
+    files_handler = FilesHandler(app, session, host_url=request.host_url)
+    files_handler.handle_files([data["fileId"], ])
+
+    for file in files_handler.files:
+        try:
+            file.integrate(data['columns_type'])
+        except Exception as e:
+            # Rollback
+            file.rollback()
+            return jsonify({
+                'error': True,
+                'errorMessage': str(e)
+            })
+
+    return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@app.route('/files/ttl/<path:user_id>/<path:username>/<path:path>')
+def serve_file(path, user_id, username):
+
+    dir_path = "{}/{}_{}/ttl".format(
+        app.iniconfig.get('askomics', 'data_directory'),
+        user_id,
+        username
+    )
+
+    return(send_from_directory(dir_path, path))
