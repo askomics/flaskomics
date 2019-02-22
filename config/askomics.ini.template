@@ -17,21 +17,32 @@ data_directory = /tmp/flaskomics
 database_path = /tmp/flaskomics/database.db
 
 # Authentication
+
+# Salt for user password. Use a random string
 password_salt = 4sk0mIcs
+# If true, accout are locked at creation
 default_locked_account = true
 
 [triplestore]
+# name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
+# Sparql endpoint
 endpoint = http://localhost:8890/sparql
+# Sparql updatepoint
 updatepoint = http://localhost:8890/sparql
+# If triplestore is fuseki, set the upload url
 # fuseki_upload_url = http://localhost:3030/database/upload
+# Triplestore credentials
 username = dba
 password = dba
+# If the triplesotre and askomics are on different network, the loadurl is askomics url accessible by the triplesotre
 # load_url = 
 upload_method = load
 chunk_size = 4000
-
+# Default askomics graph
 default_graph = urn:sparql:askomics
+# User graph
 users_graph = urn:sparql:askomics:users
+# Askomics rdf prefix and namespace
 prefix = http://www.semanticweb.org/user/ontologies/2018/1#
 namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#
