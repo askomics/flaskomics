@@ -104,15 +104,15 @@ class SparqlQuery(Params):
         query = '''
         DELETE WHERE {{
             GRAPH <{}> {{
-                <{}>, ?p, ?o
+                <{}> ?p ?o
             }}
         }}
-        '''.format(graph)
+        '''.format(graph, graph)
         self.execute_query(query)
 
         # Drop graph
         query = '''
-        DROP SILENT GRAPH <>
+        DROP SILENT GRAPH <{}>
         '''.format(graph)
         self.execute_query(query)
 
