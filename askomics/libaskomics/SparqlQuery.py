@@ -98,6 +98,24 @@ class SparqlQuery(Params):
 
         return self.execute_query(query)
 
+    def drop_dataset(self, graph):
+        
+        # Remove metadata
+        query = '''
+        DELETE WHERE {{
+            GRAPH <{}> {{
+                <{}>, ?p, ?o
+            }}
+        }}
+        '''.format(graph)
+        self.execute_query(query)
+
+        # Drop graph
+        query = '''
+        DROP SILENT GRAPH <>
+        '''.format(graph)
+        self.execute_query(query)
+
 
     def process_query(self, query):
         """Execute a query and return parsed results

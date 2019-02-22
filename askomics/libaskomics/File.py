@@ -103,7 +103,10 @@ class File(Params):
         # Remove tmp file
         os.remove(temp_file_path)
 
+    def rollback(self):
 
+        sparql = SparqlQuery(self.app, self.session)
+        sparql.drop_dataset(self.file_graph)
 
     def integrate(self):
 
