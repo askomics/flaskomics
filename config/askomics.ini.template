@@ -21,9 +21,10 @@ password_salt = 4sk0mIcs
 default_locked_account = true
 
 [triplestore]
-virtuoso = true
+triplestore = virtuoso
 endpoint = http://localhost:8890/sparql
 updatepoint = http://localhost:8890/sparql
+# fuseki_upload_url = http://localhost:3030/database/upload
 username = dba
 password = dba
 # load_url = 

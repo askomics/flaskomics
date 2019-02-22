@@ -6,3 +6,4 @@ python-magic
 celery
 rdflib
 SPARQLWrapper
+requests
