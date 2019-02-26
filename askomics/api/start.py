@@ -1,4 +1,5 @@
 from flask import (Blueprint, current_app, jsonify, request, session)
+from pkg_resources import get_distribution
 
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.LocalAuth import LocalAuth
@@ -42,7 +43,7 @@ def start():
     json = {
         "user": None,
         "logged": False,
-        "version": current_app.iniconfig.get('askomics', 'version'),
+        "version": get_distribution('askomics').version,
         "footer_message": current_app.iniconfig.get('askomics', 'footer_message')
     }
 

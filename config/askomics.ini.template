@@ -9,7 +9,6 @@ result_backend = redis://localhost:6379
 
 [askomics]
 # AskOmics configuration
-version = 19.01
 footer_message = Welcome to AskOmics!
 
 # data directory
