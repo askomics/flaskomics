@@ -71,6 +71,7 @@ class Database(Params):
         self.create_query_table()
         self.create_endpoints_table()
         self.create_files_table()
+        self.create_datasets_table()
 
     def create_user_table(self):
         """Create the user table
@@ -102,6 +103,27 @@ class Database(Params):
             url text,
             apikey text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+        '''
+        self.execute_sql_query(query)
+
+    def create_datasets_table(self):
+        """Create the datasets table
+        """
+        query = '''
+        CREATE TABLE IF NOT EXISTS datasets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            celery_id INTEGER,
+            file_id INTEGER,
+            name text,
+            status text,
+            start int,
+            end int,
+            ntriples int,
+            error_message text,
+            FOREIGN KEY(user_id) REFERENCES users(user_id),
+            FOREIGN KEY(file_id) REFERENCES files(id)
         )
         '''
         self.execute_sql_query(query)
