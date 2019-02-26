@@ -74,6 +74,8 @@ if [[ ! -f $config_path ]]; then
     cp $config_template_path $config_path
 fi
 
+trap 'kill 0' INT
+
 # Run
 echo "Building JS ..."
 npm run $npm_depmode &

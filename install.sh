@@ -22,6 +22,8 @@ else
     source ${dir_venv}/bin/activate
 fi
 
+trap 'kill 0' INT
+
 # install python dependancies inside the virtual environment
 echo "Installing Python dependancies inside the virtual environment ..."
 pip install -e . &
