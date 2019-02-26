@@ -1,11 +1,12 @@
-"""Api routes
-"""
-from flask import jsonify, session
-from askomics import app, login_required
+from flask import (Blueprint, current_app, jsonify, request, session)
+
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-@app.route('/api/hello', methods=['GET'])
+
+start_bp = Blueprint('start', __name__, url_prefix='/')
+
+@start_bp.route('/api/hello', methods=['GET'])
 def hello():
     """Dummy routes
 
@@ -17,15 +18,15 @@ def hello():
     if 'user' in session:
         data = {
             'message':
-            'Hello {} {}, welcome to FlaskOmics!'.format(session['user']['fname'],
+            'Hello {} {}, welcome to AskOmics!'.format(session['user']['fname'],
                                                          session['user']['lname'])
         }
     else:
-        data = {'message': 'Welcome to FlaskOmics!'}
+        data = {'message': 'Welcome to AskOmics!'}
 
     return jsonify(data)
 
-@app.route('/api/start', methods=['GET'])
+@start_bp.route('/api/start', methods=['GET'])
 def start():
     """Starting route
 
@@ -35,18 +36,18 @@ def start():
         Information about a eventualy logged user, and the AskOmics version
         and a footer message
     """
-    starter = Start(app, session)
+    starter = Start(current_app, session)
     starter.start()
 
     json = {
         "user": None,
         "logged": False,
-        "version": app.iniconfig.get('askomics', 'version'),
-        "footer_message": app.iniconfig.get('askomics', 'footer_message')
+        "version": current_app.iniconfig.get('askomics', 'version'),
+        "footer_message": current_app.iniconfig.get('askomics', 'footer_message')
     }
 
     if 'user' in session:
-        local_auth = LocalAuth(app, session)
+        local_auth = LocalAuth(current_app, session)
         user = local_auth.get_user(session['user']['username'])
         session['user'] = user
         json['user'] = user

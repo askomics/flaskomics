@@ -1,9 +1,10 @@
 """Catch_all route
 """
-from flask import redirect, url_for
-from askomics import app
+from flask import Blueprint, redirect, url_for
 
-@app.route('/<path:path>')
+catch_url_bp = Blueprint('catch_url', __name__, url_prefix='/')
+
+@catch_url_bp.route('/<path:path>')
 def catch_all(path):
     """Return all routes to home
 
@@ -19,4 +20,4 @@ def catch_all(path):
     """
 
 
-    return redirect(url_for('home'))
+    return redirect('/')

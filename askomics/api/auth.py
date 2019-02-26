@@ -1,10 +1,41 @@
 """Authentication routes
 """
-from flask import jsonify, request, session
-from askomics import app, login_required, admin_required
+from functools import wraps
+from flask import (Blueprint, current_app, jsonify, request, session)
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-@app.route('/api/auth/signup', methods=['POST'])
+auth_bp = Blueprint('auth', __name__, url_prefix='/')
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Login required decorator
+        """
+
+        if 'user' in session:
+            if not session['user']['blocked']:
+                return f(*args, **kwargs)
+            return jsonify({"error": True, "errorMessage": "Blocked account"})
+        return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Login required decorator
+        """
+
+        if 'user' in session:
+            if session['user']['admin']:
+                return f(*args, **kwargs)
+            return jsonify({"error": True, "errorMessage": "Admin required"})
+        return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+    return decorated_function
+
+
+@auth_bp.route('/api/auth/signup', methods=['POST'])
 def signup():
     """Register a new user
 
@@ -18,7 +49,7 @@ def signup():
 
     data = request.get_json()
 
-    local_auth = LocalAuth(app, session)
+    local_auth = LocalAuth(current_app, session)
     local_auth.check_inputs(data)
 
     if not local_auth.get_error():
@@ -32,7 +63,7 @@ def signup():
         'user': user
     })
 
-@app.route('/api/auth/login', methods=['POST'])
+@auth_bp.route('/api/auth/login', methods=['POST'])
 def login():
     """Log a user
 
@@ -43,7 +74,7 @@ def login():
     """
     data = request.get_json()
 
-    local_auth = LocalAuth(app, session)
+    local_auth = LocalAuth(current_app, session)
     authentication = local_auth.authenticate_user(data)
 
     if not authentication['error']:
@@ -55,7 +86,7 @@ def login():
         'user': authentication['user']
         })
 
-@app.route('/api/auth/profile', methods=['POST'])
+@auth_bp.route('/api/auth/profile', methods=['POST'])
 @login_required
 def update_profile():
     """Update user profile (names and email)
@@ -67,7 +98,7 @@ def update_profile():
     """
     data = request.get_json()
 
-    local_auth = LocalAuth(app, session)
+    local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_profile(data, session['user'])
 
     session['user'] = updated_user['user']
@@ -78,7 +109,7 @@ def update_profile():
         'user': updated_user['user']
         })
 
-@app.route('/api/auth/password', methods=['POST'])
+@auth_bp.route('/api/auth/password', methods=['POST'])
 @login_required
 def update_password():
     """Update the user passord
@@ -90,7 +121,7 @@ def update_password():
     """
     data = request.get_json()
 
-    local_auth = LocalAuth(app, session)
+    local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_password(data, session['user'])
 
 
@@ -100,7 +131,7 @@ def update_password():
         'user': updated_user['user']
         })
 
-@app.route('/api/auth/apikey', methods=['GET'])
+@auth_bp.route('/api/auth/apikey', methods=['GET'])
 @login_required
 def update_apikey():
     """Update the user apikey
@@ -110,7 +141,7 @@ def update_apikey():
     json
         The user with his new apikey
     """
-    local_auth = LocalAuth(app, session)
+    local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_apikey(session['user'])
 
     session['user'] = updated_user['user']
@@ -122,7 +153,7 @@ def update_apikey():
         })
 
 
-@app.route('/api/auth/logout', methods=['GET'])
+@auth_bp.route('/api/auth/logout', methods=['GET'])
 def logout():
     """Logout the current user
 
@@ -134,5 +165,5 @@ def logout():
     session.pop('user', None)
 
 
-    app.logger.debug(session)
+    current_app.logger.debug(session)
     return jsonify({'user': {}, 'logged': False})

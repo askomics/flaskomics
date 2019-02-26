@@ -30,7 +30,7 @@ case $depmode in
     prod|production|"")
         flask_depmod="production"
         npm_depmode="prod"
-        flask_command="gunicorn -b localhost:5000 askomics:app"
+        flask_command="gunicorn -b localhost:5000 app"
     ;;
     dev|development)
         flask_depmod="development"
@@ -45,7 +45,7 @@ esac
 
 # Exports
 export FLASK_ENV=$flask_depmod
-export FLASK_APP=$dir_askomics/askomics
+export FLASK_APP="app"
 
 echo "Removing python cache ..."
 find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
@@ -77,5 +77,10 @@ fi
 # Run
 echo "Building JS ..."
 npm run $npm_depmode &
+echo "Starting celery ..."
+celery -A askomics.tasks.celery worker -l info &
+
 echo "Starting server ..."
-$flask_command
+$flask_command &
+
+wait

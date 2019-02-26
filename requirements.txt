@@ -3,7 +3,8 @@ Flask-ini
 validate_email
 gunicorn
 python-magic
-celery
 rdflib
 SPARQLWrapper
 requests
+celery
+redis

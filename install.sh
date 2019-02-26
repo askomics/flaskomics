@@ -24,10 +24,12 @@ fi
 
 # install python dependancies inside the virtual environment
 echo "Installing Python dependancies inside the virtual environment ..."
-pip install -e .
+pip install -e . &
 
 # Install npm dependancies in node_modules
 echo "Installing npm dependancies inside node_modules ..."
-npm install
+npm install &
+
+wait
 
 echo "Installation done!"
