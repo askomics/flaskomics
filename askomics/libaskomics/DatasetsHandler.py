@@ -35,7 +35,7 @@ class DatasetsHandler(Params):
             dataset = {
                 'id': row[0],
                 'name': row[1],
-                'public': row[2],
+                'public': True if int(row[2] == 1) else False,
                 'status': row[3],
                 'start': row[4],
                 'end': row[5],

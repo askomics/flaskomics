@@ -76,9 +76,9 @@ export default class DatasetsTable extends Component {
       sort: true,
       formatter: (cell, row) => {
         if (cell) {
-          return <p className="text-primary"><i className="fas fa-lock"></i> Private</p>
-        }else{
           return <p className="text-info"><i className="fas fa-globe-europe"></i> Public</p>
+        }else{
+          return <p className="text-primary"><i className="fas fa-lock"></i> Private</p>
         }
       }
     }, {
