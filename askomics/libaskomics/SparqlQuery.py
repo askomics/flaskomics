@@ -118,7 +118,7 @@ class SparqlQuery(Params):
         """
         try:
             load_url = self.settings.get('askomics', 'load_url')
-        except Exception as e:
+        except Exception:
             load_url = host_url
 
         file_url = '{}files/ttl/{}/{}/{}'.format(
@@ -177,7 +177,7 @@ class SparqlQuery(Params):
         '''.format(graph, triples)
 
         with open('/home/xgarnier/Desktop/query.sparql', 'w') as f:
-            f.write(query) 
+            f.write(query)
 
         return self.execute_query(query)
 
@@ -271,5 +271,5 @@ class SparqlQuery(Params):
             return [{
                 sparql_variable: entry[sparql_variable]["value"] for sparql_variable in entry.keys()
             } for entry in json_results["results"]["bindings"]]
-        except Exception as e:
+        except Exception:
             return []

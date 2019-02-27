@@ -9,7 +9,6 @@ from askomics.libaskomics.Utils import Utils
 from pkg_resources import get_distribution
 
 import rdflib
-
 from rdflib.namespace import Namespace
 
 

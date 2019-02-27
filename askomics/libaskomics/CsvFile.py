@@ -1,6 +1,5 @@
 import csv
 import re
-
 from urllib.parse import quote
 
 from askomics.libaskomics.File import File

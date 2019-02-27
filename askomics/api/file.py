@@ -166,11 +166,11 @@ def integrate():
         # task = async_integrate.delay(data, request.host_url)
         current_app.logger.debug(task)
     except Exception as e:
-            return jsonify({
-                'error': True,
-                'errorMessage': str(e),
-                'task_id': None
-            }), 500
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e),
+            'task_id': None
+        }), 500
 
     return jsonify({
         'error': False,
