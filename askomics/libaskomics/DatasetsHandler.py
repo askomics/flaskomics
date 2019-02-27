@@ -84,6 +84,5 @@ class DatasetsHandler(Params):
         for dataset in self.datasets:
             # Delete from triplestore
             sparql.drop_dataset(dataset.graph_name)
-
-        # Delete from database
-        self.delete_datasets_in_db()
+            # Delete from db
+            dataset.delete_from_db()

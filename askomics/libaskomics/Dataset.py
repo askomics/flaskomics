@@ -76,7 +76,19 @@ class Dataset(Params):
         end=strftime('%s', 'now'),
         ntriples=?,
         error_message=?
-        WHERE id=?
+        WHERE user_id = ? AND id=?
         '''
 
-        database.execute_sql_query(query, (status, 0, message, self.id))
+        database.execute_sql_query(query, (status, 0, message, self.session['user']['id'], self.id))
+
+    def delete_from_db(self):
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        DELETE FROM datasets
+        WHERE user_id = ?
+        AND id = ?
+        '''
+
+        database.execute_sql_query(query, (self.session['user']['id'], self.id))

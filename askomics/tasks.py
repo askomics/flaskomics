@@ -15,8 +15,6 @@ def integrate(self, session, data, host_url):
     files_handler = FilesHandler(app, session, host_url=host_url)
     files_handler.handle_files([data["fileId"], ])
 
-    app.logger.debug(data)
-
     for file in files_handler.files:
 
         try:
