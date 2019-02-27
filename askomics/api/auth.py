@@ -1,10 +1,14 @@
 """Authentication routes
 """
+
 from functools import wraps
-from flask import (Blueprint, current_app, jsonify, request, session)
+
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/')
+from flask import (Blueprint, current_app, jsonify, request, session)
+
+auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
+
 
 def login_required(f):
     @wraps(f)
@@ -19,6 +23,7 @@ def login_required(f):
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
+
 
 def admin_required(f):
     @wraps(f)
@@ -35,7 +40,7 @@ def admin_required(f):
     return decorated_function
 
 
-@auth_bp.route('/api/auth/signup', methods=['POST'])
+@auth_bp.route('/signup', methods=['POST'])
 def signup():
     """Register a new user
 
@@ -63,7 +68,8 @@ def signup():
         'user': user
     })
 
-@auth_bp.route('/api/auth/login', methods=['POST'])
+
+@auth_bp.route('/login', methods=['POST'])
 def login():
     """Log a user
 
@@ -84,9 +90,10 @@ def login():
         'error': authentication['error'],
         'errorMessage': authentication['error_messages'],
         'user': authentication['user']
-        })
+    })
 
-@auth_bp.route('/api/auth/profile', methods=['POST'])
+
+@auth_bp.route('/profile', methods=['POST'])
 @login_required
 def update_profile():
     """Update user profile (names and email)
@@ -107,9 +114,10 @@ def update_profile():
         'error': updated_user['error'],
         'errorMessage': updated_user['error_message'],
         'user': updated_user['user']
-        })
+    })
 
-@auth_bp.route('/api/auth/password', methods=['POST'])
+
+@auth_bp.route('/password', methods=['POST'])
 @login_required
 def update_password():
     """Update the user passord
@@ -124,14 +132,14 @@ def update_password():
     local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_password(data, session['user'])
 
-
     return jsonify({
         'error': updated_user['error'],
         'errorMessage': updated_user['error_message'],
         'user': updated_user['user']
-        })
+    })
 
-@auth_bp.route('/api/auth/apikey', methods=['GET'])
+
+@auth_bp.route('/apikey', methods=['GET'])
 @login_required
 def update_apikey():
     """Update the user apikey
@@ -150,10 +158,10 @@ def update_apikey():
         'error': updated_user['error'],
         'errorMessage': updated_user['error_message'],
         'user': updated_user['user']
-        })
+    })
 
 
-@auth_bp.route('/api/auth/logout', methods=['GET'])
+@auth_bp.route('/logout', methods=['GET'])
 def logout():
     """Logout the current user
 
@@ -163,7 +171,6 @@ def logout():
         no username and logged false
     """
     session.pop('user', None)
-
 
     current_app.logger.debug(session)
     return jsonify({'user': {}, 'logged': False})

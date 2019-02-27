@@ -1,12 +1,14 @@
 """Admin routes
 """
-from flask import (Blueprint, current_app, jsonify, request, session)
-from askomics.api.auth import login_required, admin_required
+from askomics.api.auth import admin_required
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/')
+from flask import (Blueprint, current_app, jsonify, request, session)
 
-@admin_bp.route('/api/admin/getusers', methods=['GET'])
+admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
+
+
+@admin_bp.route('/getusers', methods=['GET'])
 @admin_required
 def get_users():
     """Get all users
@@ -14,15 +16,32 @@ def get_users():
     Returns
     -------
     json
-        all users infos
+        users: list of all users info
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
     """
-    local_auth = LocalAuth(current_app, session)
-    all_users = local_auth.get_all_users()
+
+    try:
+        local_auth = LocalAuth(current_app, session)
+        all_users = local_auth.get_all_users()
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'users': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'users': all_users,
+        'error': False,
+        'errorMessage': ''
+    })
 
     return jsonify({'users': all_users})
 
-    
-@admin_bp.route('/api/admin/setadmin', methods=['POST'])
+
+@admin_bp.route('/setadmin', methods=['POST'])
 @admin_required
 def set_admin():
     """change admin status of a user
@@ -30,19 +49,28 @@ def set_admin():
     Returns
     -------
     json
-        Description
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
 
-    local_auth = LocalAuth(current_app, session)
-    local_auth.set_admin(data['newAdmin'], data['username'])
+    try:
+        local_auth = LocalAuth(current_app, session)
+        local_auth.set_admin(data['newAdmin'], data['username'])
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': ''
     })
 
-@admin_bp.route('/api/admin/setblocked', methods=['POST'])
+
+@admin_bp.route('/setblocked', methods=['POST'])
 @admin_required
 def set_blocked():
     """Change blocked status of a user
@@ -50,12 +78,20 @@ def set_blocked():
     Returns
     -------
     json
-        Description
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
 
-    local_auth = LocalAuth(current_app, session)
-    local_auth.set_blocked(data['newBlocked'], data['username'])
+    try:
+        local_auth = LocalAuth(current_app, session)
+        local_auth.set_blocked(data['newBlocked'], data['username'])
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
 
     return jsonify({
         'error': False,

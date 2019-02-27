@@ -1,16 +1,25 @@
 """Api routes
 """
-from flask import (Blueprint, current_app, jsonify, session, request, send_from_directory)
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
-from askomics.libaskomics.File import File
 
-file_bp = Blueprint('file', __name__, url_prefix='/')
+from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
 
-@file_bp.route('/api/files', methods=['GET', 'POST'])
+file_bp = Blueprint('file', __name__, url_prefix='/api/files')
+
+
+@file_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def get_files():
+    """Get files info of the logged user
 
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     files_id = None
     if request.method == 'POST':
         data = request.get_json()
@@ -33,10 +42,19 @@ def get_files():
         'errorMessage': ''
     })
 
-@file_bp.route('/api/files/upload', methods=['POST'])
+
+@file_bp.route('/upload', methods=['POST'])
 @login_required
 def upload():
+    """Upload files
 
+    Returns
+    -------
+    json
+        uploadedFiles: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     inputs = request.files
 
     try:
@@ -56,10 +74,19 @@ def upload():
         'errorMessage': ''
     })
 
-@file_bp.route('/api/files/preview', methods=['POST'])
+
+@file_bp.route('/preview', methods=['POST'])
 @login_required
 def get_preview():
+    """Get files preview
 
+    Returns
+    -------
+    json
+        previewFiles: preview of selected files
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
 
     try:
@@ -85,10 +112,19 @@ def get_preview():
         'errorMessage': ''
     })
 
-@file_bp.route('/api/files/delete', methods=['POST'])
+
+@file_bp.route('/delete', methods=['POST'])
 @login_required
 def delete_files():
+    """Delete files
 
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
 
     try:
@@ -108,10 +144,19 @@ def delete_files():
         'errorMessage': ''
     })
 
-@file_bp.route('/api/files/integrate', methods=['POST'])
+
+@file_bp.route('/integrate', methods=['POST'])
 @login_required
 def integrate():
+    """Integrate a file
 
+    Returns
+    -------
+    json
+        task_id: celery task id
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
 
     session_dict = {'user': session['user']}
@@ -136,7 +181,22 @@ def integrate():
 
 @file_bp.route('/files/ttl/<path:user_id>/<path:username>/<path:path>')
 def serve_file(path, user_id, username):
+    """Serve a static ttl file of a user
 
+    Parameters
+    ----------
+    path : string
+        The file path to serve
+    user_id : int
+        user id
+    username : string
+        username
+
+    Returns
+    -------
+    file
+        the file
+    """
     dir_path = "{}/{}_{}/ttl".format(
         current_app.iniconfig.get('askomics', 'data_directory'),
         user_id,
@@ -144,36 +204,3 @@ def serve_file(path, user_id, username):
     )
 
     return(send_from_directory(dir_path, path))
-
-# @celery.task()
-# def async_integrate(data, host_url):
-
-#     # import time
-#     # with open('/home/xgarnier/Desktop/coucou.txt', 'w') as file:
-#     #     file.write(str(time.time()))
-
-
-#     files_handler = FilesHandler(app, session, host_url=host_url)
-#     files_handler.handle_files([data["fileId"], ])
-
-#     for file in files_handler.files:
-
-#         try:
-#             file.integrate(data['columns_type'])
-#         except Exception as e:
-#             app.logger.error(str(e))
-#             # Rollback
-#             file.rollback()
-#             return 'error'
-#             # return jsonify({
-#             #     'error': True,
-#             #     'errorMessage': str(e)
-#             # }), 500
-
-#     app.logger.debug('DONE')
-#     return 'DONE'
-
-#     # return jsonify({
-#     #     'error': False,
-#     #     'errorMessage': ''
-#     # })

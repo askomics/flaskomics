@@ -1,17 +1,27 @@
 """Api routes
 """
-from flask import (Blueprint, current_app, jsonify, session, request)
-from askomics.api.auth import login_required
 
+from askomics.api.auth import login_required
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 
-datasets_bp = Blueprint('datasets', __name__, url_prefix='/')
+from flask import (Blueprint, current_app, jsonify, request, session)
 
-@datasets_bp.route('/api/datasets', methods=['GET'])
+
+datasets_bp = Blueprint('datasets', __name__, url_prefix='/api/datasets')
+
+
+@datasets_bp.route('/', methods=['GET'])
 @login_required
 def get_datasets():
+    """Get datasets information
 
-
+    Returns
+    -------
+    json
+        datasets: list of all datasets of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     try:
         datasets_handler = DatasetsHandler(current_app, session)
         datasets = datasets_handler.get_datasets()
@@ -29,10 +39,18 @@ def get_datasets():
         'errorMessage': ''
     })
 
-@datasets_bp.route('/api/datasets/delete', methods=['POST'])
+
+@datasets_bp.route('/delete', methods=['POST'])
 @login_required
 def delete_datasets():
+    """Delete some datasets (db and triplestore) with a celery task
 
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
     datasets_info = []
     for dataset_id in data['datasetsIdToDelete']:
@@ -46,7 +64,7 @@ def delete_datasets():
         datasets_handler.handle_datasets()
         datasets_handler.update_status_in_db('deleting')
         # Trigger the celery task to delete it in the ts, and in db
-        task = current_app.celery.send_task('delete_datasets', (session_dict, datasets_info))
+        current_app.celery.send_task('delete_datasets', (session_dict, datasets_info))
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({

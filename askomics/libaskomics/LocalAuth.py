@@ -1,20 +1,21 @@
 """Contain the Database class
 """
-import os
-import random
+
 import hashlib
+import os
+
+from askomics.libaskomics.Database import Database
+from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Utils import Utils
+
 from validate_email import validate_email
 
-from askomics.libaskomics.Utils import Utils
-from askomics.libaskomics.Params import Params
-from askomics.libaskomics.Database import Database
 
 class LocalAuth(Params):
 
     def __init__(self, app, session):
 
         Params.__init__(self, app, session)
-
 
     def check_inputs(self, inputs):
         """Check user inputs
@@ -60,8 +61,6 @@ class LocalAuth(Params):
         if self.is_email_in_db(inputs['email']):
             self.error = True
             self.error_message.append('Email already registered')
-
-
 
     def is_username_in_db(self, username):
         """
@@ -136,7 +135,7 @@ class LocalAuth(Params):
 
         database = Database(self.app, self.session)
 
-        #check if user is the first. if yes, set him admin
+        # Check if user is the first. if yes, set him admin
         if self.get_number_of_users() == 0:
             admin = True
             blocked = False
@@ -192,7 +191,6 @@ class LocalAuth(Params):
             'apikey': api_key
         }
 
-
     def create_user_directories(self, user_id, username):
 
         userdir_path = "{}/{}_{}".format(
@@ -210,7 +208,6 @@ class LocalAuth(Params):
         self.create_directory(ttl_path)
         self.create_directory(results_path)
 
-
     def create_directory(self, directory_path):
 
         try:
@@ -222,7 +219,6 @@ class LocalAuth(Params):
             self.error_message.append(
                 "Impossible to create directory {}, permission denied.").format(
                     directory_path)
-
 
     def get_number_of_users(self):
         """
@@ -238,7 +234,6 @@ class LocalAuth(Params):
         rows = database.execute_sql_query(query)
 
         return rows[0][0]
-
 
     def authenticate_user(self, inputs):
         """
@@ -441,7 +436,6 @@ class LocalAuth(Params):
         return {'error': error, 'error_message': error_message, 'user': user}
 
     def get_user(self, username):
-
 
         database = Database(self.app, self.session)
 

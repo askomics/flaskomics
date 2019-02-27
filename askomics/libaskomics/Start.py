@@ -2,8 +2,9 @@
 """
 import os
 
-from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
+from askomics.libaskomics.Params import Params
+
 
 class Start(Params):
 
@@ -49,4 +50,3 @@ class Start(Params):
         """
         database = Database(self.app, self.session)
         database.init_database()
-

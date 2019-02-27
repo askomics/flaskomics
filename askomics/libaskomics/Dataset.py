@@ -1,9 +1,39 @@
-from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
+from askomics.libaskomics.Params import Params
+
 
 class Dataset(Params):
 
+    """Dataset
+
+    Attributes
+    ----------
+    celery_id : string
+        celery id
+    file_id : int
+        database file id
+    graph_name : string
+        graph name
+    id : int
+        database dataset id
+    name : string
+        dataset name
+    public : bool
+        Public
+    """
+
     def __init__(self, app, session, dataset_info={}):
+        """init
+
+        Parameters
+        ----------
+        app : Flask
+            Flask app
+        session :
+            AskOmics session
+        dataset_info : dict, optional
+            Dataset info
+        """
         Params.__init__(self, app, session)
 
         self.id = dataset_info["id"] if "id" in dataset_info else None
@@ -14,7 +44,8 @@ class Dataset(Params):
         self.public = dataset_info["public"] if "public" in dataset_info else False
 
     def set_info_from_db(self):
-
+        """Set the info in from the database
+        """
         database = Database(self.app, self.session)
 
         query = '''
@@ -33,7 +64,8 @@ class Dataset(Params):
         self.public = rows[0][4]
 
     def save_in_db(self):
-
+        """Save the dataset into the database
+        """
         database = Database(self.app, self.session)
 
         query = '''
@@ -64,7 +96,15 @@ class Dataset(Params):
         ), get_id=True)
 
     def update_in_db(self, error=False, error_message=None):
+        """Update the dataset when integration is done
 
+        Parameters
+        ----------
+        error : bool, optional
+            True if error during integration
+        error_message : None, optional
+            Error string if error is True
+        """
         status = "failure" if error else "success"
         message = error_message if error else ""
 
@@ -82,7 +122,8 @@ class Dataset(Params):
         database.execute_sql_query(query, (status, 0, message, self.session['user']['id'], self.id))
 
     def delete_from_db(self):
-
+        """Delete a dataset from the database
+        """
         database = Database(self.app, self.session)
 
         query = '''

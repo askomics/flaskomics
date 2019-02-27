@@ -1,15 +1,46 @@
 import csv
 import re
-import rdflib
 
 from urllib.parse import quote
 
 from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
 
+import rdflib
+
+
 class CsvFile(File):
 
+    """CSV file
+
+    Attributes
+    ----------
+    category_values : dict
+        Category values
+    columns_type : list
+        Columns type
+    header : list
+        Header
+    preview : list
+        Previex
+    public : bool
+        Public
+    """
+
     def __init__(self, app, session, file_info, host_url=None):
+        """init
+
+        Parameters
+        ----------
+        app : Flask
+            Flask app
+        session :
+            AskOmics session
+        file_info : dict
+            file info
+        host_url : None, optional
+            AskOmics url
+        """
         File.__init__(self, app, session, file_info, host_url)
         self.header = []
         self.preview = []
@@ -17,12 +48,19 @@ class CsvFile(File):
         self.category_values = {}
 
     def set_preview(self):
-
+        """Set previex, header and columns type by sniffing the file
+        """
         self.set_preview_and_header()
         self.set_columns_type()
 
     def get_preview(self):
+        """Get a preview of the file
 
+        Returns
+        -------
+        dict
+            File preview
+        """
         return {
             'type': self.type,
             'id': self.id,
@@ -35,11 +73,24 @@ class CsvFile(File):
         }
 
     def force_columns_type(self, forced_columns_type):
+        """Set the columns type without detecting them
 
+        Parameters
+        ----------
+        forced_columns_type : list
+            columns type
+        """
         self.columns_type = forced_columns_type
 
     def set_preview_and_header(self, preview_limit=30):
+        """Set the preview and header by looking in the fists lines of the
+        file
 
+        Parameters
+        ----------
+        preview_limit : int, optional
+            Number of line to read
+        """
         with open(self.path, 'r', encoding='utf-8') as csv_file:
             reader = csv.reader(csv_file, dialect=self.dialect)
             count = 0
@@ -47,7 +98,7 @@ class CsvFile(File):
             header = next(reader)
             self.header = [h.strip() for h in header]
 
-            # Loop on lines 
+            # Loop on lines
             preview = []
             for row in reader:
                 res_row = {}
@@ -67,14 +118,28 @@ class CsvFile(File):
         self.preview = preview
 
     def set_columns_type(self):
-
+        """Set the columns type by guessing them
+        """
         index = 0
         for col in self.transposed_preview:
             self.columns_type.append(self.guess_column_type(col, index))
             index += 1
 
-
     def guess_column_type(self, values, header_index):
+        """Guess the columns type
+
+        Parameters
+        ----------
+        values : list
+            columns preview
+        header_index : int
+            Header index
+
+        Returns
+        -------
+        string
+            The guessed type
+        """
 
         # First col is entity start
         if header_index == 0:
@@ -127,11 +192,22 @@ class CsvFile(File):
         elif len(set(values)) < threshold:
             return "category"
 
-        return "text" # default
+        return "text"  # default
 
     @staticmethod
     def is_decimal(value):
+        """Guess if a variable if a number
 
+        Parameters
+        ----------
+        value :
+            The var to test
+
+        Returns
+        -------
+        boolean
+            True if it's decimal
+        """
         if value == "":
             return True
         if value.isdigit():
@@ -145,17 +221,28 @@ class CsvFile(File):
 
     @property
     def transposed_preview(self):
+        """Transpose the preview
 
+        Returns
+        -------
+        list
+            Transposed preview
+        """
         data = [[] for x in range(len(self.header))]
         for row in self.preview:
             for key, value in row.items():
                 data[self.header.index(key)].append(value)
         return data
 
-
     @cached_property
     def dialect(self):
+        """Csv dialect
 
+        Returns
+        -------
+        TYPE
+            dialect
+        """
         with open(self.path, 'r', encoding="utf-8", errors="ignore") as tabfile:
             # The sniffer needs to have enough data to guess,
             # and we restrict to a list of allowed delimiters to avoid strange results
@@ -163,18 +250,30 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-
     def integrate(self, forced_columns_type, public=False):
+        """Integrate the file
 
+        Parameters
+        ----------
+        forced_columns_type : list
+            columns type
+        public : bool, optional
+            True if dataset will be public
+        """
         self.public = public
         self.set_preview_and_header()
         self.force_columns_type(forced_columns_type)
         File.integrate(self)
 
     def get_rdf_domain_knowledge(self):
+        """Get the domain knowledge
 
+        Returns
+        -------
+        Graph
+            Graph of domain knowledge
+        """
         rdf_graph = self.rdf_graph()
-
 
         for index, attribute in enumerate(self.header):
 
@@ -190,7 +289,13 @@ class CsvFile(File):
         return rdf_graph
 
     def get_rdf_abstraction(self):
+        """Get the abstraction
 
+        Returns
+        -------
+        Graph
+            Abstraction
+        """
         rdf_graph = self.rdf_graph()
 
         # Entity
@@ -231,7 +336,7 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.decimal
                 rdf_type = rdflib.OWL.DatatypeProperty
 
-            #TODO: datetime
+            # TODO: datetime
 
             # Text (default)
             else:
@@ -247,10 +352,14 @@ class CsvFile(File):
 
         return rdf_graph
 
-
     def generate_rdf_content(self):
+        """Generator of the rdf content
 
-
+        Yields
+        ------
+        Graph
+            Rdf content
+        """
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
 
@@ -260,9 +369,8 @@ class CsvFile(File):
             # Entity
             entity_type = self.askomics_prefix[quote(self.header[0])]
 
-            # Faldo?
-            is_faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
-
+            # TODO: Faldo
+            # is_faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
 
             # Loop on lines
             for row_number, row in enumerate(reader):
@@ -308,8 +416,7 @@ class CsvFile(File):
                         relation = self.askomics_namespace[quote(current_header)]
                         attribute = rdflib.Literal(self.convert_type(cell))
 
-
-                    #TODO: datetime
+                    # TODO: datetime
 
                     # default is text
                     else:
@@ -319,7 +426,6 @@ class CsvFile(File):
                     rdf_graph.add((entity, relation, attribute))
 
                 yield rdf_graph
-
 
     def convert_type(self, value):
         """Convert a value to a int or float or text

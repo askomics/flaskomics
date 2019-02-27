@@ -5,6 +5,7 @@ import textwrap
 
 from askomics.libaskomics.Params import Params
 
+
 class Database(Params):
     """
     Manage Database connection

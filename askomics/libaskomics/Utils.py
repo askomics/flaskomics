@@ -1,9 +1,10 @@
-"""Contain the Utils class
-"""
 import random
 
 
 class Utils():
+
+    """Contain utils fonction and classes
+    """
 
     @staticmethod
     def get_random_string(number):
@@ -20,7 +21,6 @@ class Utils():
             a random string of n chars
         """
 
-
         alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         return ''.join(random.choice(alpabet) for i in range(number))
 
@@ -33,18 +33,28 @@ class cached_property(object):
     cost no more than standard Python attribute access.
     If the instance attribute is deleted the next access will re-evaluate the function.
     Source: https://blog.ionelmc.ro/2014/11/04/an-interesting-python-descriptor-quirk/
-    usage:
-        class Shape(object):
 
-            @cached_property
-            def area(self):
-                # compute value
-                return value
+    usage
+    -----
+    class Shape(object):
+
+        @cached_property
+        def area(self):
+            # compute value
+            return value
+
+    Attributes
+    ----------
+    func : TYPE
+        Description
     """
     __slots__ = ('func')
+
     def __init__(self, func):
+
         self.func = func
 
     def __get__(self, obj, cls):
+
         value = obj.__dict__[self.func.__name__] = self.func(obj)
         return value

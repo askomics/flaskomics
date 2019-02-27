@@ -1,16 +1,24 @@
-import os
+"""AskOmics app
 
-from celery import Celery
-from flask import Flask
-from flask_ini import FlaskIni
+Attributes
+----------
+BLUEPRINTS : Tuple
+    Flask blueprints
+"""
 
+from askomics.api.admin import admin_bp
+from askomics.api.auth import auth_bp
+from askomics.api.catch_url import catch_url_bp
+from askomics.api.datasets import datasets_bp
+from askomics.api.file import file_bp
 from askomics.api.start import start_bp
 from askomics.api.view import view_bp
-from askomics.api.auth import auth_bp
-from askomics.api.admin import admin_bp
-from askomics.api.file import file_bp
-from askomics.api.datasets import datasets_bp
-from askomics.api.catch_url import catch_url_bp
+
+from celery import Celery
+
+from flask import Flask
+
+from flask_ini import FlaskIni
 
 
 __all__ = ('create_app', 'create_celery')
@@ -27,11 +35,23 @@ BLUEPRINTS = (
 
 
 def create_app(config='config/askomics.ini', app_name='askomics', blueprints=None):
+    """Create the AskOmics app
 
-    app = Flask(app_name,
-        static_folder='static',
-        template_folder='templates'
-    )
+    Parameters
+    ----------
+    config : str, optional
+        Path to the config file
+    app_name : str, optional
+        Application name
+    blueprints : None, optional
+        Flask blueprints
+
+    Returns
+    -------
+    Flask
+        AskOmics Flask application
+    """
+    app = Flask(app_name, static_folder='static', template_folder='templates')
 
     app.iniconfig = FlaskIni()
 
@@ -48,17 +68,30 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
 
     return app
 
+
 def create_celery(app):
+    """Create the celery object
+
+    Parameters
+    ----------
+    app : Flask
+        AskOmics Flask application
+
+    Returns
+    -------
+    Celery
+        Celery object
+    """
     celery = Celery(app.import_name, broker=app.iniconfig.get("celery", "broker_url"))
     # celery.conf.update(app.config)
-    TaskBase = celery.Task
+    task_base = celery.Task
 
-    class ContextTask(TaskBase):
+    class ContextTask(task_base):
         abstract = True
 
         def __call__(self, *args, **kwargs):
             with app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
+                return task_base.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
 
     app.celery = celery
