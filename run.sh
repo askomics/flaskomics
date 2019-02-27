@@ -80,7 +80,7 @@ trap 'kill 0' INT
 echo "Building JS ..."
 npm run $npm_depmode &
 echo "Starting celery ..."
-watchmedo auto-restart -d . --recursive -p '*.py' --ignore-patterns="*.pyc" -- celery -A askomics.tasks.celery worker -l info &
+watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns="*.pyc" -- celery -A askomics.tasks.celery worker -l info &
 
 echo "Starting server ..."
 $flask_command &

@@ -9,6 +9,7 @@ from askomics.api.view import view_bp
 from askomics.api.auth import auth_bp
 from askomics.api.admin import admin_bp
 from askomics.api.file import file_bp
+from askomics.api.datasets import datasets_bp
 from askomics.api.catch_url import catch_url_bp
 
 
@@ -20,6 +21,7 @@ BLUEPRINTS = (
     auth_bp,
     admin_bp,
     file_bp,
+    datasets_bp,
     catch_url_bp
 )
 

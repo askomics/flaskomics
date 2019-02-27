@@ -66,6 +66,7 @@ export default class Routes extends Component {
             <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/upload" exact component={() => (<Upload user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/datasets" exact component={() => (<Datasets user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/integration" exact component={Integration} />
           </Switch>
           <br />

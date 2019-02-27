@@ -132,8 +132,8 @@ export default class CsvTable extends Component {
         <br /><br />
         <div className="center-div">
           <ButtonGroup>
-            <Button onClick={this.integrate} public="private" color="secondary"><i className="fas fa-lock"></i> Integrate (private dataset)</Button>
-            <Button onClick={this.integrate} public="public" color="secondary"><i className="fas fa-globe-europe"></i> Integrate (public dataset)</Button>
+            <Button onClick={this.integrate} value="private" color="secondary"><i className="fas fa-lock"></i> Integrate (private dataset)</Button>
+            <Button onClick={this.integrate} value="public" color="secondary"><i className="fas fa-globe-europe"></i> Integrate (public dataset)</Button>
           </ButtonGroup>
         </div>
       </div>

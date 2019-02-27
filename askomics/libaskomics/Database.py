@@ -1,6 +1,7 @@
 """Contain the Database class
 """
 import sqlite3
+import textwrap
 
 from askomics.libaskomics.Params import Params
 
@@ -47,10 +48,11 @@ class Database(Params):
         """
 
         connection = sqlite3.connect("file:" + self.database_path, uri=True)
+        # connection.set_trace_callback(self.log.debug)
         cursor = connection.cursor()
 
         if variables:
-            cursor.execute(query, variables)
+            cursor.execute(textwrap.dedent(query), variables)
         else:
             cursor.execute(query)
         rows = cursor.fetchall()
@@ -117,6 +119,8 @@ class Database(Params):
             celery_id INTEGER,
             file_id INTEGER,
             name text,
+            graph_name text,
+            public boolean,
             status text,
             start int,
             end int,

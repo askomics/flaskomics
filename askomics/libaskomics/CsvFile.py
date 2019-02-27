@@ -164,8 +164,9 @@ class CsvFile(File):
             return dialect
 
 
-    def integrate(self, forced_columns_type):
+    def integrate(self, forced_columns_type, public=False):
 
+        self.public = public
         self.set_preview_and_header()
         self.force_columns_type(forced_columns_type)
         File.integrate(self)
