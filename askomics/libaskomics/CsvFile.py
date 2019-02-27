@@ -210,7 +210,7 @@ class CsvFile(File):
 
             # Relation
             if self.columns_type[index] in ('general_relation', ):
-                splitted = split(attribute_name, '@')
+                splitted = attribute_name.split('@')
 
                 attribute = self.askomics_namespace[quote(splitted[0])]
                 label = rdflib.Literal(splitted[0])
