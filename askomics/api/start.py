@@ -23,7 +23,7 @@ def hello():
 
     try:
         message = "Welcome to AskOmics" if 'user' not in session else "Hello {} {}, Welcome to AskOmics!".format(
-            session["user"]["fname"], session["user"]["fname"])
+            session["user"]["fname"], session["user"]["lname"])
 
     except Exception as e:
         current_app.logger.error(str(e))
