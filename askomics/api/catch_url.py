@@ -20,4 +20,4 @@ def catch_all(path):
         Redirect to route /
     """
 
-    return redirect('/')
+    return redirect('/?path={}'.format(path))
