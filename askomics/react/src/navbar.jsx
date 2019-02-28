@@ -20,43 +20,52 @@ export default  class AskoNavbar extends Component {
 
   render() {
 
-    let links = (
-      <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
-    )
+    let links
+    let askLink
 
-    if(this.props.logged) {
-      let adminLinks
-      if (this.props.user.admin) {
-        adminLinks = (
-          <DropdownItem className="bg-dark" tag="Link">
-            <Link className="nav-link" to="/admin"><i className="fas fa-chess-king"></i> Admin</Link>
-          </DropdownItem>
+    // if wait is false
+    if (!this.props.waitForStart) {
+      askLink = (
+        <NavItem><Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link></NavItem>
+      )
+      links = (
+        <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
+      )
+
+      if(this.props.logged) {
+        let adminLinks
+        if (this.props.user.admin) {
+          adminLinks = (
+            <DropdownItem className="bg-dark" tag="Link">
+              <Link className="nav-link" to="/admin"><i className="fas fa-chess-king"></i> Admin</Link>
+            </DropdownItem>
+          )
+        }
+        links = (
+          <>
+          <NavItem><Link className="nav-link" to="/jobs"><i className="fas fa-question"></i> Queries</Link></NavItem>
+          <NavItem><Link className="nav-link" to="/upload"><i className="fas fa-file"></i> Files</Link></NavItem>
+          <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
+          <NavItem>
+            <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+              <DropdownToggle nav caret>
+                <i className="fas fa-user"></i> {this.props.user.fname} {this.props.user.lname}
+              </DropdownToggle>
+              <DropdownMenu className="bg-dark">
+                <DropdownItem className="bg-dark" tag="Link">
+                  <Link className="nav-link" to="/account"><i className="fas fa-cog"></i> Account managment</Link>
+                </DropdownItem>
+                {adminLinks}
+                <DropdownItem className="bg-dark" divider />
+                <DropdownItem className="bg-dark" tag="Link">
+                  <Link className="nav-link" to="/logout"><i className="fas fa-sign-out-alt"></i> Logout</Link>
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </NavItem>
+          </>
         )
       }
-      links = (
-        <>
-        <NavItem><Link className="nav-link" to="/jobs"><i className="fas fa-question"></i> Queries</Link></NavItem>
-        <NavItem><Link className="nav-link" to="/upload"><i className="fas fa-file"></i> Files</Link></NavItem>
-        <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
-        <NavItem>
-          <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-            <DropdownToggle nav caret>
-              <i className="fas fa-user"></i> {this.props.user.fname} {this.props.user.lname}
-            </DropdownToggle>
-            <DropdownMenu className="bg-dark">
-              <DropdownItem className="bg-dark" tag="Link">
-                <Link className="nav-link" to="/account"><i className="fas fa-cog"></i> Account managment</Link>
-              </DropdownItem>
-              {adminLinks}
-              <DropdownItem className="bg-dark" divider />
-              <DropdownItem className="bg-dark" tag="Link">
-                <Link className="nav-link" to="/logout"><i className="fas fa-sign-out-alt"></i> Logout</Link>
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </NavItem>
-        </>
-      )
     }
 
     return (
@@ -66,9 +75,7 @@ export default  class AskoNavbar extends Component {
             <NavbarBrand href="/">AskOmics</NavbarBrand>
             <Collapse navbar>
               <Nav className="ml-auto" navbar>
-                <NavItem>
-                  <Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link>
-                </NavItem>
+                {askLink}
                 {links}
               </Nav>
             </Collapse>

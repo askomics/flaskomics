@@ -26,17 +26,20 @@ export default class Routes extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      waiting: true,
       error: false,
       errorMessage: null,
       logged: false,
       user: {}
     }
+    this.cancelRequest
   }
+
 
   componentDidMount() {
 
     let requestUrl = '/api/start'
-    axios.get(requestUrl)
+    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -45,11 +48,18 @@ export default class Routes extends Component {
         user: response.data.user,
         logged: response.data.logged,
         version: response.data.version,
-        footerMessage: response.data.footer_message
+        footerMessage: response.data.footer_message,
+        waiting: false
       })
     })
-    .catch( (error) => {
-      console.log(error)
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
     })
   }
 
@@ -57,9 +67,9 @@ export default class Routes extends Component {
     return (
       <Router history={history}>
         <div>
-          <AskoNavbar logged={this.state.logged} user={this.state.user}/>
+          <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user}/>
           <Switch>
-            <Route path="/" exact component={() => (<Ask user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/login" exact component={() => (<Login setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/signup" exact component={() => (<Signup setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />

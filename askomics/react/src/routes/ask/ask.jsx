@@ -21,28 +21,32 @@ export default class Ask extends Component {
 
   componentDidMount() {
 
-    let requestUrl = '/api/hello'
-    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        message: response.data.message,
-        waiting: false
+    if (!this.props.waitForStart) {
+      let requestUrl = '/api/hello'
+      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          message: response.data.message,
+          waiting: false
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        waiting: false,
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          waiting: false,
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status
+        })
       })
-    })
+    }
   }
 
   componentWillUnmount() {
-    this.cancelRequest()
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
   }
 
   render() {
