@@ -71,15 +71,15 @@ export default class Routes extends Component {
           <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user}/>
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
-            <Route path="/login" exact component={() => (<Login setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/signup" exact component={() => (<Signup setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/logout" exact component={() => (<Logout setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/account" exact component={() => (<Account user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/admin" exact component={() => (<Admin user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/files" exact component={() => (<Upload user={this.state.user} logged={this.state.logged} />)} />
-            <Route path="/datasets" exact component={() => (<Datasets user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/login" exact component={() => (<Login waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/signup" exact component={() => (<Signup waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/logout" exact component={() => (<Logout waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/account" exact component={() => (<Account waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/admin" exact component={() => (<Admin waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/files" exact component={() => (<Upload waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/datasets" exact component={() => (<Datasets waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/integration" exact component={Integration} />
-            <Route path="/sparql" exact component={() => (<Sparql user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/sparql" exact component={() => (<Sparql waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
           </Switch>
           <br />
           <br />

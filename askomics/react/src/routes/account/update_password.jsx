@@ -14,6 +14,7 @@ export default class UpdateProfile extends Component {
       newPassword: '',
       confPassword: ''
     }
+    this.cancelRequest
   }
 
   handleChange(event) {
@@ -40,7 +41,7 @@ export default class UpdateProfile extends Component {
       confPassword: this.state.confPassword
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({

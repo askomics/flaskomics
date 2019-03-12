@@ -9,13 +9,14 @@ export default class UpdateApiKey extends Component {
     super(props)
     this.state = {}
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.cancelRequest
   }
 
   handleSubmit(event) {
 
     let requestUrl = '/api/auth/apikey'
 
-    axios.get(requestUrl)
+    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({

@@ -35,27 +35,33 @@ export default class Sparql extends Component {
   }
 
   componentDidMount() {
-
-    let requestUrl = '/api/sparql/getquery'
-    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        sparqlInput: response.data.query,
-        waiting: false
+    if (!this.props.waitForStart) {
+      let requestUrl = '/api/sparql/getquery'
+      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          sparqlInput: response.data.query,
+          waiting: false
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        waiting: false,
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          waiting: false,
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status
+        })
       })
-    })
+    }
   }
 
+  componentWillUnmount() {
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
+  }
 
   handleCodeChange(code) {
     this.setState({

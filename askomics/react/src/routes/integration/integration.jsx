@@ -23,35 +23,39 @@ export default class Upload extends Component {
   }
 
   componentDidMount() {
-
-    let requestUrl = '/api/files/preview'
-    let data = {
-      filesId: this.state.filesId
+    if (!this.props.waitForStart) {
+      let requestUrl = '/api/files/preview'
+      let data = {
+        filesId: this.state.filesId
+      }
+      axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          previewFiles: response.data.previewFiles,
+          waiting: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
     }
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        previewFiles: response.data.previewFiles,
-        waiting: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
-      })
-    })
   }
 
   componentWillUnmount() {
-    this.cancelRequest()
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
   }
+
 
   render() {
 

@@ -14,6 +14,7 @@ export default class UpdateProfile extends Component {
       newLname: '',
       newEmail: ''
     }
+    this.cancelRequest
   }
 
   handleChange(event) {
@@ -45,7 +46,7 @@ export default class UpdateProfile extends Component {
 
     axios.post(requestUrl, data)
     .then(response => {
-      console.log(requestUrl, response.data)
+      console.log(requestUrl, response.data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
       this.setState({
         isLoading: false,
         error: response.data.error,

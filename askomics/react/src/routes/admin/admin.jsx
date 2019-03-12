@@ -16,6 +16,7 @@ export default class Admin extends Component {
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
+    this.cancelRequest
   }
 
   handleChangeAdmin(event) {
@@ -34,7 +35,7 @@ export default class Admin extends Component {
       newAdmin: newAdmin
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -71,7 +72,7 @@ export default class Admin extends Component {
       newBlocked: newBlocked
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -94,28 +95,37 @@ export default class Admin extends Component {
   }
 
   componentDidMount() {
+    if (!this.props.waitForStart) {
     let requestUrl = '/api/admin/getusers'
 
-    axios.get(requestUrl)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        users: response.data.users
+      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          users: response.data.users
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error
+        })
       })
-    })
+    }
   }
+
+  componentWillUnmount() {
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
+  }
+
 
   render() {
 

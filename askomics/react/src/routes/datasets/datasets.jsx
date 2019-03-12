@@ -23,14 +23,19 @@ export default class Datasets extends Component {
   }
 
   componentDidMount() {
-    this.getDatasets()
-    this.interval = setInterval(() => {
+    if (!this.props.waitForStart) {
       this.getDatasets()
-    }, 5000)
+      this.interval = setInterval(() => {
+        this.getDatasets()
+      }, 5000)
+    }
   }
 
   componentWillUnmount() {
     clearInterval(this.interval)
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
   }
 
   getDatasets() {
