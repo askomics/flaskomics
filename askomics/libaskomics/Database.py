@@ -49,7 +49,7 @@ class Database(Params):
         """
 
         connection = sqlite3.connect("file:" + self.database_path, uri=True)
-        # connection.set_trace_callback(self.log.debug)
+        connection.set_trace_callback(self.log.debug)
         cursor = connection.cursor()
 
         if variables:

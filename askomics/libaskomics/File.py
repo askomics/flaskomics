@@ -3,7 +3,7 @@ import os
 import time
 
 from askomics.libaskomics.Params import Params
-from askomics.libaskomics.SparqlQuery import SparqlQuery
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
 from pkg_resources import get_distribution
@@ -13,7 +13,6 @@ from rdflib.namespace import Namespace
 
 
 class File(Params):
-
     """Summary
 
     Attributes
@@ -156,7 +155,7 @@ class File(Params):
         tmp_file_name : string
             Path to a tmp file
         """
-        sparql = SparqlQuery(self.app, self.session)
+        sparql = SparqlQueryLauncher(self.app, self.session)
 
         temp_file_path = '{}/{}'.format(self.ttl_dir, tmp_file_name)
         rdf_graph.serialize(format='turtle', encoding='utf-8', destination=temp_file_path)
@@ -168,15 +167,13 @@ class File(Params):
         os.remove(temp_file_path)
 
     def rollback(self):
-        """Drop the dataset from the triplestore in case of error
-        """
-        sparql = SparqlQuery(self.app, self.session)
+        """Drop the dataset from the triplestore in case of error"""
+        sparql = SparqlQueryLauncher(self.app, self.session)
         sparql.drop_dataset(self.file_graph)
 
     def integrate(self):
-        """Integrate the file into the triplestore
-        """
-        sparql = SparqlQuery(self.app, self.session)
+        """Integrate the file into the triplestore"""
+        sparql = SparqlQueryLauncher(self.app, self.session)
 
         method = self.settings.get('triplestore', 'upload_method')
         max_chunk_size = self.settings.getint('triplestore', 'chunk_size')

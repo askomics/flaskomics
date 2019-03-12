@@ -7,9 +7,8 @@ from askomics.libaskomics.Params import Params
 import requests
 
 
-class SparqlQuery(Params):
-
-    """SparqlQuery
+class SparqlQueryLauncher(Params):
+    """SparqlQueryLauncher
 
     Attributes
     ----------
@@ -121,7 +120,7 @@ class SparqlQuery(Params):
         except Exception:
             load_url = host_url
 
-        file_url = '{}files/ttl/{}/{}/{}'.format(
+        file_url = '{}api/files/ttl/{}/{}/{}'.format(
             load_url,
             self.session['user']['id'],
             self.session['user']['username'],
@@ -189,7 +188,6 @@ class SparqlQuery(Params):
         graph : string
             graph name to remove
         """
-
         # Remove metadata
         query = '''
         DELETE WHERE {{
@@ -254,7 +252,7 @@ class SparqlQuery(Params):
 
         return results
 
-    def parse_results(self, json_results):
+    def parse_results_old(self, json_results):
         """Parse result of sparql query
 
         Parameters
@@ -273,3 +271,31 @@ class SparqlQuery(Params):
             } for entry in json_results["results"]["bindings"]]
         except Exception:
             return []
+
+    def parse_results(self, json_results):
+        """Parse result of sparql query
+
+        Parameters
+        ----------
+        json_results : dict
+            Query result
+
+        Returns
+        -------
+        list, list
+            Header and data
+        """
+        try:
+            header = json_results['head']['vars']
+            data = []
+            for row in json_results["results"]["bindings"]:
+                row_dict = {}
+                for key, value in row.items():
+                    row_dict[key] = value['value']
+                data.append(row_dict)
+
+        except Exception as e:
+            self.log.error(str(e))
+            return [], []
+
+        return header, data

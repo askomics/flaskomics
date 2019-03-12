@@ -179,7 +179,7 @@ def integrate():
     })
 
 
-@file_bp.route('/files/ttl/<path:user_id>/<path:username>/<path:path>')
+@file_bp.route('/ttl/<path:user_id>/<path:username>/<path:path>', methods=['GET'])
 def serve_file(path, user_id, username):
     """Serve a static ttl file of a user
 

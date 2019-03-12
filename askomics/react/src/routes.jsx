@@ -13,6 +13,7 @@ import Login from './routes/login/login'
 import Logout from './routes/login/logout'
 import Account from './routes/account/account'
 import Admin from './routes/admin/admin'
+import Sparql from './routes/sparql/sparql'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
 
@@ -78,6 +79,7 @@ export default class Routes extends Component {
             <Route path="/files" exact component={() => (<Upload user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/datasets" exact component={() => (<Datasets user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/integration" exact component={Integration} />
+            <Route path="/sparql" exact component={() => (<Sparql user={this.state.user} logged={this.state.logged} />)} />
           </Switch>
           <br />
           <br />

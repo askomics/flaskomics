@@ -11,6 +11,7 @@ from askomics.api.auth import auth_bp
 from askomics.api.catch_url import catch_url_bp
 from askomics.api.datasets import datasets_bp
 from askomics.api.file import file_bp
+from askomics.api.sparql import sparql_bp
 from askomics.api.start import start_bp
 from askomics.api.view import view_bp
 
@@ -24,6 +25,7 @@ from flask_ini import FlaskIni
 __all__ = ('create_app', 'create_celery')
 
 BLUEPRINTS = (
+    sparql_bp,
     start_bp,
     view_bp,
     auth_bp,

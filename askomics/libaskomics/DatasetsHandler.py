@@ -1,7 +1,7 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.Params import Params
-from askomics.libaskomics.SparqlQuery import SparqlQuery
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
 class DatasetsHandler(Params):
@@ -114,7 +114,7 @@ class DatasetsHandler(Params):
     def delete_datasets(self):
         """delete the datasets from the database and the triplestore
         """
-        sparql = SparqlQuery(self.app, self.session)
+        sparql = SparqlQueryLauncher(self.app, self.session)
         for dataset in self.datasets:
             # Delete from triplestore
             sparql.drop_dataset(dataset.graph_name)
