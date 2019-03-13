@@ -24,7 +24,7 @@ export default class CsvTable extends Component {
   handleChangeType(index, event) {
 
     this.setState({
-      columns_type: this.columns_type.types.map((elem, i) => i == index ? event.target.value : elem)
+      columns_type: this.state.columns_type.map((elem, i) => i == index ? event.target.value : elem)
     })
   }
 
