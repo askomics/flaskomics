@@ -235,6 +235,10 @@ class SparqlQueryLauncher(Params):
         start_time = time.time()
         self.endpoint.setQuery(query)
 
+        # Debug
+        if self.settings.getboolean('askomics', 'debug'):
+            self.log.debug(query)
+
         # Update
         if self.endpoint.isSparqlUpdateRequest():
             self.endpoint.setMethod('POST')

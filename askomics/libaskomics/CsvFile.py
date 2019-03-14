@@ -9,7 +9,6 @@ import rdflib
 
 
 class CsvFile(File):
-
     """CSV file
 
     Attributes
@@ -47,8 +46,7 @@ class CsvFile(File):
         self.category_values = {}
 
     def set_preview(self):
-        """Set previex, header and columns type by sniffing the file
-        """
+        """Set previex, header and columns type by sniffing the file"""
         self.set_preview_and_header()
         self.set_columns_type()
 
@@ -82,8 +80,7 @@ class CsvFile(File):
         self.columns_type = forced_columns_type
 
     def set_preview_and_header(self, preview_limit=30):
-        """Set the preview and header by looking in the fists lines of the
-        file
+        """Set the preview and header by looking in the fists lines of the file
 
         Parameters
         ----------
@@ -117,8 +114,7 @@ class CsvFile(File):
         self.preview = preview
 
     def set_columns_type(self):
-        """Set the columns type by guessing them
-        """
+        """Set the columns type by guessing them"""
         index = 0
         for col in self.transposed_preview:
             self.columns_type.append(self.guess_column_type(col, index))
@@ -139,7 +135,6 @@ class CsvFile(File):
         string
             The guessed type
         """
-
         # First col is entity start
         if header_index == 0:
             return "start_entity"
@@ -277,12 +272,12 @@ class CsvFile(File):
         for index, attribute in enumerate(self.header):
 
             if self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
-                s = self.askomics_namespace["{}Category".format(quote(attribute))]
+                s = self.askomics_prefix["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.askomics_namespace["category"]
                 for value in self.category_values[self.header[index]]:
-                    o = self.askomics_namespace[quote(value)]
+                    o = self.askomics_prefix[self.format_uri(value)]
                     rdf_graph.add((s, p, o))
-                    rdf_graph.add((o, rdflib.RDF.type, self.askomics_namespace["{}CategoryValue".format(quote(self.header[index]))]))
+                    rdf_graph.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     rdf_graph.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
 
         return rdf_graph
@@ -298,12 +293,12 @@ class CsvFile(File):
         rdf_graph = self.rdf_graph()
 
         # Entity
-        entity = self.askomics_prefix[quote(self.header[0])]
+        entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
 
         rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
-        rdf_graph.add((entity, rdflib.RDF.type, self.askomics_namespace['entity']))
+        rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
         if self.columns_type[0] == 'start_entity':
-            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_namespace['startPoint']))
+            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
 
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
@@ -316,21 +311,21 @@ class CsvFile(File):
             if self.columns_type[index] in ('general_relation', ):
                 splitted = attribute_name.split('@')
 
-                attribute = self.askomics_namespace[quote(splitted[0])]
+                attribute = self.askomics_prefix[quote(splitted[0])]
                 label = rdflib.Literal(splitted[0])
                 rdf_range = self.askomics_prefix[quote(splitted[1])]
                 rdf_type = rdflib.OWL.ObjectProperty
 
             # Category
             elif self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
-                attribute = self.askomics_namespace[quote(attribute_name)]
+                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
                 label = rdflib.Literal(attribute_name)
-                rdf_range = self.askomics_namespace["{}Category".format(quote(attribute_name))]
-                rdf_type = rdflib.OWL.DatatypeProperty
+                rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
+                rdf_type = rdflib.OWL.ObjectProperty
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
-                attribute = self.askomics_namespace[quote(attribute_name)]
+                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.decimal
                 rdf_type = rdflib.OWL.DatatypeProperty
@@ -339,7 +334,7 @@ class CsvFile(File):
 
             # Text (default)
             else:
-                attribute = self.askomics_namespace[quote(attribute_name)]
+                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
@@ -381,7 +376,7 @@ class CsvFile(File):
                     continue
 
                 # Entity
-                entity = self.askomics_prefix[quote(row[0])]
+                entity = self.askomics_prefix[self.format_uri(row[0])]
                 rdf_graph.add((entity, rdflib.RDF.type, entity_type))
 
                 # For attributes, loop on cell
@@ -396,8 +391,8 @@ class CsvFile(File):
                     # Relation
                     if current_type == 'general_relation':
                         splitted = current_header.split('@')
-                        relation = self.askomics_namespace[quote(splitted[0])]
-                        attribute = self.askomics_prefix[quote(cell)]
+                        relation = self.askomics_prefix[self.format_uri(splitted[0])]
+                        attribute = self.askomics_prefix[self.format_uri(cell)]
 
                     # Category
                     elif current_type in ('category', 'organism', 'chromosome', 'strand'):
@@ -407,19 +402,19 @@ class CsvFile(File):
                         else:
                             # add the cell in the set
                             self.category_values[current_header].add(cell)
-                        relation = self.askomics_namespace[quote(current_header)]
+                        relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):
-                        relation = self.askomics_namespace[quote(current_header)]
+                        relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     # TODO: datetime
 
                     # default is text
                     else:
-                        relation = self.askomics_namespace[quote(current_header)]
+                        relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     rdf_graph.add((entity, relation, attribute))

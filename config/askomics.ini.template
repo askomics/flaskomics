@@ -8,7 +8,9 @@ broker_url = redis://localhost:6379
 result_backend = redis://localhost:6379
 
 [askomics]
-# AskOmics configuration
+debug = true
+debug_ttl = false
+
 footer_message = Welcome to AskOmics!
 
 # data directory
@@ -43,5 +45,7 @@ default_graph = urn:sparql:askomics
 # User graph
 users_graph = urn:sparql:askomics:users
 # Askomics rdf prefix and namespace
+# prefix        :
+# namespace     askomics:
 prefix = http://www.semanticweb.org/user/ontologies/2018/1#
 namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#

@@ -10,6 +10,7 @@ from pkg_resources import get_distribution
 
 import rdflib
 from rdflib.namespace import Namespace
+from urllib.parse import quote
 
 
 class File(Params):
@@ -97,6 +98,12 @@ class File(Params):
         self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
         self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
 
+    def format_uri(self, string, remove_space=False):
+        """remove space and quote"""
+        if remove_space:
+            return quote(string.replace(' ', ''))
+        return quote(string)
+
     def rdf_graph(self):
         """Initialize a rdf graph with akomics prefixes
 
@@ -164,7 +171,8 @@ class File(Params):
         sparql.load_data(tmp_file_name, self.file_graph, self.host_url)
 
         # Remove tmp file
-        os.remove(temp_file_path)
+        if not self.settings.getboolean('askomics', 'debug_ttl'):
+            os.remove(temp_file_path)
 
     def rollback(self):
         """Drop the dataset from the triplestore in case of error"""
