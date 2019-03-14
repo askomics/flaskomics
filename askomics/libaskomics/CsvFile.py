@@ -6,6 +6,7 @@ from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
 
 import rdflib
+from rdflib.namespace import Namespace
 
 
 class CsvFile(File):
@@ -293,7 +294,15 @@ class CsvFile(File):
         rdf_graph = self.rdf_graph()
 
         # Entity
-        entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
+        # Check subclass syntax (<)
+        if self.header[0].find('<') > 0:
+            splitted = self.header[0].split('<')
+            entity = self.askomics_prefix[self.format_uri(splitted[0], remove_space=True)]
+            mother_class = self.askomics_prefix[self.format_uri(splitted[1], remove_space=True)]
+            # subClassOf
+            rdf_graph.add((entity, rdflib.RDFS.subClassOf, mother_class))
+        else:
+            entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
 
         rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
         rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
@@ -361,7 +370,12 @@ class CsvFile(File):
             next(reader)
 
             # Entity
-            entity_type = self.askomics_prefix[quote(self.header[0])]
+            # Check subclass syntax (<)
+            if self.header[0].find('<') > 0:
+                splitted = self.header[0].split('<')
+                entity_type = self.askomics_prefix[self.format_uri(splitted[0], remove_space=True)]
+            else:
+                entity_type = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
 
             # TODO: Faldo
             # is_faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
