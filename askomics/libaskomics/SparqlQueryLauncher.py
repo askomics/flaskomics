@@ -116,7 +116,7 @@ class SparqlQueryLauncher(Params):
             result of query
         """
         try:
-            load_url = self.settings.get('askomics', 'load_url')
+            load_url = self.settings.get('triplestore', 'load_url')
         except Exception:
             load_url = host_url
 
@@ -174,9 +174,6 @@ class SparqlQueryLauncher(Params):
             }}
         }}
         '''.format(graph, triples)
-
-        with open('/home/xgarnier/Desktop/query.sparql', 'w') as f:
-            f.write(query)
 
         return self.execute_query(query)
 
