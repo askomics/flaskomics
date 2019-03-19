@@ -5,10 +5,10 @@ from askomics.libaskomics.FilesHandler import FilesHandler
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
 
-file_bp = Blueprint('file', __name__, url_prefix='/api/files')
+file_bp = Blueprint('file', __name__, url_prefix='/')
 
 
-@file_bp.route('/', methods=['GET', 'POST'])
+@file_bp.route('/api/files', methods=['GET', 'POST'])
 @login_required
 def get_files():
     """Get files info of the logged user
@@ -43,7 +43,7 @@ def get_files():
     })
 
 
-@file_bp.route('/upload', methods=['POST'])
+@file_bp.route('/api/files/upload', methods=['POST'])
 @login_required
 def upload():
     """Upload files
@@ -75,7 +75,7 @@ def upload():
     })
 
 
-@file_bp.route('/preview', methods=['POST'])
+@file_bp.route('/api/files/preview', methods=['POST'])
 @login_required
 def get_preview():
     """Get files preview
@@ -113,7 +113,7 @@ def get_preview():
     })
 
 
-@file_bp.route('/delete', methods=['POST'])
+@file_bp.route('/api/files/delete', methods=['POST'])
 @login_required
 def delete_files():
     """Delete files
@@ -145,7 +145,7 @@ def delete_files():
     })
 
 
-@file_bp.route('/integrate', methods=['POST'])
+@file_bp.route('/api/files/integrate', methods=['POST'])
 @login_required
 def integrate():
     """Integrate a file
@@ -179,7 +179,7 @@ def integrate():
     })
 
 
-@file_bp.route('/ttl/<path:user_id>/<path:username>/<path:path>', methods=['GET'])
+@file_bp.route('/api/files/ttl/<path:user_id>/<path:username>/<path:path>', methods=['GET'])
 def serve_file(path, user_id, username):
     """Serve a static ttl file of a user
 
