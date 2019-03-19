@@ -6,10 +6,10 @@ from flask import (Blueprint, current_app, jsonify, session)
 from pkg_resources import get_distribution
 
 
-start_bp = Blueprint('start', __name__, url_prefix='/api')
+start_bp = Blueprint('start', __name__, url_prefix='/')
 
 
-@start_bp.route('/hello', methods=['GET'])
+@start_bp.route('/api/hello', methods=['GET'])
 def hello():
     """Dummy routes
 
@@ -40,7 +40,7 @@ def hello():
     })
 
 
-@start_bp.route('/start', methods=['GET'])
+@start_bp.route('/api/start', methods=['GET'])
 def start():
     """Starting route
 

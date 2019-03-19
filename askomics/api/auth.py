@@ -7,7 +7,7 @@ from askomics.libaskomics.LocalAuth import LocalAuth
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
+auth_bp = Blueprint('auth', __name__, url_prefix='/')
 
 
 def login_required(f):
@@ -40,7 +40,7 @@ def admin_required(f):
     return decorated_function
 
 
-@auth_bp.route('/signup', methods=['POST'])
+@auth_bp.route('/api/auth/signup', methods=['POST'])
 def signup():
     """Register a new user
 
@@ -69,7 +69,7 @@ def signup():
     })
 
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/api/auth/login', methods=['POST'])
 def login():
     """Log a user
 
@@ -93,7 +93,7 @@ def login():
     })
 
 
-@auth_bp.route('/profile', methods=['POST'])
+@auth_bp.route('/api/auth/profile', methods=['POST'])
 @login_required
 def update_profile():
     """Update user profile (names and email)
@@ -117,7 +117,7 @@ def update_profile():
     })
 
 
-@auth_bp.route('/password', methods=['POST'])
+@auth_bp.route('/api/auth/password', methods=['POST'])
 @login_required
 def update_password():
     """Update the user passord
@@ -139,7 +139,7 @@ def update_password():
     })
 
 
-@auth_bp.route('/apikey', methods=['GET'])
+@auth_bp.route('/api/auth/apikey', methods=['GET'])
 @login_required
 def update_apikey():
     """Update the user apikey
@@ -161,7 +161,7 @@ def update_apikey():
     })
 
 
-@auth_bp.route('/logout', methods=['GET'])
+@auth_bp.route('/api/auth/logout', methods=['GET'])
 def logout():
     """Logout the current user
 

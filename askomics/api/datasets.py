@@ -7,10 +7,10 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from flask import (Blueprint, current_app, jsonify, request, session)
 
 
-datasets_bp = Blueprint('datasets', __name__, url_prefix='/api/datasets')
+datasets_bp = Blueprint('datasets', __name__, url_prefix='/')
 
 
-@datasets_bp.route('/', methods=['GET'])
+@datasets_bp.route('/api/datasets/', methods=['GET'])
 @login_required
 def get_datasets():
     """Get datasets information
@@ -40,7 +40,7 @@ def get_datasets():
     })
 
 
-@datasets_bp.route('/delete', methods=['POST'])
+@datasets_bp.route('/api/datasets/delete', methods=['POST'])
 @login_required
 def delete_datasets():
     """Delete some datasets (db and triplestore) with a celery task

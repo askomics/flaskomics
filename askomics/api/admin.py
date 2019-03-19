@@ -5,10 +5,10 @@ from askomics.libaskomics.LocalAuth import LocalAuth
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
+admin_bp = Blueprint('admin', __name__, url_prefix='/')
 
 
-@admin_bp.route('/getusers', methods=['GET'])
+@admin_bp.route('/api/admin/getusers', methods=['GET'])
 @admin_required
 def get_users():
     """Get all users
@@ -41,7 +41,7 @@ def get_users():
     return jsonify({'users': all_users})
 
 
-@admin_bp.route('/setadmin', methods=['POST'])
+@admin_bp.route('/api/admin/setadmin', methods=['POST'])
 @admin_required
 def set_admin():
     """change admin status of a user
@@ -70,7 +70,7 @@ def set_admin():
     })
 
 
-@admin_bp.route('/setblocked', methods=['POST'])
+@admin_bp.route('/api/admin/setblocked', methods=['POST'])
 @admin_required
 def set_blocked():
     """Change blocked status of a user

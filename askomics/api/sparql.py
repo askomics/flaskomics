@@ -4,10 +4,10 @@ from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from flask import (Blueprint, current_app, jsonify, session, request)
 
 
-sparql_bp = Blueprint('sparql', __name__, url_prefix='/api/sparql')
+sparql_bp = Blueprint('sparql', __name__, url_prefix='/')
 
 
-@sparql_bp.route('/getquery', methods=['GET'])
+@sparql_bp.route('/api/sparql/getquery', methods=['GET'])
 def prefix():
     """Get the default sparql query
 
@@ -35,7 +35,7 @@ def prefix():
     })
 
 
-@sparql_bp.route('/query', methods=['POST'])
+@sparql_bp.route('/api/sparql/query', methods=['POST'])
 def query():
     """Perform a sparql query
 
