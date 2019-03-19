@@ -10,7 +10,7 @@ from flask import (Blueprint, current_app, jsonify, request, session)
 datasets_bp = Blueprint('datasets', __name__, url_prefix='/')
 
 
-@datasets_bp.route('/api/datasets/', methods=['GET'])
+@datasets_bp.route('/api/datasets', methods=['GET'])
 @login_required
 def get_datasets():
     """Get datasets information

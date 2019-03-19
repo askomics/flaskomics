@@ -19,18 +19,6 @@ export default class Ask extends Component {
     this.cancelRequest
   }
 
-  redirect() {
-    let url = new URL(window.location)
-    let redirect = url.searchParams.get('path')
-    if (redirect != null) {
-      if (redirect == 'integration') {
-        return 'files'
-      }
-      return redirect
-    }
-    return
-  }
-
   componentDidMount() {
 
     if (!this.props.waitForStart) {
@@ -79,17 +67,8 @@ export default class Ask extends Component {
       )
     }
 
-    // URL redirection
-    // redirect /?path=<path> to the <path> component
-    let urlRedirect
-    let redirection = this.redirect()
-    if (redirection) {
-      urlRedirect = <Redirect to={redirection} />
-    }
-
     return (
       <div className="container">
-        {urlRedirect}
         {redirectLogin}
         <h2>Ask!</h2>
         <hr />
