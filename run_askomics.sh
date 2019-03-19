@@ -83,8 +83,10 @@ do
     section=$(echo $setting | egrep -o "^ASKO[^=]+" | sed 's/^.\{5\}//g' | cut -d "_" -f 1)
     key=$(echo $setting | egrep -o "^ASKO[^=]+" | sed 's/^.\{5\}//g' | sed "s/$section\_//g")
     value=$(echo $setting | egrep -o "=.*$" | sed 's/^=//g')
-    # crudini --set $config_path $section $key $value
-    python3 config_updater.py -p $config_path -s $section -k $key -v $value
+    # crudini --set ${config_path} "${section}" "${key}" "${value}"
+    python3 config_updater.py -p $config_path -s "${section}" -k "${key}" -v "${value}"
+    $cmd
+
 done
 
 echo "Starting AskOmics ..."
