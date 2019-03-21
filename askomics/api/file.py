@@ -43,6 +43,20 @@ def get_files():
     })
 
 
+@file_bp.route('/api/files/upload_chunk', methods=['POST'])
+@login_required
+def upload_chunk():
+
+    data = request.get_json()
+    files = FilesHandler(current_app, session)
+    path = files.persist_chunk(data)
+    # current_app.logger.debug(data['chunk'])
+
+    return jsonify({
+        "path": path
+    })
+
+
 @file_bp.route('/api/files/upload', methods=['POST'])
 @login_required
 def upload():

@@ -100,6 +100,95 @@ class FilesHandler(Params):
 
         return files
 
+
+    def persist_chunk(self, chunk_info):
+
+        upload_path = "{}/{}_{}/upload".format(
+            self.settings.get("askomics", "data_directory"),
+            self.session['user']['id'],
+            self.session['user']['username']
+        )
+
+        # small file
+        if chunk_info["first"] and chunk_info["last"]:
+            self.log.debug('loading uniq chunk ...')
+            file_local_name = Utils.get_random_string(10)
+            file_path = "{}/{}".format(upload_path, file_local_name)
+            with open(file_path, "w") as file:
+                file.write(chunk_info["chunk"])
+            # database
+            database = Database(self.app, self.session)
+            query = '''
+            INSERT INTO files VALUES(
+                NULL,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+            )
+            '''
+
+            # Type
+            if chunk_info["type"] == 'text/tab-separated-values':
+                filetype = 'csv/tsv'
+            else:
+                # Default is csv/tsv
+                filetype = 'csv/tsv'
+
+            database.execute_sql_query(query, (self.session['user']['id'], chunk_info["name"], filetype, file_path, chunk_info["size"]))
+
+            return chunk_info["path"]
+
+        elif chunk_info["first"]:
+            self.log.debug('loading first chunk ...')
+
+            file_local_name = Utils.get_random_string(10)
+            file_path = "{}/{}".format(upload_path, file_local_name)
+            with open(file_path, "w") as file:
+                file.write(chunk_info["chunk"])
+            return file_local_name
+
+        elif chunk_info["last"]:
+            self.log.debug('loading last chunk ...')
+            file_path = "{}/{}".format(upload_path, chunk_info["path"])
+            with open(file_path, "a") as file:
+                file.write(chunk_info["chunk"])
+            # database
+            database = Database(self.app, self.session)
+            query = '''
+            INSERT INTO files VALUES(
+                NULL,
+                ?,
+                ?,
+                ?,
+                ?,
+                ?
+            )
+            '''
+
+            # Type
+            if chunk_info["type"] == 'text/tab-separated-values':
+                filetype = 'csv/tsv'
+            else:
+                # Default is csv/tsv
+                filetype = 'csv/tsv'
+
+            database.execute_sql_query(query, (self.session['user']['id'], chunk_info["name"], filetype, file_path, chunk_info["size"]))
+
+            return chunk_info["path"]
+
+        else:
+            self.log.debug('loading chunk ...')
+            file_path = "{}/{}".format(upload_path, chunk_info["path"])
+            with open(file_path, "a") as file:
+                file.write(chunk_info["chunk"])
+            return chunk_info["path"]
+
+
+
+
+
     def persist_files(self, input_files):
         """Persist files into the filesystem, and the database
 
