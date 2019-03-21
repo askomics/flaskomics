@@ -35,7 +35,9 @@ export default class UploadForm extends Component {
         name: file.name,
         size: file.size,
         uploadPercentage: 0,
-        path: ''
+        path: '',
+        error: false,
+        errorMessage: ''
       })),
       label: label
     })
@@ -113,48 +115,14 @@ export default class UploadForm extends Component {
             })
             .catch(error => {
               console.log(error, error.response.data.errorMessage)
+              this.setState({
+                new_files: update(this.state.new_files, {[i]: {error: {$set: true}}}, {[i]: {errorMessage: {$set: error.response.data.errorMessage}}})
+              })
             })
-
-
-
-
-
           }
         })
       }
-
-
-// this.setState({
-//   items: update(this.state.items, {1: {name: {$set: 'updated field name'}}})
-// })
-
-
-
-      // console.log(this.state.new_files[i].name)
-      // data.append(this.state.new_files[i].name, this.state.new_files[i])
     }
-
-    // axios.post(requestUrl, data)
-    // .then(response => {
-    //   console.log(requestUrl, response.data)
-    //   this.setState({
-    //     error: response.data.error,
-    //     files: response.data.uploadedFiles,
-    //     errorMessage: response.data.errorMessage,
-    //   })
-    //   this.props.setStateUpload({
-    //     files: this.state.files
-    //   })
-    // })
-    // .catch(error => {
-    //   console.log(error, error.response.data.errorMessage)
-    //   this.setState({
-    //     error: true,
-    //     errorMessage: error.response.data.errorMessage,
-    //     status: error.response.status,
-    //     success: !response.data.error
-    //   })
-    // })
     event.preventDefault()
   }
 
@@ -170,10 +138,16 @@ export default class UploadForm extends Component {
               <p>The maximum file size is 4GB</p>
             </FormText>
             {this.state.new_files.map(file => {
+              let progressBar
+              if (file.error) {
+                progressBar = <Progress color="error" value="100">ERROR</Progress>
+              }else{
+                progressBar = <Progress color="success" value={file.uploadPercentage}>{file.uploadPercentage} %</Progress>
+              }
               return (
                 <div>
                   <div className="text-center">{file.name}</div>
-                  <Progress color="success" value={file.uploadPercentage}>{file.uploadPercentage} %</Progress>
+                    {progressBar}
                 </div>
               )
             })}

@@ -6,7 +6,6 @@ from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
 
 import rdflib
-from rdflib.namespace import Namespace
 
 
 class CsvFile(File):

@@ -46,14 +46,31 @@ def get_files():
 @file_bp.route('/api/files/upload_chunk', methods=['POST'])
 @login_required
 def upload_chunk():
+    """Upload a file chunk
 
+    Returns
+    -------
+    json
+        path: name of the local file. To append the next chunk into it
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
-    files = FilesHandler(current_app, session)
-    path = files.persist_chunk(data)
-    # current_app.logger.debug(data['chunk'])
 
+    try:
+        files = FilesHandler(current_app, session)
+        path = files.persist_chunk(data)
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            "path": '',
+            "error": True,
+            "errorMessage": str(e)
+        }), 500
     return jsonify({
-        "path": path
+        "path": path,
+        "error": False,
+        "errorMessage": ""
     })
 
 

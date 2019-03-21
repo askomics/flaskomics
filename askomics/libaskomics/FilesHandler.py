@@ -15,6 +15,8 @@ class FilesHandler(Params):
         list of File
     host_url : string
         AskOmics url, for the triplestore
+    upload_path : string
+        Upload path
     """
 
     def __init__(self, app, session, host_url=None):
@@ -32,6 +34,11 @@ class FilesHandler(Params):
         Params.__init__(self, app, session)
         self.files = []
         self.host_url = host_url
+        self.upload_path = "{}/{}_{}/upload".format(
+            self.settings.get("askomics", "data_directory"),
+            self.session['user']['id'],
+            self.session['user']['username']
+        )
 
     def handle_files(self, files_id):
         """Handle file
@@ -100,149 +107,116 @@ class FilesHandler(Params):
 
         return files
 
-
-    def persist_chunk(self, chunk_info):
-
-        upload_path = "{}/{}_{}/upload".format(
-            self.settings.get("askomics", "data_directory"),
-            self.session['user']['id'],
-            self.session['user']['username']
-        )
-
-        # small file
-        if chunk_info["first"] and chunk_info["last"]:
-            self.log.debug('loading uniq chunk ...')
-            file_local_name = Utils.get_random_string(10)
-            file_path = "{}/{}".format(upload_path, file_local_name)
-            with open(file_path, "w") as file:
-                file.write(chunk_info["chunk"])
-            # database
-            database = Database(self.app, self.session)
-            query = '''
-            INSERT INTO files VALUES(
-                NULL,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?
-            )
-            '''
-
-            # Type
-            if chunk_info["type"] == 'text/tab-separated-values':
-                filetype = 'csv/tsv'
-            else:
-                # Default is csv/tsv
-                filetype = 'csv/tsv'
-
-            database.execute_sql_query(query, (self.session['user']['id'], chunk_info["name"], filetype, file_path, chunk_info["size"]))
-
-            return chunk_info["path"]
-
-        elif chunk_info["first"]:
-            self.log.debug('loading first chunk ...')
-
-            file_local_name = Utils.get_random_string(10)
-            file_path = "{}/{}".format(upload_path, file_local_name)
-            with open(file_path, "w") as file:
-                file.write(chunk_info["chunk"])
-            return file_local_name
-
-        elif chunk_info["last"]:
-            self.log.debug('loading last chunk ...')
-            file_path = "{}/{}".format(upload_path, chunk_info["path"])
-            with open(file_path, "a") as file:
-                file.write(chunk_info["chunk"])
-            # database
-            database = Database(self.app, self.session)
-            query = '''
-            INSERT INTO files VALUES(
-                NULL,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?
-            )
-            '''
-
-            # Type
-            if chunk_info["type"] == 'text/tab-separated-values':
-                filetype = 'csv/tsv'
-            else:
-                # Default is csv/tsv
-                filetype = 'csv/tsv'
-
-            database.execute_sql_query(query, (self.session['user']['id'], chunk_info["name"], filetype, file_path, chunk_info["size"]))
-
-            return chunk_info["path"]
-
-        else:
-            self.log.debug('loading chunk ...')
-            file_path = "{}/{}".format(upload_path, chunk_info["path"])
-            with open(file_path, "a") as file:
-                file.write(chunk_info["chunk"])
-            return chunk_info["path"]
-
-
-
-
-
-    def persist_files(self, input_files):
-        """Persist files into the filesystem, and the database
-
-        Parameters
-        ----------
-        input_files : list
-            list of files to persist
+    def get_file_name(self):
+        """Get a random file name
 
         Returns
         -------
-        list
-            list of files info
+        string
+            file name
         """
-        upload_path = "{}/{}_{}/upload".format(
-            self.settings.get("askomics", "data_directory"),
-            self.session['user']['id'],
-            self.session['user']['username']
+        return Utils.get_random_string(10)
+
+    def write_data_into_file(self, data, file_name, mode):
+        """Write data into a file
+
+        Parameters
+        ----------
+        data : string
+            data to write
+        file_name : string
+            Local file name
+        mode : string
+            open mode (w or a)
+        """
+        file_path = "{}/{}".format(self.upload_path, file_name)
+        with open(file_path, mode) as file:
+            file.write(data)
+
+    def store_file_info_in_db(self, name, filetype, file_name, size):
+        """Store the file info in the database
+
+        Parameters
+        ----------
+        name : string
+            Name of the file
+        filetype : string
+            Type (csv ...)
+        file_name : string
+            Local file name
+        size : string
+            Size of file
+        """
+        file_path = "{}/{}".format(self.upload_path, file_name)
+
+        database = Database(self.app, self.session)
+        query = '''
+        INSERT INTO files VALUES(
+            NULL,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
         )
+        '''
 
-        for file in input_files:
+        # Type
+        if filetype == 'text/tab-separated-values':
+            filetype = 'csv/tsv'
+        else:
+            # Default is csv/tsv
+            filetype = 'csv/tsv'
 
-            # Get name, extension local name (a random string), and path
-            splitted_name = os.path.splitext(input_files[file].filename)
-            file_name = splitted_name[0]
-            file_ext = splitted_name[1].lower()
-            file_local_name = Utils.get_random_string(10)
-            file_path = "{}/{}".format(upload_path, file_local_name)
+        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size))
 
-            # save in user upload directory
-            input_files[file].save("{}/{}".format(upload_path, file_local_name))
-            # Get file size
-            file_size = os.path.getsize(file_path)
-            # Get file type
-            file_type = self.get_type(file_ext)
+    def persist_chunk(self, chunk_info):
+        """Persist a file by chunk. Store info in db if the chunk is the last
 
-            # Save in db
-            database = Database(self.app, self.session)
-            query = '''
-            INSERT INTO files VALUES(
-                NULL,
-                ?,
-                ?,
-                ?,
-                ?,
-                ?
-            )
-            '''
+        Parameters
+        ----------
+        chunk_info : dict
+            Info about the chunk
 
-            database.execute_sql_query(query, (self.session['user']['id'], file_name, file_type, file_path, file_size))
+        Returns
+        -------
+        str
+            local filename
+        """
+        try:
+            # 1 chunk file
+            if chunk_info["first"] and chunk_info["last"]:
+                # Write data into file
+                file_name = self.get_file_name()
+                self.write_data_into_file(chunk_info["chunk"], file_name, "w")
+                # store file info in db
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+            # first chunk of large file
+            elif chunk_info["first"]:
+                file_name = self.get_file_name()
+                self.write_data_into_file(chunk_info["chunk"], file_name, "w")
+            # last chunk of large file
+            elif chunk_info["last"]:
+                file_name = chunk_info["path"]
+                self.write_data_into_file(chunk_info["chunk"], file_name, "a")
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+            # chunk of large file
+            else:
+                file_name = chunk_info["path"]
+                self.write_data_into_file(chunk_info["chunk"], file_name, "a")
 
-        return self.get_files_infos()
+            return file_name
+        except Exception as e:
+            # Rollback
+            try:
+                self.delete_file_from_fs("{}/{}".format(self.upload_path, file_name))
+            except Exception:
+                pass
+            raise(e)
 
     def get_type(self, file_ext):
         """Get files type, based on extension
+
         TODO: sniff file to get type
 
         Parameters
