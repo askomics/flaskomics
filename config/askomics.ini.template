@@ -22,7 +22,7 @@ database_path = /tmp/flaskomics/database.db
 # Salt for user password. Use a random string
 password_salt = 4sk0mIcs
 # If true, accout are locked at creation
-default_locked_account = true
+default_locked_account = false
 
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki
