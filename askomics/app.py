@@ -8,11 +8,11 @@ BLUEPRINTS : Tuple
 
 from askomics.api.admin import admin_bp
 from askomics.api.auth import auth_bp
-# from askomics.api.catch_url import catch_url_bp
 from askomics.api.datasets import datasets_bp
 from askomics.api.file import file_bp
 from askomics.api.sparql import sparql_bp
 from askomics.api.start import start_bp
+from askomics.api.startpoints import startpoints_bp
 from askomics.api.view import view_bp
 
 from celery import Celery
@@ -32,7 +32,7 @@ BLUEPRINTS = (
     admin_bp,
     file_bp,
     datasets_bp,
-    # catch_url_bp
+    startpoints_bp
 )
 
 

@@ -145,7 +145,9 @@ class File(Params):
         rdf_graph.add((rdflib.Literal(self.file_graph), prov.describesService, rdflib.Literal(os.uname()[1])))
 
         if self.public:
-            rdf_graph.add((rdflib.Literal(self.file_graph), rdflib.RDF.type, self.askomics_prefix['publicGraph']))
+            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
+        else:
+            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(False)))
 
         return rdf_graph
 

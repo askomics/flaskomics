@@ -297,14 +297,17 @@ class CsvFile(File):
         if self.header[0].find('<') > 0:
             splitted = self.header[0].split('<')
             entity = self.askomics_prefix[self.format_uri(splitted[0], remove_space=True)]
+            entity_label = rdflib.Literal(splitted[0])
             mother_class = self.askomics_prefix[self.format_uri(splitted[1], remove_space=True)]
             # subClassOf
             rdf_graph.add((entity, rdflib.RDFS.subClassOf, mother_class))
         else:
             entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
+            entity_label = rdflib.Literal(self.header[0])
 
         rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
         rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
+        rdf_graph.add((entity, rdflib.RDFS.label, entity_label))
         if self.columns_type[0] == 'start_entity':
             rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
 

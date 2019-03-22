@@ -96,6 +96,26 @@ class SparqlQueryBuilder(Params):
 
         return query
 
+    def prefix_query(self, query):
+        """Add prefix and dedent a sparql query string
+
+        Parameters
+        ----------
+        query : string
+            The sparql query
+
+        Returns
+        -------
+        string
+            Formatted query
+        """
+        prefix_manager = PrefixManager(self.app, self.session)
+        query = textwrap.dedent(query)
+        return '{}{}'.format(
+            prefix_manager.get_prefix(),
+            query
+        )
+
     def get_default_query_with_prefix(self):
         """Get default query with the prefixes
 

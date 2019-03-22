@@ -1,9 +1,10 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Alert } from 'reactstrap';
+import { Alert, Button } from 'reactstrap';
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
+import update from 'react-addons-update'
 
 export default class Ask extends Component {
 
@@ -13,22 +14,32 @@ export default class Ask extends Component {
       waiting: true,
       error: false,
       errorMessage: null,
-      logged: props.logged,
-      user: props.user
+      startpoints: [],
+      selected: null,
+      startSession: false
     }
     this.cancelRequest
+    this.handleClick = this.handleClick.bind(this)
+    this.handleStart = this.handleStart.bind(this)
   }
 
   componentDidMount() {
 
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/hello'
+      let requestUrl = '/api/startpoints'
       axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          message: response.data.message,
-          waiting: false
+          waiting: false,
+          startpoints: response.data.startpoints.map(startpoint => new Object({
+            graph: startpoint.graph,
+            entity: startpoint.entity,
+            entity_label: startpoint.entity_label,
+            creator: startpoint.creator,
+            public: startpoint.public,
+            selected: false
+          }))
         })
       })
       .catch(error => {
@@ -49,11 +60,41 @@ export default class Ask extends Component {
     }
   }
 
+  handleClick(event) {
+    this.setState({
+      selected: event.target.id
+    })
+  }
+
+  handleStart(event) {
+    console.log("Start session with " + this.state.selected)
+    this.setState({
+      startSession: true
+    })
+  }
+
+  disabledStartButton() {
+    return this.state.selected ? false : true
+  }
+
+
   render() {
 
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
+    }
+
+    let redirectQueryBuilder
+    if (this.state.startSession) {
+      redirectQueryBuilder = <Redirect to={{
+        pathname: "/query",
+        state: {
+          startpoint: this.state.selected,
+          user: this.props.user,
+          logged: this.props.logged
+        }
+      }} />
     }
 
     let errorDiv
@@ -67,13 +108,35 @@ export default class Ask extends Component {
       )
     }
 
+    let startpoints
+    if (!this.state.waiting) {
+      startpoints = (
+        <div>
+          <p>Select an entity to start a session:</p>
+          <div className="startpoints-div">
+            {this.state.startpoints.map(startpoint => (
+              <div className="input-label" id={startpoint.entity_label}>
+                <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
+                <label className="startpoint-label" id={startpoint.name} for={startpoint.entity}>
+                  <i class={startpoint.public == "true" ? "fa fa-globe-europe text-info" : "fa fa-lock text-primary"}></i> <em className={startpoint.public == "true" ? "text-info" : "text-primary"}>{startpoint.entity_label}</em>
+                </label>
+              </div>
+            ))}
+          </div>
+          <br />
+          <Button disabled={this.disabledStartButton()} onClick={this.handleStart} color="secondary">Start!</Button>
+        </div>
+      )
+    }
+
     return (
       <div className="container">
+        {redirectQueryBuilder}
         {redirectLogin}
         <h2>Ask!</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
-        <p>{this.state.message}</p>
+        {startpoints}
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

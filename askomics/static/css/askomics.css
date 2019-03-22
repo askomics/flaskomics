@@ -42,3 +42,26 @@
 .center-div {
   text-align: center;
 }
+
+div.startpoints-div {
+    height: 200px;
+    width: 30%;
+    overflow-y: scroll;
+    border:1px solid #ccc;
+    border-radius: 4px;
+    /*border-top-style: none;*/
+}
+
+label.startpoint-label {
+    cursor: pointer;
+    display: block;
+    margin-left: 5px;
+}
+
+.startpoint-radio {
+    display:none;
+}
+
+input[type="radio"].startpoint-radio:checked+label{
+    background-color: #ccc;
+}
