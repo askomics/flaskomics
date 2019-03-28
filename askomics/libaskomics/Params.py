@@ -43,3 +43,20 @@ class Params(object):
     def get_error_message(self):
 
         return self.error_message
+
+    def str_to_bool(self, bool_str):
+        """Convert a true/false string to a boolan value
+
+        Parameters
+        ----------
+        bool_str : str
+            boolean string
+
+        Returns
+        -------
+        bool
+            True or False
+        """
+        if bool_str.lower() == 'true':
+            return True
+        return False

@@ -33,11 +33,11 @@ export default class Ask extends Component {
         this.setState({
           waiting: false,
           startpoints: response.data.startpoints.map(startpoint => new Object({
-            graph: startpoint.graph,
+            graphs: startpoint.graphs,
             entity: startpoint.entity,
             entity_label: startpoint.entity_label,
-            creator: startpoint.creator,
             public: startpoint.public,
+            private: startpoint.private,
             selected: false
           }))
         })
@@ -117,8 +117,10 @@ export default class Ask extends Component {
             {this.state.startpoints.map(startpoint => (
               <div className="input-label" id={startpoint.entity_label}>
                 <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
-                <label className="startpoint-label" id={startpoint.name} for={startpoint.entity}>
-                  <i class={startpoint.public == "true" ? "fa fa-globe-europe text-info" : "fa fa-lock text-primary"}></i> <em className={startpoint.public == "true" ? "text-info" : "text-primary"}>{startpoint.entity_label}</em>
+                <label className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
+                  {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
+                  {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
+                  <em> {startpoint.entity_label}</em>
                 </label>
               </div>
             ))}

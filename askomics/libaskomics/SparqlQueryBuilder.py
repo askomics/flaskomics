@@ -37,12 +37,20 @@ class SparqlQueryBuilder(Params):
     def set_graphs_from_db(self):
         """Get named graph from the db"""
         database = Database(self.app, self.session)
-        query = '''
-        SELECT graph_name, user_id, public
-        FROM datasets
-        WHERE (user_id = ? OR public = ? )
-        '''
-        rows = database.execute_sql_query(query, (self.session['user']['id'], True))
+        if 'user' in self.session:
+            query = '''
+            SELECT graph_name, user_id, public
+            FROM datasets
+            WHERE (user_id = ? OR public = ? )
+            '''
+            rows = database.execute_sql_query(query, (self.session['user']['id'], True))
+        else:
+            query = '''
+            SELECT graph_name, user_id, public
+            FROM datasets
+            WHERE public = ?
+            '''
+            rows = database.execute_sql_query(query, (True, ))
 
         for row in rows:
             if row[2]:

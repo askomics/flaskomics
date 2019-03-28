@@ -19,7 +19,12 @@ def startpoints():
     """
     try:
         tse = TriplestoreExplorer(current_app, session)
-        startpoints = tse.get_startpoints()
+        if 'user' in session:
+            current_app.logger.debug('logged')
+            startpoints = tse.get_startpoints()
+        else:
+            current_app.logger.debug('public')
+            startpoints = tse.get_public_startpoints()
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({
