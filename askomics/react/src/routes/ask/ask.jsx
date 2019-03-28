@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Alert, Button } from 'reactstrap';
+import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap';
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
@@ -21,6 +21,7 @@ export default class Ask extends Component {
     this.cancelRequest
     this.handleClick = this.handleClick.bind(this)
     this.handleStart = this.handleStart.bind(this)
+    this.handleFilter = this.handleFilter.bind(this)
   }
 
   componentDidMount() {
@@ -38,6 +39,7 @@ export default class Ask extends Component {
             entity_label: startpoint.entity_label,
             public: startpoint.public,
             private: startpoint.private,
+            hidden: false,
             selected: false
           }))
         })
@@ -77,6 +79,23 @@ export default class Ask extends Component {
     return this.state.selected ? false : true
   }
 
+  handleFilter(event) {
+    this.state.startpoints.map((startpoint, i) => {
+      let re = new RegExp(event.target.value, 'g')
+      let res = startpoint.entity_label.toLowerCase().match(re)
+      if (res == null) {
+        // don't match, hide
+        startpoint.hidden = true
+
+      }else{
+        // show
+        startpoint.hidden = false
+      }
+    })
+    this.forceUpdate()
+
+  }
+
 
   render() {
 
@@ -113,11 +132,14 @@ export default class Ask extends Component {
       startpoints = (
         <div>
           <p>Select an entity to start a session:</p>
+          <div className="startpoints-filter-div">
+            <Input placeholder="Filter entities" onChange={this.handleFilter} />
+          </div>
           <div className="startpoints-div">
             {this.state.startpoints.map(startpoint => (
               <div className="input-label" id={startpoint.entity_label}>
-                <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
-                <label className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
+                <input hidden={startpoint.hidden ? "hidden" : ""} className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
+                <label hidden={startpoint.hidden ? "hidden" : ""} className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
                   {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
                   {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
                   <em> {startpoint.entity_label}</em>
