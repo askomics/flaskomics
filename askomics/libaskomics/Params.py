@@ -60,3 +60,15 @@ class Params(object):
         if bool_str.lower() == 'true':
             return True
         return False
+
+    def logged_user(self):
+        """Check if a user is logged
+
+        Returns
+        -------
+        bool
+            True if a user is logged
+        """
+        if "user" in self.session:
+            return True
+        return False

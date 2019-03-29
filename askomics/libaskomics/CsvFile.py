@@ -326,6 +326,7 @@ class CsvFile(File):
                 label = rdflib.Literal(splitted[0])
                 rdf_range = self.askomics_prefix[quote(splitted[1])]
                 rdf_type = rdflib.OWL.ObjectProperty
+                rdf_graph.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
 
             # Category
             elif self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
@@ -333,6 +334,7 @@ class CsvFile(File):
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
+                rdf_graph.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsCategory"]))
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
