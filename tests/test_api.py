@@ -43,8 +43,6 @@ class TestApi(AskomicsTestCase):
             "footer_message": app.iniconfig.get('askomics', 'footer_message')
         }
 
-        assert 'user' not in flask.session
-
         # Jdoe (admin) logged
         response = client_logged_as_jdoe.get('/api/start')
 

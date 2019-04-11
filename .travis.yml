@@ -9,7 +9,7 @@ services:
 cache:
   - pip
 install:
-  - python setup.py install
+  - pip install -r requirements.txt
 before_script:
   - docker pull redis:4.0
   - docker pull askomics/virtuoso
@@ -17,4 +17,4 @@ before_script:
   - sudo docker run -d --name redis --net="host" -t redis:4.0
   - sleep 1m
 script:
-  - python setup.py pytest
+  - pytest
