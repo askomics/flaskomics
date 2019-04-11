@@ -18,3 +18,5 @@ before_script:
   - sleep 1m
 script:
   - pytest
+after_success:
+  coveralls
