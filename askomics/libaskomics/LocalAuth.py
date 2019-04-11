@@ -144,7 +144,7 @@ class LocalAuth(Params):
             admin = False
             blocked = self.settings.getboolean('askomics', 'default_locked_account')
 
-        api_key = Utils.get_random_string(20)
+        api_key = Utils.get_random_string(20) if "apikey" not in inputs else inputs["apikey"]
 
         query = '''
         INSERT INTO users VALUES(
@@ -167,7 +167,7 @@ class LocalAuth(Params):
 
         if not ldap:
             # Create a salt
-            salt = Utils.get_random_string(20)
+            salt = Utils.get_random_string(20) if "salt" not in inputs else inputs["salt"]
             # Concat askomics_salt + user_password + salt
             salted_pw = self.settings.get('askomics', 'password_salt') + inputs['password'] + salt
             # hash
@@ -278,18 +278,18 @@ class LocalAuth(Params):
             if rows[0][6] != shapw:
                 error = True
                 error_messages.append('Wrong password')
-
-            user = {
-                'id': rows[0][0],
-                'ldap': rows[0][1],
-                'fname': rows[0][2],
-                'lname': rows[0][3],
-                'username': rows[0][4],
-                'email': rows[0][5],
-                'admin': rows[0][9],
-                'blocked': rows[0][10],
-                'apikey': rows[0][8]
-            }
+            else:
+                user = {
+                    'id': rows[0][0],
+                    'ldap': rows[0][1],
+                    'fname': rows[0][2],
+                    'lname': rows[0][3],
+                    'username': rows[0][4],
+                    'email': rows[0][5],
+                    'admin': rows[0][9],
+                    'blocked': rows[0][10],
+                    'apikey': rows[0][8]
+                }
         else:
             error = True
             error_messages.append('Wrong username')
@@ -324,32 +324,35 @@ class LocalAuth(Params):
         new_lname = user['lname']
         new_email = user['email']
 
-        if inputs['newFname']:
-            update.append('fname=?')
-            values.append(inputs['newFname'])
-            new_fname = inputs['newFname']
-        if inputs['newLname']:
-            update.append('lname=?')
-            values.append(inputs['newLname'])
-            new_lname = inputs['newLname']
-        if inputs['newEmail']:
-            update.append('email=?')
-            values.append(inputs['newEmail'])
-            new_email = inputs['newEmail']
+        # update only if one value are provided
+        if not list(inputs.values()) == ['', '', '']:
 
-        update_str = ', '.join(update)
+            if inputs['newFname']:
+                update.append('fname=?')
+                values.append(inputs['newFname'])
+                new_fname = inputs['newFname']
+            if inputs['newLname']:
+                update.append('lname=?')
+                values.append(inputs['newLname'])
+                new_lname = inputs['newLname']
+            if inputs['newEmail']:
+                update.append('email=?')
+                values.append(inputs['newEmail'])
+                new_email = inputs['newEmail']
 
-        query = '''
-        UPDATE users SET
-        {}
-        WHERE username=?
-        '''.format(update_str)
+            update_str = ', '.join(update)
 
-        database.execute_sql_query(query, tuple(values) + (user['username'], ))
+            query = '''
+            UPDATE users SET
+            {}
+            WHERE username=?
+            '''.format(update_str)
 
-        user['fname'] = new_fname
-        user['lname'] = new_lname
-        user['email'] = new_email
+            database.execute_sql_query(query, tuple(values) + (user['username'], ))
+
+            user['fname'] = new_fname
+            user['lname'] = new_lname
+            user['email'] = new_email
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
@@ -376,29 +379,33 @@ class LocalAuth(Params):
         # check if new passwords are identicals
         password_identical = (inputs['newPassword'] == inputs['confPassword'])
 
-        if password_identical:
-            # Try to authenticate the user with his old password
-            credentials = {'login': user['username'], 'password': inputs['oldPassword']}
-            authentication = self.authenticate_user(credentials)
-            if not authentication['error']:
-                # Update the password
-                salt = Utils.get_random_string(20)
-                salted_pw = self.settings.get('askomics', 'password_salt') + inputs['newPassword'] + salt
-                sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
+        if not inputs["newPassword"] == '':
+            if password_identical:
+                # Try to authenticate the user with his old password
+                credentials = {'login': user['username'], 'password': inputs['oldPassword']}
+                authentication = self.authenticate_user(credentials)
+                if not authentication['error']:
+                    # Update the password
+                    salt = Utils.get_random_string(20)
+                    salted_pw = self.settings.get('askomics', 'password_salt') + inputs['newPassword'] + salt
+                    sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
 
-                query = '''
-                UPDATE users SET
-                password=?, salt=?
-                WHERE username=?
-                '''
+                    query = '''
+                    UPDATE users SET
+                    password=?, salt=?
+                    WHERE username=?
+                    '''
 
-                database.execute_sql_query(query, (sha512_pw, salt, user['username']))
+                    database.execute_sql_query(query, (sha512_pw, salt, user['username']))
+                else:
+                    error = True
+                    error_message = 'Incorrect old password'
             else:
                 error = True
-                error_message = 'Incorrect old password'
+                error_message = 'New passwords are not identical'
         else:
             error = True
-            error_message = 'New passwords are not identical'
+            error_message = 'Empty password'
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
@@ -446,6 +453,8 @@ class LocalAuth(Params):
         '''
 
         rows = database.execute_sql_query(query, (username, ))
+        self.log.debug("rows")
+        self.log.debug(rows)
 
         user = {}
         user['id'] = rows[0][0]

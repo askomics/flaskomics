@@ -1,3 +1,6 @@
+import sys
+import traceback
+
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Start import Start
 
@@ -75,6 +78,7 @@ def start():
 
     except Exception as e:
         current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             "error": True,
             "errorMessage": str(e),

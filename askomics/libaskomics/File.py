@@ -72,6 +72,7 @@ class File(Params):
         self.size = file_info['size']
         self.id = file_info['id']
         self.public = False
+        self.timestamp = int(time.time())
 
         self.default_graph = "{}".format(self.settings.get('triplestore', 'default_graph'))
         self.user_graph = "{}:{}_{}".format(
@@ -84,7 +85,7 @@ class File(Params):
             self.session['user']['id'],
             self.session['user']['username'],
             self.name,
-            int(time.time())
+            self.timestamp
         )
 
         self.ttl_dir = '{}/{}_{}/ttl'.format(

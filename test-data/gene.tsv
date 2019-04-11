@@ -1,0 +1,9 @@
+Gene	organism	chromosome	strand	start	end
+AT001	Arabidopsis thaliana	AT1	plus	1	40000
+AT002	Arabidopsis thaliana	AT1	plus	50000	80000
+AT003	Arabidopsis thaliana	AT2	plus	200	6000
+AT004	Arabidopsis thaliana	AT3	minus	1000	60000
+AT005	Arabidopsis thaliana	AT3	plus	90000	110000
+BN001	Brassica napus	BN1	plus	700	90000
+BN002	Brassica napus	BN2	plus	60	4000
+BN003	Brassica napus	BN2	plus	7000	10000
