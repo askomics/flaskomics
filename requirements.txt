@@ -9,3 +9,5 @@ requests
 celery
 redis
 watchdog
+pytest
+coveralls
