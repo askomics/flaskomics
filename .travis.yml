@@ -17,6 +17,6 @@ before_script:
   - sudo docker run -d --name redis --net="host" -t redis:4.0
   - sleep 1m
 script:
-  - pytest
+  - pytest --cov=.
 after_success:
   coveralls

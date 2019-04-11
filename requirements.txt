@@ -10,4 +10,5 @@ celery
 redis
 watchdog
 pytest
+pytest-cov
 coveralls
