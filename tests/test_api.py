@@ -1,5 +1,3 @@
-import flask
-
 from pkg_resources import get_distribution
 
 from . import AskomicsTestCase

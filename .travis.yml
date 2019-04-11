@@ -10,6 +10,7 @@ cache:
   - pip
 install:
   - pip install -r requirements.txt
+  - python setup.py install
 before_script:
   - docker pull redis:4.0
   - docker pull askomics/virtuoso
