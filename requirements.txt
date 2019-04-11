@@ -9,6 +9,6 @@ requests
 celery
 redis
 watchdog
-pytest
+pytest>=3.6
 pytest-cov
 coveralls
