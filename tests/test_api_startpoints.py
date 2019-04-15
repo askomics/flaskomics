@@ -1,3 +1,5 @@
+import unittest
+
 from . import AskomicsTestCase
 
 
@@ -6,10 +8,11 @@ class TestApiStartpoints(AskomicsTestCase):
 
     def test_startpoints(self, client_logged_as_jdoe_with_data):
         """Test /api/startpoints route"""
+        case = unittest.TestCase()
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
         response = client_logged_as_jdoe_with_data.get('/api/startpoints')
         assert response.status_code == 200
-        assert response.json == {
+        expected = {
             'error': False,
             'errorMessage': '',
             'startpoints': [{
@@ -26,14 +29,15 @@ class TestApiStartpoints(AskomicsTestCase):
                 'public': False
             }]
         }
+        case.assertCountEqual(response.json, expected)
 
     def test_get_abstraction(self, client_logged_as_jdoe_with_data):
         """Test /api/startpoints/abstraction route"""
+        case = unittest.TestCase()
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
         response = client_logged_as_jdoe_with_data.get('/api/startpoints/abstraction')
         assert response.status_code == 200
-        print(response.json)
-        assert response.json == {
+        expected =  {
             'abstraction': [{
                 'attributes':
                 [{
@@ -98,3 +102,4 @@ class TestApiStartpoints(AskomicsTestCase):
             'error': False,
             'errorMessage': ''
         }
+        case.assertCountEqual(response.json, expected)

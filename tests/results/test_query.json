@@ -1,0 +1,134 @@
+{
+    "data": [
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT001"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT002"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT003"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT004"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT005"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN001"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN002"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN003"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#Class",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#entity",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#startPoint",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#end"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#organism"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#organism"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#start"
+        },
+        {
+            "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT1"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT2"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT3"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#organismCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis%20thaliana"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN1"
+        },
+        {
+            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN2"
+        }
+    ],
+    "header": [
+        "s",
+        "p",
+        "o"
+    ]
+}
