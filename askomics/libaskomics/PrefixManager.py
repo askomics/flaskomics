@@ -50,7 +50,8 @@ class PrefixManager(Params):
             prefixes
         """
         prefix_string = ''
-        for prefix, url in self.prefix.items():
-            prefix_string += 'PREFIX {} <{}>\n'.format(prefix, url)
+        sorted_keys = sorted(self.prefix)  # We sort because python3.5 don't keep the dict order and it fail the unittest
+        for prefix in sorted_keys:
+            prefix_string += 'PREFIX {} <{}>\n'.format(prefix, self.prefix[prefix])
 
         return prefix_string
