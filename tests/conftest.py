@@ -367,7 +367,9 @@ def client_logged_as_jdoe_with_data():
         user_session = sess
 
     # Upload people.tsv
-    load_file(dir_path, 'test-data/gene.tsv', user_session)
+    fpath = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    client.gene_file_path = fpath
+
     # Integrate
     file_info = {
         "id": 1,
