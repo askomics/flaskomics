@@ -1,5 +1,5 @@
 import os
-import unittest
+
 from . import AskomicsTestCase
 
 
@@ -8,7 +8,6 @@ class TestApiFile(AskomicsTestCase):
 
     def test_get_files(self, client_logged_as_jdoe_with_data):
         """test the /api/files route"""
-        case = unittest.TestCase()
         response = client_logged_as_jdoe_with_data.get('/api/files')
         assert response.status_code == 200
         assert response.json == {
