@@ -350,6 +350,9 @@ def client_logged_as_jdoe_with_data():
 
     client = current_app.test_client()
 
+    # store dirpath
+    client.dir_path = dir_path
+
     # log as jsmith
     # log as jdoe
     with client.session_transaction() as sess:
