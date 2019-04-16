@@ -17,6 +17,7 @@ before_script:
   - sudo docker run -d --name redis --net="host" -t redis:4.0
   - sleep 1m
 script:
+  - flake8 askomics tests --ignore=E501,W504
   - pytest --cov=. -vv --log-cli-level debug
 after_success:
   coveralls
