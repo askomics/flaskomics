@@ -37,7 +37,7 @@ class TestApiStartpoints(AskomicsTestCase):
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
         response = client_logged_as_jdoe_with_data.get('/api/startpoints/abstraction')
         assert response.status_code == 200
-        expected =  {
+        expected = {
             'abstraction': [{
                 'attributes':
                 [{

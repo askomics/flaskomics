@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -10,7 +11,6 @@ from pkg_resources import get_distribution
 
 import rdflib
 from rdflib.namespace import Namespace
-from urllib.parse import quote
 
 
 class File(Params):

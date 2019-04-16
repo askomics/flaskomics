@@ -1,7 +1,7 @@
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
-from flask import (Blueprint, current_app, jsonify, session, request)
+from flask import (Blueprint, current_app, jsonify, request, session)
 
 
 sparql_bp = Blueprint('sparql', __name__, url_prefix='/')

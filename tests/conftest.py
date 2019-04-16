@@ -1,16 +1,16 @@
 """conftest"""
-from askomics.app import create_app, create_celery
+import os
+import shutil
+import tempfile
 
-from askomics.libaskomics.FilesHandler import FilesHandler
-from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
+from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
+from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 
-import tempfile
 import pytest
-import shutil
-import os
 
 
 def init_database(dir_path):
