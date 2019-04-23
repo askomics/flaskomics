@@ -42,6 +42,7 @@
     "react-bootstrap-table-next": "^2.1.0",
     "react-bootstrap-table2-paginator": "^2.0.1",
     "react-dom": "^16.7.0",
+    "react-force-graph": "^1.20.6",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-simple-code-editor": "^0.9.3",
