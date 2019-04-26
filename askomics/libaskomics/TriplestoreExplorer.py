@@ -87,6 +87,175 @@ class TriplestoreExplorer(Params):
         return startpoints
 
     def get_abstraction(self):
+
+        return self.get_abstraction_new()
+        # return self.get_abstraction_deprecated()
+
+    def get_abstraction_new(self):
+        """Get user abstraction from the triplestore
+
+        Returns
+        -------
+        list
+            AskOmics abstraction
+        """
+        filter_user = ""
+        if self.logged_user():
+            filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_builder = SparqlQueryBuilder(self.app, self.session)
+
+        query = '''
+        SELECT DISTINCT ?graph ?entity_uri ?entity_label ?attribute_uri ?attribute_label ?attribute_type ?property_uri ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
+        WHERE {{
+            # Graphs
+            ?graph :public ?public .
+            ?graph dc:creator ?creator .
+            GRAPH ?graph {{
+                # Entities
+                ?entity_uri a :entity .
+                ?entity_uri a :startPoint .
+                ?entity_uri rdfs:label ?entity_label .
+                # Attributes
+                OPTIONAL {{
+                    ?attribute_uri a owl:DatatypeProperty .
+                    ?attribute_uri rdfs:label ?attribute_label .
+                    ?attribute_uri rdfs:domain ?entity_uri .
+                    ?attribute_uri rdfs:range ?attribute_type .
+                }}
+                # Property (relations and categories)
+                OPTIONAL {{
+                    ?property_uri a owl:ObjectProperty .
+                    ?property_uri rdfs:label ?property_label .
+                    ?property_uri rdfs:domain ?entity_uri .
+                    ?property_uri rdfs:range ?range_uri .
+                    ?property_uri a ?property_type .
+                }}
+                # Categories (DK)
+                OPTIONAL {{
+                    ?range_uri askomics:category ?category_value_uri .
+                    ?category_value_uri rdfs:label ?category_value_label .
+                }}
+            }}
+            FILTER (
+                ?public = <true>{}
+            )
+        }}
+        '''.format(filter_user)
+
+        header, data = query_launcher.process_query(query_builder.prefix_query(query))
+
+        entities_list = []  # list of entity uri
+        attributes_list = []
+        relations_list = []
+
+        entities = []  # list of entity dict
+        attributes = []
+        relations = []
+
+        abstraction = []
+
+        for result in data:
+            if result["entity_uri"] not in entities_list:
+                # New entity
+                entities_list.append(result["entity_uri"])
+                # Uri, graph and label
+                entity = {
+                    "uri": result["entity_uri"],
+                    "label": result["entity_label"],
+                    "graphs": [result["graph"]],
+                }
+
+                entities.append(entity)
+            else:
+                # if graph is different, store it
+                index_entity = entities_list.index(result['entity_uri'])
+                if result["graph"] not in entities[index_entity]["graphs"]:
+                    entities[index_entity]["graphs"].append(result["graph"])
+
+            # Get index of the current entity
+            index_entity = entities_list.index(result['entity_uri'])
+
+            # Attributes
+            if "attribute_uri" in result and "attribute_label" in result:
+                attr_tpl = (result["attribute_uri"], result["entity_uri"])
+                if attr_tpl not in attributes_list:
+                    attributes_list.append(attr_tpl)
+                    attribute = {
+                        "uri": result["attribute_uri"],
+                        "label": result["attribute_label"],
+                        "graphs": [result["graph"], ],
+                        "entityUri": result["entity_uri"],
+                        "type": result["attribute_type"]
+                    }
+                    attributes.append(attribute)
+                else:
+                    # if graph is different, store it
+                    index_attribute = attributes_list.index(attr_tpl)
+                    if result["graph"] not in attributes[index_attribute]["graphs"]:
+                        attributes[index_attribute]["graphs"].append(result["graph"])
+
+            index_attribute = attributes_list.index(attr_tpl)
+
+            # Categories
+            if "property_uri" in result and result["property_type"] == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory":
+                attr_tpl = (result["property_uri"], result["entity_uri"])
+                if attr_tpl not in attributes_list:
+                    attributes_list.append(attr_tpl)
+                    attribute = {
+                        "uri": result["property_uri"],
+                        "label": result["property_label"],
+                        "graphs": [result["graph"], ],
+                        "entityUri": result["entity_uri"],
+                        "type": result["property_type"],
+                        "categories": [{
+                            "uri": result["category_value_uri"],
+                            "label": result["category_value_label"]
+                        }]
+                    }
+                    attributes.append(attribute)
+                else:
+                    # if graph diff, store it
+                    index_attribute = attributes_list.index(attr_tpl)
+                    if result["graph"] not in attributes[index_attribute]["graphs"]:
+                        attributes[index_attribute]["graphs"].append(result["graph"])
+                    # Store value if new
+                    value = {
+                        "uri": result["category_value_uri"],
+                        "label": result["category_value_label"]
+                    }
+                    if value not in attributes[index_attribute]["categories"]:
+                        attributes[index_attribute]["categories"].append(value)
+
+            # Relation
+            if "property_uri" in result and result["property_type"] == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsRelation":
+                rel_tpl = (result["property_uri"], result["entity_uri"], result["range_uri"])
+                if rel_tpl not in relations_list:
+                    relations_list.append(rel_tpl)
+                    relation = {
+                        "uri": result["property_uri"],
+                        "label": result["property_label"],
+                        "graphs": [result["graph"], ],
+                        "source": result["entity_uri"],
+                        "target": result["range_uri"]
+                    }
+                    relations.append(relation)
+                else:
+                    # if graph is diff, append it
+                    index_relation = relations_list.index(rel_tpl)
+                    if result["graph"] not in relations[index_relation]["graphs"]:
+                        relations[index_relation]["graphs"].append(result["graph"])
+
+        abstraction = {
+            "entities": entities,
+            "attributes": attributes,
+            "relations": relations
+        }
+
+        return abstraction
+
+    def get_abstraction_deprecated(self):
         """Get user abstraction from the triplestore
 
         Returns

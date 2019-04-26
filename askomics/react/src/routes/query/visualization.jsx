@@ -25,6 +25,7 @@ export default class Visualization extends Component {
     this.colorFirebrick = "#cc0000"
 
     this.cancelRequest
+    this.handleSelection = this.props.handleSelection.bind(this)
   }
 
   stringToHexColor(str) {
@@ -40,6 +41,7 @@ export default class Visualization extends Component {
   }
 
   render() {
+    console.log("graphState", this.props.graphState)
     return (
       <div>
         <div id="query-builder">
@@ -49,28 +51,41 @@ export default class Visualization extends Component {
             height={this.h}
             nodeLabel="label"
             backgroundColor="Gainsboro"
-            onNodeClick={node => {
-              let newGraphState = this.props.graphState
-              newGraphState.nodes.map(inode => {
-                if (inode == node) {
-                  inode.selected = !inode.selected
-                }
-              })
-              this.props.setStateAsk({
-                graphState: newGraphState
-              })
-            }}
+            onNodeClick={this.handleSelection}
             nodeCanvasObject={(node, ctx, globalScale) => {
-                  // node style
-                  ctx.fillStyle = this.stringToHexColor(node.uri)
-                  ctx.beginPath()
-                  ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false)
-                  // stroke style
-                  ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
-                  // build node
-                  ctx.stroke()
-                  ctx.fill()
-                }}
+              // node style
+              ctx.fillStyle = this.stringToHexColor(node.uri)
+              ctx.beginPath()
+              ctx.arc(node.x, node.y, 4, 0, 2 * Math.PI, false)
+              // stroke style
+              ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
+              ctx.globalAlpha = node.suggested ? 0.5 : 1
+              // text
+              // ctx.font = '5px Sans-Serif'
+              // ctx.textAlign = 'middle'
+              // ctx.textBaseline = 'middle'
+              // ctx.fillText(node.label, node.x + 2, node.y + 8)
+              // build node
+              ctx.stroke()
+              ctx.fill()
+            }}
+            linkLabel="label"
+            // linkWidth="1"
+            linkDirectionalArrowLength={5}
+            linkDirectionalArrowRelPos={1}
+            linkCanvasObject={(link, ctx, globalScale) => {
+              ctx.moveTo(link.source.x, link.source.y)
+              ctx.lineTo(link.target.x, link.target.y)
+              ctx.strokeStyle = this.colorGrey
+              ctx.globalAlpha = link.suggested ? 0.5 : 1
+              ctx.stroke()
+              // arrow
+
+
+
+
+            }}
+
           />
         </div>
       </div>
