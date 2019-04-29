@@ -193,9 +193,9 @@ export default class Query extends Component {
     this.graphState.links.push(link)
   }
 
-  manageCurrentPreviousSelected(currentUri) {
+  manageCurrentPreviousSelected(currentNode) {
       this.previousSelected = this.currentSelected
-      this.currentSelected = currentUri
+      this.currentSelected = currentNode
   }
 
   unselectAllNodes() {
