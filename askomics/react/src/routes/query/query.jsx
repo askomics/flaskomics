@@ -204,11 +204,11 @@ export default class Query extends Component {
     })
   }
 
-selectAndInstanciateNode(uri) {
-    this.graphState.nodes.map(node => {
-      if (node.uri == uri) {
-        node.selected = true
-        node.suggested = false
+selectAndInstanciateNode(node) {
+    this.graphState.nodes.map(inode => {
+      if (node.id == inode.id) {
+        inode.selected = true
+        inode.suggested = false
       }
     })
   }
@@ -235,7 +235,7 @@ selectAndInstanciateNode(uri) {
       // unselect all nodes
       this.unselectAllNodes()
       // select and instanciate the new node
-      this.selectAndInstanciateNode(clickedNode.uri)
+      this.selectAndInstanciateNode(clickedNode)
       // remove all suggestion
       this.removeAllSuggestion()
       // instanciate link
