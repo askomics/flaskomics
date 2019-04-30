@@ -215,7 +215,7 @@ selectAndInstanciateNode(node) {
 
 
 
-  handleSelection(clickedNode) {
+  handleNodeSelection(clickedNode) {
 
     // case 1 : clicked node is selected, so deselect it
     if (clickedNode.selected) {
@@ -279,11 +279,11 @@ selectAndInstanciateNode(node) {
         this.setState({
           error: true,
           errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
+          status: error.response.status
         })
       }).then(response => {
         this.initGraph()
+        this.setState({waiting: false})
       })
     }
   }
@@ -311,12 +311,9 @@ selectAndInstanciateNode(node) {
       )
     }
 
-    return (
-      <div className="container">
-        {redirectLogin}
-        <h2>Query Builder</h2>
-        <hr />
-        <WaitingDiv waiting={this.state.waiting} center />
+    let visualizationDiv
+    if (!this.state.waiting) {
+      visualizationDiv = (
         <Visualization
           abstraction={this.state.abstraction}
           startpoint={this.state.startpoint}
@@ -324,9 +321,18 @@ selectAndInstanciateNode(node) {
           logged={this.state.logged}
           user={this.state.user}
           waiting={this.state.waiting}
-          setStateAsk={p => this.setState(p)}
-          handleSelection={p => this.handleSelection(p)}
+          handleNodeSelection={p => this.handleNodeSelection(p)}
         />
+      )
+    }
+
+    return (
+      <div className="container">
+        {redirectLogin}
+        <h2>Query Builder</h2>
+        <hr />
+        <WaitingDiv waiting={this.state.waiting} center />
+        {visualizationDiv}
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

@@ -29,7 +29,7 @@ export default class Visualization extends Component {
     this.arrowLength = 7
 
     this.cancelRequest
-    this.handleSelection = this.props.handleSelection.bind(this)
+    this.handleNodeSelection = this.props.handleNodeSelection.bind(this)
     this.drawNode = this.drawNode.bind(this)
     this.drawLink = this.drawLink.bind(this)
   }
@@ -65,11 +65,11 @@ export default class Visualization extends Component {
     let x
     let y
     if (x1 < x2) {
-      x = x1 + 12 * Math.cos(theta)
-      y = y1 - 12 * Math.sin(theta)
+      x = x1 + (this.nodeSize * 4) * Math.cos(theta)
+      y = y1 - (this.nodeSize * 4) * Math.sin(theta)
     } else {
-      x = x1 - 12 * Math.cos(theta)
-      y = y1 + 12 * Math.sin(theta)
+      x = x1 - (this.nodeSize * 4) * Math.cos(theta)
+      y = y1 + (this.nodeSize * 4) * Math.sin(theta)
     }
     return {x: x, y: y}
   }
@@ -95,16 +95,16 @@ export default class Visualization extends Component {
     // node style
     ctx.fillStyle = this.stringToHexColor(node.uri)
     ctx.lineWidth = this.lineWidth
-    ctx.beginPath()
-    ctx.arc(node.x, node.y, this.nodeSize, 0, 2 * Math.PI, false)
-    // stroke style
     ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
     ctx.globalAlpha = node.suggested ? 0.5 : 1
     node.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
+    // draw node
+    ctx.beginPath()
+    ctx.arc(node.x, node.y, this.nodeSize, 0, 2 * Math.PI, false)
     ctx.stroke()
     ctx.fill()
     ctx.closePath()
-    // text
+    // draw text
     ctx.beginPath()
     ctx.fillStyle = this.colorDarkGrey
     ctx.font = this.nodeSize + 'px Sans-Serif'
@@ -115,21 +115,21 @@ export default class Visualization extends Component {
   }
 
   drawLink(link, ctx, globalScale) {
+    // link style
     link.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
     ctx.strokeStyle = this.colorGrey
     ctx.fillStyle = this.colorGrey
     ctx.globalAlpha = link.suggested ? 0.3 : 1
     ctx.lineWidth = this.lineWidth
+    // draw link (from source to target)
     ctx.beginPath()
-    // first point (source)
     let c = this.IntersectionCoordinate(link.source.x, link.source.y, link.target.x, link.target.y, this.nodeSize)
     ctx.moveTo(c.x, c.y)
-    // second point (target)
     c = this.IntersectionCoordinate(link.target.x, link.target.y, link.source.x, link.source.y, this.nodeSize)
     ctx.lineTo(c.x, c.y)
     ctx.stroke()
     ctx.closePath()
-    // arrow
+    // draw arrow
     ctx.beginPath()
     let triangle = this.triangleCoordinate(link.target.x, link.target.y, link.source.x, link.source.y, this.arrowLength)
     ctx.moveTo(c.x, c.y)
@@ -137,8 +137,7 @@ export default class Visualization extends Component {
     ctx.lineTo(triangle.xb, triangle.yb)
     ctx.fill()
     ctx.closePath()
-
-    // text
+    // draw text
     ctx.beginPath()
     ctx.fillStyle = this.colorDarkGrey
     ctx.font = this.nodeSize - 0.5 + 'px Sans-Serif'
@@ -147,11 +146,6 @@ export default class Visualization extends Component {
     let m = this.middleCoordinate(link.source.x, link.source.y, link.target.x, link.target.y)
     ctx.fillText(link.label, m.x, m.y)
     ctx.closePath()
-
-
-    // build link
-    // ctx.stroke()
-    // ctx.closePath()
   }
 
   render() {
@@ -163,16 +157,10 @@ export default class Visualization extends Component {
             graphData={this.props.graphState}
             width={this.w}
             height={this.h}
-            // nodeLabel="label"
             backgroundColor="Gainsboro"
-            onNodeClick={this.handleSelection}
+            onNodeClick={this.handleNodeSelection}
             nodeCanvasObject={this.drawNode}
-            // linkLabel="label"
-            // linkWidth="1"
-            // linkDirectionalArrowLength={5}
-            // linkDirectionalArrowRelPos={1}
             linkCanvasObject={this.drawLink}
-
           />
         </div>
       </div>
