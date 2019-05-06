@@ -19,8 +19,11 @@ export default class Visualization extends Component {
     }
 
     // graph constants
-    this.w = 500
-    this.h = 500
+    this.fg
+    this.w = 550
+    this.h = 550
+    this.zoom = 5
+    this.zoomTime = 1000
     this.colorGrey = "#808080"
     this.colorDarkGrey = "#404040"
     this.colorFirebrick = "#cc0000"
@@ -148,21 +151,24 @@ export default class Visualization extends Component {
     ctx.closePath()
   }
 
+  componentDidMount() {
+    this.fg.zoom(this.zoom, this.zoomTime)
+  }
+
   render() {
     console.log("graphState", this.props.graphState)
     return (
       <div>
-        <div id="query-builder">
-          <ForceGraph2D
-            graphData={this.props.graphState}
-            width={this.w}
-            height={this.h}
-            backgroundColor="Gainsboro"
-            onNodeClick={this.handleNodeSelection}
-            nodeCanvasObject={this.drawNode}
-            linkCanvasObject={this.drawLink}
-          />
-        </div>
+        <ForceGraph2D
+          ref={element => { this.fg = element }}
+          graphData={this.props.graphState}
+          width={this.w}
+          height={this.h}
+          backgroundColor="Gainsboro"
+          onNodeClick={this.handleNodeSelection}
+          nodeCanvasObject={this.drawNode}
+          linkCanvasObject={this.drawLink}
+        />
       </div>
       )
   }
