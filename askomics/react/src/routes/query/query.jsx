@@ -1,11 +1,12 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Alert, Button } from 'reactstrap';
+import { Alert, Button, Row, Col } from 'reactstrap';
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
 import update from 'react-addons-update'
 import Visualization from './visualization'
+import AttributeBox from './attribute'
 
 export default class Query extends Component {
 
@@ -18,16 +19,20 @@ export default class Query extends Component {
       abstraction: [],
       graphState: {
         nodes: [],
-        links: []
+        links: [],
+        attr: []
       },
       waiting: true,
       error: false,
       errorMessage: null,
     }
+
     this.graphState = {
       nodes: [],
-      links: []
+      links: [],
+      attr: []
     }
+
     this.idNumber = 0
     this.previousSelected = null
     this.currentSelected = null
@@ -35,9 +40,9 @@ export default class Query extends Component {
   }
 
   getId() {
-    this.idNumber += 1
-      return this.idNumber
-    }
+  this.idNumber += 1
+    return this.idNumber
+  }
 
   entityExist(uri) {
     let result = false
@@ -60,13 +65,62 @@ export default class Query extends Component {
     return label
   }
 
+  getAttributeType(typeUri) {
+    //FIXME: don't hardcode uri
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#decimal") {
+      return "decimal"
+    }
+    if (typeUri == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory") {
+      return "category"
+    }
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#string") {
+      return "text"
+    }
+  }
+
+  setNodeAttributes(nodeUri, nodeId) {
+
+    let nodeAttributes = []
+    this.state.abstraction.attributes.forEach(attr => {
+      if (attr.entityUri == nodeUri) {
+        let nodeAttribute = {}
+        let attributeType = this.getAttributeType(attr.type)
+        nodeAttribute.visible = false
+        nodeAttribute.nodeId = nodeId
+        nodeAttribute.uri = attr.uri,
+        nodeAttribute.label = attr.label,
+        nodeAttribute.entityUri = attr.entityUri,
+        nodeAttribute.type = attributeType
+
+        if (attributeType == "decimal") {
+          nodeAttribute.filterSign = "="
+          nodeAttribute.filterValue = ""
+        }
+
+        if (attributeType == "text") {
+          nodeAttribute.filterType = "exact"
+          nodeAttribute.filterValue = ""
+        }
+
+        if (attributeType == "category") {
+          nodeAttribute.filterValues = attr.categories
+          nodeAttribute.filterSelectedValues = []
+        }
+        // return nodeAttribute
+        nodeAttributes.push(nodeAttribute)
+      }
+    })
+    this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
+  }
+
   insertNode(uri, selected, suggested) {
     /*
     Insert a new node in the graphState
-    */    
+    */
+    let nodeId = this.getId()
     let node = {
       uri: uri,
-      id: this.getId(),
+      id: nodeId,
       label: this.getLabel(uri),
       selected: selected,
       suggested: suggested
@@ -74,6 +128,10 @@ export default class Query extends Component {
     this.graphState.nodes.push(node)
     if (selected) {
       this.currentSelected = node
+    }
+
+    if (!suggested) {
+      this.setNodeAttributes(uri, nodeId)
     }
   }
 
@@ -152,9 +210,11 @@ export default class Query extends Component {
         return link
       }
     })
+    let newAttr = this.graphState.attr
     this.graphState = {
       nodes: newNodes,
-      links: newLinks
+      links: newLinks,
+      attr: newAttr
     }
   }
 
@@ -204,14 +264,16 @@ export default class Query extends Component {
     })
   }
 
-selectAndInstanciateNode(node) {
+  selectAndInstanciateNode(node) {
     this.graphState.nodes.map(inode => {
       if (node.id == inode.id) {
         inode.selected = true
         inode.suggested = false
       }
     })
-  }
+    // get attributes
+    this.setNodeAttributes(node.uri, node.id)
+    }
 
 
 
@@ -295,11 +357,13 @@ selectAndInstanciateNode(node) {
   }
 
   render() {
+    // login page redirection
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
     }
 
+    // error div
     let errorDiv
     if (this.state.error) {
       errorDiv = (
@@ -312,7 +376,40 @@ selectAndInstanciateNode(node) {
     }
 
     let visualizationDiv
+    let uriLabelBoxes
+    let AttributeBoxes
     if (!this.state.waiting) {
+
+      // Uri and Label boxes
+      if (this.currentSelected) {
+        uriLabelBoxes = (
+          <dummy>
+            <AttributeBox
+              label="URI"
+              type="text"
+            />
+            <AttributeBox
+              label="Label"
+              type="text"
+            />
+          </dummy>
+        )
+      }
+
+      // Other attribute boxes
+      if (this.currentSelected) {
+        AttributeBoxes = this.state.graphState.attr.map(attribute => {
+          if (attribute.nodeId == this.currentSelected.id) {
+            return (
+              <AttributeBox
+                label={attribute.label}
+                type="text"
+              />
+            )
+          }
+        })
+      }
+
       visualizationDiv = (
         <Visualization
           abstraction={this.state.abstraction}
@@ -332,7 +429,15 @@ selectAndInstanciateNode(node) {
         <h2>Query Builder</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
-        {visualizationDiv}
+        <Row>
+          <Col xs="6">
+            {visualizationDiv}
+          </Col>
+          <Col xs="6">
+            {uriLabelBoxes}
+            {AttributeBoxes}
+          </Col>
+        </Row>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
