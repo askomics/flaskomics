@@ -88,3 +88,8 @@ label.attr-label {
 div.attr-icons {
   float: right;
 }
+
+i.attr-icon {
+  padding-right: 8px;
+  cursor: pointer;
+}

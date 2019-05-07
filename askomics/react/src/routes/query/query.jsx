@@ -78,36 +78,77 @@ export default class Query extends Component {
     }
   }
 
+  attributeExist(attrUri, nodeId) {
+    let result = false
+    this.state.graphState.attr.forEach(attr => {
+      if (attr.uri == attrUri && attr.nodeId == nodeId) {
+        result = true
+      }
+    })
+    return result
+  }
+
   setNodeAttributes(nodeUri, nodeId) {
 
     let nodeAttributes = []
+
+    // create uri and label attributes
+    if (!this.attributeExist("uri", nodeId)) {
+      nodeAttributes.push({
+        id: this.getId(),
+        visible: false,
+        nodeId: nodeId,
+        uri: "uri",
+        label: "Uri",
+        type: "text",
+        filterType: "exact",
+        filterValue: ""
+      })
+    }
+
+    if (!this.attributeExist("label", nodeId)) {
+      nodeAttributes.push({
+        id: this.getId(),
+        visible: true,
+        nodeId: nodeId,
+        uri: "label",
+        label: "Label",
+        type: "text",
+        filterType: "exact",
+        filterValue: ""
+      })
+    }
+
     this.state.abstraction.attributes.forEach(attr => {
       if (attr.entityUri == nodeUri) {
-        let nodeAttribute = {}
-        let attributeType = this.getAttributeType(attr.type)
-        nodeAttribute.visible = false
-        nodeAttribute.nodeId = nodeId
-        nodeAttribute.uri = attr.uri,
-        nodeAttribute.label = attr.label,
-        nodeAttribute.entityUri = attr.entityUri,
-        nodeAttribute.type = attributeType
+        if (!this.attributeExist(attr.uri, nodeId)) {
+          let nodeAttribute = {}
+          let attributeType = this.getAttributeType(attr.type)
+          nodeAttribute.id = this.getId()
+          nodeAttribute.visible = false
+          nodeAttribute.nodeId = nodeId
+          nodeAttribute.uri = attr.uri,
+          nodeAttribute.label = attr.label,
+          nodeAttribute.entityUri = attr.entityUri,
+          nodeAttribute.type = attributeType
 
-        if (attributeType == "decimal") {
-          nodeAttribute.filterSign = "="
-          nodeAttribute.filterValue = ""
-        }
+          if (attributeType == "decimal") {
+            nodeAttribute.filterSign = "="
+            nodeAttribute.filterValue = ""
+          }
 
-        if (attributeType == "text") {
-          nodeAttribute.filterType = "exact"
-          nodeAttribute.filterValue = ""
-        }
+          if (attributeType == "text") {
+            nodeAttribute.filterType = "exact"
+            nodeAttribute.filterValue = ""
+          }
 
-        if (attributeType == "category") {
-          nodeAttribute.filterValues = attr.categories
-          nodeAttribute.filterSelectedValues = []
+          if (attributeType == "category") {
+            nodeAttribute.filterValues = attr.categories
+            nodeAttribute.filterSelectedValues = []
+          }
+          // return nodeAttribute
+          nodeAttributes.push(nodeAttribute)
         }
-        // return nodeAttribute
-        nodeAttributes.push(nodeAttribute)
       }
     })
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
@@ -325,6 +366,36 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // Attributes managment -----------------------
+  toggleVisibility(event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.visible = !attr.visible
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleFilterType(event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        // let newType = attr.filterType == "exact" ? "regexp" : "exact"
+        attr.filterType = attr.filterType == "exact" ? "regexp" : "exact"
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterValue(event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+
   componentDidMount() {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/startpoints/abstraction'
@@ -379,31 +450,16 @@ export default class Query extends Component {
     let uriLabelBoxes
     let AttributeBoxes
     if (!this.state.waiting) {
-
-      // Uri and Label boxes
-      if (this.currentSelected) {
-        uriLabelBoxes = (
-          <dummy>
-            <AttributeBox
-              label="URI"
-              type="text"
-            />
-            <AttributeBox
-              label="Label"
-              type="text"
-            />
-          </dummy>
-        )
-      }
-
-      // Other attribute boxes
+      // attribute boxes
       if (this.currentSelected) {
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id) {
             return (
               <AttributeBox
-                label={attribute.label}
-                type="text"
+                attribute={attribute}
+                toggleVisibility={p => this.toggleVisibility(p)}
+                toggleFilterType={p => this.toggleFilterType(p)}
+                handleFilterValue={p => this.handleFilterValue(p)}
               />
             )
           }
