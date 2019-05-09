@@ -17,6 +17,8 @@ export default class AttributeBox extends Component {
     this.toggleFilterType = this.props.toggleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
+    this.handleFilterNumericSign = this.props.handleFilterNumericSign.bind(this)
+    this.handleFilterNumericValue = this.props.handleFilterNumericValue.bind(this)
   }
 
 
@@ -37,19 +39,48 @@ export default class AttributeBox extends Component {
           <i className={filterIcon} id={this.props.attribute.id} onClick={this.toggleFilterType}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        <Input type="text" name="name" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+        <Input type="text" value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
       </div>
     )
   }
 
   renderNumeric() {
+    let eyeIcon = "attr-icon fas fa-eye-slash"
+    if (this.props.attribute.visible) {
+      eyeIcon = "attr-icon fas fa-eye"
+    }
+
+    let selected = {
+      "=": false,
+      "<": false,
+      "<=": false,
+      ">": false,
+      ">=": false,
+      "!=": false
+    }
+
+    selected[this.props.attribute.filterSign] = true
+
     return(
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className="fas fa-eye"></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        <Input type="text" name="name" id="id" />
+          <table style={{width: "100%"}}>
+          <tr>
+            <td>
+              <CustomInput type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+                {Object.keys(selected).map(sign => {
+                  return <option selected={selected[sign]} value={sign}>{sign}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterNumericValue} />
+            </td>
+          </tr>
+        </table>
       </div>
     )
   }
@@ -89,7 +120,7 @@ export default class AttributeBox extends Component {
     if (this.props.attribute.type == "text") {
       box = this.renderText()
     }
-    if (this.props.attribute.type == "numeric") {
+    if (this.props.attribute.type == "decimal") {
       box = this.renderNumeric()
     }
     if (this.props.attribute.type == "category") {

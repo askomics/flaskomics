@@ -404,6 +404,30 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+
+  handleFilterNumericSign(event) {
+    console.log("new sign", event.target.value)
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterSign = event.target.value
+      }
+    })
+
+    this.updateGraphState()
+  }
+
+
+  handleFilterNumericValue(event) {
+    if (!isNaN(event.target.value)) {
+      this.state.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.filterValue = event.target.value
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
   // ------------------------------------------------
 
   componentDidMount() {
@@ -471,6 +495,8 @@ export default class Query extends Component {
                 toggleFilterType={p => this.toggleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}
+                handleFilterNumericSign={p => this.handleFilterNumericSign(p)}
+                handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
               />
             )
           }
