@@ -6,11 +6,11 @@ from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from flask import (Blueprint, current_app, jsonify, session)
 
 
-startpoints_bp = Blueprint('startpoints', __name__, url_prefix='/')
+query_bp = Blueprint('query', __name__, url_prefix='/')
 
 
-@startpoints_bp.route('/api/startpoints', methods=['GET'])
-def startpoints():
+@query_bp.route('/api/query/startpoints', methods=['GET'])
+def query():
     """Get start points
 
     Returns
@@ -38,7 +38,7 @@ def startpoints():
     })
 
 
-@startpoints_bp.route('/api/startpoints/abstraction', methods=['GET'])
+@query_bp.route('/api/query/abstraction', methods=['GET'])
 def get_abstraction():
     """Get abstraction
 
