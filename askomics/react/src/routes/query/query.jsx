@@ -523,10 +523,10 @@ export default class Query extends Component {
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
         <Row>
-          <Col xs="6">
+          <Col xs="7">
             {visualizationDiv}
           </Col>
-          <Col xs="6">
+          <Col xs="5">
             {uriLabelBoxes}
             {AttributeBoxes}
           </Col>

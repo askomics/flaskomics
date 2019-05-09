@@ -20,8 +20,8 @@ export default class Visualization extends Component {
 
     // graph constants
     this.fg
-    this.w = 550
-    this.h = 550
+    this.w = 650
+    this.h = 650
     this.zoom = 5
     this.zoomTime = 1000
     this.colorGrey = "#808080"
