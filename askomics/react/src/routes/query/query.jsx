@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Alert, Button, Row, Col } from 'reactstrap';
+import { Alert, Button, Row, Col, ButtonGroup } from 'reactstrap';
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
@@ -32,6 +32,8 @@ export default class Query extends Component {
       links: [],
       attr: []
     }
+
+    this.divHeight = 650
 
     this.idNumber = 0
     this.previousSelected = null
@@ -265,7 +267,6 @@ export default class Query extends Component {
 
     this.state.abstraction.relations.forEach(relation => {
       if (relation.source == node1.uri && relation.target == node2.uri) {
-        console.log("insert link " + node1.label + " --> " + node2.label)
         link = {
           uri: relation.uri,
           id: this.getId(),
@@ -278,7 +279,6 @@ export default class Query extends Component {
       }
 
       if (relation.source == node2.uri && relation.target == node1.uri) {
-        console.log("insert link " + node1.label + " <-- " + node2.label)
         link = {
           uri: relation.uri,
           id: this.getId(),
@@ -354,7 +354,6 @@ export default class Query extends Component {
   }
 
   updateGraphState() {
-    console.log("graphState", this.graphState)
     this.setState({
       graphState: this.graphState
     })
@@ -406,7 +405,6 @@ export default class Query extends Component {
 
 
   handleFilterNumericSign(event) {
-    console.log("new sign", event.target.value)
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterSign = event.target.value
@@ -483,8 +481,10 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let buttons
+
     if (!this.state.waiting) {
-      // attribute boxes
+      // attribute boxes (right view)
       if (this.currentSelected) {
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id) {
@@ -503,8 +503,10 @@ export default class Query extends Component {
         })
       }
 
+      // visualization (left view)
       visualizationDiv = (
         <Visualization
+          divHeight={this.divHeight}
           abstraction={this.state.abstraction}
           startpoint={this.state.startpoint}
           graphState={this.state.graphState}
@@ -513,6 +515,14 @@ export default class Query extends Component {
           waiting={this.state.waiting}
           handleNodeSelection={p => this.handleNodeSelection(p)}
         />
+      )
+
+      // buttons
+      buttons = (
+        <ButtonGroup>
+          <Button color="secondary">Preview results</Button>
+          <Button color="secondary">Launch Query</Button>
+        </ButtonGroup>
       )
     }
 
@@ -524,13 +534,18 @@ export default class Query extends Component {
         <WaitingDiv waiting={this.state.waiting} center />
         <Row>
           <Col xs="7">
+          <div>
             {visualizationDiv}
+          </div>
           </Col>
           <Col xs="5">
+          <div style={{display: "block", height: this.divHeight + "px", "overflow-y": "auto"}}>
             {uriLabelBoxes}
             {AttributeBoxes}
+          </div>
           </Col>
         </Row>
+        {buttons}
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

@@ -21,7 +21,7 @@ export default class Visualization extends Component {
     // graph constants
     this.fg
     this.w = 650
-    this.h = 650
+    this.h = this.props.divHeight
     this.zoom = 5
     this.zoomTime = 1000
     this.colorGrey = "#808080"
@@ -156,7 +156,6 @@ export default class Visualization extends Component {
   }
 
   render() {
-    console.log("graphState", this.props.graphState)
     return (
       <div>
         <ForceGraph2D

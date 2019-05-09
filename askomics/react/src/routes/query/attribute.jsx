@@ -39,7 +39,7 @@ export default class AttributeBox extends Component {
           <i className={filterIcon} id={this.props.attribute.id} onClick={this.toggleFilterType}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        <Input type="text" value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+        <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
       </div>
     )
   }
