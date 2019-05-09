@@ -22,6 +22,7 @@ export default class Query extends Component {
         links: [],
         attr: []
       },
+      previewData: null,
       waiting: true,
       error: false,
       errorMessage: null,
@@ -39,6 +40,8 @@ export default class Query extends Component {
     this.previousSelected = null
     this.currentSelected = null
     this.cancelRequest
+
+    this.handlePreview = this.handlePreview.bind(this)
   }
 
   getId() {
@@ -428,9 +431,21 @@ export default class Query extends Component {
 
   // ------------------------------------------------
 
+  // Preview results and Launch query buttons -------
+
+  handlePreview(event) {
+    let requestUrl = '/api/'
+  }
+
+
+
+
+
+  // ------------------------------------------------
+
   componentDidMount() {
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/startpoints/abstraction'
+      let requestUrl = '/api/query/abstraction'
       axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
       .then(response => {
         console.log(requestUrl, response.data)
@@ -520,7 +535,7 @@ export default class Query extends Component {
       // buttons
       buttons = (
         <ButtonGroup>
-          <Button color="secondary">Preview results</Button>
+          <Button onClick={this.handlePreview} color="secondary">Preview results</Button>
           <Button color="secondary">Launch Query</Button>
         </ButtonGroup>
       )

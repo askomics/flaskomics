@@ -27,7 +27,7 @@ export default class Ask extends Component {
   componentDidMount() {
 
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/startpoints'
+      let requestUrl = '/api/query/startpoints'
       axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
       .then(response => {
         console.log(requestUrl, response.data)
