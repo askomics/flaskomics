@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
-import { Alert, Button, Row, Col, Input } from 'reactstrap';
+import { Input, FormGroup, CustomInput } from 'reactstrap';
 import { Redirect} from 'react-router-dom'
 import ErrorDiv from "../error/error"
 import WaitingDiv from "../../components/waiting"
@@ -16,6 +16,7 @@ export default class AttributeBox extends Component {
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.toggleFilterType = this.props.toggleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
+    this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
   }
 
 
@@ -53,14 +54,31 @@ export default class AttributeBox extends Component {
     )
   }
 
+
   renderCategory() {
+    let eyeIcon = "attr-icon fas fa-eye-slash"
+    if (this.props.attribute.visible) {
+      eyeIcon = "attr-icon fas fa-eye"
+    }
+
+    let categoryFormGroup = (
+      <FormGroup>
+        <CustomInput style={{height: "60px"}} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
+        {this.props.attribute.filterValues.map(value => {
+          let selected = this.props.attribute.filterSelectedValues.includes(value.uri)
+          return (<option attrId={this.props.attribute.uri} value={value.uri} selected={selected}>{value.label}</option>)
+        })}
+        </CustomInput>
+      </FormGroup>
+    )
+
     return(
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className="fas fa-eye"></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        <Input type="text" name="name" id="id" />
+        {categoryFormGroup}
       </div>
     )
   }

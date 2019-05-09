@@ -379,7 +379,6 @@ export default class Query extends Component {
   toggleFilterType(event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        // let newType = attr.filterType == "exact" ? "regexp" : "exact"
         attr.filterType = attr.filterType == "exact" ? "regexp" : "exact"
       }
     })
@@ -395,6 +394,17 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+
+  handleFilterCategory(event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterSelectedValues = [...event.target.selectedOptions].map(o => o.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
+  // ------------------------------------------------
 
   componentDidMount() {
     if (!this.props.waitForStart) {
@@ -460,6 +470,7 @@ export default class Query extends Component {
                 toggleVisibility={p => this.toggleVisibility(p)}
                 toggleFilterType={p => this.toggleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
+                handleFilterCategory={p => this.handleFilterCategory(p)}
               />
             )
           }
