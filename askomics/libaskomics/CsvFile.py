@@ -396,6 +396,7 @@ class CsvFile(File):
                 # Entity
                 entity = self.askomics_prefix[self.format_uri(row[0])]
                 rdf_graph.add((entity, rdflib.RDF.type, entity_type))
+                rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
 
                 # For attributes, loop on cell
                 for column_number, cell in enumerate(row):

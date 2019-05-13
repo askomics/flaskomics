@@ -70,6 +70,16 @@ export default class Query extends Component {
     return label
   }
 
+  getGraphs(uri) {
+    let graphs = []
+    this.state.abstraction.entities.forEach(node => {
+      if (node.uri == uri) {
+        graphs = graphs.concat(node.graphs)
+      }
+    })
+    return graphs
+  }
+
   getAttributeType(typeUri) {
     //FIXME: don't hardcode uri
     if (typeUri == "http://www.w3.org/2001/XMLSchema#decimal") {
@@ -103,9 +113,11 @@ export default class Query extends Component {
         id: this.getId(),
         visible: false,
         nodeId: nodeId,
-        uri: "uri",
+        uri: "rdf:type",
         label: "Uri",
-        type: "text",
+        entityLabel: this.getLabel(nodeUri),
+        entityUri: nodeUri,
+        type: "uri",
         filterType: "exact",
         filterValue: ""
       })
@@ -116,8 +128,10 @@ export default class Query extends Component {
         id: this.getId(),
         visible: true,
         nodeId: nodeId,
-        uri: "label",
+        uri: "rdfs:label",
         label: "Label",
+        entityLabel: this.getLabel(nodeUri),
+        entityUri: nodeUri,
         type: "text",
         filterType: "exact",
         filterValue: ""
@@ -134,6 +148,7 @@ export default class Query extends Component {
           nodeAttribute.nodeId = nodeId
           nodeAttribute.uri = attr.uri,
           nodeAttribute.label = attr.label,
+          nodeAttribute.entityLabel = this.getLabel(nodeUri)
           nodeAttribute.entityUri = attr.entityUri,
           nodeAttribute.type = attributeType
 
@@ -166,6 +181,7 @@ export default class Query extends Component {
     let nodeId = this.getId()
     let node = {
       uri: uri,
+      graphs: this.getGraphs(uri),
       id: nodeId,
       label: this.getLabel(uri),
       selected: selected,
@@ -200,6 +216,7 @@ export default class Query extends Component {
           // Push suggested target
           this.graphState.nodes.push({
             uri: relation.target,
+            graphs: this.getGraphs(relation.target),
             id: targetId,
             label: this.getLabel(relation.target),
             selected: false,
@@ -225,6 +242,7 @@ export default class Query extends Component {
           // Push suggested source
           this.graphState.nodes.push({
             uri: relation.source,
+            graphs: this.getGraphs(relation.source),
             id: sourceId,
             label: this.getLabel(relation.source),
             selected: false,
@@ -434,12 +452,23 @@ export default class Query extends Component {
   // Preview results and Launch query buttons -------
 
   handlePreview(event) {
-    let requestUrl = '/api/'
+    let requestUrl = '/api/query/preview'
+    let data = {
+      graphState: this.state.graphState
+    }
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status
+      })
+    })
   }
-
-
-
-
 
   // ------------------------------------------------
 

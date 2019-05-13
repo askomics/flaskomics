@@ -20,9 +20,23 @@ class Utils():
         str
             a random string of n chars
         """
-
         alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         return ''.join(random.choice(alpabet) for i in range(number))
+
+    @staticmethod
+    def unique(a):
+        """return the list with duplicate elements removed"""
+        return list(set(a))
+
+    @staticmethod
+    def intersect(a, b):
+        """return the intersection of two lists"""
+        return list(set(a) & set(b))
+
+    @staticmethod
+    def union(a, b):
+        """return the union of two lists"""
+        return list(set(a) | set(b))
 
 
 class cached_property(object):

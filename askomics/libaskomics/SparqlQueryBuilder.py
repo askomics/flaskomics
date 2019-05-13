@@ -4,6 +4,7 @@ import textwrap
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.Utils import Utils
 
 
 class SparqlQueryBuilder(Params):
@@ -181,3 +182,122 @@ class SparqlQueryBuilder(Params):
             new_query += '\nLIMIT {}'.format(limit)
 
         return new_query
+
+    def get_checked_asked_graphs(self, asked_graphs):
+        """Check if asked graphs are present in public and private graphs
+
+        Parameters
+        ----------
+        asked_graphs : list
+            list of graphs asked by the user
+
+        Returns
+        -------
+        list
+            list of graphs asked by the user, in the public and private graphs
+        """
+        return Utils.intersect(asked_graphs, self.private_graphs + self.public_graphs)
+
+    def get_froms_from_graphs(self, graphs):
+        """Get FROM's form a list of graphs
+
+        Parameters
+        ----------
+        graphs : list
+            List of graphs
+
+        Returns
+        -------
+        str
+            from string
+        """
+        from_string = ''
+
+        for graph in graphs:
+            from_string += '\nFROM <{}>'.format(graph)
+
+        return from_string
+
+    def build_query_from_json(self, json_query):
+        """Build a sparql query for the json dict of the query builder
+
+        Parameters
+        ----------
+        json_query : dict
+            The json query from the query builder
+
+        Returns
+        -------
+        str
+            SPARQL query
+        """
+        user_asked_graphs = []
+
+        selects = []
+        triples = []
+
+        # browse node
+        for node in json_query["nodes"]:
+            if not node["suggested"]:
+                # get user_asked_graphs
+                user_asked_graphs += node["graphs"]
+
+        # Browse attributes
+        for attribute in json_query["attr"]:
+            # URI ---
+            if attribute["type"] == "uri":
+                subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                predicate = attribute["uri"]
+                obj = attribute["entityUri"]
+                triples.append("{} {} <{}> .".format(subject, predicate, obj))
+                if attribute["visible"]:
+                    selects.append(subject)
+
+            # Text
+            if attribute["type"] == "text":
+                if attribute["visible"] or attribute["filterValue"] != "":
+                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    if attribute["uri"] == "rdfs:label":
+                        predicate = attribute["uri"]
+                    else:
+                        predicate = "<{}>".format(attribute["uri"])
+
+                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    if attribute["visible"]:
+                        selects.append(obj)
+
+            # Numeric
+            if attribute["type"] == "decimal":
+                if attribute["visible"] or attribute["filterValue"] != "":
+                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    if attribute["visible"]:
+                        selects.append(obj)
+
+            # Category
+            if attribute["type"] == "category":
+                if attribute["visible"] or attribute["filterSelectedValues"] != []:
+                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    if attribute["visible"]:
+                        selects.append(obj)
+
+        # check if asked_graphs are allowed
+        graphs = self.get_checked_asked_graphs(user_asked_graphs)
+
+        from_string = self.get_froms_from_graphs(graphs)
+
+        query = """
+        SELECT {}
+        {}
+        WHERE {{
+            {}
+        }}
+        """.format(' '.join(selects), from_string, '\n'.join(triples))
+
+        return self.prefix_query(textwrap.dedent(query))
