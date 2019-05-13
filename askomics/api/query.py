@@ -75,13 +75,13 @@ def get_preview():
     Returns
     -------
     json
-        abstraction: abstraction
+        resultsPreview: Preview of the query results
+        headerPreview: Header of the results table
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
     try:
         data = request.get_json()
-        current_app.logger.debug(data["graphState"])
 
         query_builder = SparqlQueryBuilder(current_app, session)
         query_launcher = SparqlQueryLauncher(current_app, session)

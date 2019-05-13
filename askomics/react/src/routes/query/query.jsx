@@ -606,7 +606,7 @@ export default class Query extends Component {
           </Col>
         </Row>
         {buttons}
-        <br />
+        <br /> <br />
         <div>
           {resultsTable}
         </div>

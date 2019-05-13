@@ -319,13 +319,21 @@ class SparqlQueryBuilder(Params):
                     filter_string = "FILTER ({})".format(filter_substring)
                     filters.append(filter_string)
 
+        # Browse links
+        for link in json_query["links"]:
+            if not link["suggested"]:
+                source = "?{}{}_uri".format(link["source"]["label"], link["source"]["id"])
+                relation = "<{}>".format(link["uri"])
+                target = "?{}{}_uri".format(link["target"]["label"], link["target"]["id"])
+                triples.append("{} {} {} .".format(source, relation, target))
+
         # check if asked_graphs are allowed
         graphs = self.get_checked_asked_graphs(user_asked_graphs)
 
         from_string = self.get_froms_from_graphs(graphs)
 
         query = """
-        SELECT {}
+        SELECT DISTINCT {}
         {}
         WHERE {{
             {}
