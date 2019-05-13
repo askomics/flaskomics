@@ -422,7 +422,7 @@ class CsvFile(File):
                             # add the cell in the set
                             self.category_values[current_header].add(cell)
                         relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
-                        attribute = rdflib.Literal(self.convert_type(cell))
+                        attribute = self.askomics_prefix[self.format_uri(cell)]
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):

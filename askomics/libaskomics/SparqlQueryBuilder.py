@@ -235,6 +235,7 @@ class SparqlQueryBuilder(Params):
 
         selects = []
         triples = []
+        filters = []
 
         # browse node
         for node in json_query["nodes"]:
@@ -252,6 +253,14 @@ class SparqlQueryBuilder(Params):
                 triples.append("{} {} <{}> .".format(subject, predicate, obj))
                 if attribute["visible"]:
                     selects.append(subject)
+                # filters
+                if attribute["filterValue"] != "":
+                    if attribute["filterType"] == "regexp":
+                        filter_string = "FILTER (contains(str({}), '{}')) .".format(subject, attribute["filterValue"])
+                        filters.append(filter_string)
+                    elif attribute["filterType"] == "exact":
+                        filter_string = "FILTER (str({}) = '{}') .".format(subject, attribute["filterValue"])
+                        filters.append(filter_string)
 
             # Text
             if attribute["type"] == "text":
@@ -266,6 +275,14 @@ class SparqlQueryBuilder(Params):
                     triples.append("{} {} {} .".format(subject, predicate, obj))
                     if attribute["visible"]:
                         selects.append(obj)
+                # filters
+                if attribute["filterValue"] != "":
+                    if attribute["filterType"] == "regexp":
+                        filter_string = "FILTER (contains(str({}), '{}')) .".format(obj, attribute["filterValue"])
+                        filters.append(filter_string)
+                    elif attribute["filterType"] == "exact":
+                        filter_string = "FILTER (str({}) = '{}') .".format(obj, attribute["filterValue"])
+                        filters.append(filter_string)
 
             # Numeric
             if attribute["type"] == "decimal":
@@ -276,16 +293,31 @@ class SparqlQueryBuilder(Params):
                     triples.append("{} {} {} .".format(subject, predicate, obj))
                     if attribute["visible"]:
                         selects.append(obj)
+                # filters
+                if attribute["filterValue"] != "":
+                    filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
+                    filters.append(filter_string)
 
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != []:
-                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
-                    predicate = "<{}>".format(attribute["uri"])
-                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
-                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    node_uri = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    category_name = "<{}>".format(attribute["uri"])
+                    category_value_uri = "?{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    label = "rdfs:label"
+                    category_label = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    triples.append("{} {} {} .".format(node_uri, category_name, category_value_uri))
+                    triples.append("{} {} {} .".format(category_value_uri, label, category_label))
                     if attribute["visible"]:
-                        selects.append(obj)
+                        selects.append(category_label)
+                # filters
+                if attribute["filterSelectedValues"] != []:
+                    filter_substrings_list = []
+                    for value in attribute["filterSelectedValues"]:
+                        filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))
+                    filter_substring = ' || '.join(filter_substrings_list)
+                    filter_string = "FILTER ({})".format(filter_substring)
+                    filters.append(filter_string)
 
         # check if asked_graphs are allowed
         graphs = self.get_checked_asked_graphs(user_asked_graphs)
@@ -297,7 +329,8 @@ class SparqlQueryBuilder(Params):
         {}
         WHERE {{
             {}
+            {}
         }}
-        """.format(' '.join(selects), from_string, '\n'.join(triples))
+        """.format(' '.join(selects), from_string, '\n'.join(triples), '\n'.join(filters))
 
         return self.prefix_query(textwrap.dedent(query))
