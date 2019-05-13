@@ -218,7 +218,7 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
-    def build_query_from_json(self, json_query):
+    def build_query_from_json(self, json_query, preview=False):
         """Build a sparql query for the json dict of the query builder
 
         Parameters
@@ -332,5 +332,8 @@ class SparqlQueryBuilder(Params):
             {}
         }}
         """.format(' '.join(selects), from_string, '\n'.join(triples), '\n'.join(filters))
+
+        if preview:
+            query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))
 
         return self.prefix_query(textwrap.dedent(query))

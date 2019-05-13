@@ -49,3 +49,5 @@ users_graph = urn:sparql:askomics:users
 # namespace     askomics:
 prefix = http://www.semanticweb.org/user/ontologies/2018/1#
 namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#
+# preview limit
+preview_limit = 25

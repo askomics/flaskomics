@@ -7,6 +7,7 @@ import WaitingDiv from "../../components/waiting"
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
+import ResultsTable from '../sparql/resultstable'
 
 export default class Query extends Component {
 
@@ -22,7 +23,8 @@ export default class Query extends Component {
         links: [],
         attr: []
       },
-      previewData: null,
+      resultsPreview: [],
+      headerPreview: [],
       waiting: true,
       error: false,
       errorMessage: null,
@@ -459,6 +461,12 @@ export default class Query extends Component {
     axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
+      this.setState({
+        resultsPreview: response.data.resultsPreview,
+        headerPreview: response.data.headerPreview,
+        waiting: false,
+        error: false
+      })
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
@@ -570,6 +578,14 @@ export default class Query extends Component {
       )
     }
 
+    // preview
+    let resultsTable
+    if (this.state.resultsPreview.length > 0) {
+      resultsTable = (
+        <ResultsTable data={this.state.resultsPreview} header={this.state.headerPreview} />
+      )
+    }
+
     return (
       <div className="container">
         {redirectLogin}
@@ -590,6 +606,10 @@ export default class Query extends Component {
           </Col>
         </Row>
         {buttons}
+        <br />
+        <div>
+          {resultsTable}
+        </div>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

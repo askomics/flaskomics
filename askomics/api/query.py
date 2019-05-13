@@ -84,23 +84,22 @@ def get_preview():
         current_app.logger.debug(data["graphState"])
 
         query_builder = SparqlQueryBuilder(current_app, session)
-        # query_launcher = SparqlQueryLauncher(current_app, session)
+        query_launcher = SparqlQueryLauncher(current_app, session)
 
-        query = query_builder.build_query_from_json(data["graphState"])
-        # header, data = query_launcher.process_query(query)
+        query = query_builder.build_query_from_json(data["graphState"], preview=True)
+        header, preview = query_launcher.process_query(query)
 
-        current_app.logger.debug(query)
-
-        result_preview = ["a", "b", "c"]
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'resultsPreview': [],
+            'headerPreview': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
     return jsonify({
-        'resultsPreview': result_preview,
+        'resultsPreview': preview,
+        'headerPreview': header,
         'error': False,
         'errorMessage': ''
     })
