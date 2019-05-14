@@ -11,6 +11,9 @@ from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.Result import Result
+from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
 app = create_app(config='config/askomics.ini')
@@ -104,6 +107,55 @@ def delete_datasets(self, session, datasets_info):
             'errorMessage': str(e)
         }
 
+    return {
+        'error': False,
+        'errorMessage': ''
+    }
+
+
+@celery.task(bind=True, name="query")
+def query(self, session, graph_state):
+    """Save the query results in filesystem and db
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    graph_state : dict
+        JSON graph state
+
+    Returns
+    -------
+    dict
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        result = Result(app, session, graph_state, self.request.id)
+
+        # Save job in database database
+        result.save_in_db()
+
+        # launch query
+        query_builder = SparqlQueryBuilder(app, session)
+        query_launcher = SparqlQueryLauncher(app, session)
+        query = query_builder.build_query_from_json(graph_state)
+        headers, results = query_launcher.process_query(query)
+
+        # write result to a file
+        result.save_result_in_file(headers, results)
+
+        # Update database status
+        result.update_db_status()
+
+    except Exception as e:
+        app.logger.error(str(e))
+        result.rollback()
+        result.update_db_status(error=True, error_message=str(e))
+        return {
+            'error': True,
+            'errorMessage': str(e)
+        }
     return {
         'error': False,
         'errorMessage': ''

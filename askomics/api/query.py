@@ -103,3 +103,32 @@ def get_preview():
         'error': False,
         'errorMessage': ''
     })
+
+
+@query_bp.route('/api/query/save_result', methods=['POST'])
+def save_result():
+    """Save a query in filesystem and db, using a celery task
+
+    Returns
+    -------
+    json
+        task_id: celery task id
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        graph_state = request.get_json()["graphState"]
+        session_dict = {"user": session["user"]}
+        task = current_app.celery.send_task("query", (session_dict, graph_state))
+    except Exception as e:
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e),
+            'task_id': None
+        }), 500
+
+    return jsonify({
+        'error': False,
+        'errorMessage': '',
+        'task_id': task.id
+    })

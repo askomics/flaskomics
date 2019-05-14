@@ -44,6 +44,7 @@ export default class Query extends Component {
     this.cancelRequest
 
     this.handlePreview = this.handlePreview.bind(this)
+    this.handleQuery = this.handleQuery.bind(this)
   }
 
   getId() {
@@ -478,6 +479,24 @@ export default class Query extends Component {
     })
   }
 
+  handleQuery(event) {
+    let requestUrl = '/api/query/save_result'
+    let data = {
+      graphState: this.state.graphState
+    }
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+    }).catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status
+      })
+    })
+  }
+
   // ------------------------------------------------
 
   componentDidMount() {
@@ -573,7 +592,7 @@ export default class Query extends Component {
       buttons = (
         <ButtonGroup>
           <Button onClick={this.handlePreview} color="secondary">Preview results</Button>
-          <Button color="secondary">Launch Query</Button>
+          <Button onClick={this.handleQuery} color="secondary">Launch Query</Button>
         </ButtonGroup>
       )
     }

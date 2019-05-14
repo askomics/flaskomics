@@ -72,7 +72,7 @@ class Database(Params):
         self.create_user_table()
         self.create_galaxy_table()
         self.create_integration_table()
-        self.create_query_table()
+        self.create_results_table()
         self.create_endpoints_table()
         self.create_files_table()
         self.create_datasets_table()
@@ -151,21 +151,19 @@ class Database(Params):
         '''
         self.execute_sql_query(query)
 
-    def create_query_table(self):
-        """Create the query table
+    def create_results_table(self):
+        """Create the results table
         """
         query = '''
-        CREATE TABLE IF NOT EXISTS query (
+        CREATE TABLE IF NOT EXISTS results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
-            state text,
+            celery_id text,
+            status text,
+            path text,
             start int,
             end int,
-            data text,
-            file text,
-            preview text,
-            graph text,
-            variates text,
+            graph_state text,
             nrows int,
             error text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
