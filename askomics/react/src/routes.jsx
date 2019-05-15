@@ -15,6 +15,7 @@ import Account from './routes/account/account'
 import Admin from './routes/admin/admin'
 import Sparql from './routes/sparql/sparql'
 import Query from './routes/query/query'
+import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
 
@@ -81,6 +82,7 @@ export default class Routes extends Component {
             <Route path="/datasets" exact component={() => (<Datasets waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/integration" exact component={Integration} />
             <Route path="/query" exact component={Query} />
+            <Route path="/results" exact component={() => (<Results waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/sparql" exact component={() => (<Sparql waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
           </Switch>
           <br />

@@ -131,7 +131,11 @@ def query(self, session, graph_state):
         errorMessage: the error message of error, else an empty string
     """
     try:
-        result = Result(app, session, graph_state, self.request.id)
+        info = {
+            "graph_state": graph_state,
+            "celery_id": self.request.id
+        }
+        result = Result(app, session, info)
 
         # Save job in database database
         result.save_in_db()

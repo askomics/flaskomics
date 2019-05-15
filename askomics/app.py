@@ -14,6 +14,7 @@ from askomics.api.sparql import sparql_bp
 from askomics.api.start import start_bp
 from askomics.api.query import query_bp
 from askomics.api.view import view_bp
+from askomics.api.results import results_bp
 
 from celery import Celery
 
@@ -32,7 +33,8 @@ BLUEPRINTS = (
     admin_bp,
     file_bp,
     datasets_bp,
-    query_bp
+    query_bp,
+    results_bp
 )
 
 

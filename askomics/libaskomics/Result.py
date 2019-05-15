@@ -26,7 +26,7 @@ class Result(Params):
         results directory path
     """
 
-    def __init__(self, app, session, graph_state, celery_id):
+    def __init__(self, app, session, result_info):
         """init object
 
         Parameters
@@ -35,22 +35,74 @@ class Result(Params):
             flask app
         session :
             AskOmics session, contain the user
-        dump_graph_state : string
-            The query graph state
-        celery_id : str
-            celery job id
+        result_info : dict
+            Result file info
         """
         Params.__init__(self, app, session)
-        self.id = None
-        self.dump_graph_state = json.dumps(graph_state, ensure_ascii=False)
-        self.celery_id = str(celery_id)
+
         self.result_path = "{}/{}_{}/results".format(
             self.settings.get("askomics", "data_directory"),
             self.session['user']['id'],
             self.session['user']['username']
         )
-        self.file_name = Utils.get_random_string(10)
-        self.file_path = "{}/{}".format(self.result_path, self.file_name)
+
+        if "id" in result_info:
+            self.id = result_info["id"]
+            self.set_info_from_db_with_id()
+        else:
+            self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
+            self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
+            file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
+            self.file_path = "{}/{}".format(self.result_path, file_name)
+
+    def set_info_from_db_with_id(self):
+        """Set result info from the db"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT celery_id, path, graph_state
+        FROM results
+        WHERE user_id = ? AND id = ?
+        '''
+
+        rows = database.execute_sql_query(query, (self.session["user"]["id"], self.id))
+
+        self.celery_id = rows[0][0]
+        self.file_path = rows[0][1]
+        self.graph_state = json.loads(rows[0][2])
+
+    def get_file_preview(self):
+        """Get a preview of the results file
+
+        Returns
+        -------
+        list, list
+            headers and preview
+        """
+        with open(self.file_path) as file:
+            spamreader = csv.reader(file, delimiter='\t')
+            first = True
+            preview_limit = self.settings.getint("triplestore", "preview_limit")
+            row_number = 0
+            headers = []
+            data = []
+            for row in spamreader:
+                # header
+                if first:
+                    headers = row
+                    first = False
+                    continue
+
+                # rows
+                row_dict = {}
+                for i in range(len(row)):
+                    row_dict[headers[i]] = row[i]
+                data.append(row_dict)
+                row_number += 1
+                if row_number >= preview_limit:
+                    break
+
+            return headers, data
 
     def save_result_in_file(self, headers, results):
         """Save query results in a csv file
@@ -94,19 +146,8 @@ class Result(Params):
         self.id = database.execute_sql_query(query, (
             self.session["user"]["id"],
             self.celery_id,
-            self.dump_graph_state,
+            json.dumps(self.graph_state),
         ), get_id=True)
-
-        # id INTEGER PRIMARY KEY AUTOINCREMENT,
-        # user_id INTEGER,
-        # celery_id text,
-        # status text,
-        # path text,
-        # start int,
-        # end int,
-        # graph_state text,
-        # nrows int,
-        # error text,
 
     def update_db_status(self, error=False, error_message=None):
         """Update status of results in db

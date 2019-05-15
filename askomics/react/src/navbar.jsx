@@ -43,7 +43,7 @@ export default  class AskoNavbar extends Component {
         }
         links = (
           <>
-          <NavItem><Link className="nav-link" to="/queries"><i className="fas fa-question"></i> Queries</Link></NavItem>
+          <NavItem><Link className="nav-link" to="/results"><i className="fas fa-tasks"></i> Results</Link></NavItem>
           <NavItem><Link className="nav-link" to="/files"><i className="fas fa-file"></i> Files</Link></NavItem>
           <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
           <NavItem>
