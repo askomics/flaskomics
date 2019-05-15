@@ -19,7 +19,8 @@ export default class Results extends Component {
       results: [],
       selected: [],
       resultsPreview: [],
-      headerPreview: []
+      headerPreview: [],
+      currentPreview: null
     }
     this.cancelRequest
     this.deleteSelectedResults = this.deleteSelectedResults.bind(this)
@@ -109,7 +110,7 @@ export default class Results extends Component {
     if (this.state.resultsPreview.length > 0) {
       resultsTable = (
         <div>
-          <h4>Result preview</h4>
+          <h4>Result {this.state.currentPreview} preview</h4>
           <hr />
           <ResultsTable data={this.state.resultsPreview} header={this.state.headerPreview} currentPreview={this.state.currentPreview} />
         </div>

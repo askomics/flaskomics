@@ -84,6 +84,11 @@ export default class ResultsFilesTable extends Component {
   render() {
 
     let columns = [{
+      text: 'Id',
+      sort: true,
+      formatter: (cell, row) => {return row.id},
+      headerStyle: () => {return { width: "10%" }}
+    }, {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
@@ -103,6 +108,7 @@ export default class ResultsFilesTable extends Component {
         }
         return <Badge color="danger">Failure</Badge>
       },
+      headerStyle: () => {return { width: "10%" }},
       sort: true
     }, {
       dataField: 'error_message',
