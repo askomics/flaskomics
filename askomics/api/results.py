@@ -126,3 +126,33 @@ def download_result():
         }), 500
 
     return(send_from_directory(dir_path, file_name))
+
+
+@results_bp.route('/api/results/delete', methods=['POST'])
+def delete_result():
+    """Summary
+
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        files_id = request.get_json()["filesIdToDelete"]
+        results_handler = ResultsHandler(current_app, session)
+        remaining_files = results_handler.delete_results(files_id)
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'remainingFiles': {},
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'remainingFiles': remaining_files,
+        'error': False,
+        'errorMessage': ''
+    })

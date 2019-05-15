@@ -23,6 +23,7 @@ export default class Results extends Component {
       currentPreview: null
     }
     this.cancelRequest
+    this.interval
     this.deleteSelectedResults = this.deleteSelectedResults.bind(this)
   }
 
@@ -39,8 +40,10 @@ export default class Results extends Component {
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
-        files: response.data.files,
-        selected: [],
+        results: response.data.remainingFiles,
+        resultsPreview: [],
+        headerPreview: [],
+        currentPreview: null,
         error: response.data.error,
         errorMessage: response.data.errorMessage
       })
@@ -51,41 +54,46 @@ export default class Results extends Component {
         error: true,
         errorMessage: error.response.data.errorMessage,
         status: error.response.status,
-        selected: []
       })
     })
   }
 
   componentDidMount() {
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/results'
-      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          results: response.data.files,
-          waiting: false
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
-        })
-      })
+      this.getResults()
+      this.interval = setInterval(() => {
+        this.getResults()
+      }, 5000)
     }
   }
 
   componentWillUnmount() {
+    clearInterval(this.interval)
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-
+  getResults() {
+    let requestUrl = '/api/results'
+    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.setState({
+        results: response.data.files,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
 
   render() {
 

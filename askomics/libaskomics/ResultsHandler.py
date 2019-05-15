@@ -1,5 +1,6 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Result import Result
 
 
 class ResultsHandler(Params):
@@ -16,6 +17,25 @@ class ResultsHandler(Params):
             AskOmics session, contain the user
         """
         Params.__init__(self, app, session)
+
+    def delete_results(self, files_id):
+        """Delete files
+
+        Parameters
+        ----------
+        files_id : list
+            list of file id to delete
+
+        Returns
+        -------
+        list
+            list of remaining files
+        """
+        for file_id in files_id:
+            result = Result(self.app, self.session, {"id": file_id})
+            result.delete_result()
+
+        return self.get_files_info()
 
     def get_files_info(self):
         """Get files info of the user

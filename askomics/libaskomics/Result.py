@@ -266,6 +266,26 @@ class Result(Params):
         ))
 
     def rollback(self):
+        """Delete file"""
+        self.delete_file_from_filesystem(self)
+
+    def delete_result(self):
+        """Remove results from db and filesystem"""
+        self.delete_db_entry()
+        self.delete_file_from_filesystem()
+
+    def delete_db_entry(self):
+        """Delete results from db"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        DELETE FROM results
+        WHERE id = ? AND user_id = ?
+        '''
+
+        database.execute_sql_query(query, (self.id, self.session["user"]["id"]))
+
+    def delete_file_from_filesystem(self):
         """Remove result file from filesystem"""
         try:
             os.remove(self.file_path)
