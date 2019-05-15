@@ -1,7 +1,7 @@
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 
-from flask import (Blueprint, current_app, jsonify, session, request)
+from flask import (Blueprint, current_app, jsonify, session, request, send_from_directory)
 
 
 results_bp = Blueprint('results', __name__, url_prefix='/')
@@ -71,3 +71,23 @@ def get_preview():
         'error': False,
         'errorMessage': ''
     })
+
+
+@results_bp.route('/api/results/download', methods=['POST'])
+def download_result():
+    """Download result file"""
+    try:
+        file_id = request.get_json()["fileId"]
+        result_info = {"id": file_id}
+        result = Result(current_app, session, result_info)
+        dir_path = result.get_dir_path()
+        file_name = result.get_file_name()
+
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return(send_from_directory(dir_path, file_name))

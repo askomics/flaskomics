@@ -52,8 +52,28 @@ class Result(Params):
         else:
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
-            file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
-            self.file_path = "{}/{}".format(self.result_path, file_name)
+            self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
+            self.file_path = "{}/{}".format(self.result_path, self.file_name)
+
+    def get_file_name(self):
+        """Get file name
+
+        Returns
+        -------
+        str
+            file name
+        """
+        return self.file_name
+
+    def get_dir_path(self):
+        """Get directory path
+
+        Returns
+        -------
+        str
+            directory path
+        """
+        return self.result_path
 
     def set_info_from_db_with_id(self):
         """Set result info from the db"""
@@ -69,6 +89,7 @@ class Result(Params):
 
         self.celery_id = rows[0][0]
         self.file_path = rows[0][1]
+        self.file_name = os.path.basename(self.file_path)
         self.graph_state = json.loads(rows[0][2])
 
     def get_file_preview(self):

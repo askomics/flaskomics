@@ -4,6 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from "../../components/waiting"
 import { Badge, Button } from 'reactstrap'
+import FileDownload from 'js-file-download'
 
 export default class ResultsFilesTable extends Component {
 
@@ -73,7 +74,22 @@ export default class ResultsFilesTable extends Component {
   }
 
   handleDownload(event) {
-    console.log(event.target.id)
+    let requestUrl = '/api/results/download'
+    let data = {fileId: event.target.id}
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then((response) => {
+      console.log(requestUrl, response.data)
+      FileDownload(response.data, "result.csv")
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
   }
 
   handleRedo(event) {
