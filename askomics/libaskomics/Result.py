@@ -187,5 +187,5 @@ class Result(Params):
         """Remove result file from filesystem"""
         try:
             os.remove(self.file_path)
-        except:
+        except Exception:
             self.log.debug("Impossible to delete {}".format(self.file_path))
