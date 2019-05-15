@@ -377,6 +377,14 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  setCurrentSelected() {
+    this.graphState.nodes.forEach(node => {
+      if (node.selected) {
+        this.currentSelected = node
+      }
+    })
+  }
+
   updateGraphState() {
     this.setState({
       graphState: this.graphState
@@ -518,7 +526,14 @@ export default class Query extends Component {
           status: error.response.status
         })
       }).then(response => {
-        this.initGraph()
+        if (this.props.location.state.redo) {
+          // redo a query
+          this.graphState = this.props.location.state.graphState
+          this.setCurrentSelected()
+          this.updateGraphState()
+        }else{
+          this.initGraph()
+        }
         this.setState({waiting: false})
       })
     }
@@ -579,7 +594,6 @@ export default class Query extends Component {
         <Visualization
           divHeight={this.divHeight}
           abstraction={this.state.abstraction}
-          startpoint={this.state.startpoint}
           graphState={this.state.graphState}
           logged={this.state.logged}
           user={this.state.user}

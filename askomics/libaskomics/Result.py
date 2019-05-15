@@ -50,10 +50,61 @@ class Result(Params):
             self.id = result_info["id"]
             self.set_info_from_db_with_id()
         else:
-            self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
+            self.graph_state = self.format_graph_state(result_info["graph_state"]) if "graph_state" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
+
+    def format_graph_state(self, d3_graph_state):
+        """Format Graph state
+
+        Remove coordinates and other things
+
+        Parameters
+        ----------
+        d3_graph_state : dict
+            The d3 graph state
+
+        Returns
+        -------
+        dict
+            formatted graph state
+        """
+        new_nodes = []
+        new_links = []
+
+        for node in d3_graph_state["nodes"]:
+
+            new_node = {
+                "uri": node["uri"],
+                "graphs": node["graphs"],
+                "id": node["id"],
+                "label": node["label"],
+                "selected": node["selected"],
+                "suggested": node["suggested"]
+            }
+
+            new_nodes.append(new_node)
+
+        for link in d3_graph_state["links"]:
+
+            new_link = {
+                "uri": link["uri"],
+                "id": link["id"],
+                "label": link["label"],
+                "source": link["source"]["id"],
+                "target": link["target"]["id"],
+                "selected": link["selected"],
+                "suggested": link["suggested"]
+            }
+
+            new_links.append(new_link)
+
+        return {
+            "nodes": new_nodes,
+            "links": new_links,
+            "attr": d3_graph_state["attr"]
+        }
 
     def get_file_name(self):
         """Get file name
@@ -74,6 +125,16 @@ class Result(Params):
             directory path
         """
         return self.result_path
+
+    def get_graph_state(self):
+        """Get get_graph_state
+
+        Returns
+        -------
+        dict
+            graph state
+        """
+        return self.graph_state
 
     def set_info_from_db_with_id(self):
         """Set result info from the db"""

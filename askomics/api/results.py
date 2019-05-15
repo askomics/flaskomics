@@ -73,6 +73,41 @@ def get_preview():
     })
 
 
+@results_bp.route('/api/results/graphstate', methods=['POST'])
+def get_graph_state():
+    """Summary
+
+    Returns
+    -------
+    json
+        preview: list of result preview
+        header: result header
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        file_id = request.get_json()["fileId"]
+        result_info = {"id": file_id}
+        result = Result(current_app, session, result_info)
+        graph_state = result.get_graph_state()
+
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'graphState': {},
+            'id': file_id,
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'graphState': graph_state,
+        'id': file_id,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @results_bp.route('/api/results/download', methods=['POST'])
 def download_result():
     """Download result file"""

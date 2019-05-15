@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import axios from 'axios'
+import { Redirect} from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from "../../components/waiting"
@@ -11,6 +12,10 @@ export default class ResultsFilesTable extends Component {
 
   constructor(props) {
     super(props)
+    this.state = {
+      redirectQueryBuilder: false,
+      graphState: []
+    }
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.handlePreview = this.handlePreview.bind(this)
@@ -93,11 +98,44 @@ export default class ResultsFilesTable extends Component {
   }
 
   handleRedo(event) {
-    console.log(event.target.id)
+    // request api to get a preview of file
+    let requestUrl = '/api/results/graphstate'
+    let data = {fileId: event.target.id}
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+      // set state of resultsPreview
+      this.setState({
+        redirectQueryBuilder: true,
+        graphState: response.data.graphState
+      })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
   }
 
 
   render() {
+
+    let redirectQueryBuilder
+    if (this.state.redirectQueryBuilder) {
+      redirectQueryBuilder = <Redirect to={{
+        pathname: "/query",
+        state: {
+          redo: true,
+          graphState: this.state.graphState,
+          user: this.props.user,
+          logged: this.props.logged
+        }
+      }} />
+    }
 
     let columns = [{
       text: 'Id',
@@ -162,6 +200,7 @@ export default class ResultsFilesTable extends Component {
 
     return (
       <div>
+        {redirectQueryBuilder}
         <BootstrapTable
           selectRow={ { mode: 'checkbox' } }
           tabIndexCell
