@@ -356,7 +356,7 @@ export default class Query extends Component {
       this.removeAllSuggestion()
     } else {
       // case 2: clicked node is unselected, so select it
-
+      let suggested = clickedNode.suggested
       // update current and previous
       this.manageCurrentPreviousSelected(clickedNode)
       // unselect all nodes
@@ -365,8 +365,8 @@ export default class Query extends Component {
       this.selectAndInstanciateNode(clickedNode)
       // remove all suggestion
       this.removeAllSuggestion()
-      // instanciate link
-      if (this.previousSelected) {
+      // instanciate link only if clicked node is suggested
+      if (suggested) {
         this.insertLinkIfExists(this.currentSelected, this.previousSelected)
       }
       // insert suggestion
