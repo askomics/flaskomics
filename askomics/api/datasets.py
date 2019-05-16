@@ -62,17 +62,19 @@ def delete_datasets():
         # Change status into database
         datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
         datasets_handler.handle_datasets()
-        datasets_handler.update_status_in_db('deleting')
+        datasets = datasets_handler.update_status_in_db('deleting')
         # Trigger the celery task to delete it in the ts, and in db
         current_app.celery.send_task('delete_datasets', (session_dict, datasets_info))
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({
+            'datasets': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
+        'datasets': datasets,
         'error': False,
         'errorMessage': ''
     })

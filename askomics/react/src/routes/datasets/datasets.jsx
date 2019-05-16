@@ -72,6 +72,11 @@ export default class Datasets extends Component {
     axios.post(requestUrl, data)
     .then(response => {
       console.log(requestUrl, response.data)
+      this.setState({
+        datasets: response.data.datasets,
+        selected: [],
+        waiting: false
+      })
     })
   }
 

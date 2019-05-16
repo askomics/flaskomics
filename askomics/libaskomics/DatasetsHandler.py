@@ -80,6 +80,11 @@ class DatasetsHandler(Params):
         ----------
         status : string
             The new status (started, success or deleting)
+
+        Returns
+        -------
+        list
+            Remaining datasets
         """
         database = Database(self.app, self.session)
 
@@ -95,9 +100,10 @@ class DatasetsHandler(Params):
 
         database.execute_sql_query(query, (status, self.session['user']['id']) + tuple(datasets_id))
 
+        return self.get_datasets()
+
     def delete_datasets_in_db(self):
-        """Delete datasets of the database
-        """
+        """Delete datasets of the database"""
         database = Database(self.app, self.session)
 
         where_str = '(' + ' OR '.join(['id = ?'] * len(self.datasets)) + ')'
@@ -112,8 +118,7 @@ class DatasetsHandler(Params):
         database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(datasets_id))
 
     def delete_datasets(self):
-        """delete the datasets from the database and the triplestore
-        """
+        """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
         for dataset in self.datasets:
             # Delete from triplestore
