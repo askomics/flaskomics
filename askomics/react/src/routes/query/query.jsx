@@ -567,7 +567,8 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
-    let buttons
+    let previewButton
+    let launchQueryButton
 
     if (!this.state.waiting) {
       // attribute boxes (right view)
@@ -603,12 +604,11 @@ export default class Query extends Component {
       )
 
       // buttons
-      buttons = (
-        <ButtonGroup>
-          <Button onClick={this.handlePreview} color="secondary">Preview results</Button>
-          <Button onClick={this.handleQuery} color="secondary">Launch Query</Button>
-        </ButtonGroup>
-      )
+      launchQueryButton
+      previewButton = <Button onClick={this.handlePreview} color="secondary">Preview results</Button>
+      if (this.state.logged) {
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary">Launch Query</Button>
+      }
     }
 
     // preview
@@ -638,7 +638,10 @@ export default class Query extends Component {
           </div>
           </Col>
         </Row>
-        {buttons}
+        <ButtonGroup>
+          {previewButton}
+          {launchQueryButton}
+        </ButtonGroup>
         <br /> <br />
         <div>
           {resultsTable}

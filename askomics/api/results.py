@@ -1,3 +1,4 @@
+from askomics.api.auth import login_required
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 
@@ -7,6 +8,7 @@ from flask import (Blueprint, current_app, jsonify, session, request, send_from_
 results_bp = Blueprint('results', __name__, url_prefix='/')
 
 
+@login_required
 @results_bp.route('/api/results', methods=['GET'])
 def get_results():
     """Get ...
@@ -36,6 +38,7 @@ def get_results():
     })
 
 
+@login_required
 @results_bp.route('/api/results/preview', methods=['POST'])
 def get_preview():
     """Summary
@@ -73,6 +76,7 @@ def get_preview():
     })
 
 
+@login_required
 @results_bp.route('/api/results/graphstate', methods=['POST'])
 def get_graph_state():
     """Summary
@@ -108,6 +112,7 @@ def get_graph_state():
     })
 
 
+@login_required
 @results_bp.route('/api/results/download', methods=['POST'])
 def download_result():
     """Download result file"""
@@ -128,6 +133,7 @@ def download_result():
     return(send_from_directory(dir_path, file_name))
 
 
+@login_required
 @results_bp.route('/api/results/delete', methods=['POST'])
 def delete_result():
     """Summary

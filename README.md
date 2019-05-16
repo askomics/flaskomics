@@ -6,6 +6,21 @@
 
 FlaskOmics is the future of [AskOmics](https://github.com/askomics/askomics).
 
+## Dependencies
+
+FlAskOmics need a triplestore and a redos database to run.
+
+### Redis
+
+```bash
+sudo apt install redis
+```
+
+### Virtuoso
+
+[virtuoso](https://github.com/openlink/virtuoso-opensource)
+
+
 ## Requirements
 
 Python3, Python3 virtual env and npm
@@ -22,7 +37,7 @@ sudo apt install python3 python3-venv npm
 ## Run
 
 ```bash
-run_all.sh
+run_all.sh -d dev
 ```
 
 FlaskOmics is available at http://localhost:5000

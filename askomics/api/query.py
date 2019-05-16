@@ -1,6 +1,7 @@
 import sys
 import traceback
 
+from askomics.api.auth import login_required
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -105,6 +106,7 @@ def get_preview():
     })
 
 
+@login_required
 @query_bp.route('/api/query/save_result', methods=['POST'])
 def save_result():
     """Save a query in filesystem and db, using a celery task
