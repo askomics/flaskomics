@@ -111,7 +111,7 @@ export default class Query extends Component {
     let nodeAttributes = []
 
     // create uri and label attributes
-    if (!this.attributeExist("uri", nodeId)) {
+    if (!this.attributeExist("rdf:type", nodeId)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: false,
@@ -126,7 +126,7 @@ export default class Query extends Component {
       })
     }
 
-    if (!this.attributeExist("label", nodeId)) {
+    if (!this.attributeExist("rdfs:label", nodeId)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
