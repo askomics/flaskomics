@@ -28,6 +28,7 @@ export default class Query extends Component {
       waiting: true,
       error: false,
       errorMessage: null,
+      tick: false
     }
 
     this.graphState = {
@@ -495,6 +496,14 @@ export default class Query extends Component {
     axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
+      this.setState({
+        tick: true
+      })
+      setTimeout(() => {
+        this.setState({
+          tick: false
+        })
+      }, 2000)
     }).catch(error => {
       console.log(error, error.response.data.errorMessage)
       this.setState({
@@ -605,9 +614,13 @@ export default class Query extends Component {
 
       // buttons
       launchQueryButton
-      previewButton = <Button onClick={this.handlePreview} color="secondary">Preview results</Button>
+      previewButton = <Button onClick={this.handlePreview} color="secondary"><i className="fas fa-table"></i> Preview results</Button>
       if (this.state.logged) {
-        launchQueryButton = <Button onClick={this.handleQuery} color="secondary">Launch Query</Button>
+        let lauchQueryIcon = <i className="fas fa-question"></i>
+        if (this.state.tick) {
+          lauchQueryIcon = <i className="fas fa-check text-success"></i>
+        }
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary">{lauchQueryIcon} Launch Query</Button>
       }
     }
 
