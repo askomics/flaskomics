@@ -50,7 +50,7 @@ class Result(Params):
             self.id = result_info["id"]
             self.set_info_from_db_with_id()
         else:
-            self.graph_state = self.format_graph_state(result_info["graph_state"]) if "graph_state" in result_info else None
+            self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
@@ -126,7 +126,7 @@ class Result(Params):
         """
         return self.result_path
 
-    def get_graph_state(self):
+    def get_graph_state(self, formated=False):
         """Get get_graph_state
 
         Returns
@@ -134,6 +134,8 @@ class Result(Params):
         dict
             graph state
         """
+        if formated:
+            return self.format_graph_state(self.graph_state)
         return self.graph_state
 
     def set_info_from_db_with_id(self):

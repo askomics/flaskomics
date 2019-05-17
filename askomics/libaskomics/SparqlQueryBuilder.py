@@ -218,7 +218,7 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
-    def build_query_from_json(self, json_query, preview=False):
+    def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
         Parameters
@@ -332,14 +332,25 @@ class SparqlQueryBuilder(Params):
 
         from_string = self.get_froms_from_graphs(graphs)
 
-        query = """
-        SELECT DISTINCT {}
-        {}
-        WHERE {{
-            {}
-            {}
-        }}
-        """.format(' '.join(selects), from_string, '\n'.join(triples), '\n'.join(filters))
+        if for_editor:
+            query = """
+SELECT DISTINCT {}
+WHERE {{
+    {}
+    {}
+
+}}
+            """.format(' '.join(selects), '\n    '.join(triples), '\n    '.join(filters))
+        else:
+
+            query = """
+SELECT DISTINCT {}
+{}
+WHERE {{
+    {}
+    {}
+}}
+            """.format(' '.join(selects), from_string, '\n    '.join(triples), '\n    '.join(filters))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))

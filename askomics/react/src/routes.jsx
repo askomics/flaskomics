@@ -83,7 +83,7 @@ export default class Routes extends Component {
             <Route path="/integration" exact component={Integration} />
             <Route path="/query" exact component={Query} />
             <Route path="/results" exact component={() => (<Results waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
-            <Route path="/sparql" exact component={() => (<Sparql waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/sparql" exact component={Sparql} />
           </Switch>
           <br />
           <br />

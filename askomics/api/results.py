@@ -1,6 +1,10 @@
+import traceback
+import sys
+
 from askomics.api.auth import login_required
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
+from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 
 from flask import (Blueprint, current_app, jsonify, session, request, send_from_directory)
 
@@ -93,7 +97,7 @@ def get_graph_state():
         file_id = request.get_json()["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
-        graph_state = result.get_graph_state()
+        graph_state = result.get_graph_state(formated=True)
 
     except Exception as e:
         current_app.logger.error(str(e))
@@ -159,6 +163,44 @@ def delete_result():
 
     return jsonify({
         'remainingFiles': remaining_files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@login_required
+@results_bp.route('/api/results/sparqlquery', methods=['POST'])
+def get_sparql_query():
+    """Get sparql query of result for the query editor
+
+    Returns
+    -------
+    json
+        query: the sparql query
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        file_id = request.get_json()["fileId"]
+        result_info = {"id": file_id}
+
+        result = Result(current_app, session, result_info)
+        query_builder = SparqlQueryBuilder(current_app, session)
+
+        graph_state = result.get_graph_state()
+        query = query_builder.build_query_from_json(graph_state, for_editor=True)
+
+    except Exception as e:
+        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'query': {},
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'query': query,
         'error': False,
         'errorMessage': ''
     })

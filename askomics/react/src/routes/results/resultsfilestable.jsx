@@ -4,7 +4,7 @@ import { Redirect} from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from "../../components/waiting"
-import { Badge, Button } from 'reactstrap'
+import { Badge, Button, ButtonGroup } from 'reactstrap'
 import FileDownload from 'js-file-download'
 
 export default class ResultsFilesTable extends Component {
@@ -21,6 +21,7 @@ export default class ResultsFilesTable extends Component {
     this.handlePreview = this.handlePreview.bind(this)
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
+    this.handleEditQuery = this.handleEditQuery.bind(this)
   }
 
   humanDate(date) {
@@ -121,8 +122,43 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
+  handleEditQuery(event) {
+    let requestUrl = '/api/results/sparqlquery'
+    let data = {fileId: event.target.id}
+    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.setState({
+        redirectSparqlEditor: true,
+        sparqlQuery: response.data.query
+      })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
+
 
   render() {
+
+    let redirectSparqlEditor
+    if (this.state.redirectSparqlEditor) {
+      redirectSparqlEditor = <Redirect to={{
+        pathname: "/sparql",
+        state: {
+          redo: true,
+          sparqlQuery: this.state.sparqlQuery,
+          user: this.props.user,
+          logged: this.props.logged
+        }
+      }} />
+    }
 
     let redirectQueryBuilder
     if (this.state.redirectQueryBuilder) {
@@ -141,7 +177,7 @@ export default class ResultsFilesTable extends Component {
       text: 'Id',
       sort: true,
       formatter: (cell, row) => {return row.id},
-      headerStyle: () => {return { width: "10%" }}
+      headerStyle: () => {return { width: "5%" }}
     }, {
       dataField: 'start',
       text: 'Creation date',
@@ -166,17 +202,19 @@ export default class ResultsFilesTable extends Component {
       sort: true
     }, {
       dataField: 'error_message',
-      text: 'Message'
+      text: 'Message',
+      headerStyle: () => {return { width: "20%" }}
     }, {
       // buttons
       text: 'Actions',
       formatter: (cell, row) => {
         return (
-          <div>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>{' '}
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>{' '}
+          <ButtonGroup>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-          </div>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Edit Sparql</Button>
+          </ButtonGroup>
         )
       }
     }]
@@ -200,7 +238,7 @@ export default class ResultsFilesTable extends Component {
 
     return (
       <div>
-        {redirectQueryBuilder}
+        {redirectQueryBuilder}{redirectSparqlEditor}
         <BootstrapTable
           selectRow={ { mode: 'checkbox' } }
           tabIndexCell
