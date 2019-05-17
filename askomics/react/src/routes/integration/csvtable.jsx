@@ -13,7 +13,9 @@ export default class CsvTable extends Component {
       id: props.file.id,
       header: props.file.csv_data.header,
       columns_type: props.file.csv_data.columns_type,
-      integrated: false
+      integrated: false,
+      publicTick: false,
+      privateTick: false
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -77,6 +79,7 @@ export default class CsvTable extends Component {
   integrate(event) {
 
     let requestUrl = '/api/files/integrate'
+    let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
     let data = {
       fileId: this.state.id,
       columns_type: this.state.columns_type,
@@ -86,10 +89,14 @@ export default class CsvTable extends Component {
     axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
     .then(response => {
       console.log(requestUrl, response.data)
-      // this.setState({
-      //   files: response.data.files,
-      //   waiting: false
-      // })
+      this.setState({
+        [tick]: true
+      })
+      setTimeout(() => {
+        this.setState({
+          [tick]: false
+        })
+      }, 2000)
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
@@ -104,6 +111,10 @@ export default class CsvTable extends Component {
 
   }
 
+  sleep(ms) {
+    return new Promise(resolve => setTimeout((resolve, ms)))
+  }
+
   render() {
 
     let columns = this.state.header.map((colName, index) => {
@@ -116,6 +127,15 @@ export default class CsvTable extends Component {
         selectedType: this.state.columns_type[index]
       })
     })
+
+    let privateIcon = <i className="fas fa-lock"></i>
+    if (this.state.privateTick) {
+      privateIcon = <i className="fas fa-check text-success"></i>
+    }
+    let publicIcon = <i className="fas fa-globe-europe"></i>
+    if (this.state.publicTick) {
+      publicIcon = <i className="fas fa-check text-success"></i>
+    }
 
     return (
       <div>
@@ -132,8 +152,8 @@ export default class CsvTable extends Component {
         <br /><br />
         <div className="center-div">
           <ButtonGroup>
-            <Button onClick={this.integrate} value="private" color="secondary"><i className="fas fa-lock"></i> Integrate (private dataset)</Button>
-            <Button onClick={this.integrate} value="public" color="secondary"><i className="fas fa-globe-europe"></i> Integrate (public dataset)</Button>
+            <Button onClick={this.integrate} value="private" color="secondary">{privateIcon} Integrate (private dataset)</Button>
+            <Button onClick={this.integrate} value="public" color="secondary">{publicIcon} Integrate (public dataset)</Button>
           </ButtonGroup>
         </div>
       </div>
