@@ -26,6 +26,9 @@ class TestApiDatasets(AskomicsTestCase):
         data = {
             "datasetsIdToDelete": [1, ]
         }
+
         response = client_logged_as_jdoe_with_data.post('/api/datasets/delete', json=data)
         assert response.status_code == 200
-        assert response.json == {'error': False, 'errorMessage': ''}
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["datasets"][0]["status"] == "deleting"

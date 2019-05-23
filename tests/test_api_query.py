@@ -10,7 +10,7 @@ class TestApiStartpoints(AskomicsTestCase):
         """Test /api/startpoints route"""
         case = unittest.TestCase()
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
-        response = client_logged_as_jdoe_with_data.get('/api/startpoints')
+        response = client_logged_as_jdoe_with_data.get('/api/query/startpoints')
         assert response.status_code == 200
         expected = {
             'error': False,
@@ -35,7 +35,7 @@ class TestApiStartpoints(AskomicsTestCase):
         """Test /api/startpoints/abstraction route"""
         case = unittest.TestCase()
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
-        response = client_logged_as_jdoe_with_data.get('/api/startpoints/abstraction')
+        response = client_logged_as_jdoe_with_data.get('/api/query/abstraction')
         assert response.status_code == 200
         expected = {
             'abstraction': [{
