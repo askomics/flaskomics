@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from . import AskomicsTestCase
 
@@ -102,4 +103,63 @@ class TestApiStartpoints(AskomicsTestCase):
             'error': False,
             'errorMessage': ''
         }
+        case.assertCountEqual(response.json, expected)
+
+    def test_get_preview(self, client_logged_as_jdoe_with_data):
+        """Test /api/query/preview route"""
+        case = unittest.TestCase()
+
+        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
+
+        with open("tests/data/query.json", "r") as file:
+            file_content = file.read()
+
+        raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
+        json_query = json.loads(raw_query)
+
+        data = {
+            "graphState": json_query,
+        }
+
+        expected = {
+            'error': False,
+            'errorMessage': '',
+            'headerPreview': ['Gene1_Label'],
+            'resultsPreview': [{
+                'Gene1_Label': 'AT001'
+            }, {
+                'Gene1_Label': 'AT001'
+            }, {
+                'Gene1_Label': 'AT002'
+            }, {
+                'Gene1_Label': 'AT002'
+            }, {
+                'Gene1_Label': 'AT003'
+            }, {
+                'Gene1_Label': 'AT003'
+            }, {
+                'Gene1_Label': 'AT004'
+            }, {
+                'Gene1_Label': 'AT004'
+            }, {
+                'Gene1_Label': 'AT005'
+            }, {
+                'Gene1_Label': 'AT005'
+            }, {
+                'Gene1_Label': 'BN001'
+            }, {
+                'Gene1_Label': 'BN001'
+            }, {
+                'Gene1_Label': 'BN002'
+            }, {
+                'Gene1_Label': 'BN002'
+            }, {
+                'Gene1_Label': 'BN003'
+            }, {
+                'Gene1_Label': 'BN003'
+            }]
+        }
+
+        response = client_logged_as_jdoe_with_data.post('/api/query/preview', json=data)
+        assert response.status_code == 200
         case.assertCountEqual(response.json, expected)
