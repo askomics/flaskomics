@@ -163,3 +163,22 @@ class TestApiStartpoints(AskomicsTestCase):
         response = client_logged_as_jdoe_with_data.post('/api/query/preview', json=data)
         assert response.status_code == 200
         case.assertCountEqual(response.json, expected)
+
+    def test_save_result(self, client_logged_as_jdoe_with_data):
+        """Test /api/query/save_result route"""
+        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
+
+        with open("tests/data/query.json", "r") as file:
+            file_content = file.read()
+
+        raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
+        json_query = json.loads(raw_query)
+
+        data = {
+            "graphState": json_query,
+        }
+
+        response = client_logged_as_jdoe_with_data.post('/api/query/save_result', json=data)
+        assert response.status_code == 200
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
