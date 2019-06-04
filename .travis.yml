@@ -12,8 +12,8 @@ cache:
 install:
   - pip install --user -r requirements.txt
   - pip install --user -U flake8
-  - python setup.py install
-  - sudo npm install
+  - sudo python setup.py install
+  - npm install
 before_script:
   - docker pull redis:4.0
   - docker pull askomics/virtuoso
