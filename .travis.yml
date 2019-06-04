@@ -21,8 +21,8 @@ before_script:
   - sudo docker run -d --name redis --net="host" -t redis:4.0
   - sleep 1m
 script:
-  - flake8 askomics tests --ignore=E501,W504
-  - ./node_modules/.bin/eslint "askomics/react/src/**"
-  - pytest --cov=. -vv --log-cli-level debug
+  - sudo flake8 askomics tests --ignore=E501,W504
+  - sudo ./node_modules/.bin/eslint "askomics/react/src/**"
+  - sudo pytest --cov=. -vv --log-cli-level debug
 after_success:
   coveralls
