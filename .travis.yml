@@ -1,15 +1,17 @@
 sudo: required
-language: python
+language: node_js
 python:
   - "3.5"
   - "3.6"
+node_js:
+  - "8" 
 services:
   - docker
 cache:
   - pip
 install:
-  - pip install -r requirements.txt
-  - pip install -U flake8
+  - pip install --user -r requirements.txt
+  - pip install --user -U flake8
   - python setup.py install
   - sudo npm install
 before_script:
