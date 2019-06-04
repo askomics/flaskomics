@@ -1,26 +1,26 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
-import { Redirect} from 'react-router'
-import { Link } from "react-router-dom";
-import ErrorDiv from "../error/error"
+import { Redirect } from 'react-router'
+import { Link } from 'react-router-dom'
+import ErrorDiv from '../error/error'
+import PropTypes from 'prop-types'
 
 export default class Signup extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
-    this.state = {isLoading: true,
-                  error: false,
-                  errorMessage: [],
-                  fname: '',
-                  lname: '',
-                  username: '',
-                  email: '',
-                  password: '',
-                  passwordconf:'',
-                  usernameFirstChar: '',
-                  usernameLastChars: '',
-                  logged: false
+    this.state = { isLoading: true,
+      error: false,
+      errorMessage: [],
+      fname: '',
+      lname: '',
+      username: '',
+      email: '',
+      password: '',
+      passwordconf: '',
+      usernameFirstChar: '',
+      usernameLastChars: '',
+      logged: false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
@@ -28,32 +28,32 @@ export default class Signup extends Component {
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  handleChangeFname(event) {
+  handleChangeFname (event) {
     this.setState({
       username: event.target.value.charAt(0).toLowerCase(),
       fname: event.target.value
     })
   }
 
-  handleChangeLname(event) {
+  handleChangeLname (event) {
     this.setState({
       username: this.state.fname.charAt(0).toLowerCase() + event.target.value.toLowerCase(),
       lname: event.target.value
     })
   }
 
-  handleChange(event) {
+  handleChange (event) {
     this.setState({
       [event.target.id]: event.target.value
     })
   }
 
-  validateEmail(email) {
+  validateEmail (email) {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
   }
 
-  validateForm() {
+  validateForm () {
     return (
       this.state.fname.length > 0 &&
       this.state.lname.length > 0 &&
@@ -64,8 +64,7 @@ export default class Signup extends Component {
     )
   }
 
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     let requestUrl = '/api/auth/signup'
     let data = {
       fname: this.state.fname,
@@ -77,41 +76,41 @@ export default class Signup extends Component {
     }
 
     axios.post(requestUrl, data)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        user: response.data.user,
-        logged: !response.data.error
-      })
-      if (!this.state.error) {
-        this.props.setStateNavbar({
-          user: this.state.user,
-          logged: this.state.logged
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          user: response.data.user,
+          logged: !response.data.error
         })
-      }
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error,
-        fname: '',
-        lname: '',
-        username: '',
-        email: '',
-        password: '',
-        passwordconf:''
+        if (!this.state.error) {
+          this.props.setStateNavbar({
+            user: this.state.user,
+            logged: this.state.logged
+          })
+        }
       })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error,
+          fname: '',
+          lname: '',
+          username: '',
+          email: '',
+          password: '',
+          passwordconf: ''
+        })
+      })
     event.preventDefault()
   }
 
-  render() {
+  render () {
     let html = <Redirect to="/" />
     if (!this.state.logged) {
       html = (
@@ -156,3 +155,6 @@ export default class Signup extends Component {
   }
 }
 
+Signup.propTypes = {
+  setStateNavbar: PropTypes.func
+}

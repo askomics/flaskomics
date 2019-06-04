@@ -1,12 +1,12 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
+import PropTypes from 'prop-types'
 
 export default class CsvTable extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       name: props.file.name,
@@ -23,28 +23,26 @@ export default class CsvTable extends Component {
     this.integrate = this.integrate.bind(this)
   }
 
-  handleChangeType(index, event) {
-
+  handleChangeType (index, event) {
     this.setState({
       columns_type: this.state.columns_type.map((elem, i) => i == index ? event.target.value : elem)
     })
   }
 
-  headerFormatter(column, colIndex) {
-
-    let boundChangeType = this.handleChangeType.bind(this, colIndex);
+  headerFormatter (column, colIndex) {
+    let boundChangeType = this.handleChangeType.bind(this, colIndex)
 
     if (colIndex == 0) {
       return (
-      <div>
-        <FormGroup>
+        <div>
+          <FormGroup>
             <p>{this.state.header[colIndex]}</p>
             <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
               <option value="start_entity" >Start entity</option>
               <option value="entity" >Entity</option>
             </CustomInput>
           </FormGroup>
-      </div>
+        </div>
       )
     }
 
@@ -52,7 +50,7 @@ export default class CsvTable extends Component {
       <div>
         <FormGroup>
           <p>{this.state.header[colIndex]}</p>
-            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
+          <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
             <optgroup label="Attributes">
               <option value="numeric" >Numeric</option>
               <option value="text" >Text</option>
@@ -70,53 +68,49 @@ export default class CsvTable extends Component {
               <option value="general_relation" >General</option>
               <option value="symetric_relation" >Symetric</option>
             </optgroup>
-            </CustomInput>
-          </FormGroup>
+          </CustomInput>
+        </FormGroup>
       </div>
     )
   }
 
-  integrate(event) {
-
+  integrate (event) {
     let requestUrl = '/api/files/integrate'
     let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
     let data = {
       fileId: this.state.id,
       columns_type: this.state.columns_type,
-      public: event.target.value == 'public' ? true : false,
+      public: event.target.value == 'public',
       type: 'csv'
     }
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        [tick]: true
-      })
-      setTimeout(() => {
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
         this.setState({
-          [tick]: false
+          [tick]: true
         })
-      }, 2000)
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+        setTimeout(() => {
+          this.setState({
+            [tick]: false
+          })
+        }, 2000)
       })
-    })
-
-
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
   }
 
-  sleep(ms) {
+  sleep (ms) {
     return new Promise(resolve => setTimeout((resolve, ms)))
   }
 
-  render() {
-
+  render () {
     let columns = this.state.header.map((colName, index) => {
       return ({
         dataField: this.state.header[index],
@@ -159,4 +153,8 @@ export default class CsvTable extends Component {
       </div>
     )
   }
+}
+
+CsvTable.propTypes = {
+  file: PropTypes.object
 }

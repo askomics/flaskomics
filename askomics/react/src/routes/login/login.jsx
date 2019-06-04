@@ -1,37 +1,35 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
-import { Redirect} from 'react-router-dom'
-import { Link } from "react-router-dom";
-import ErrorDiv from "../error/error"
+import { Redirect, Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class Login extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
-    this.state = {isLoading: true,
-                  error: false,
-                  errorMessage: [],
-                  login: '',
-                  password: '',
-                  logged: false
+    this.state = { isLoading: true,
+      error: false,
+      errorMessage: [],
+      login: '',
+      password: '',
+      logged: false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  handleChange(event) { 
+  handleChange (event) {
     this.setState({
       [event.target.id]: event.target.value
     })
   }
 
-  validateForm() {
+  validateForm () {
     return this.state.login.length > 0 && this.state.password.length > 0
   }
 
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     let requestUrl = '/api/auth/login'
     let data = {
       login: this.state.login,
@@ -39,35 +37,35 @@ export default class Login extends Component {
     }
 
     axios.post(requestUrl, data)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        user: response.data.user,
-        logged: !response.data.error
-      })
-      if (!this.state.error) {
-        this.props.setStateNavbar({
-          user: this.state.user,
-          logged: this.state.logged
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          user: response.data.user,
+          logged: !response.data.error
         })
-      }
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error
+        if (!this.state.error) {
+          this.props.setStateNavbar({
+            user: this.state.user,
+            logged: this.state.logged
+          })
+        }
       })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error
+        })
+      })
     event.preventDefault()
   }
 
-  render() {
+  render () {
     let html = <Redirect to="/" />
     if (!this.state.logged) {
       html = (
@@ -96,3 +94,6 @@ export default class Login extends Component {
   }
 }
 
+Login.propTypes = {
+  setStateNavbar: PropTypes.func
+}

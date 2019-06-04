@@ -1,17 +1,17 @@
-import React, { Component } from "react"
-import { Link } from "react-router-dom";
-import { Collapse, Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap';
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import { Collapse, Navbar, NavbarBrand, Nav, NavItem } from 'reactstrap'
+import PropTypes from 'prop-types'
 
 export default class AskoFooter extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
 
-  render() {
+  render () {
     return (
       <footer className="footer footer-content">
-      <div className="container">
+        <div className="container">
           <div className="footer-left">
             AskOmics {this.props.version}
           </div>
@@ -22,4 +22,9 @@ export default class AskoFooter extends Component {
       </footer>
     )
   }
+}
+
+AskoFooter.propTypes = {
+  version: PropTypes.string,
+  message: PropTypes.string
 }

@@ -1,51 +1,50 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon } from 'reactstrap'
-import ErrorDiv from "../error/error"
+import ErrorDiv from '../error/error'
+import PropTypes from 'prop-types'
 
 export default class UpdateApiKey extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {}
     this.handleSubmit = this.handleSubmit.bind(this)
     this.cancelRequest
   }
 
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     let requestUrl = '/api/auth/apikey'
 
-    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        user: response.data.user,
-        success: !response.data.error,
-      })
-      if (!this.state.error) {
-        this.props.setStateNavbar({
-          user: this.state.user,
-          logged: true
+    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          user: response.data.user,
+          success: !response.data.error
         })
-      }
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error,
+        if (!this.state.error) {
+          this.props.setStateNavbar({
+            user: this.state.user,
+            logged: true
+          })
+        }
       })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error
+        })
+      })
     event.preventDefault()
   }
 
-  render() {
+  render () {
     let successTick
     if (this.state.success) {
       successTick = <i color="success" className="fas fa-check"></i>
@@ -69,3 +68,7 @@ export default class UpdateApiKey extends Component {
   }
 }
 
+UpdateApiKey.propTypes = {
+  setStateNavbar: PropTypes.func,
+  user: PropTypes.object
+}

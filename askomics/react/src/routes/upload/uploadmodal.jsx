@@ -1,25 +1,25 @@
-import React, { Component } from "react"
-import axios from 'axios'
-import {  Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, FormText } from 'reactstrap'
+import React, { Component } from 'react'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup } from 'reactstrap'
 import UploadForm from './uploadform'
+import PropTypes from 'prop-types'
 
 export default class UploadModal extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {
-      modal: false,
+      modal: false
     }
     this.toggleModal = this.toggleModal.bind(this)
   }
 
-  toggleModal() {
+  toggleModal () {
     this.setState({
       modal: !this.state.modal
     })
   }
 
-  render() {
+  render () {
     return (
 
       <div>
@@ -41,4 +41,8 @@ export default class UploadModal extends Component {
       </div>
     )
   }
+}
+
+UploadModal.propTypes = {
+  setStateUpload: PropTypes.func
 }

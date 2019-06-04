@@ -11,6 +11,7 @@ install:
   - pip install -r requirements.txt
   - pip install -U flake8
   - python setup.py install
+  - sudo npm install
 before_script:
   - docker pull redis:4.0
   - docker pull askomics/virtuoso
@@ -19,6 +20,7 @@ before_script:
   - sleep 1m
 script:
   - flake8 askomics tests --ignore=E501,W504
+  - ./node_modules/.bin/eslint "askomics/react/src/**"
   - pytest --cov=. -vv --log-cli-level debug
 after_success:
   coveralls

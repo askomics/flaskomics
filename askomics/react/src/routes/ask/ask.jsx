@@ -1,14 +1,14 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap';
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
+import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap'
+import { Redirect } from 'react-router-dom'
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
+import PropTypes from 'prop-types'
 
 export default class Ask extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       waiting: true,
@@ -24,81 +24,76 @@ export default class Ask extends Component {
     this.handleFilter = this.handleFilter.bind(this)
   }
 
-  componentDidMount() {
-
+  componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/startpoints'
-      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          waiting: false,
-          startpoints: response.data.startpoints.map(startpoint => new Object({
-            graphs: startpoint.graphs,
-            entity: startpoint.entity,
-            entity_label: startpoint.entity_label,
-            public: startpoint.public,
-            private: startpoint.private,
-            hidden: false,
-            selected: false
-          }))
+      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            waiting: false,
+            startpoints: response.data.startpoints.map(startpoint => new Object({
+              graphs: startpoint.graphs,
+              entity: startpoint.entity,
+              entity_label: startpoint.entity_label,
+              public: startpoint.public,
+              private: startpoint.private,
+              hidden: false,
+              selected: false
+            }))
+          })
         })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          waiting: false,
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            waiting: false,
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status
+          })
         })
-      })
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-  handleClick(event) {
+  handleClick (event) {
     this.setState({
       selected: event.target.id
     })
   }
 
-  handleStart(event) {
-    console.log("Start session with " + this.state.selected)
+  handleStart (event) {
+    console.log('Start session with ' + this.state.selected)
     this.setState({
       startSession: true
     })
   }
 
-  disabledStartButton() {
-    return this.state.selected ? false : true
+  disabledStartButton () {
+    return !this.state.selected
   }
 
-  handleFilter(event) {
+  handleFilter (event) {
     this.state.startpoints.map((startpoint, i) => {
       let re = new RegExp(event.target.value, 'g')
       let res = startpoint.entity_label.toLowerCase().match(re)
       if (res == null) {
         // don't match, hide
         startpoint.hidden = true
-
-      }else{
+      } else {
         // show
         startpoint.hidden = false
       }
     })
     this.forceUpdate()
-
   }
 
-
-  render() {
-
+  render () {
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
@@ -107,7 +102,7 @@ export default class Ask extends Component {
     let redirectQueryBuilder
     if (this.state.startSession) {
       redirectQueryBuilder = <Redirect to={{
-        pathname: "/query",
+        pathname: '/query',
         state: {
           startpoint: this.state.selected,
           user: this.props.user,
@@ -137,9 +132,9 @@ export default class Ask extends Component {
           </div>
           <div className="startpoints-div">
             {this.state.startpoints.map(startpoint => (
-              <div className="input-label" id={startpoint.entity_label}>
-                <input hidden={startpoint.hidden ? "hidden" : ""} className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
-                <label hidden={startpoint.hidden ? "hidden" : ""} className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
+              <div key={startpoint.entity} className="input-label" id={startpoint.entity_label}>
+                <input hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
+                <label hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
                   {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
                   {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
                   <em> {startpoint.entity_label}</em>
@@ -165,4 +160,10 @@ export default class Ask extends Component {
       </div>
     )
   }
+}
+
+Ask.propTypes = {
+  waitForStart: PropTypes.bool,
+  user: PropTypes.object,
+  logged: PropTypes.bool
 }

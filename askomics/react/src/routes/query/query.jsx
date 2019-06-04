@@ -1,17 +1,17 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, Row, Col, ButtonGroup } from 'reactstrap';
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
+import { Alert, Button, Row, Col, ButtonGroup } from 'reactstrap'
+import { Redirect } from 'react-router-dom'
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import ResultsTable from '../sparql/resultstable'
+import PropTypes from 'prop-types'
 
 export default class Query extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       logged: this.props.location.state.logged,
@@ -48,12 +48,12 @@ export default class Query extends Component {
     this.handleQuery = this.handleQuery.bind(this)
   }
 
-  getId() {
-  this.idNumber += 1
+  getId () {
+    this.idNumber += 1
     return this.idNumber
   }
 
-  entityExist(uri) {
+  entityExist (uri) {
     let result = false
     this.state.abstraction.entities.forEach(entity => {
       if (entity.uri == uri) {
@@ -63,18 +63,18 @@ export default class Query extends Component {
     return result
   }
 
-  getLabel(uri) {
+  getLabel (uri) {
     let label = this.state.abstraction.entities.map(node => {
       if (node.uri == uri) {
         return node.label
-      }else {
+      } else {
         return null
       }
     }).filter(label => label != null).reduce(label => label)
     return label
   }
 
-  getGraphs(uri) {
+  getGraphs (uri) {
     let graphs = []
     this.state.abstraction.entities.forEach(node => {
       if (node.uri == uri) {
@@ -84,20 +84,20 @@ export default class Query extends Component {
     return graphs
   }
 
-  getAttributeType(typeUri) {
-    //FIXME: don't hardcode uri
-    if (typeUri == "http://www.w3.org/2001/XMLSchema#decimal") {
-      return "decimal"
+  getAttributeType (typeUri) {
+    // FIXME: don't hardcode uri
+    if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
+      return 'decimal'
     }
-    if (typeUri == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory") {
-      return "category"
+    if (typeUri == 'http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory') {
+      return 'category'
     }
-    if (typeUri == "http://www.w3.org/2001/XMLSchema#string") {
-      return "text"
+    if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {
+      return 'text'
     }
   }
 
-  attributeExist(attrUri, nodeId) {
+  attributeExist (attrUri, nodeId) {
     let result = false
     this.state.graphState.attr.forEach(attr => {
       if (attr.uri == attrUri && attr.nodeId == nodeId) {
@@ -107,38 +107,37 @@ export default class Query extends Component {
     return result
   }
 
-  setNodeAttributes(nodeUri, nodeId) {
-
+  setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
 
     // create uri and label attributes
-    if (!this.attributeExist("rdf:type", nodeId)) {
+    if (!this.attributeExist('rdf:type', nodeId)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: false,
         nodeId: nodeId,
-        uri: "rdf:type",
-        label: "Uri",
+        uri: 'rdf:type',
+        label: 'Uri',
         entityLabel: this.getLabel(nodeUri),
         entityUri: nodeUri,
-        type: "uri",
-        filterType: "exact",
-        filterValue: ""
+        type: 'uri',
+        filterType: 'exact',
+        filterValue: ''
       })
     }
 
-    if (!this.attributeExist("rdfs:label", nodeId)) {
+    if (!this.attributeExist('rdfs:label', nodeId)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
         nodeId: nodeId,
-        uri: "rdfs:label",
-        label: "Label",
+        uri: 'rdfs:label',
+        label: 'Label',
         entityLabel: this.getLabel(nodeUri),
         entityUri: nodeUri,
-        type: "text",
-        filterType: "exact",
-        filterValue: ""
+        type: 'text',
+        filterType: 'exact',
+        filterValue: ''
       })
     }
 
@@ -156,17 +155,17 @@ export default class Query extends Component {
           nodeAttribute.entityUri = attr.entityUri,
           nodeAttribute.type = attributeType
 
-          if (attributeType == "decimal") {
-            nodeAttribute.filterSign = "="
-            nodeAttribute.filterValue = ""
+          if (attributeType == 'decimal') {
+            nodeAttribute.filterSign = '='
+            nodeAttribute.filterValue = ''
           }
 
-          if (attributeType == "text") {
-            nodeAttribute.filterType = "exact"
-            nodeAttribute.filterValue = ""
+          if (attributeType == 'text') {
+            nodeAttribute.filterType = 'exact'
+            nodeAttribute.filterValue = ''
           }
 
-          if (attributeType == "category") {
+          if (attributeType == 'category') {
             nodeAttribute.filterValues = attr.categories
             nodeAttribute.filterSelectedValues = []
           }
@@ -178,7 +177,7 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode(uri, selected, suggested) {
+  insertNode (uri, selected, suggested) {
     /*
     Insert a new node in the graphState
     */
@@ -201,7 +200,7 @@ export default class Query extends Component {
     }
   }
 
-  insertSuggestion(node) {
+  insertSuggestion (node) {
     /*
     Insert suggestion for this node
 
@@ -267,7 +266,7 @@ export default class Query extends Component {
     })
   }
 
-  removeAllSuggestion() {
+  removeAllSuggestion () {
     let newNodes = this.graphState.nodes.filter(node => {
       if (!node.suggested) {
         return node
@@ -286,8 +285,7 @@ export default class Query extends Component {
     }
   }
 
-  insertLinkIfExists(node1, node2) {
-
+  insertLinkIfExists (node1, node2) {
     let link = {}
 
     this.state.abstraction.relations.forEach(relation => {
@@ -314,23 +312,22 @@ export default class Query extends Component {
           suggested: false
         }
       }
-
     })
     this.graphState.links.push(link)
   }
 
-  manageCurrentPreviousSelected(currentNode) {
-      this.previousSelected = this.currentSelected
-      this.currentSelected = currentNode
+  manageCurrentPreviousSelected (currentNode) {
+    this.previousSelected = this.currentSelected
+    this.currentSelected = currentNode
   }
 
-  unselectAllNodes() {
+  unselectAllNodes () {
     this.graphState.nodes.map(node => {
       node.selected = false
     })
   }
 
-  selectAndInstanciateNode(node) {
+  selectAndInstanciateNode (node) {
     this.graphState.nodes.map(inode => {
       if (node.id == inode.id) {
         inode.selected = true
@@ -339,12 +336,9 @@ export default class Query extends Component {
     })
     // get attributes
     this.setNodeAttributes(node.uri, node.id)
-    }
+  }
 
-
-
-  handleNodeSelection(clickedNode) {
-
+  handleNodeSelection (clickedNode) {
     // case 1 : clicked node is selected, so deselect it
     if (clickedNode.selected) {
       // update current and previous
@@ -372,13 +366,12 @@ export default class Query extends Component {
       }
       // insert suggestion
       this.insertSuggestion(this.currentSelected)
-
     }
     // update graph state
     this.updateGraphState()
   }
 
-  setCurrentSelected() {
+  setCurrentSelected () {
     this.graphState.nodes.forEach(node => {
       if (node.selected) {
         this.currentSelected = node
@@ -386,20 +379,20 @@ export default class Query extends Component {
     })
   }
 
-  updateGraphState() {
+  updateGraphState () {
     this.setState({
       graphState: this.graphState
     })
   }
 
-  initGraph() {
+  initGraph () {
     this.insertNode(this.state.startpoint, true, false)
     this.insertSuggestion(this.currentSelected)
     this.updateGraphState()
   }
 
   // Attributes managment -----------------------
-  toggleVisibility(event) {
+  toggleVisibility (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.visible = !attr.visible
@@ -408,16 +401,16 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  toggleFilterType(event) {
+  toggleFilterType (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.filterType = attr.filterType == "exact" ? "regexp" : "exact"
+        attr.filterType = attr.filterType == 'exact' ? 'regexp' : 'exact'
       }
     })
     this.updateGraphState()
   }
 
-  handleFilterValue(event) {
+  handleFilterValue (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
@@ -426,8 +419,7 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-
-  handleFilterCategory(event) {
+  handleFilterCategory (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterSelectedValues = [...event.target.selectedOptions].map(o => o.value)
@@ -436,8 +428,7 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-
-  handleFilterNumericSign(event) {
+  handleFilterNumericSign (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterSign = event.target.value
@@ -447,8 +438,7 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-
-  handleFilterNumericValue(event) {
+  handleFilterNumericValue (event) {
     if (!isNaN(event.target.value)) {
       this.state.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
@@ -463,68 +453,19 @@ export default class Query extends Component {
 
   // Preview results and Launch query buttons -------
 
-  handlePreview(event) {
+  handlePreview (event) {
     let requestUrl = '/api/query/preview'
     let data = {
       graphState: this.state.graphState
     }
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        resultsPreview: response.data.resultsPreview,
-        headerPreview: response.data.headerPreview,
-        waiting: false,
-        error: false
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status
-      })
-    })
-  }
-
-  handleQuery(event) {
-    let requestUrl = '/api/query/save_result'
-    let data = {
-      graphState: this.state.graphState
-    }
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        tick: true
-      })
-      setTimeout(() => {
-        this.setState({
-          tick: false
-        })
-      }, 2000)
-    }).catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status
-      })
-    })
-  }
-
-  // ------------------------------------------------
-
-  componentDidMount() {
-    if (!this.props.waitForStart) {
-      let requestUrl = '/api/query/abstraction'
-      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
+          resultsPreview: response.data.resultsPreview,
+          headerPreview: response.data.headerPreview,
           waiting: false,
-          abstraction: response.data.abstraction,
+          error: false
         })
       })
       .catch(error => {
@@ -534,27 +475,76 @@ export default class Query extends Component {
           errorMessage: error.response.data.errorMessage,
           status: error.response.status
         })
-      }).then(response => {
-        if (this.props.location.state.redo) {
-          // redo a query
-          this.graphState = this.props.location.state.graphState
-          this.setCurrentSelected()
-          this.updateGraphState()
-        }else{
-          this.initGraph()
-        }
-        this.setState({waiting: false})
       })
+  }
+
+  handleQuery (event) {
+    let requestUrl = '/api/query/save_result'
+    let data = {
+      graphState: this.state.graphState
+    }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          tick: true
+        })
+        setTimeout(() => {
+          this.setState({
+            tick: false
+          })
+        }, 2000)
+      }).catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status
+        })
+      })
+  }
+
+  // ------------------------------------------------
+
+  componentDidMount () {
+    if (!this.props.waitForStart) {
+      let requestUrl = '/api/query/abstraction'
+      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            waiting: false,
+            abstraction: response.data.abstraction
+          })
+        })
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status
+          })
+        }).then(response => {
+          if (this.props.location.state.redo) {
+          // redo a query
+            this.graphState = this.props.location.state.graphState
+            this.setCurrentSelected()
+            this.updateGraphState()
+          } else {
+            this.initGraph()
+          }
+          this.setState({ waiting: false })
+        })
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-  render() {
+  render () {
     // login page redirection
     let redirectLogin
     if (this.state.status == 401) {
@@ -640,15 +630,15 @@ export default class Query extends Component {
         <WaitingDiv waiting={this.state.waiting} center />
         <Row>
           <Col xs="7">
-          <div>
-            {visualizationDiv}
-          </div>
+            <div>
+              {visualizationDiv}
+            </div>
           </Col>
           <Col xs="5">
-          <div style={{display: "block", height: this.divHeight + "px", "overflow-y": "auto"}}>
-            {uriLabelBoxes}
-            {AttributeBoxes}
-          </div>
+            <div style={{ display: 'block', height: this.divHeight + 'px', 'overflow-y': 'auto' }}>
+              {uriLabelBoxes}
+              {AttributeBoxes}
+            </div>
           </Col>
         </Row>
         <ButtonGroup>
@@ -663,4 +653,9 @@ export default class Query extends Component {
       </div>
     )
   }
+}
+
+Query.propTypes = {
+  location: PropTypes.object,
+  waitForStart: PropTypes.bool
 }

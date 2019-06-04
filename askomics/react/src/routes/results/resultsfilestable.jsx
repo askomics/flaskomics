@@ -1,16 +1,15 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
-import { Redirect} from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
-import WaitingDiv from "../../components/waiting"
+import WaitingDiv from '../../components/waiting'
 import { Badge, Button, ButtonGroup } from 'reactstrap'
 import FileDownload from 'js-file-download'
+import PropTypes from 'prop-types'
 
 export default class ResultsFilesTable extends Component {
-
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       redirectQueryBuilder: false,
@@ -24,12 +23,12 @@ export default class ResultsFilesTable extends Component {
     this.handleEditQuery = this.handleEditQuery.bind(this)
   }
 
-  humanDate(date) {
+  humanDate (date) {
     let event = new Date(date * 1000)
     return event.toUTCString()
   }
 
-  handleSelection(row, isSelect) {
+  handleSelection (row, isSelect) {
     if (isSelect) {
       this.props.setStateResults(() => ({
         selected: [...this.props.selected, row.id]
@@ -41,12 +40,12 @@ export default class ResultsFilesTable extends Component {
     }
   }
 
-  handleSelectionAll(isSelect, rows) {
+  handleSelectionAll (isSelect, rows) {
     const ids = rows.map(r => r.id)
     if (isSelect) {
       this.props.setStateResults(() => ({
         selected: ids
-      }));
+      }))
     } else {
       this.props.setStateResults(() => ({
         selected: []
@@ -54,103 +53,101 @@ export default class ResultsFilesTable extends Component {
     }
   }
 
-  handlePreview(event) {
+  handlePreview (event) {
     // request api to get a preview of file
     let requestUrl = '/api/results/preview'
-    let data = {fileId: event.target.id}
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      // set state of resultsPreview
-      this.props.setStateResults({
-        resultsPreview: response.data.preview,
-        headerPreview: response.data.header,
-        currentPreview: response.data.id
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.props.setStateResults({
+          resultsPreview: response.data.preview,
+          headerPreview: response.data.header,
+          currentPreview: response.data.id
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
       })
-    })
   }
 
-  handleDownload(event) {
+  handleDownload (event) {
     let requestUrl = '/api/results/download'
-    let data = {fileId: event.target.id}
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then((response) => {
-      console.log(requestUrl, response.data)
-      FileDownload(response.data, "result.csv")
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then((response) => {
+        console.log(requestUrl, response.data)
+        FileDownload(response.data, 'result.csv')
       })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
   }
 
-  handleRedo(event) {
+  handleRedo (event) {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
-    let data = {fileId: event.target.id}
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      // set state of resultsPreview
-      this.setState({
-        redirectQueryBuilder: true,
-        graphState: response.data.graphState
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          redirectQueryBuilder: true,
+          graphState: response.data.graphState
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
       })
-    })
   }
 
-  handleEditQuery(event) {
+  handleEditQuery (event) {
     let requestUrl = '/api/results/sparqlquery'
-    let data = {fileId: event.target.id}
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        redirectSparqlEditor: true,
-        sparqlQuery: response.data.query
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          redirectSparqlEditor: true,
+          sparqlQuery: response.data.query
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
       })
-    })
   }
 
-
-  render() {
-
+  render () {
     let redirectSparqlEditor
     if (this.state.redirectSparqlEditor) {
       redirectSparqlEditor = <Redirect to={{
-        pathname: "/sparql",
+        pathname: '/sparql',
         state: {
           redo: true,
           sparqlQuery: this.state.sparqlQuery,
@@ -163,7 +160,7 @@ export default class ResultsFilesTable extends Component {
     let redirectQueryBuilder
     if (this.state.redirectQueryBuilder) {
       redirectQueryBuilder = <Redirect to={{
-        pathname: "/query",
+        pathname: '/query',
         state: {
           redo: true,
           graphState: this.state.graphState,
@@ -176,13 +173,13 @@ export default class ResultsFilesTable extends Component {
     let columns = [{
       text: 'Id',
       sort: true,
-      formatter: (cell, row) => {return row.id},
-      headerStyle: () => {return { width: "5%" }}
+      formatter: (cell, row) => { return row.id },
+      headerStyle: () => { return { width: '5%' } }
     }, {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
-      formatter: (cell, row) => {return this.humanDate(cell)},
+      formatter: (cell, row) => { return this.humanDate(cell) }
     }, {
       dataField: 'status',
       text: 'Status',
@@ -198,12 +195,12 @@ export default class ResultsFilesTable extends Component {
         }
         return <Badge color="danger">Failure</Badge>
       },
-      headerStyle: () => {return { width: "10%" }},
+      headerStyle: () => { return { width: '10%' } },
       sort: true
     }, {
       dataField: 'error_message',
       text: 'Message',
-      headerStyle: () => {return { width: "20%" }}
+      headerStyle: () => { return { width: '20%' } }
     }, {
       // buttons
       text: 'Actions',
@@ -231,7 +228,7 @@ export default class ResultsFilesTable extends Component {
       onSelectAll: this.handleSelectionAll
     }
 
-    let noDataIndication = "No datasets"
+    let noDataIndication = 'No datasets'
     if (this.props.waiting) {
       noDataIndication = <WaitingDiv waiting={this.props.waiting} />
     }
@@ -240,7 +237,6 @@ export default class ResultsFilesTable extends Component {
       <div>
         {redirectQueryBuilder}{redirectSparqlEditor}
         <BootstrapTable
-          selectRow={ { mode: 'checkbox' } }
           tabIndexCell
           bootstrap4
           keyField='id'
@@ -254,4 +250,13 @@ export default class ResultsFilesTable extends Component {
       </div>
     )
   }
+}
+
+ResultsFilesTable.propTypes = {
+  setStateResults: PropTypes.func,
+  selected: PropTypes.object,
+  user: PropTypes.object,
+  logged: PropTypes.bool,
+  waiting: PropTypes.bool,
+  results: PropTypes.object
 }

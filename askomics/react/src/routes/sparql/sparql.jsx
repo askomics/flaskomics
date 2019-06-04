@@ -1,23 +1,24 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button } from 'reactstrap';
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
+import { Alert, Button } from 'reactstrap'
+import { Redirect } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
-import brace from 'brace';
-import AceEditor from 'react-ace';
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
 
-import 'brace/mode/sparql';
-import 'brace/theme/tomorrow';
+import brace from 'brace'
+import AceEditor from 'react-ace'
 
-import dedent from "dedent"
+import 'brace/mode/sparql'
+import 'brace/theme/tomorrow'
+
+import dedent from 'dedent'
 
 import ResultsTable from './resultstable'
 
 export default class Sparql extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       logged: this.props.location.state.logged,
@@ -32,44 +33,41 @@ export default class Sparql extends Component {
     this.launchQuery = this.launchQuery.bind(this)
   }
 
-  handleCodeChange(code) {
+  handleCodeChange (code) {
     this.setState({
       sparqlInput: code
     })
   }
 
-  launchQuery() {
-
+  launchQuery () {
     let requestUrl = '/api/sparql/query'
     let data = {
       query: this.state.sparqlInput
     }
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        results_data: response.data.data,
-        results_header: response.data.header,
-        waiting: false,
-        error: false
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          results_data: response.data.data,
+          results_header: response.data.header,
+          waiting: false,
+          error: false
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        results_data: [],
-        results_header: [],
-        waiting: false,
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          results_data: [],
+          results_header: [],
+          waiting: false,
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status
+        })
       })
-    })
   }
 
-
-  render() {
-
+  render () {
     let resultsTable
     if (this.state.results_header.length > 0) {
       resultsTable = (
@@ -93,9 +91,9 @@ export default class Sparql extends Component {
             showGutter={true}
             highlightActiveLine={true}
             value={this.state.sparqlInput}
-            editorProps={{$blockScrolling: true}}
+            editorProps={{ $blockScrolling: true }}
             height={400}
-            width={"auto"}
+            width={'auto'}
           />
         </div>
 
@@ -104,7 +102,6 @@ export default class Sparql extends Component {
         <br />
         <br />
 
-
         {resultsTable}
 
         <WaitingDiv waiting={this.state.waiting} center />
@@ -112,4 +109,8 @@ export default class Sparql extends Component {
       </div>
     )
   }
+}
+
+Sparql.propTypes = {
+  location: PropTypes.object,
 }

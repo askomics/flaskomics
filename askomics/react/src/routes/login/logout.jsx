@@ -1,30 +1,33 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 
 export default class logout extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
 
-  componentDidMount() {
+  componentDidMount () {
     let requestUrl = '/api/auth/logout'
     axios.get(requestUrl)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.props.setStateNavbar({
-        username: response.data.username,
-        logged: response.data.logged
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.props.setStateNavbar({
+          username: response.data.username,
+          logged: response.data.logged
+        })
       })
-    })
-    .catch(error => {
-      console.log(error)
-    })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
-  render() {
+  render () {
     return <Redirect to="/" />
   }
 }
 
+logout.propTypes = {
+  setStateNavbar: PropTypes.func
+}

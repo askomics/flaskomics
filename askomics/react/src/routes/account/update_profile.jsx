@@ -1,11 +1,11 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
-import ErrorDiv from "../error/error"
+import ErrorDiv from '../error/error'
+import PropTypes from 'prop-types'
 
 export default class UpdateProfile extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -17,26 +17,25 @@ export default class UpdateProfile extends Component {
     this.cancelRequest
   }
 
-  handleChange(event) {
+  handleChange (event) {
     this.setState({
       [event.target.id]: event.target.value
     })
   }
 
-  validateEmail(email) {
+  validateEmail (email) {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
   }
 
-  validateForm() {
+  validateForm () {
     return (
       (this.state.newFname.length > 0 || this.state.newLname.length > 0 || this.validateEmail(this.state.newEmail)) &&
       (this.validateEmail(this.state.newEmail) || this.state.newEmail.length == 0)
     )
   }
 
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     let requestUrl = '/api/auth/profile'
     let data = {
       newFname: this.state.newFname,
@@ -45,35 +44,35 @@ export default class UpdateProfile extends Component {
     }
 
     axios.post(requestUrl, data)
-    .then(response => {
-      console.log(requestUrl, response.data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        user: response.data.user,
-        success: !response.data.error,
-      })
-      if (!this.state.error) {
-        this.props.setStateNavbar({
-          user: this.state.user,
-          logged: true
+      .then(response => {
+        console.log(requestUrl, response.data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          user: response.data.user,
+          success: !response.data.error
         })
-      }
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error,
+        if (!this.state.error) {
+          this.props.setStateNavbar({
+            user: this.state.user,
+            logged: true
+          })
+        }
       })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error
+        })
+      })
     event.preventDefault()
   }
 
-  render() {
+  render () {
     let successTick
     if (this.state.success) {
       successTick = <i color="success" className="fas fa-check"></i>
@@ -81,7 +80,7 @@ export default class UpdateProfile extends Component {
 
     return (
       <Col md={4}>
-      <h4>Update profile</h4>
+        <h4>Update profile</h4>
         <Form onSubmit={this.handleSubmit}>
           <Row form>
             <Col md={6}>
@@ -110,3 +109,7 @@ export default class UpdateProfile extends Component {
   }
 }
 
+UpdateProfile.propTypes = {
+  setStateNavbar: PropTypes.func,
+  user: PropTypes.object
+}

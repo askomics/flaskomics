@@ -1,10 +1,10 @@
-import React, { Component } from "react"
-import { Link } from "react-router-dom";
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import { Collapse, Navbar, NavbarBrand, Nav, NavItem, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap'
+import PropTypes from 'prop-types'
 
-export default  class AskoNavbar extends Component {
-
-  constructor(props) {
+export default class AskoNavbar extends Component {
+  constructor (props) {
     super(props)
     this.toggle = this.toggle.bind(this)
     this.state = {
@@ -12,14 +12,13 @@ export default  class AskoNavbar extends Component {
     }
   }
 
-  toggle() {
+  toggle () {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen
     })
   }
 
-  render() {
-
+  render () {
     let links
     let askLink
 
@@ -32,7 +31,7 @@ export default  class AskoNavbar extends Component {
         <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
       )
 
-      if(this.props.logged) {
+      if (this.props.logged) {
         let adminLinks
         if (this.props.user.admin) {
           adminLinks = (
@@ -85,4 +84,10 @@ export default  class AskoNavbar extends Component {
       </div>
     )
   }
+}
+
+AskoNavbar.propTypes = {
+  waitForStart: PropTypes.func,
+  logged: PropTypes.bool,
+  user: PropTypes.object
 }

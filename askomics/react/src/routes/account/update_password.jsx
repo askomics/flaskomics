@@ -1,11 +1,10 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText, Alert } from 'reactstrap'
-import ErrorDiv from "../error/error"
+import ErrorDiv from '../error/error'
 
 export default class UpdateProfile extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -17,13 +16,13 @@ export default class UpdateProfile extends Component {
     this.cancelRequest
   }
 
-  handleChange(event) {
+  handleChange (event) {
     this.setState({
       [event.target.id]: event.target.value
     })
   }
 
-  validateForm() {
+  validateForm () {
     return (
       this.state.oldPassword.length > 0 &&
       this.state.newPassword.length > 0 &&
@@ -32,8 +31,7 @@ export default class UpdateProfile extends Component {
     )
   }
 
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     let requestUrl = '/api/auth/password'
     let data = {
       oldPassword: this.state.oldPassword,
@@ -41,43 +39,43 @@ export default class UpdateProfile extends Component {
       confPassword: this.state.confPassword
     }
 
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        isLoading: false,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        user: response.data.user,
-        success: !response.data.error,
-        oldPassword: '',
-        newPassword: '',
-        confPassword: ''
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          user: response.data.user,
+          success: !response.data.error,
+          oldPassword: '',
+          newPassword: '',
+          confPassword: ''
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error,
-        oldPassword: '',
-        newPassword: '',
-        confPassword: ''
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error,
+          oldPassword: '',
+          newPassword: '',
+          confPassword: ''
+        })
       })
-    })
     event.preventDefault()
   }
 
-  render() {
+  render () {
     let successTick
     if (this.state.success) {
       successTick = <i color="success" className="fas fa-check"></i>
     }
     return (
       <Col md={4}>
-      <h4>Update password</h4>
+        <h4>Update password</h4>
         <Form onSubmit={this.handleSubmit}>
           <Row form>
           </Row>
@@ -101,4 +99,3 @@ export default class UpdateProfile extends Component {
     )
   }
 }
-

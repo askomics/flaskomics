@@ -1,28 +1,27 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert, Col, CustomInput } from 'reactstrap'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import update from 'react-addons-update'
+import PropTypes from 'prop-types'
 
 export default class Admin extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
-    this.state = {isLoading: true,
-                  error: false,
-                  errorMessage: '',
-                  users: []
+    this.state = { isLoading: true,
+      error: false,
+      errorMessage: '',
+      users: []
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
     this.cancelRequest
   }
 
-  handleChangeAdmin(event) {
-
+  handleChangeAdmin (event) {
     let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) =>  user.username == username)
+    let index = this.state.users.findIndex((user) => user.username == username)
 
     let newAdmin = 0
     if (event.target.value == 0) {
@@ -35,31 +34,30 @@ export default class Admin extends Component {
       newAdmin: newAdmin
     }
 
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        success: !response.data.error,
-        users: update(this.state.users, {[index]: {admin: {$set: newAdmin}}})
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          success: !response.data.error,
+          users: update(this.state.users, { [index]: { admin: { $set: newAdmin } } })
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !response.data.error
+        })
       })
-    })
   }
 
-  handleChangeBlocked(event) {
-
+  handleChangeBlocked (event) {
     let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) =>  user.username == username)
+    let index = this.state.users.findIndex((user) => user.username == username)
 
     let newBlocked = 0
     if (event.target.value == 0) {
@@ -72,40 +70,14 @@ export default class Admin extends Component {
       newBlocked: newBlocked
     }
 
-    axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        error: response.data.error,
-        errorMessage: response.data.errorMessage,
-        success: !response.data.error,
-        users: update(this.state.users, {[index]: {blocked: {$set: newBlocked}}})
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        success: !response.data.error
-      })
-    })
-
-  }
-
-  componentDidMount() {
-    if (!this.props.waitForStart) {
-    let requestUrl = '/api/admin/getusers'
-
-      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          isLoading: false,
           error: response.data.error,
           errorMessage: response.data.errorMessage,
-          users: response.data.users
+          success: !response.data.error,
+          users: update(this.state.users, { [index]: { blocked: { $set: newBlocked } } })
         })
       })
       .catch(error => {
@@ -117,29 +89,52 @@ export default class Admin extends Component {
           success: !response.data.error
         })
       })
+  }
+
+  componentDidMount () {
+    if (!this.props.waitForStart) {
+      let requestUrl = '/api/admin/getusers'
+
+      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            isLoading: false,
+            error: response.data.error,
+            errorMessage: response.data.errorMessage,
+            users: response.data.users
+          })
+        })
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status,
+            success: !response.data.error
+          })
+        })
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-
-  render() {
-
+  render () {
     // console.log()
 
     let columns = [{
       dataField: 'ldap',
       text: 'Authentication type',
-      formatter: (cell, row) => {return cell?"Ldap":"Local"},
+      formatter: (cell, row) => { return cell ? 'Ldap' : 'Local' },
       sort: true
     }, {
       dataField: 'fname',
       text: 'Name',
-      formatter: (cell, row) => {return row.fname + " " + row.lname},
+      formatter: (cell, row) => { return row.fname + ' ' + row.lname },
       sort: true
     }, {
       dataField: 'username',
@@ -148,7 +143,7 @@ export default class Admin extends Component {
     }, {
       dataField: 'email',
       text: 'Email',
-      formatter: (cell, row) => {return <a href={"mailto:" + cell}>{cell}</a>},
+      formatter: (cell, row) => { return <a href={'mailto:' + cell}>{cell}</a> },
       sort: true
     }, {
       dataField: 'admin',
@@ -157,7 +152,7 @@ export default class Admin extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" username={row.username} id={"set-admin-" + row.username} name="admin" onChange={this.handleChangeAdmin} label="Admin" checked={cell} value={cell} />
+              <CustomInput type="switch" username={row.username} id={'set-admin-' + row.username} name="admin" onChange={this.handleChangeAdmin} label="Admin" checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -170,7 +165,7 @@ export default class Admin extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" username={row.username} id={"set-blocked-" + row.username} name="blocked" onChange={this.handleChangeBlocked} label="Blocked" checked={cell} value={cell} />
+              <CustomInput type="switch" username={row.username} id={'set-blocked-' + row.username} name="blocked" onChange={this.handleChangeBlocked} label="Blocked" checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -185,11 +180,14 @@ export default class Admin extends Component {
 
     return (
       <div className="container">
-      <h2>Admin</h2>
-      <hr />
+        <h2>Admin</h2>
+        <hr />
         <BootstrapTable bootstrap4 keyField='id' data={this.state.users} columns={columns} defaultSorted={defaultSorted} pagination={paginationFactory()} />
       </div>
     )
   }
 }
 
+Admin.propTypes = {
+  waitForStart: PropTypes.bool
+}

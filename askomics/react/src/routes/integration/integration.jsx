@@ -1,14 +1,14 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Alert, Input, Button, ButtonGroup } from 'reactstrap'
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
-import CsvTable from "./csvtable"
+import { Redirect } from 'react-router-dom'
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
+import CsvTable from './csvtable'
+import PropTypes from 'prop-types'
 
-export default class Upload extends Component {
-
-  constructor(props) {
+export default class Integration extends Component {
+  constructor (props) {
     super(props)
     this.state = {
       waiting: true,
@@ -22,43 +22,41 @@ export default class Upload extends Component {
     this.cancelRequest
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/files/preview'
       let data = {
         filesId: this.state.filesId
       }
-      axios.post(requestUrl, data, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          previewFiles: response.data.previewFiles,
-          waiting: false,
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
+      axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            previewFiles: response.data.previewFiles,
+            waiting: false,
+            error: response.data.error,
+            errorMessage: response.data.errorMessage
+          })
         })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status,
+            waiting: false
+          })
         })
-      })
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-
-  render() {
-
+  render () {
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
@@ -69,7 +67,6 @@ export default class Upload extends Component {
         {redirectLogin}
         <h2>Integrate</h2>
         <hr />
-
 
         {
           this.state.previewFiles.map(file => {
@@ -85,4 +82,9 @@ export default class Upload extends Component {
       </div>
     )
   }
+}
+
+Integration.propTypes = {
+  location: PropTypes.object,
+  waitForStart: PropTypes.bool
 }

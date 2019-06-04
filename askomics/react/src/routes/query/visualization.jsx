@@ -1,17 +1,17 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 // import ReactDOM from 'react-dom'
 import axios from 'axios'
-import { Alert, Button } from 'reactstrap';
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
+import { Alert, Button } from 'reactstrap'
+import { Redirect } from 'react-router-dom'
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import * as d3 from "d3"
-import { ForceGraph2D } from 'react-force-graph';
+import * as d3 from 'd3'
+import { ForceGraph2D } from 'react-force-graph'
+import PropTypes from 'prop-types'
 
 export default class Visualization extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       error: false,
@@ -24,9 +24,9 @@ export default class Visualization extends Component {
     this.h = this.props.divHeight
     this.zoom = 5
     this.zoomTime = 1000
-    this.colorGrey = "#808080"
-    this.colorDarkGrey = "#404040"
-    this.colorFirebrick = "#cc0000"
+    this.colorGrey = '#808080'
+    this.colorDarkGrey = '#404040'
+    this.colorFirebrick = '#cc0000'
     this.lineWidth = 0.5
     this.nodeSize = 3
     this.arrowLength = 7
@@ -37,7 +37,7 @@ export default class Visualization extends Component {
     this.drawLink = this.drawLink.bind(this)
   }
 
-  stringToHexColor(str) {
+  stringToHexColor (str) {
     // first, hash the string into an int
     let hash = 0
     for (var i = 0; i < str.length; i++) {
@@ -45,11 +45,11 @@ export default class Visualization extends Component {
     }
     // Then convert this int into a rgb color code
     let c = (hash & 0x00FFFFFF).toString(16).toUpperCase()
-    let hex = "#" + "00000".substring(0, 6 - c.length) + c
+    let hex = '#' + '00000'.substring(0, 6 - c.length) + c
     return hex
   }
 
-  IntersectionCoordinate(x1, y1, x2, y2, r) {
+  IntersectionCoordinate (x1, y1, x2, y2, r) {
     let theta = Math.atan((y2 - y1) / (x1 - x2))
     let x
     let y
@@ -60,10 +60,10 @@ export default class Visualization extends Component {
       x = x1 - r * Math.cos(theta)
       y = y1 + r * Math.sin(theta)
     }
-    return {x: x, y: y}
+    return { x: x, y: y }
   }
 
-  middleCoordinate(x1, y1, x2, y2) {
+  middleCoordinate (x1, y1, x2, y2) {
     let theta = Math.atan((y2 - y1) / (x1 - x2))
     let x
     let y
@@ -74,10 +74,10 @@ export default class Visualization extends Component {
       x = x1 - (this.nodeSize * 4) * Math.cos(theta)
       y = y1 + (this.nodeSize * 4) * Math.sin(theta)
     }
-    return {x: x, y: y}
+    return { x: x, y: y }
   }
 
-  triangleCoordinate(x1, y1, x2, y2, headlen) {
+  triangleCoordinate (x1, y1, x2, y2, headlen) {
     let theta = Math.atan2(y1 - y2, x1 - x2)
 
     let xa = x1 - headlen * Math.cos(theta - Math.PI / 14)
@@ -94,7 +94,7 @@ export default class Visualization extends Component {
     }
   }
 
-  drawNode(node, ctx, globalScale) {
+  drawNode (node, ctx, globalScale) {
     // node style
     ctx.fillStyle = this.stringToHexColor(node.uri)
     ctx.lineWidth = this.lineWidth
@@ -117,7 +117,7 @@ export default class Visualization extends Component {
     ctx.closePath()
   }
 
-  drawLink(link, ctx, globalScale) {
+  drawLink (link, ctx, globalScale) {
     // link style
     link.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
     ctx.strokeStyle = this.colorGrey
@@ -151,11 +151,11 @@ export default class Visualization extends Component {
     ctx.closePath()
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.fg.zoom(this.zoom, this.zoomTime)
   }
 
-  render() {
+  render () {
     return (
       <div>
         <ForceGraph2D
@@ -169,6 +169,12 @@ export default class Visualization extends Component {
           linkCanvasObject={this.drawLink}
         />
       </div>
-      )
+    )
   }
+}
+
+Visualization.propTypes = {
+  divHeight: PropTypes.number,
+  handleNodeSelection: PropTypes.object,
+  graphState: PropTypes.object
 }

@@ -1,29 +1,28 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress } from 'reactstrap'
 import axios from 'axios'
 import update from 'react-addons-update'
+import PropTypes from 'prop-types'
 
 export default class UploadForm extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {
       files: [],
       new_files: [],
-      label: "Browse files"
+      label: 'Browse files'
     }
 
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChange = this.handleChange.bind(this)
   }
 
-
-  handleChange(event) {
-
+  handleChange (event) {
     let nselected = event.target.files.length
-    let label = nselected + " file selected"
+    let label = nselected + ' file selected'
     if (nselected > 1) {
-      label = nselected + " files selected"
+      label = nselected + ' files selected'
     }
 
     console.log('files', event.target.files)
@@ -45,9 +44,7 @@ export default class UploadForm extends Component {
     console.log('state', this.state)
   }
 
-
-  handleSubmit(event) {
-
+  handleSubmit (event) {
     event.preventDefault()
 
     let requestUrlUpload = '/api/files/upload_chunk'
@@ -81,53 +78,52 @@ export default class UploadForm extends Component {
           size: totalSize
         }
         axios.post(requestUrlUpload, data)
-        .then(response => {
-          console.log(requestUrlUpload, response.data)
-          first = false
-          loaded += chunkSize
-          // update precentage
-          this.setState({
-            new_files: update(this.state.new_files, {[i]: {uploadPercentage: {$set: Math.round((loaded / totalSize) * 100)}}}),
-          })
-          //FIXME: use one setState
-          this.setState({
-            new_files: update(this.state.new_files, {[i]: {path: {$set: response.data.path}}})
-          })
-          if (loaded <= totalSize) {
-            blob = file.slice(loaded, loaded + chunkSize)
-            if (totalSize - loaded <= chunkSize) {
-              last = true
-            }
-            reader.readAsBinaryString(blob)
-          } else {
-            loaded = totalSize
+          .then(response => {
+            console.log(requestUrlUpload, response.data)
+            first = false
+            loaded += chunkSize
+            // update precentage
             this.setState({
-              new_files: update(this.state.new_files, {[i]: {uploadPercentage: {$set: 100}}})
+              new_files: update(this.state.new_files, { [i]: { uploadPercentage: { $set: Math.round((loaded / totalSize) * 100) } } })
             })
-            // load file component
-            let requestUrlFiles = '/api/files'
-            axios.get(requestUrlFiles, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-            .then(response => {
-              console.log(requestUrlFiles, response.data)
-              this.props.setStateUpload({
-                files: response.data.files
-              })
+            // FIXME: use one setState
+            this.setState({
+              new_files: update(this.state.new_files, { [i]: { path: { $set: response.data.path } } })
             })
-            .catch(error => {
-              console.log(error, error.response.data.errorMessage)
+            if (loaded <= totalSize) {
+              blob = file.slice(loaded, loaded + chunkSize)
+              if (totalSize - loaded <= chunkSize) {
+                last = true
+              }
+              reader.readAsBinaryString(blob)
+            } else {
+              loaded = totalSize
               this.setState({
-                new_files: update(this.state.new_files, {[i]: {error: {$set: true}}}, {[i]: {errorMessage: {$set: error.response.data.errorMessage}}})
+                new_files: update(this.state.new_files, { [i]: { uploadPercentage: { $set: 100 } } })
               })
-            })
-          }
-        })
+              // load file component
+              let requestUrlFiles = '/api/files'
+              axios.get(requestUrlFiles, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+                .then(response => {
+                  console.log(requestUrlFiles, response.data)
+                  this.props.setStateUpload({
+                    files: response.data.files
+                  })
+                })
+                .catch(error => {
+                  console.log(error, error.response.data.errorMessage)
+                  this.setState({
+                    new_files: update(this.state.new_files, { [i]: { error: { $set: true } } }, { [i]: { errorMessage: { $set: error.response.data.errorMessage } } })
+                  })
+                })
+            }
+          })
       }
     }
     event.preventDefault()
   }
 
-
-  render() {
+  render () {
     return (
       <div>
         <Form onSubmit={this.handleSubmit}>
@@ -141,13 +137,13 @@ export default class UploadForm extends Component {
               let progressBar
               if (file.error) {
                 progressBar = <Progress color="error" value="100">ERROR</Progress>
-              }else{
+              } else {
                 progressBar = <Progress color="success" value={file.uploadPercentage}>{file.uploadPercentage} %</Progress>
               }
               return (
-                <div>
+                <div key={file.id}>
                   <div className="text-center">{file.name}</div>
-                    {progressBar}
+                  {progressBar}
                 </div>
               )
             })}
@@ -156,6 +152,9 @@ export default class UploadForm extends Component {
         </Form>
       </div>
     )
-
   }
+}
+
+UploadForm.propTypes = {
+  setStateUpload: PropTypes.func
 }

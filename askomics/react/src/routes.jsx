@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import { Router, Route, Switch } from "react-router-dom"
+import React, { Component } from 'react'
+import { Router, Route, Switch } from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import axios from 'axios'
 
@@ -25,8 +25,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 const history = createBrowserHistory()
 
 export default class Routes extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       waiting: true,
@@ -38,35 +37,33 @@ export default class Routes extends Component {
     this.cancelRequest
   }
 
-
-  componentDidMount() {
-
+  componentDidMount () {
     let requestUrl = '/api/start'
-    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        error: false,
-        errorMessage: null,
-        user: response.data.user,
-        logged: response.data.logged,
-        version: response.data.version,
-        footerMessage: response.data.footer_message,
-        waiting: false
+    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          error: false,
+          errorMessage: null,
+          user: response.data.user,
+          logged: response.data.logged,
+          version: response.data.version,
+          footerMessage: response.data.footer_message,
+          waiting: false
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
       })
-    })
   }
 
-  render() {
+  render () {
     return (
       <Router history={history}>
         <div>

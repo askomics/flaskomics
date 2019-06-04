@@ -1,16 +1,16 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap';
-import { Redirect} from 'react-router-dom'
+import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap'
+import { Redirect } from 'react-router-dom'
 import ResultsFilesTable from './resultsfilestable'
-import ErrorDiv from "../error/error"
-import WaitingDiv from "../../components/waiting"
+import ErrorDiv from '../error/error'
+import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import ResultsTable from '../sparql/resultstable'
+import PropTypes from 'prop-types'
 
 export default class Results extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       waiting: true,
@@ -27,38 +27,38 @@ export default class Results extends Component {
     this.deleteSelectedResults = this.deleteSelectedResults.bind(this)
   }
 
-  isDisabled() {
-    return this.state.selected.length == 0 ? true : false
+  isDisabled () {
+    return this.state.selected.length == 0
   }
 
-  deleteSelectedResults() {
+  deleteSelectedResults () {
     let requestUrl = '/api/results/delete'
     let data = {
       filesIdToDelete: this.state.selected
     }
     axios.post(requestUrl, data)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        results: response.data.remainingFiles,
-        resultsPreview: [],
-        headerPreview: [],
-        currentPreview: null,
-        error: response.data.error,
-        errorMessage: response.data.errorMessage
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          results: response.data.remainingFiles,
+          resultsPreview: [],
+          headerPreview: [],
+          currentPreview: null,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status
+        })
       })
-    })
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (!this.props.waitForStart) {
       this.getResults()
       this.interval = setInterval(() => {
@@ -67,36 +67,35 @@ export default class Results extends Component {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     clearInterval(this.interval)
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
-  getResults() {
+  getResults () {
     let requestUrl = '/api/results'
-    axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        results: response.data.files,
-        waiting: false
+    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          results: response.data.files,
+          waiting: false
+        })
       })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        waiting: false
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
       })
-    })
   }
 
-  render() {
-
+  render () {
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
@@ -138,4 +137,8 @@ export default class Results extends Component {
       </div>
     )
   }
+}
+
+Results.propTypes = {
+  waitForStart: PropTypes.bool,
 }

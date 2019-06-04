@@ -1,14 +1,14 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 import axios from 'axios'
 import { Alert, Input, Button, ButtonGroup } from 'reactstrap'
-import { Redirect} from 'react-router-dom'
-import ErrorDiv from "../error/error"
+import { Redirect } from 'react-router-dom'
+import ErrorDiv from '../error/error'
 import UploadModal from './uploadmodal'
 import FilesTable from './filestable'
+import PropTypes from 'prop-types'
 
 export default class Upload extends Component {
-
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       error: false,
@@ -25,15 +25,48 @@ export default class Upload extends Component {
     this.cancelRequest
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/files'
-      axios.get(requestUrl, {cancelToken: new axios.CancelToken((c) => {this.cancelRequest = c})})
+      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            files: response.data.files,
+            waiting: false
+          })
+        })
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status,
+            waiting: false
+          })
+        })
+    }
+  }
+
+  componentWillUnmount () {
+    if (!this.props.waitForStart) {
+      this.cancelRequest()
+    }
+  }
+
+  deleteSelectedFiles () {
+    let requestUrl = '/api/files/delete'
+    let data = {
+      filesIdToDelete: this.state.selected
+    }
+    axios.post(requestUrl, data)
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           files: response.data.files,
-          waiting: false
+          selected: [],
+          error: response.data.error,
+          errorMessage: response.data.errorMessage
         })
       })
       .catch(error => {
@@ -42,57 +75,23 @@ export default class Upload extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          waiting: false
+          selected: []
         })
       })
-    }
   }
 
-  componentWillUnmount() {
-    if (!this.props.waitForStart) {
-      this.cancelRequest()
-    }
-  }
-
-  deleteSelectedFiles() {
-    let requestUrl = '/api/files/delete'
-    let data = {
-      filesIdToDelete: this.state.selected
-    }
-    axios.post(requestUrl, data)
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        files: response.data.files,
-        selected: [],
-        error: response.data.error,
-        errorMessage: response.data.errorMessage
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        error: true,
-        errorMessage: error.response.data.errorMessage,
-        status: error.response.status,
-        selected: []
-      })
-    })
-  }
-
-  integrateSelectedFiles() {
+  integrateSelectedFiles () {
     console.log(this.state.selected)
-     this.setState({
+    this.setState({
       integration: true
-     })
+    })
   }
 
-  isDisabled() {
-    return this.state.selected.length == 0 ? true : false
+  isDisabled () {
+    return this.state.selected.length == 0
   }
 
-  render() {
-
+  render () {
     let redirectLogin
     if (this.state.status == 401) {
       redirectLogin = <Redirect to="/login" />
@@ -101,7 +100,7 @@ export default class Upload extends Component {
     let redirectIntegration
     if (this.state.integration) {
       redirectIntegration = <Redirect to={{
-        pathname: "/integration",
+        pathname: '/integration',
         state: {
           filesId: this.state.selected,
           user: this.props.user,
@@ -109,7 +108,6 @@ export default class Upload extends Component {
         }
       }} />
     }
-
 
     return (
       <div className="container">
@@ -129,4 +127,10 @@ export default class Upload extends Component {
       </div>
     )
   }
+}
+
+Upload.propTypes = {
+  logged: PropTypes.bool,
+  user: PropTypes.object,
+  waitForStart: PropTypes.bool
 }

@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router } from 'react-router-dom'
 
 import Routes from './routes'
 
 class App extends React.Component {
-  render() {
+  render () {
     return (
       <Routes />
     )
