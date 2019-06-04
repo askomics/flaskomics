@@ -31,6 +31,8 @@ class TestApiResults(AskomicsTestCase):
 
     def test_get_preview(self, client_logged_as_jdoe_with_data_and_result):
         """test /api/results/preview route"""
+        case = unittest.TestCase()
+
         result_info = client_logged_as_jdoe_with_data_and_result.result_info
 
         data = {
@@ -40,7 +42,7 @@ class TestApiResults(AskomicsTestCase):
         response = client_logged_as_jdoe_with_data_and_result.post('/api/results/preview', json=data)
 
         assert response.status_code == 200
-        assert response.json == {
+        case.assertCountEqual(response.json, {
             'error': False,
             'errorMessage': '',
             'header': ['Gene1_Label'],
@@ -78,7 +80,7 @@ class TestApiResults(AskomicsTestCase):
             }, {
                 'Gene1_Label': 'BN003'
             }]
-        }
+        })
 
     def test_get_graph_state(self, client_logged_as_jdoe_with_data_and_result):
         """test /api/results/graphstate"""
