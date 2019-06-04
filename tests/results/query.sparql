@@ -1,0 +1,16 @@
+PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>
+PREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?Gene1_Label
+WHERE {
+    ?Gene1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#Gene> .
+    ?Gene1_uri rdfs:label ?Gene1_Label .
+
+
+}

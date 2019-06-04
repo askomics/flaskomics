@@ -1,6 +1,7 @@
 import os
 import csv
 import json
+import time
 
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
@@ -54,6 +55,8 @@ class Result(Params):
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
+            self.start = None
+            self.end = None
 
     def format_graph_state(self, d3_graph_state):
         """Format Graph state
@@ -143,7 +146,7 @@ class Result(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT celery_id, path, graph_state
+        SELECT celery_id, path, graph_state, start, end
         FROM results
         WHERE user_id = ? AND id = ?
         '''
@@ -154,6 +157,8 @@ class Result(Params):
         self.file_path = rows[0][1]
         self.file_name = os.path.basename(self.file_path)
         self.graph_state = json.loads(rows[0][2])
+        self.start = rows[0][3]
+        self.end = rows[0][4]
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -212,6 +217,8 @@ class Result(Params):
         """Save results file info into the database"""
         database = Database(self.app, self.session)
 
+        self.start = int(time.time())
+
         query = '''
         INSERT INTO results VALUES(
             NULL,
@@ -219,7 +226,7 @@ class Result(Params):
             ?,
             "started",
             NULL,
-            strftime('%s', 'now'),
+            ?,
             NULL,
             ?,
             NULL,
@@ -230,6 +237,7 @@ class Result(Params):
         self.id = database.execute_sql_query(query, (
             self.session["user"]["id"],
             self.celery_id,
+            self.start,
             json.dumps(self.graph_state),
         ), get_id=True)
 
@@ -245,13 +253,14 @@ class Result(Params):
         """
         status = "failure" if error else "success"
         message = error_message if error else ""
+        self.end = int(time.time())
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE results SET
         status=?,
-        end=strftime('%s', 'now'),
+        end=?,
         path=?,
         nrows=?,
         error=?
@@ -260,6 +269,7 @@ class Result(Params):
 
         database.execute_sql_query(query, (
             status,
+            self.end,
             self.file_path,
             0,
             message,

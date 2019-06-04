@@ -1,0 +1,145 @@
+{
+    "error": false,
+    "errorMessage": "",
+    "graphState": {
+        "attr": [
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterType": "exact",
+                "filterValue": "",
+                "id": 2,
+                "label": "Uri",
+                "nodeId": 1,
+                "type": "uri",
+                "uri": "rdf:type",
+                "visible": false
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterType": "exact",
+                "filterValue": "",
+                "id": 3,
+                "label": "Label",
+                "nodeId": 1,
+                "type": "text",
+                "uri": "rdfs:label",
+                "visible": true
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterSign": "=",
+                "filterValue": "",
+                "id": 4,
+                "label": "end",
+                "nodeId": 1,
+                "type": "decimal",
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
+                "visible": false
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterSelectedValues": [],
+                "filterValues": [
+                    {
+                        "label": "+",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#%2B"
+                    },
+                    {
+                        "label": "-",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#-"
+                    }
+                ],
+                "id": 5,
+                "label": "strand",
+                "nodeId": 1,
+                "type": "category",
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
+                "visible": false
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterSign": "=",
+                "filterValue": "",
+                "id": 6,
+                "label": "start",
+                "nodeId": 1,
+                "type": "decimal",
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
+                "visible": false
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterSelectedValues": [],
+                "filterValues": [
+                    {
+                        "label": "AT1",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT1"
+                    },
+                    {
+                        "label": "AT2",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT2"
+                    },
+                    {
+                        "label": "AT3",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT3"
+                    },
+                    {
+                        "label": "BN1",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#BN1"
+                    },
+                    {
+                        "label": "BN2",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#BN2"
+                    }
+                ],
+                "id": 7,
+                "label": "chromosome",
+                "nodeId": 1,
+                "type": "category",
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome",
+                "visible": false
+            },
+            {
+                "entityLabel": "Gene",
+                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "filterSelectedValues": [],
+                "filterValues": [
+                    {
+                        "label": "Arabidopsis thaliana",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis%20thaliana"
+                    },
+                    {
+                        "label": "Brassica napus",
+                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Brassica%20napus"
+                    }
+                ],
+                "id": 8,
+                "label": "organism",
+                "nodeId": 1,
+                "type": "category",
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#organism",
+                "visible": false
+            }
+        ],
+        "links": [],
+        "nodes": [
+            {
+                "graphs": [
+                    "urn:sparql:askomics_test:1_jdoe:gene_#1559641686"
+                ],
+                "id": 1,
+                "label": "Gene",
+                "selected": true,
+                "suggested": false,
+                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+            }
+        ]
+    },
+    "id": 1
+}

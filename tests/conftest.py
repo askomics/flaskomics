@@ -2,6 +2,7 @@
 import os
 import shutil
 import tempfile
+import json
 
 from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
@@ -9,6 +10,8 @@ from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
+from askomics.libaskomics.Result import Result
+from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 
 import pytest
 
@@ -151,6 +154,51 @@ def interate_dataset(dir_path, file_info, user_session, public):
         dataset.update_in_db()
 
         return file_timestamp
+
+
+def save_query(dir_path, user_session, gene_timestamp):
+    """create a query and save results in database and filesystem"""
+    current_app = create_app(config='config/askomics.test.ini')
+
+    db_path = "{}/database.db".format(dir_path)
+
+    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
+    current_app.iniconfig.set('askomics', 'database_path', db_path)
+
+    with open("tests/data/query.json", "r") as file:
+        file_content = file.read()
+
+    raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
+    json_query = json.loads(raw_query)
+
+    info = {
+        "graph_state": json_query,
+        "celery_id": '00000000-0000-0000-0000-000000000000'
+    }
+
+    result = Result(current_app, user_session, info)
+
+    # Save job in database database
+    result.save_in_db()
+
+    # launch query
+    query_builder = SparqlQueryBuilder(current_app, user_session)
+    query_launcher = SparqlQueryLauncher(current_app, user_session)
+    query = query_builder.build_query_from_json(json_query)
+    headers, results = query_launcher.process_query(query)
+
+    # write result to a file
+    result.save_result_in_file(headers, results)
+
+    # Update database status
+    result.update_db_status()
+
+    return {
+        "id": result.id,
+        "path": result.file_path,
+        "start": result.start,
+        "end": result.end
+    }
 
 
 @pytest.fixture
@@ -381,6 +429,71 @@ def client_logged_as_jdoe_with_data():
 
     gene_timestamp = interate_dataset(dir_path, file_info, user_session, False)
     client.gene_timestamp = gene_timestamp
+
+    yield client
+
+    shutil.rmtree(dir_path)
+    # clean triplestore
+    query_launcher = SparqlQueryLauncher(current_app, user_session)
+    query_launcher.drop_dataset('urn:sparql:askomics_test:1_jdoe:gene_{}'.format(gene_timestamp))
+
+
+@pytest.fixture
+def client_logged_as_jdoe_with_data_and_result():
+    """Logged client (jdoe, admin), db with users inside, and data loaded and integrated + a result"""
+    current_app = create_app(config='config/askomics.test.ini')
+    create_celery(current_app)
+
+    # dirpath in config
+    dir_path = tempfile.mkdtemp(prefix="askotest_")
+    db_path = "{}/database.db".format(dir_path)
+
+    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
+    current_app.iniconfig.set('askomics', 'database_path', db_path)
+
+    create_users(dir_path)
+
+    # Establish an application context before running the tests.
+    ctx = current_app.app_context()
+    ctx.push()
+
+    client = current_app.test_client()
+
+    # store dirpath
+    client.dir_path = dir_path
+
+    # log as jsmith
+    # log as jdoe
+    with client.session_transaction() as sess:
+        sess["user"] = {
+            'id': 1,
+            'ldap': False,
+            'fname': "John",
+            'lname': "Doe",
+            'username': "jdoe",
+            'email': "jdoe@askomics.org",
+            'admin': True,
+            'blocked': False,
+            'apikey': "0000000000"
+        }
+        user_session = sess
+
+    # Upload people.tsv
+    fpath = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    client.gene_file_path = fpath
+
+    # Integrate
+    file_info = {
+        "id": 1,
+        "columns_type": ["start_entity", "organism", "chromosome", "strand", "start", "end"]
+    }
+
+    gene_timestamp = interate_dataset(dir_path, file_info, user_session, False)
+    client.gene_timestamp = gene_timestamp
+
+    # save a result
+    result_info = save_query(dir_path, user_session, gene_timestamp)
+    client.result_info = result_info
 
     yield client
 
