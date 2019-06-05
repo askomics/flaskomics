@@ -19,6 +19,14 @@
   float: left;
 }
 
+.right {
+  float: right;
+}
+
+.visibility-icon {
+  padding-right: 5px;
+}
+
 .center {
   position:absolute;
   top:50%;
