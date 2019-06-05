@@ -38,15 +38,19 @@ export default class ResultsTable extends Component {
 
     return (
       <div>
-        <BootstrapTable
-          tabIndexCell
-          bootstrap4
-          keyField='id'
-          data={this.props.data}
-          columns={columns}
-          pagination={paginationFactory()}
-          noDataIndication={'No results'}
-        />
+        <div className="asko-table-div">
+          <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
+            tabIndexCell
+            bootstrap4
+            keyField='id'
+            data={this.props.data}
+            columns={columns}
+            pagination={paginationFactory()}
+            noDataIndication={'No results'}
+          />
+        </div>
       </div>
     )
   }

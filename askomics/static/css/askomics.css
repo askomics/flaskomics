@@ -25,18 +25,21 @@
   left:50%; 
 }
 
-.preview-table {
-  width: auto;
-  white-space: nowrap;
-  table-layout: auto;
-}
-
-.preview-table-div {
+.asko-table-div {
   width: auto;
   display: block;
   overflow-x: auto;
   overflow-y: auto;
   max-height: 350px;
+}
+
+.asko-table-wrapper {
+  width: auto;
+  white-space: nowrap;
+}
+
+.asko-table {
+  table-layout: auto !important;
 }
 
 .center-div {

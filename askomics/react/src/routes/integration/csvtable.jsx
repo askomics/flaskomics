@@ -134,9 +134,10 @@ export default class CsvTable extends Component {
     return (
       <div>
         <h4>{this.state.name}</h4>
-        <div className="preview-table-div">
+        <div className="asko-table-div">
           <BootstrapTable
-            wrapperClasses="preview-table"
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
             bootstrap4
             keyField={this.state.header[0]}
             data={this.props.file.csv_data.content_preview}
