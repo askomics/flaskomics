@@ -25,7 +25,9 @@ export default class CsvTable extends Component {
 
   handleChangeType (index, event) {
     this.setState({
-      columns_type: this.state.columns_type.map((elem, i) => i == index ? event.target.value : elem)
+      columns_type: this.state.columns_type.map((elem, i) => i == index ? event.target.value : elem),
+      publicTick: false,
+      privateTick: false
     })
   }
 
@@ -89,11 +91,6 @@ export default class CsvTable extends Component {
         this.setState({
           [tick]: true
         })
-        setTimeout(() => {
-          this.setState({
-            [tick]: false
-          })
-        }, 2000)
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -104,10 +101,6 @@ export default class CsvTable extends Component {
           waiting: false
         })
       })
-  }
-
-  sleep (ms) {
-    return new Promise(resolve => setTimeout((resolve, ms)))
   }
 
   render () {
@@ -147,8 +140,8 @@ export default class CsvTable extends Component {
         <br /><br />
         <div className="center-div">
           <ButtonGroup>
-            <Button onClick={this.integrate} value="private" color="secondary">{privateIcon} Integrate (private dataset)</Button>
-            <Button onClick={this.integrate} value="public" color="secondary">{publicIcon} Integrate (public dataset)</Button>
+            <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+            <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
           </ButtonGroup>
         </div>
       </div>
