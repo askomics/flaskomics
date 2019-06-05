@@ -100,8 +100,8 @@ export default class DatasetsTable extends Component {
     }]
 
     let defaultSorted = [{
-      dataField: 'name',
-      order: 'asc'
+      dataField: 'start',
+      order: 'desc'
     }]
 
     let selectRow = {

@@ -1,4 +1,5 @@
 import os
+import time
 
 from askomics.libaskomics.CsvFile import CsvFile
 from askomics.libaskomics.Database import Database
@@ -75,7 +76,7 @@ class FilesHandler(Params):
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path
+            SELECT id, name, type, size, path, date
             FROM files
             WHERE user_id = ?
             AND {}
@@ -86,7 +87,7 @@ class FilesHandler(Params):
         else:
 
             query = '''
-            SELECT id, name, type, size, path
+            SELECT id, name, type, size, path, date
             FROM files
             WHERE user_id = ?
             '''
@@ -99,7 +100,8 @@ class FilesHandler(Params):
                 'id': row[0],
                 'name': row[1],
                 'type': row[2],
-                'size': row[3]
+                'size': row[3],
+                'date': row[5]
             }
             if return_path:
                 file['path'] = row[4]
@@ -157,6 +159,7 @@ class FilesHandler(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
@@ -168,7 +171,7 @@ class FilesHandler(Params):
             # Default is csv/tsv
             filetype = 'csv/tsv'
 
-        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size))
+        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, int(time.time())))
 
     def persist_chunk(self, chunk_info):
         """Persist a file by chunk. Store info in db if the chunk is the last

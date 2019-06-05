@@ -197,6 +197,7 @@ class Database(Params):
             type text,
             path text,
             size int,
+            date int,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''

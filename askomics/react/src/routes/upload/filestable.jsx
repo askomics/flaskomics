@@ -50,11 +50,21 @@ export default class FilesTable extends Component {
     }
   }
 
+  humanDate (date) {
+    let event = new Date(date * 1000)
+    return event.toUTCString()
+  }
+
   render () {
     let columns = [{
       dataField: 'name',
       text: 'File name',
       sort: true
+    }, {
+      dataField: 'date',
+      text: 'Date',
+      sort: true,
+      formatter: (cell, row) => { return this.humanDate(cell) }
     }, {
       dataField: 'type',
       text: 'Type',
@@ -67,8 +77,8 @@ export default class FilesTable extends Component {
     }]
 
     let defaultSorted = [{
-      dataField: 'name',
-      order: 'asc'
+      dataField: 'date',
+      order: 'desc'
     }]
 
     let selectRow = {
