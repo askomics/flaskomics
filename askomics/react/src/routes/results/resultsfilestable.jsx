@@ -228,7 +228,7 @@ export default class ResultsFilesTable extends Component {
       onSelectAll: this.handleSelectionAll
     }
 
-    let noDataIndication = 'No datasets'
+    let noDataIndication = 'No result file'
     if (this.props.waiting) {
       noDataIndication = <WaitingDiv waiting={this.props.waiting} />
     }

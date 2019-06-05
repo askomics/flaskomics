@@ -28,7 +28,15 @@ export default class Query extends Component {
       waiting: true,
       error: false,
       errorMessage: null,
-      tick: false
+      saveTick: false,
+
+      // save query icons
+      disableSave: false,
+      saveIcon: "question",
+
+      // Preview icons
+      disablePreview: false,
+      previewIcon: "table"
     }
 
     this.graphState = {
@@ -46,6 +54,12 @@ export default class Query extends Component {
 
     this.handlePreview = this.handlePreview.bind(this)
     this.handleQuery = this.handleQuery.bind(this)
+  }
+
+  resetIcons() {
+    this.setState({
+      previewIcon: "table"
+    })
   }
 
   getId () {
@@ -381,7 +395,12 @@ export default class Query extends Component {
 
   updateGraphState () {
     this.setState({
-      graphState: this.graphState
+      graphState: this.graphState,
+      previewIcon: "table",
+      resultsPreview: [],
+      disableSave: false,
+      disablePreview: false,
+      saveIcon: "question"
     })
   }
 
@@ -458,6 +477,10 @@ export default class Query extends Component {
     let data = {
       graphState: this.state.graphState
     }
+    this.setState({
+      disablePreview: true,
+      previewIcon: "spinner"
+    })
     axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -465,7 +488,8 @@ export default class Query extends Component {
           resultsPreview: response.data.resultsPreview,
           headerPreview: response.data.headerPreview,
           waiting: false,
-          error: false
+          error: false,
+          previewIcon: "check text-success"
         })
       })
       .catch(error => {
@@ -473,7 +497,9 @@ export default class Query extends Component {
         this.setState({
           error: true,
           errorMessage: error.response.data.errorMessage,
-          status: error.response.status
+          status: error.response.status,
+          disablePreview: false,
+          previewIcon: "times text-error"
         })
       })
   }
@@ -487,19 +513,17 @@ export default class Query extends Component {
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          tick: true
+          saveIcon: "check text-success",
+          disableSave: true
         })
-        setTimeout(() => {
-          this.setState({
-            tick: false
-          })
-        }, 2000)
       }).catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
           error: true,
           errorMessage: error.response.data.errorMessage,
-          status: error.response.status
+          status: error.response.status,
+          saveIcon: "times text-error",
+          disableSave: false
         })
       })
   }
@@ -604,13 +628,9 @@ export default class Query extends Component {
 
       // buttons
       launchQueryButton
-      previewButton = <Button onClick={this.handlePreview} color="secondary"><i className="fas fa-table"></i> Preview results</Button>
+      previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Preview results</Button>
       if (this.state.logged) {
-        let lauchQueryIcon = <i className="fas fa-question"></i>
-        if (this.state.tick) {
-          lauchQueryIcon = <i className="fas fa-check text-success"></i>
-        }
-        launchQueryButton = <Button onClick={this.handleQuery} color="secondary">{lauchQueryIcon} Launch Query</Button>
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Save Query</Button>
       }
     }
 
