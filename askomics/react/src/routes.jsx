@@ -4,6 +4,7 @@ import createBrowserHistory from 'history/createBrowserHistory'
 import axios from 'axios'
 
 import Ask from './routes/ask/ask'
+import About from './routes/about/about'
 import Jobs from './routes/jobs/jobs'
 import Upload from './routes/upload/upload'
 import Integration from './routes/integration/integration'
@@ -70,6 +71,7 @@ export default class Routes extends Component {
           <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user}/>
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/about" exact component={() => (<About />)} />
             <Route path="/login" exact component={() => (<Login waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/signup" exact component={() => (<Signup waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />

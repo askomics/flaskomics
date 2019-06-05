@@ -21,15 +21,21 @@ export default class AskoNavbar extends Component {
   render () {
     let links
     let askLink
+    let aboutLink
 
     // if wait is false
     if (!this.props.waitForStart) {
       askLink = (
         <NavItem><Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link></NavItem>
       )
+
       links = (
-        <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
+        <>
+          <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
+          <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
+        </>
       )
+
 
       if (this.props.logged) {
         let adminLinks
@@ -45,6 +51,7 @@ export default class AskoNavbar extends Component {
           <NavItem><Link className="nav-link" to="/results"><i className="fas fa-tasks"></i> Results</Link></NavItem>
           <NavItem><Link className="nav-link" to="/files"><i className="fas fa-file"></i> Files</Link></NavItem>
           <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
+          <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
           <NavItem>
             <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
               <DropdownToggle nav caret>
