@@ -45,5 +45,5 @@ export default class ErrorDiv extends Component {
 ErrorDiv.propTypes = {
   status: PropTypes.number,
   error: PropTypes.bool,
-  errorMessage: PropTypes.object
+  errorMessage: PropTypes.string
 }
