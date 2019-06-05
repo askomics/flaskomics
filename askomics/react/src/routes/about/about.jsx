@@ -24,35 +24,35 @@ export default class About extends Component {
           the user creates a path on an abstraction graph. This path can then be transformed
           into a SPARQL query that can be executed on the original dataset.
         </p>
-        <h4>Running Instances</h4>
+        <h4>Running instances</h4>
         <p>
           Several AskOmics instance are publicly available:
           <br /><br />
           <div>
-            <a href="https://bipaa.genouest.org/askomics/bnapus_gene/">BIPAA</a>, Contain <em>Brassica napus</em> datasets
+            <a target="_newtab" rel="noopener noreferrer" href="https://bipaa.genouest.org/askomics/bnapus_gene/">BIPAA</a>, Contain <em>Brassica napus</em> datasets
           </div>
           <div>
-            <a href="https://bbip.genouest.org/askomics/bbric/">BBIP</a>, empty instance, used for training
+            <a target="_newtab" rel="noopener noreferrer" href="https://bbip.genouest.org/askomics/bbric/">BBIP</a>, empty instance, used for training
           </div>
           <div>
-            <a href="https://askomics.genouest.org">Genouest</a>, Sandbox instance with examples datasets
+            <a target="_newtab" rel="noopener noreferrer" href="https://askomics.genouest.org">Genouest</a>, Sandbox instance with examples datasets
           </div>
         </p>
         <h4>Usefull links</h4>
         <p>
           <div>
-            <a href="https://askomics.readthedocs.io">Docs</a>
+            <a target="_newtab" rel="noopener noreferrer" href="https://flaskomics.readthedocs.io">Docs</a>
           </div>
           <div>
-            <a href="https://github.com/xgaia/flaskomics">Github repository</a>
+            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics">Github repository</a>
           </div>
           <div>
-            <a href="https://github.com/xgaia/flaskomics-docker-compose">Github docker-compose repository</a>
+            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics-docker-compose">Github docker-compose repository</a>
           </div>
         </p>
         <h4>Need help?</h4>
         <p>
-          Use <a href="https://github.com/xgaia/flaskomics/issues">Github issues</a> to report a bug, get help or request for a new feature.
+          Use <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics/issues">Github issues</a> to report a bug, get help or request for a new feature.
         </p>
       </div>
     )
