@@ -31,4 +31,4 @@ matrix:
       install:
         - npm install
       script:
-        - ./node_modules/.bin/eslint "askomics/react/src/**"
+        - ./node_modules/.bin/eslint --config .eslintrc.yml "askomics/react/src/**"
