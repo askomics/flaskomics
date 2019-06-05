@@ -87,7 +87,7 @@ export default class AskoNavbar extends Component {
 }
 
 AskoNavbar.propTypes = {
-  waitForStart: PropTypes.func,
+  waitForStart: PropTypes.bool,
   logged: PropTypes.bool,
   user: PropTypes.object
 }
