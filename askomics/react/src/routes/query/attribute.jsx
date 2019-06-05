@@ -71,7 +71,7 @@ export default class AttributeBox extends Component {
             <td>
               <CustomInput type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
                 {Object.keys(selected).map(sign => {
-                  return <option key={value.uri} selected={selected[sign]} value={sign}>{sign}</option>
+                  return <option key={sign} selected={selected[sign]} value={sign}>{sign}</option>
                 })}
               </CustomInput>
             </td>
