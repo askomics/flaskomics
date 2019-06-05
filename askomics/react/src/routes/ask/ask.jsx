@@ -135,7 +135,7 @@ export default class Ask extends Component {
               <div key={startpoint.entity} className="input-label" id={startpoint.entity_label}>
                 <input hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
                 <label hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
-                  <em> {startpoint.entity_label}</em>
+                  {startpoint.entity_label}
                     <nodiv className="visibility-icon right">
                       {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
                       {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
