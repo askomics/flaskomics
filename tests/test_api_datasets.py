@@ -12,7 +12,7 @@ class TestApiDatasets(AskomicsTestCase):
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
         assert len(response.json["datasets"]) == 1
-        assert len(response.json["datasets"][0]) == 7
+        assert len(response.json["datasets"][0]) == 8
         assert response.json["datasets"][0]["id"] == 1
         assert response.json["datasets"][0]["name"] == "gene"
         assert not response.json["datasets"][0]["public"]
