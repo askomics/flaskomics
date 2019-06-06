@@ -195,12 +195,20 @@ export default class ResultsFilesTable extends Component {
         }
         return <Badge color="danger">Failure</Badge>
       },
-      headerStyle: () => { return { width: '10%' } },
+      headerStyle: () => { return { width: '8%' } },
       sort: true
+    }, {
+      dataField: "nrows",
+      text: "Row number",
+      sort: true,
+      formatter: (cell, row) => {
+        return new Intl.NumberFormat('fr-FR').format(cell)
+      },
+      headerStyle: () => { return { width: '10%' } }
     }, {
       dataField: 'error_message',
       text: 'Message',
-      headerStyle: () => { return { width: '20%' } }
+      headerStyle: () => { return { width: '15%' } }
     }, {
       // buttons
       text: 'Actions',

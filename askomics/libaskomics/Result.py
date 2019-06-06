@@ -57,6 +57,7 @@ class Result(Params):
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
             self.start = None
             self.end = None
+            self.nrows = 0
 
     def format_graph_state(self, d3_graph_state):
         """Format Graph state
@@ -146,7 +147,7 @@ class Result(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT celery_id, path, graph_state, start, end
+        SELECT celery_id, path, graph_state, start, end, nrows
         FROM results
         WHERE user_id = ? AND id = ?
         '''
@@ -159,6 +160,7 @@ class Result(Params):
         self.graph_state = json.loads(rows[0][2])
         self.start = rows[0][3]
         self.end = rows[0][4]
+        self.nrows = rows[0][5]
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -209,6 +211,7 @@ class Result(Params):
             if len(results) > 0:
                 for i in results:
                     row = []
+                    self.nrows += 1
                     for header, value in i.items():
                         row.append(value)
                     writer.writerow(row)
@@ -271,7 +274,7 @@ class Result(Params):
             status,
             self.end,
             self.file_path,
-            0,
+            self.nrows,
             message,
             self.session["user"]["id"],
             self.id
