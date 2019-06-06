@@ -199,7 +199,7 @@ export default class ResultsFilesTable extends Component {
       sort: true
     }, {
       dataField: "nrows",
-      text: "Row number",
+      text: "Row's number",
       sort: true,
       formatter: (cell, row) => {
         return new Intl.NumberFormat('fr-FR').format(cell)

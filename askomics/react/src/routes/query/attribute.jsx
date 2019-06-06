@@ -14,7 +14,7 @@ export default class AttributeBox extends Component {
     this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
-    this.toggleFilterType = this.props.toggleFilterType.bind(this)
+    this.handleFilterType = this.props.handleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
     this.handleFilterNumericSign = this.props.handleFilterNumericSign.bind(this)
@@ -22,29 +22,44 @@ export default class AttributeBox extends Component {
   }
 
   renderText () {
-    let eyeIcon = 'attr-icon fas fa-eye-slash'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
-    let filterIcon = 'attr-icon fas fa-filter'
-    if (this.props.attribute.filterType == 'exact') {
-      filterIcon = 'attr-icon fas fa-font'
+
+    let selected = {
+      'exact': false,
+      'regexp': false
     }
+
+    selected[this.props.attribute.filterType] = true
 
     return (
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={filterIcon} id={this.props.attribute.id} onClick={this.toggleFilterType}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput type="select" id={this.props.attribute.id} onChange={this.handleFilterType}>
+                {Object.keys(selected).map(type => {
+                  return <option key={type} selected={selected[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+            </td>
+          </tr>
+        </table>
       </div>
     )
   }
 
   renderNumeric () {
-    let eyeIcon = 'attr-icon fas fa-eye-slash'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
@@ -85,7 +100,7 @@ export default class AttributeBox extends Component {
   }
 
   renderCategory () {
-    let eyeIcon = 'attr-icon fas fa-eye-slash'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
@@ -129,7 +144,7 @@ export default class AttributeBox extends Component {
 
 AttributeBox.propTypes = {
   toggleVisibility: PropTypes.func,
-  toggleFilterType: PropTypes.func,
+  handleFilterType: PropTypes.func,
   handleFilterValue: PropTypes.func,
   handleFilterCategory: PropTypes.func,
   handleFilterNumericSign: PropTypes.func,

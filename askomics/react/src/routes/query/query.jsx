@@ -32,7 +32,7 @@ export default class Query extends Component {
 
       // save query icons
       disableSave: false,
-      saveIcon: "question",
+      saveIcon: "play",
 
       // Preview icons
       disablePreview: false,
@@ -400,7 +400,7 @@ export default class Query extends Component {
       resultsPreview: [],
       disableSave: false,
       disablePreview: false,
-      saveIcon: "question"
+      saveIcon: "play"
     })
   }
 
@@ -420,10 +420,10 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  toggleFilterType (event) {
+  handleFilterType (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.filterType = attr.filterType == 'exact' ? 'regexp' : 'exact'
+        attr.filterType = event.target.value
       }
     })
     this.updateGraphState()
@@ -602,7 +602,7 @@ export default class Query extends Component {
               <AttributeBox
                 attribute={attribute}
                 toggleVisibility={p => this.toggleVisibility(p)}
-                toggleFilterType={p => this.toggleFilterType(p)}
+                handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}
                 handleFilterNumericSign={p => this.handleFilterNumericSign(p)}

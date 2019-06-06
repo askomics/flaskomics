@@ -80,7 +80,7 @@ export default class DatasetsTable extends Component {
       }
     }, {
       dataField: 'ntriples',
-      text: 'Triples number',
+      text: 'Triple\'s number',
       sort: true,
       formatter: (cell, row) => {
         return new Intl.NumberFormat('fr-FR').format(cell)

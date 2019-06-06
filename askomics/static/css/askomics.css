@@ -15,6 +15,10 @@
   float: right;
 }
 
+i.inactive {
+  color: #b3b3b3;
+}
+
 .footer-left {
   float: left;
 }
