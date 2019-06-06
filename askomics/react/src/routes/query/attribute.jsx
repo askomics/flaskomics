@@ -14,6 +14,7 @@ export default class AttributeBox extends Component {
     this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
+    this.toggleOptional = this.props.toggleOptional.bind(this)
     this.handleFilterType = this.props.handleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
@@ -27,6 +28,11 @@ export default class AttributeBox extends Component {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    if (this.props.attribute.optional) {
+      optionalIcon = 'attr-icon fas fa-question-circle'
+    }
+
     let selected = {
       'exact': false,
       'regexp': false
@@ -38,19 +44,20 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         <table style={{ width: '100%' }}>
           <tr>
             <td>
-              <CustomInput type="select" id={this.props.attribute.id} onChange={this.handleFilterType}>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterType}>
                 {Object.keys(selected).map(type => {
                   return <option key={type} selected={selected[type]} value={type}>{type}</option>
                 })}
               </CustomInput>
             </td>
             <td>
-              <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
             </td>
           </tr>
         </table>
@@ -62,6 +69,11 @@ export default class AttributeBox extends Component {
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
+    }
+
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    if (this.props.attribute.optional) {
+      optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
     let selected = {
@@ -79,19 +91,20 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         <table style={{ width: '100%' }}>
           <tr>
             <td>
-              <CustomInput type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
                 {Object.keys(selected).map(sign => {
                   return <option key={sign} selected={selected[sign]} value={sign}>{sign}</option>
                 })}
               </CustomInput>
             </td>
             <td>
-              <Input type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterNumericValue} />
+              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterNumericValue} />
             </td>
           </tr>
         </table>
@@ -105,9 +118,14 @@ export default class AttributeBox extends Component {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    if (this.props.attribute.optional) {
+      optionalIcon = 'attr-icon fas fa-question-circle'
+    }
+
     let categoryFormGroup = (
       <FormGroup>
-        <CustomInput style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
+        <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
           {this.props.attribute.filterValues.map(value => {
             let selected = this.props.attribute.filterSelectedValues.includes(value.uri)
             return (<option key={value.uri} attrId={this.props.attribute.uri} value={value.uri} selected={selected}>{value.label}</option>)
@@ -120,6 +138,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {categoryFormGroup}

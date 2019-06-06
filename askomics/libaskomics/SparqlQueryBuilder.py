@@ -272,11 +272,14 @@ class SparqlQueryBuilder(Params):
                         predicate = "<{}>".format(attribute["uri"])
 
                     obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
-                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    triple_string = "{} {} {} .".format(subject, predicate, obj)
+                    if attribute["optional"]:
+                        triple_string = "OPTIONAL {{{}}}".format(triple_string)
+                    triples.append(triple_string)
                     if attribute["visible"]:
                         selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "":
+                if attribute["filterValue"] != "" and not attribute["optional"]:
                     if attribute["filterType"] == "regexp":
                         filter_string = "FILTER (contains(str({}), '{}')) .".format(obj, attribute["filterValue"])
                         filters.append(filter_string)
@@ -290,11 +293,14 @@ class SparqlQueryBuilder(Params):
                     subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
                     predicate = "<{}>".format(attribute["uri"])
                     obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
-                    triples.append("{} {} {} .".format(subject, predicate, obj))
+                    triple_string = "{} {} {} .".format(subject, predicate, obj)
+                    if attribute["optional"]:
+                        triple_string = "OPTIONAL {{{}}}".format(triple_string)
+                    triples.append(triple_string)
                     if attribute["visible"]:
                         selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "":
+                if attribute["filterValue"] != "" and not attribute["optional"]:
                     filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
                     filters.append(filter_string)
 
@@ -306,12 +312,18 @@ class SparqlQueryBuilder(Params):
                     category_value_uri = "?{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
                     label = "rdfs:label"
                     category_label = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
-                    triples.append("{} {} {} .".format(node_uri, category_name, category_value_uri))
-                    triples.append("{} {} {} .".format(category_value_uri, label, category_label))
+                    triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
+                    triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
+                    if attribute["optional"]:
+                        triple_string_1 = "OPTIONAL {{{} {}}}".format(triple_string_1, triple_string_2)
+                        triple_string_2 = ""
+                    triples.append(triple_string_1)
+                    triples.append(triple_string_2)
+
                     if attribute["visible"]:
                         selects.append(category_label)
                 # filters
-                if attribute["filterSelectedValues"] != []:
+                if attribute["filterSelectedValues"] != [] and not attribute["optional"]:
                     filter_substrings_list = []
                     for value in attribute["filterSelectedValues"]:
                         filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))

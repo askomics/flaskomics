@@ -136,7 +136,8 @@ export default class Query extends Component {
         entityUri: nodeUri,
         type: 'uri',
         filterType: 'exact',
-        filterValue: ''
+        filterValue: '',
+        optional: false
       })
     }
 
@@ -151,7 +152,8 @@ export default class Query extends Component {
         entityUri: nodeUri,
         type: 'text',
         filterType: 'exact',
-        filterValue: ''
+        filterValue: '',
+        optional: false
       })
     }
 
@@ -163,11 +165,12 @@ export default class Query extends Component {
           nodeAttribute.id = this.getId()
           nodeAttribute.visible = false
           nodeAttribute.nodeId = nodeId
-          nodeAttribute.uri = attr.uri,
-          nodeAttribute.label = attr.label,
+          nodeAttribute.uri = attr.uri
+          nodeAttribute.label = attr.label
           nodeAttribute.entityLabel = this.getLabel(nodeUri)
-          nodeAttribute.entityUri = attr.entityUri,
+          nodeAttribute.entityUri = attr.entityUri
           nodeAttribute.type = attributeType
+          nodeAttribute.optional = false
 
           if (attributeType == 'decimal') {
             nodeAttribute.filterSign = '='
@@ -415,6 +418,21 @@ export default class Query extends Component {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.visible = !attr.visible
+        if (!attr.visible) {
+          attr.optional = false
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleOptional (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.optional = !attr.optional
+        if (attr.optional) {
+          attr.visible = true
+        }
       }
     })
     this.updateGraphState()
@@ -602,6 +620,7 @@ export default class Query extends Component {
               <AttributeBox
                 attribute={attribute}
                 toggleVisibility={p => this.toggleVisibility(p)}
+                toggleOptional={p => this.toggleOptional(p)}
                 handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}
