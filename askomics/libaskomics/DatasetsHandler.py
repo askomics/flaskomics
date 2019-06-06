@@ -51,7 +51,7 @@ class DatasetsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, public, status, start, end, error_message
+        SELECT id, name, public, status, start, end, ntriples, error_message
         FROM datasets
         WHERE user_id = ?
         '''
@@ -67,7 +67,8 @@ class DatasetsHandler(Params):
                 'status': row[3],
                 'start': row[4],
                 'end': row[5],
-                'error_message': row[6]
+                'ntriples': row[6],
+                'error_message': row[7]
             }
             datasets.append(dataset)
 

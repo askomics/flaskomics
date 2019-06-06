@@ -61,7 +61,7 @@ def integrate(self, session, data, host_url):
             file.integrate(data['columns_type'], public=data['public'])
 
             # done
-            dataset.update_in_db()
+            dataset.update_in_db(ntriples=file.ntriples)
         except Exception as e:
             app.logger.error(str(e))
             dataset.update_in_db(error=True, error_message=str(e))

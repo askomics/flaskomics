@@ -72,6 +72,7 @@ class File(Params):
         self.size = file_info['size']
         self.id = file_info['id']
         self.public = False
+        self.ntriples = 0
         self.timestamp = int(time.time())
 
         self.default_graph = "{}".format(self.settings.get('triplestore', 'default_graph'))
@@ -182,6 +183,20 @@ class File(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
         sparql.drop_dataset(self.file_graph)
 
+    def set_triples_number(self):
+        """Set graph triples number by requesting the triplestore"""
+        query = """
+        SELECT count(*) AS ?count
+        FROM <{}>
+        WHERE {{
+            ?s ?p ?o .
+        }}
+        """.format(self.file_graph)
+
+        sparql = SparqlQueryLauncher(self.app, self.session)
+        result = sparql.process_query(query)
+        self.ntriples = result[1][0]["count"]
+
     def integrate(self):
         """Integrate the file into the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
@@ -254,3 +269,5 @@ class File(Params):
         else:
             # Insert
             sparql.insert_data(abstraction_domain_knowledge, self.file_graph)
+
+        self.set_triples_number()
