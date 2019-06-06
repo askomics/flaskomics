@@ -119,7 +119,13 @@ def load_file(dir_path, file_path, user_session):
     }
 
     files = FilesHandler(current_app, user_session)
-    return files.persist_chunk(file_data)
+    filepath = files.persist_chunk(file_data)
+    filedate = files.date
+
+    return {
+        "filepath": filepath,
+        "filedate": filedate
+    }
 
 
 def interate_dataset(dir_path, file_info, user_session, public):
@@ -418,8 +424,9 @@ def client_logged_as_jdoe_with_data():
         user_session = sess
 
     # Upload people.tsv
-    fpath = load_file(dir_path, 'test-data/gene.tsv', user_session)
-    client.gene_file_path = fpath
+    file = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    client.gene_file_path = file["filepath"]
+    client.gene_file_date = file["filedate"]
 
     # Integrate
     file_info = {
@@ -479,8 +486,9 @@ def client_logged_as_jdoe_with_data_and_result():
         user_session = sess
 
     # Upload people.tsv
-    fpath = load_file(dir_path, 'test-data/gene.tsv', user_session)
-    client.gene_file_path = fpath
+    file = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    client.gene_file_path = file["filepath"]
+    client.gene_file_date = file["filedate"]
 
     # Integrate
     file_info = {

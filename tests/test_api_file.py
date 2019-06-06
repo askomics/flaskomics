@@ -15,6 +15,7 @@ class TestApiFile(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'files': [{
+                'date': client_logged_as_jdoe_with_data.gene_file_date,
                 'id': 1,
                 'size': 394,
                 'name': 'gene',
@@ -38,6 +39,7 @@ class TestApiFile(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'files': [{
+                'date': client_logged_as_jdoe_with_data.gene_file_date,
                 'id': 1,
                 'size': 394,
                 'name': 'gene',

@@ -40,6 +40,7 @@ class FilesHandler(Params):
             self.session['user']['id'],
             self.session['user']['username']
         )
+        self.date = None
 
     def handle_files(self, files_id):
         """Handle file
@@ -171,7 +172,9 @@ class FilesHandler(Params):
             # Default is csv/tsv
             filetype = 'csv/tsv'
 
-        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, int(time.time())))
+        self.date = int(time.time())
+
+        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date))
 
     def persist_chunk(self, chunk_info):
         """Persist a file by chunk. Store info in db if the chunk is the last
