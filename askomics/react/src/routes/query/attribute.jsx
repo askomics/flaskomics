@@ -14,6 +14,7 @@ export default class AttributeBox extends Component {
     this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
+    this.handleNegative = this.props.handleNegative.bind(this)
     this.toggleOptional = this.props.toggleOptional.bind(this)
     this.handleFilterType = this.props.handleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
@@ -33,9 +34,19 @@ export default class AttributeBox extends Component {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
+    let negativIcon = 'attr-icon fas fa-not-equal inactive'
+    if (this.props.attribute.negative) {
+      negativIcon = 'attr-icon fas fa-not-equal'
+    }
+
     let selected = {
       'exact': false,
       'regexp': false
+    }
+
+    let selected_sign = {
+      '=': !this.props.attribute.negative,
+      "≠": this.props.attribute.negative
     }
 
     selected[this.props.attribute.filterType] = true
@@ -53,6 +64,13 @@ export default class AttributeBox extends Component {
               <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterType}>
                 {Object.keys(selected).map(type => {
                   return <option key={type} selected={selected[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
                 })}
               </CustomInput>
             </td>
@@ -85,6 +103,15 @@ export default class AttributeBox extends Component {
       '!=': false
     }
 
+    let sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+
     selected[this.props.attribute.filterSign] = true
 
     return (
@@ -99,7 +126,7 @@ export default class AttributeBox extends Component {
             <td>
               <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
                 {Object.keys(selected).map(sign => {
-                  return <option key={sign} selected={selected[sign]} value={sign}>{sign}</option>
+                  return <option key={sign} selected={selected[sign]} value={sign}>{sign_display[sign]}</option>
                 })}
               </CustomInput>
             </td>
@@ -162,6 +189,7 @@ export default class AttributeBox extends Component {
 }
 
 AttributeBox.propTypes = {
+  handleNegative: PropTypes.func,
   toggleVisibility: PropTypes.func,
   toggleOptional: PropTypes.func,
   handleFilterType: PropTypes.func,

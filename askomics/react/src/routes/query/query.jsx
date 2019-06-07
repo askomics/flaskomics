@@ -137,7 +137,8 @@ export default class Query extends Component {
         type: 'uri',
         filterType: 'exact',
         filterValue: '',
-        optional: false
+        optional: false,
+        negative: false
       })
     }
 
@@ -153,7 +154,8 @@ export default class Query extends Component {
         type: 'text',
         filterType: 'exact',
         filterValue: '',
-        optional: false
+        optional: false,
+        negative: false
       })
     }
 
@@ -171,6 +173,7 @@ export default class Query extends Component {
           nodeAttribute.entityUri = attr.entityUri
           nodeAttribute.type = attributeType
           nodeAttribute.optional = false
+          nodeAttribute.negative = false
 
           if (attributeType == 'decimal') {
             nodeAttribute.filterSign = '='
@@ -438,6 +441,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  handleNegative (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.negative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.state.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -620,6 +632,7 @@ export default class Query extends Component {
               <AttributeBox
                 attribute={attribute}
                 toggleVisibility={p => this.toggleVisibility(p)}
+                handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
                 handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}

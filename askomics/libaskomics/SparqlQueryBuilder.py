@@ -255,11 +255,14 @@ class SparqlQueryBuilder(Params):
                     selects.append(subject)
                 # filters
                 if attribute["filterValue"] != "":
+                    not_exist = ""
+                    if attribute["negative"]:
+                        not_exist = " NOT EXISTS"
                     if attribute["filterType"] == "regexp":
-                        filter_string = "FILTER (contains(str({}), '{}')) .".format(subject, attribute["filterValue"])
+                        filter_string = "FILTER{} (contains(str({}), '{}')) .".format(not_exist, subject, attribute["filterValue"])
                         filters.append(filter_string)
                     elif attribute["filterType"] == "exact":
-                        filter_string = "FILTER (str({}) = '{}') .".format(subject, attribute["filterValue"])
+                        filter_string = "FILTER{} (str({}) = '{}') .".format(not_exist, subject, attribute["filterValue"])
                         filters.append(filter_string)
 
             # Text
@@ -280,11 +283,14 @@ class SparqlQueryBuilder(Params):
                         selects.append(obj)
                 # filters
                 if attribute["filterValue"] != "" and not attribute["optional"]:
+                    negative = ""
+                    if attribute["negative"]:
+                        negative = "!"
                     if attribute["filterType"] == "regexp":
-                        filter_string = "FILTER (contains(str({}), '{}')) .".format(obj, attribute["filterValue"])
+                        filter_string = "FILTER ({}contains(str({}), '{}')) .".format(negative, obj, attribute["filterValue"])
                         filters.append(filter_string)
                     elif attribute["filterType"] == "exact":
-                        filter_string = "FILTER (str({}) = '{}') .".format(obj, attribute["filterValue"])
+                        filter_string = "FILTER (str({}) {}= '{}') .".format(obj, negative, attribute["filterValue"])
                         filters.append(filter_string)
 
             # Numeric
