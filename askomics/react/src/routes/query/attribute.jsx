@@ -163,6 +163,7 @@ export default class AttributeBox extends Component {
 
 AttributeBox.propTypes = {
   toggleVisibility: PropTypes.func,
+  toggleOptional: PropTypes.func,
   handleFilterType: PropTypes.func,
   handleFilterValue: PropTypes.func,
   handleFilterCategory: PropTypes.func,

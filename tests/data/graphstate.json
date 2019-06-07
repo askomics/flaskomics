@@ -13,7 +13,8 @@
                 "nodeId": 1,
                 "type": "uri",
                 "uri": "rdf:type",
-                "visible": false
+                "visible": false,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -25,7 +26,8 @@
                 "nodeId": 1,
                 "type": "text",
                 "uri": "rdfs:label",
-                "visible": true
+                "visible": true,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -37,7 +39,8 @@
                 "nodeId": 1,
                 "type": "decimal",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
-                "visible": false
+                "visible": false,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -58,7 +61,8 @@
                 "nodeId": 1,
                 "type": "category",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
-                "visible": false
+                "visible": false,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -70,7 +74,8 @@
                 "nodeId": 1,
                 "type": "decimal",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
-                "visible": false
+                "visible": false,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -103,7 +108,8 @@
                 "nodeId": 1,
                 "type": "category",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome",
-                "visible": false
+                "visible": false,
+                "optional": false
             },
             {
                 "entityLabel": "Gene",
@@ -124,7 +130,8 @@
                 "nodeId": 1,
                 "type": "category",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#organism",
-                "visible": false
+                "visible": false,
+                "optional": false
             }
         ],
         "links": [],

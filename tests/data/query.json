@@ -22,6 +22,7 @@
         {
             "id": 2,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "rdf:type",
             "label": "Uri",
@@ -34,6 +35,7 @@
         {
             "id": 3,
             "visible": true,
+            "optional": false,
             "nodeId": 1,
             "uri": "rdfs:label",
             "label": "Label",
@@ -46,6 +48,7 @@
         {
             "id": 4,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
             "label": "end",
@@ -58,6 +61,7 @@
         {
             "id": 5,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
             "label": "strand",
@@ -79,6 +83,7 @@
         {
             "id": 6,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
             "label": "start",
@@ -91,6 +96,7 @@
         {
             "id": 7,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome",
             "label": "chromosome",
@@ -124,6 +130,7 @@
         {
             "id": 8,
             "visible": false,
+            "optional": false,
             "nodeId": 1,
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#organism",
             "label": "organism",
