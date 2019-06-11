@@ -20,7 +20,8 @@ export default class Results extends Component {
       selected: [],
       resultsPreview: [],
       headerPreview: [],
-      currentPreview: null
+      currentPreview: null,
+      triplestoreMaxRows: null
     }
     this.cancelRequest
     this.interval
@@ -81,6 +82,7 @@ export default class Results extends Component {
         console.log(requestUrl, response.data)
         this.setState({
           results: response.data.files,
+          triplestoreMaxRows: response.data.triplestoreMaxRows,
           waiting: false
         })
       })
@@ -129,7 +131,7 @@ export default class Results extends Component {
         {redirectLogin}
         <h2>Results</h2>
         <hr />
-        <ResultsFilesTable results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+        <ResultsFilesTable maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <Button disabled={this.isDisabled()} onClick={this.deleteSelectedResults} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <br /><br />
         {resultsTable}

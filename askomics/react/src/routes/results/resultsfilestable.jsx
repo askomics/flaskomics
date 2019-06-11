@@ -202,7 +202,14 @@ export default class ResultsFilesTable extends Component {
       text: "Row's number",
       sort: true,
       formatter: (cell, row) => {
-        return new Intl.NumberFormat('fr-FR').format(cell)
+        let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
+        if (cell == this.props.maxRows) {
+          return (
+            <>{formattedNrows} <i class="fas fa-exclamation-circle"></i></>
+          )
+        } else {
+          return formattedNrows
+        }
       },
       headerStyle: () => { return { width: '10%' } }
     }, {

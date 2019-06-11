@@ -31,12 +31,14 @@ def get_results():
         current_app.logger.error(str(e))
         return jsonify({
             'files': [],
+            'triplestoreMaxRows': 10000,
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'files': files,
+        'triplestoreMaxRows': 10000,
         'error': False,
         'errorMessage': ''
     })
