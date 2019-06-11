@@ -27,18 +27,24 @@ def get_results():
     try:
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()
+        triplestore_max_rows = None
+        try:
+            triplestore_max_rows = current_app.iniconfig.getint("triplestore", "result_set_max_rows")
+        except Exception:
+            pass
+        current_app.logger.debug(triplestore_max_rows)
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({
             'files': [],
-            'triplestoreMaxRows': 10000,
+            'triplestoreMaxRows': triplestore_max_rows,
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'files': files,
-        'triplestoreMaxRows': 10000,
+        'triplestoreMaxRows': triplestore_max_rows,
         'error': False,
         'errorMessage': ''
     })
