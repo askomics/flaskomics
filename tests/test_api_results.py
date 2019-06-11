@@ -26,7 +26,8 @@ class TestApiResults(AskomicsTestCase):
                 'path': result_info["path"],
                 'start': result_info["start"],
                 'status': 'success'
-            }]
+            }],
+            'triplestoreMaxRows': 10000
         })
 
     def test_get_preview(self, client_logged_as_jdoe_with_data_and_result):
