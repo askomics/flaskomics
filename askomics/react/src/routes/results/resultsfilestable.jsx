@@ -205,7 +205,7 @@ export default class ResultsFilesTable extends Component {
         let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
         if (cell == this.props.maxRows) {
           return (
-            <>{formattedNrows} <i class="fas fa-exclamation-circle"></i></>
+            <>{formattedNrows} <i className="fas fa-exclamation-circle"></i></>
           )
         } else {
           return formattedNrows
@@ -273,5 +273,6 @@ ResultsFilesTable.propTypes = {
   user: PropTypes.object,
   logged: PropTypes.bool,
   waiting: PropTypes.bool,
-  results: PropTypes.object
+  results: PropTypes.object,
+  maxRows: PropTypes.number
 }

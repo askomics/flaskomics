@@ -16,3 +16,4 @@ rules: {}
 settings:
   react:
     version: detect
+parser: babel-eslint
