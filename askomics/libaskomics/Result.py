@@ -233,7 +233,8 @@ class Result(Params):
             NULL,
             ?,
             NULL,
-            NULL
+            NULL,
+            ?
         )
         '''
 
@@ -242,7 +243,30 @@ class Result(Params):
             self.celery_id,
             self.start,
             json.dumps(self.graph_state),
+            False
         ), get_id=True)
+
+    def update_public_status(self, public):
+        """Change public status
+
+        Parameters
+        ----------
+        public : bool
+            New public status
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        public=?
+        WHERE user_id=? AND id=?
+        '''
+
+        database.execute_sql_query(query, (
+            public,
+            self.session["user"]["id"],
+            self.id
+        ))
 
     def update_db_status(self, error=False, error_message=None):
         """Update status of results in db

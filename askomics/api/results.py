@@ -1,7 +1,7 @@
 import traceback
 import sys
 
-from askomics.api.auth import login_required
+from askomics.api.auth import login_required, admin_required
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
@@ -33,6 +33,46 @@ def get_results():
         except Exception:
             pass
         current_app.logger.debug(triplestore_max_rows)
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'files': [],
+            'triplestoreMaxRows': triplestore_max_rows,
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'triplestoreMaxRows': triplestore_max_rows,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_required
+@results_bp.route('/api/results/setpublic', methods=['POST'])
+def set_public():
+    """Change public status of a file, and return all files
+
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result = Result(current_app, session, {"id": json["fileId"]})
+        results_handler = ResultsHandler(current_app, session)
+
+        result.update_public_status(json["public"])
+        files = results_handler.get_files_info()
+        try:
+            triplestore_max_rows = current_app.iniconfig.getint("triplestore", "result_set_max_rows")
+        except Exception:
+            triplestore_max_rows = None
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({

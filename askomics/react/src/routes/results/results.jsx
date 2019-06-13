@@ -143,4 +143,6 @@ export default class Results extends Component {
 
 Results.propTypes = {
   waitForStart: PropTypes.bool,
+  user: PropTypes.object,
+  logged: PropTypes.bool
 }

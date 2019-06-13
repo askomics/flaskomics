@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
-import { Badge, Button, ButtonGroup } from 'reactstrap'
+import { Badge, Button, ButtonGroup, FormGroup, CustomInput } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
 
@@ -21,6 +21,7 @@ export default class ResultsFilesTable extends Component {
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
+    this.togglePublicQuery = this.togglePublicQuery.bind(this)
   }
 
   humanDate (date) {
@@ -125,22 +126,48 @@ export default class ResultsFilesTable extends Component {
     let requestUrl = '/api/results/sparqlquery'
     let data = { fileId: event.target.id }
     axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          redirectSparqlEditor: true,
-          sparqlQuery: response.data.query
-        })
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.setState({
+        redirectSparqlEditor: true,
+        sparqlQuery: response.data.query
       })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
-        })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
       })
+    })
+  }
+
+  togglePublicQuery(event) {
+    let newPublic = false
+    if (event.target.value == 0) {
+      newPublic = true
+    }
+    let requestUrl = '/api/results/setpublic'
+    let data = {fileId: event.target.id, public: newPublic}
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.props.setStateResults({
+        results: response.data.files,
+        triplestoreMaxRows: response.data.triplestoreMaxRows,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
   }
 
   render () {
@@ -170,6 +197,8 @@ export default class ResultsFilesTable extends Component {
       }} />
     }
 
+    console.log("user", this.props.user)
+
     let columns = [{
       text: 'Id',
       sort: true,
@@ -180,6 +209,20 @@ export default class ResultsFilesTable extends Component {
       text: 'Creation date',
       sort: true,
       formatter: (cell, row) => { return this.humanDate(cell) }
+    }, {
+      dataField: 'public',
+      text: 'Public',
+      sort: true,
+      formatter: (cell, row) => {
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={this.props.user.admin === 1 ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
+      },
+      headerStyle: () => { return { width: '10%' } }
     }, {
       dataField: 'status',
       text: 'Status',
@@ -225,7 +268,7 @@ export default class ResultsFilesTable extends Component {
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Edit Sparql</Button>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
           </ButtonGroup>
         )
       }

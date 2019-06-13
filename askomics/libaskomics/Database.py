@@ -166,6 +166,7 @@ class Database(Params):
             graph_state text,
             nrows int,
             error text,
+            public boolean,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
