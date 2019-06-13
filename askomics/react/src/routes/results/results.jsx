@@ -116,7 +116,7 @@ export default class Results extends Component {
 
     // preview
     let resultsTable
-    if (this.state.resultsPreview.length > 0) {
+    if (this.state.headerPreview.length > 0) {
       resultsTable = (
         <div>
           <h4>Result {this.state.currentPreview} preview</h4>
@@ -131,7 +131,7 @@ export default class Results extends Component {
         {redirectLogin}
         <h2>Results</h2>
         <hr />
-        <ResultsFilesTable maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+        <ResultsFilesTable user={this.props.user} logged={this.props.logged} maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <Button disabled={this.isDisabled()} onClick={this.deleteSelectedResults} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <br /><br />
         {resultsTable}

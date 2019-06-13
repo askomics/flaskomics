@@ -1,7 +1,6 @@
 import re
 import textwrap
 
-from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -31,59 +30,22 @@ class SparqlQueryBuilder(Params):
         """
         Params.__init__(self, app, session)
 
-        self.public_graphs = []
-        self.private_graphs = []
         self.graphs = []
+        self.selects = []
 
-        self.set_graphs_from_db()
+        self.set_graphs()
 
-    def set_graphs_from_db(self):
-        """Get named graph from the db"""
-        database = Database(self.app, self.session)
-        if 'user' in self.session:
-            query = '''
-            SELECT graph_name, user_id, public
-            FROM datasets
-            WHERE (user_id = ? OR public = ? )
-            '''
-            rows = database.execute_sql_query(query, (self.session['user']['id'], True))
-        else:
-            query = '''
-            SELECT graph_name, user_id, public
-            FROM datasets
-            WHERE public = ?
-            '''
-            rows = database.execute_sql_query(query, (True, ))
-
-        for row in rows:
-            if row[2]:
-                self.public_graphs.append(row[0])
-            else:
-                self.private_graphs.append(row[0])
-
-    def get_froms(self, public=True, private=True):
-        """Get FROM clauses
-
-        Parameters
-        ----------
-        public : bool, optional
-            if True, use all public graph
-        private : bool, optional
-            if True, use all private graph
+    def get_froms(self):
+        """Get FROM string
 
         Returns
         -------
-        str
-            FROM clauses
+        string
+            FROM string
         """
         from_string = ''
-        if public:
-            for public_graph in self.public_graphs:
-                from_string += '\nFROM <{}> # public'.format(public_graph)
-
-        if private:
-            for private_graph in self.private_graphs:
-                from_string += '\nFROM <{}>'.format(private_graph)
+        for graph in self.graphs:
+            from_string += '\nFROM <{}>'.format(graph)
 
         return from_string
 
@@ -171,6 +133,7 @@ class SparqlQueryBuilder(Params):
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
+                self.selects = [i for i in line.split() if i.startswith('?')]
                 new_query += froms
             # Compute the limit
             if line.upper().lstrip().startswith('LIMIT') and limit:
@@ -220,23 +183,20 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
-    def set_graphs_from_entities(self, entities):
+    def set_graphs(self, entities=None):
         """Get all public and private graphs containing the given entities
 
         Parameters
         ----------
-        entities : list
+        entities : list, optional
             list of entity uri
-
-        Returns
-        -------
-        list
-            List of graphs that contains the entities
         """
         substrlst = []
-        for entity in entities:
-            substrlst.append("?entity_uri = <{}>".format(entity))
-        filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
+        filter_entity_string = ''
+        if entities:
+            for entity in entities:
+                substrlst.append("?entity_uri = <{}>".format(entity))
+            filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
 
         filter_public_string = 'FILTER (?public = <true>)'
         if 'user' in self.session:
@@ -276,7 +236,7 @@ class SparqlQueryBuilder(Params):
         """
         entities = []
 
-        selects = []
+        self.selects = []
         triples = []
         filters = []
 
@@ -285,7 +245,7 @@ class SparqlQueryBuilder(Params):
             if not node["suggested"]:
                 entities.append(node["uri"])
 
-        self.set_graphs_from_entities(entities)
+        self.set_graphs(entities=entities)
 
         # Browse attributes
         for attribute in json_query["attr"]:
@@ -296,7 +256,7 @@ class SparqlQueryBuilder(Params):
                 obj = attribute["entityUri"]
                 triples.append("{} {} <{}> .".format(subject, predicate, obj))
                 if attribute["visible"]:
-                    selects.append(subject)
+                    self.selects.append(subject)
                 # filters
                 if attribute["filterValue"] != "":
                     not_exist = ""
@@ -324,7 +284,7 @@ class SparqlQueryBuilder(Params):
                         triple_string = "OPTIONAL {{{}}}".format(triple_string)
                     triples.append(triple_string)
                     if attribute["visible"]:
-                        selects.append(obj)
+                        self.selects.append(obj)
                 # filters
                 if attribute["filterValue"] != "" and not attribute["optional"]:
                     negative = ""
@@ -348,7 +308,7 @@ class SparqlQueryBuilder(Params):
                         triple_string = "OPTIONAL {{{}}}".format(triple_string)
                     triples.append(triple_string)
                     if attribute["visible"]:
-                        selects.append(obj)
+                        self.selects.append(obj)
                 # filters
                 if attribute["filterValue"] != "" and not attribute["optional"]:
                     filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
@@ -371,7 +331,7 @@ class SparqlQueryBuilder(Params):
                     triples.append(triple_string_2)
 
                     if attribute["visible"]:
-                        selects.append(category_label)
+                        self.selects.append(category_label)
                 # filters
                 if attribute["filterSelectedValues"] != [] and not attribute["optional"]:
                     filter_substrings_list = []
@@ -399,7 +359,7 @@ WHERE {{
     {}
 
 }}
-            """.format(' '.join(selects), '\n    '.join(triples), '\n    '.join(filters))
+            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
         else:
 
             query = """
@@ -409,7 +369,7 @@ WHERE {{
     {}
     {}
 }}
-            """.format(' '.join(selects), from_string, '\n    '.join(triples), '\n    '.join(filters))
+            """.format(' '.join(self.selects), from_string, '\n    '.join(triples), '\n    '.join(filters))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))

@@ -51,7 +51,11 @@ def query():
         query_launcher = SparqlQueryLauncher(current_app, session)
 
         query = query_builder.format_query(q)
-        header, data = query_launcher.process_query(query)
+        # header, data = query_launcher.process_query(query)
+        header = query_builder.selects
+        data = []
+        if query_builder.graphs:
+            header, data = query_launcher.process_query(query)
 
     except Exception as e:
         current_app.logger.error(str(e).replace('\\n', '\n'))

@@ -144,7 +144,7 @@ def query(self, session, graph_state):
         query_builder = SparqlQueryBuilder(app, session)
         query_launcher = SparqlQueryLauncher(app, session)
         query = query_builder.build_query_from_json(graph_state)
-        headers = []
+        headers = query_builder.selects
         results = []
         if query_builder.graphs:
             headers, results = query_launcher.process_query(query)

@@ -404,6 +404,7 @@ export default class Query extends Component {
       graphState: this.graphState,
       previewIcon: "table",
       resultsPreview: [],
+      headerPreview: [],
       disableSave: false,
       disablePreview: false,
       saveIcon: "play"
@@ -668,7 +669,7 @@ export default class Query extends Component {
 
     // preview
     let resultsTable
-    if (this.state.resultsPreview.length > 0) {
+    if (this.state.headerPreview.length > 0) {
       resultsTable = (
         <ResultsTable data={this.state.resultsPreview} header={this.state.headerPreview} />
       )
