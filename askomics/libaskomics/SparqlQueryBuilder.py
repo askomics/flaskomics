@@ -4,6 +4,7 @@ import textwrap
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
 
@@ -218,6 +219,49 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
+    def get_graphs_from_entities(self, entities):
+        """Get all public and private graphs containing the given entities
+
+        Parameters
+        ----------
+        entities : list
+            list of entity uri
+
+        Returns
+        -------
+        list
+            List of graphs that contains the entities
+        """
+        substrlst = []
+        for entity in entities:
+            substrlst.append("?entity_uri = <{}>".format(entity))
+        filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
+
+        filter_public_string = 'FILTER (?public = <true>)'
+        if 'user' in self.session:
+            filter_public_string = 'FILTER (?public = <true> || ?creator = <{}>)'.format(self.session["user"]["username"])
+
+        query = '''
+        SELECT DISTINCT ?graph
+        WHERE {{
+          ?graph :public ?public .
+          ?graph dc:creator ?creator .
+          GRAPH ?graph {{
+            ?entity_uri a :entity .
+          }}
+          {}
+          {}
+        }}
+        '''.format(filter_public_string, filter_entity_string)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        header, results = query_launcher.process_query(self.prefix_query(query))
+        graphs = []
+        for res in results:
+            graphs.append(res["graph"])
+
+        return graphs
+
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -231,17 +275,18 @@ class SparqlQueryBuilder(Params):
         str
             SPARQL query
         """
-        user_asked_graphs = []
+        entities = []
 
         selects = []
         triples = []
         filters = []
 
-        # browse node
+        # Browse node to get graphs
         for node in json_query["nodes"]:
             if not node["suggested"]:
-                # get user_asked_graphs
-                user_asked_graphs += node["graphs"]
+                entities.append(node["uri"])
+
+        graphs = self.get_graphs_from_entities(entities)
 
         # Browse attributes
         for attribute in json_query["attr"]:
@@ -344,9 +389,6 @@ class SparqlQueryBuilder(Params):
                 relation = "<{}>".format(link["uri"])
                 target = "?{}{}_uri".format(link["target"]["label"], link["target"]["id"])
                 triples.append("{} {} {} .".format(source, relation, target))
-
-        # check if asked_graphs are allowed
-        graphs = self.get_checked_asked_graphs(user_asked_graphs)
 
         from_string = self.get_froms_from_graphs(graphs)
 
