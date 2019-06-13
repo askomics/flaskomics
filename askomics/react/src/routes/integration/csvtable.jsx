@@ -126,7 +126,7 @@ export default class CsvTable extends Component {
 
     return (
       <div>
-        <h4>{this.state.name}</h4>
+        <h4>{this.state.name} (preview)</h4>
         <div className="asko-table-div">
           <BootstrapTable
             classes="asko-table"
