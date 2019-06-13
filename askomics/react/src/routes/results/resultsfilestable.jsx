@@ -197,8 +197,6 @@ export default class ResultsFilesTable extends Component {
       }} />
     }
 
-    console.log("user", this.props.user)
-
     let columns = [{
       text: 'Id',
       sort: true,
