@@ -88,7 +88,10 @@ def get_preview():
         query_launcher = SparqlQueryLauncher(current_app, session)
 
         query = query_builder.build_query_from_json(data["graphState"], preview=True)
-        header, preview = query_launcher.process_query(query)
+        header = []
+        preview = []
+        if query_builder.graphs:
+            header, preview = query_launcher.process_query(query)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

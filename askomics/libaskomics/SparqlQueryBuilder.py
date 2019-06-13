@@ -33,6 +33,7 @@ class SparqlQueryBuilder(Params):
 
         self.public_graphs = []
         self.private_graphs = []
+        self.graphs = []
 
         self.set_graphs_from_db()
 
@@ -219,7 +220,7 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
-    def get_graphs_from_entities(self, entities):
+    def set_graphs_from_entities(self, entities):
         """Get all public and private graphs containing the given entities
 
         Parameters
@@ -256,11 +257,9 @@ class SparqlQueryBuilder(Params):
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         header, results = query_launcher.process_query(self.prefix_query(query))
-        graphs = []
+        self.graphs = []
         for res in results:
-            graphs.append(res["graph"])
-
-        return graphs
+            self.graphs.append(res["graph"])
 
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
@@ -286,7 +285,7 @@ class SparqlQueryBuilder(Params):
             if not node["suggested"]:
                 entities.append(node["uri"])
 
-        graphs = self.get_graphs_from_entities(entities)
+        self.set_graphs_from_entities(entities)
 
         # Browse attributes
         for attribute in json_query["attr"]:
@@ -390,7 +389,7 @@ class SparqlQueryBuilder(Params):
                 target = "?{}{}_uri".format(link["target"]["label"], link["target"]["id"])
                 triples.append("{} {} {} .".format(source, relation, target))
 
-        from_string = self.get_froms_from_graphs(graphs)
+        from_string = self.get_froms_from_graphs(self.graphs)
 
         if for_editor:
             query = """
