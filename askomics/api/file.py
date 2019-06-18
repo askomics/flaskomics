@@ -131,6 +131,7 @@ def get_preview():
             results.append(res)
     except Exception as e:
         current_app.logger.error(str(e))
+        raise e
         return jsonify({
             'previewFiles': [],
             'error': True,

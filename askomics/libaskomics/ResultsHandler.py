@@ -50,10 +50,10 @@ class ResultsHandler(Params):
         query = '''
         SELECT id, status, path, start, end, graph_state, nrows, error, public
         FROM results
-        WHERE user_id = ?
+        WHERE user_id = ? OR public = ?
         '''
 
-        rows = database.execute_sql_query(query, (self.session["user"]["id"], ))
+        rows = database.execute_sql_query(query, (self.session["user"]["id"], True))
 
         files = []
 
