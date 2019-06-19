@@ -221,6 +221,21 @@ class SparqlQueryBuilder(Params):
         for res in results:
             self.graphs.append(res["graph"])
 
+    def format_sparql_variable(self, name):
+        """Format a name into a sparql variable by remove spacial char and add a ?
+
+        Parameters
+        ----------
+        name : string
+            name to convert
+
+        Returns
+        -------
+        string
+            The corresponding sparql variable
+        """
+        return "?{}".format(name.replace("/", "_s_").replace(":", "_c_").replace("-", "_"))
+
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -251,7 +266,7 @@ class SparqlQueryBuilder(Params):
         for attribute in json_query["attr"]:
             # URI ---
             if attribute["type"] == "uri":
-                subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = attribute["entityUri"]
                 triples.append("{} {} <{}> .".format(subject, predicate, obj))
@@ -272,13 +287,13 @@ class SparqlQueryBuilder(Params):
             # Text
             if attribute["type"] == "text":
                 if attribute["visible"] or attribute["filterValue"] != "":
-                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["uri"] == "rdfs:label":
                         predicate = attribute["uri"]
                     else:
                         predicate = "<{}>".format(attribute["uri"])
 
-                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     triple_string = "{} {} {} .".format(subject, predicate, obj)
                     if attribute["optional"]:
                         triple_string = "OPTIONAL {{{}}}".format(triple_string)
@@ -300,9 +315,9 @@ class SparqlQueryBuilder(Params):
             # Numeric
             if attribute["type"] == "decimal":
                 if attribute["visible"] or attribute["filterValue"] != "":
-                    subject = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     predicate = "<{}>".format(attribute["uri"])
-                    obj = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     triple_string = "{} {} {} .".format(subject, predicate, obj)
                     if attribute["optional"]:
                         triple_string = "OPTIONAL {{{}}}".format(triple_string)
@@ -317,11 +332,11 @@ class SparqlQueryBuilder(Params):
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != []:
-                    node_uri = "?{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"])
+                    node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_name = "<{}>".format(attribute["uri"])
-                    category_value_uri = "?{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     label = "rdfs:label"
-                    category_label = "?{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"])
+                    category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
                     triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
                     if attribute["optional"]:
@@ -344,9 +359,9 @@ class SparqlQueryBuilder(Params):
         # Browse links
         for link in json_query["links"]:
             if not link["suggested"]:
-                source = "?{}{}_uri".format(link["source"]["label"], link["source"]["id"])
+                source = self.format_sparql_variable("{}{}_uri".format(link["source"]["label"], link["source"]["id"]))
                 relation = "<{}>".format(link["uri"])
-                target = "?{}{}_uri".format(link["target"]["label"], link["target"]["id"])
+                target = self.format_sparql_variable("{}{}_uri".format(link["target"]["label"], link["target"]["id"]))
                 triples.append("{} {} {} .".format(source, relation, target))
 
         from_string = self.get_froms_from_graphs(self.graphs)
