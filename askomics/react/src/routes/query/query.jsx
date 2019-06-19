@@ -54,6 +54,7 @@ export default class Query extends Component {
 
     this.handlePreview = this.handlePreview.bind(this)
     this.handleQuery = this.handleQuery.bind(this)
+    this.handleRemoveNode = this.handleRemoveNode.bind(this)
   }
 
   resetIcons() {
@@ -206,7 +207,7 @@ export default class Query extends Component {
       uri: uri,
       graphs: this.getGraphs(uri),
       id: nodeId,
-      label: this.getLabel(uri),
+      label: this.getLabel(uri) + nodeId,
       selected: selected,
       suggested: suggested
     }
@@ -218,6 +219,56 @@ export default class Query extends Component {
     if (!suggested) {
       this.setNodeAttributes(uri, nodeId)
     }
+  }
+
+  removeNode (id) {
+    /*
+    remove a node in the graphState
+    */
+    this.graphState.nodes.forEach((node, index, gstate) => {
+      if (node.id == id) {
+        gstate.splice(index, 1)
+      }
+    })
+  }
+
+  removeLink (id) {
+    /*
+    remove a link in the graphState
+    */
+    this.graphState.links.forEach((link, index, gstate) => {
+      if (link.id == id) {
+        gstate.splice(index, 1)
+      }
+    })
+  }
+
+  getNodesAndLinksIdToDelete (id, nodesAndLinks={nodes: [], links: []}) {
+    /*
+    recusriveky get nodes and link to remove from the graphState
+    */
+    this.graphState.links.forEach(link => {
+
+      if (link.target.id == id) {
+        if (link.source.id > id) {
+          nodesAndLinks.nodes.push(link.source.id)
+          nodesAndLinks.links.push(link.id)
+          nodesAndLinks = this.getNodesAndLinksIdToDelete(link.source.id, nodesAndLinks)
+        } else {
+          nodesAndLinks.links.push(link.id)
+        }
+      }
+      if (link.source.id == id) {
+        if (link.target.id > id) {
+          nodesAndLinks.nodes.push(link.target.id)
+          nodesAndLinks.links.push(link.id)
+          nodesAndLinks = this.getNodesAndLinksIdToDelete(link.target.id, nodesAndLinks)
+        } else {
+          nodesAndLinks.links.push(link.id)
+        }
+      }
+    })
+    return nodesAndLinks
   }
 
   insertSuggestion (node) {
@@ -241,7 +292,7 @@ export default class Query extends Component {
             uri: relation.target,
             graphs: this.getGraphs(relation.target),
             id: targetId,
-            label: this.getLabel(relation.target),
+            label: this.getLabel(relation.target) + targetId,
             selected: false,
             suggested: true
           })
@@ -267,7 +318,7 @@ export default class Query extends Component {
             uri: relation.source,
             graphs: this.getGraphs(relation.source),
             id: sourceId,
-            label: this.getLabel(relation.source),
+            label: this.getLabel(relation.source) + sourceId,
             selected: false,
             suggested: true
           })
@@ -388,6 +439,34 @@ export default class Query extends Component {
       this.insertSuggestion(this.currentSelected)
     }
     // update graph state
+    this.updateGraphState()
+  }
+
+  handleRemoveNode () {
+
+    if (this.currentSelected == null) {
+      console.log("No node selected")
+      return
+    }
+
+    if (this.currentSelected.id == 1) {
+      console.log("AskOmics can't delete the startpoint")
+      return
+    }
+
+    this.removeNode(this.currentSelected.id)
+
+    let nodeAndLinksToDelete = this.getNodesAndLinksIdToDelete(this.currentSelected.id)
+
+    nodeAndLinksToDelete.nodes.forEach(id => {
+      this.removeNode(id)
+    })
+    nodeAndLinksToDelete.links.forEach(id => {
+      this.removeLink(id)
+    })
+
+    // unselect node
+    this.manageCurrentPreviousSelected(null)
     this.updateGraphState()
   }
 
@@ -623,6 +702,7 @@ export default class Query extends Component {
     let AttributeBoxes
     let previewButton
     let launchQueryButton
+    let removeButton
 
     if (!this.state.waiting) {
       // attribute boxes (right view)
@@ -660,10 +740,16 @@ export default class Query extends Component {
       )
 
       // buttons
-      launchQueryButton
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Preview results</Button>
       if (this.state.logged) {
         launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Save Query</Button>
+      }
+      if (this.currentSelected != null) {
+        removeButton = (
+          <ButtonGroup>
+            <Button disabled={this.currentSelected.id == 1 ? true : false} onClick={this.handleRemoveNode} color="secondary" size="sm">Remove node</Button>
+          </ButtonGroup>
+        )
       }
     }
 
@@ -689,6 +775,7 @@ export default class Query extends Component {
           </Col>
           <Col xs="5">
             <div style={{ display: 'block', height: this.divHeight + 'px', 'overflow-y': 'auto' }}>
+              {removeButton}
               {uriLabelBoxes}
               {AttributeBoxes}
             </div>
