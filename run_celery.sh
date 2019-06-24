@@ -6,6 +6,39 @@ dir_venv="$dir_askomics/venv"
 dir_node_modules="$dir_askomics/node_modules"
 activate="$dir_venv/bin/activate"
 
+
+
+function usage() {
+    echo "Usage: $0 (-d { dev | prod })"
+    echo "    -d     deployment mode (default: production)"
+}
+
+while getopts "hd:" option; do
+    case $option in
+        h)
+            usage
+            exit 0
+        ;;
+
+        d)
+            depmode=$OPTARG
+        ;;
+    esac
+done
+
+case $depmode in
+    prod|production|"")
+        flask_depmod="production"
+    ;;
+    dev|development)
+        flask_depmod="development"
+    ;;
+    *)
+        echo "-d $depmode: wrong deployment mode"
+        usage
+        exit 1
+esac
+
 # Exports
 export FLASK_ENV=$flask_depmod
 export FLASK_APP="app"

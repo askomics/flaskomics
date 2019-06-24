@@ -5,6 +5,8 @@ MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 COPY . /askomics
 WORKDIR /askomics
 
+ENV DEPMODE="prod"
+
 RUN apk add --no-cache \
     python3 python3-dev \
     nodejs nodejs-npm \
@@ -16,4 +18,4 @@ RUN apk add --no-cache \
     rm -rf /root/.npm/*
 
 EXPOSE 5000
-ENTRYPOINT /askomics/run_askomics.sh
+ENTRYPOINT /askomics/run_askomics.sh -d ${DEPMODE}
