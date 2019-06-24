@@ -10,14 +10,9 @@ export default class ResultsTable extends Component {
     super(props)
   }
 
-  isUrl (str) {
-    var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[;&a-z\\d%_.~+=-]*)?$', 'i') // fragment locator
-    return !!pattern.test(str)
+  isValidURL(string) {
+    let res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)
+    return (res !== null)
   }
 
   render () {
@@ -28,7 +23,7 @@ export default class ResultsTable extends Component {
         sort: true,
         index: index,
         formatter: (cell, row) => {
-          if (this.isUrl(cell)) {
+          if (this.isValidURL(cell)) {
             return <a href={cell}>{cell.split('#')[1]}</a>
           }
           return cell
