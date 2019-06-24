@@ -207,7 +207,7 @@ export default class Query extends Component {
       uri: uri,
       graphs: this.getGraphs(uri),
       id: nodeId,
-      label: this.getLabel(uri) + nodeId,
+      label: this.getLabel(uri),
       selected: selected,
       suggested: suggested
     }
@@ -292,7 +292,7 @@ export default class Query extends Component {
             uri: relation.target,
             graphs: this.getGraphs(relation.target),
             id: targetId,
-            label: this.getLabel(relation.target) + targetId,
+            label: this.getLabel(relation.target),
             selected: false,
             suggested: true
           })
@@ -318,7 +318,7 @@ export default class Query extends Component {
             uri: relation.source,
             graphs: this.getGraphs(relation.source),
             id: sourceId,
-            label: this.getLabel(relation.source) + sourceId,
+            label: this.getLabel(relation.source),
             selected: false,
             suggested: true
           })
