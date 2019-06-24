@@ -32,7 +32,6 @@ def get_results():
             triplestore_max_rows = current_app.iniconfig.getint("triplestore", "result_set_max_rows")
         except Exception:
             pass
-        current_app.logger.debug(triplestore_max_rows)
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({

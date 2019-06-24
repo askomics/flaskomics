@@ -154,8 +154,8 @@ class Result(Params):
 
         rows = database.execute_sql_query(query, (self.session["user"]["id"], True, self.id))
 
-        self.celery_id = rows[0][0]
-        self.file_path = rows[0][1]
+        self.celery_id = rows[0][0] if rows[0][0] else ''
+        self.file_path = rows[0][1] if rows[0][1] else ''
         self.file_name = os.path.basename(self.file_path)
         self.graph_state = json.loads(rows[0][2])
         self.start = rows[0][3]
