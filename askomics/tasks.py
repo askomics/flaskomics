@@ -157,8 +157,8 @@ def query(self, session, graph_state):
 
     except Exception as e:
         app.logger.error(str(e))
-        result.rollback()
         result.update_db_status(error=True, error_message=str(e))
+        result.rollback()
         return {
             'error': True,
             'errorMessage': str(e)
