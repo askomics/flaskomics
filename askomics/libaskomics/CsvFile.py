@@ -40,6 +40,11 @@ class CsvFile(File):
             AskOmics url
         """
         File.__init__(self, app, session, file_info, host_url)
+        self.preview_limit = 30
+        try:
+            self.preview_limit = self.settings.get_int("askomics", "npreview")
+        except Exception:
+            pass
         self.header = []
         self.preview = []
         self.columns_type = []
@@ -79,14 +84,8 @@ class CsvFile(File):
         """
         self.columns_type = forced_columns_type
 
-    def set_preview_and_header(self, preview_limit=30):
-        """Set the preview and header by looking in the fists lines of the file
-
-        Parameters
-        ----------
-        preview_limit : int, optional
-            Number of line to read
-        """
+    def set_preview_and_header(self):
+        """Set the preview and header by looking in the fists lines of the file"""
         with open(self.path, 'r', encoding='utf-8') as csv_file:
             reader = csv.reader(csv_file, dialect=self.dialect)
             count = 0
@@ -106,9 +105,9 @@ class CsvFile(File):
                 preview.append(res_row)
 
                 # Stop after x lines
-                if preview_limit:
+                if self.preview_limit:
                     count += 1
-                    if count > preview_limit:
+                    if count > self.preview_limit:
                         break
 
         self.preview = preview
@@ -119,6 +118,14 @@ class CsvFile(File):
         for col in self.transposed_preview:
             self.columns_type.append(self.guess_column_type(col, index))
             index += 1
+        # check coltypes
+        self.check_columns_types()
+
+    def check_columns_types(self):
+        """Check all columns type after detection and correct them"""
+        # Change start and end into numeric if here is not only one start and one end
+        if not (self.columns_type.count("start") == 1 and self.columns_type.count("end") == 1):
+            self.columns_type = ["numeric" if ctype in ("start", "end") else ctype for ctype in self.columns_type]
 
     def guess_column_type(self, values, header_index):
         """Guess the columns type
@@ -159,11 +166,17 @@ class CsvFile(File):
             for expression in expressions:
                 epression_regexp = ".*{}.*".format(expression)
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
+                    # Test if organism is a category
+                    if stype == "organism" and not len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                        break
+                    # Test if chromosome is a category
+                    if stype == "chromosome" and not len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                        break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
                         break
-                    # test if strand is a catégory with 2 elements
-                    if stype == 'strand' and len(set(values)) != 2:
+                    # test if strand is a category with 2 elements
+                    if stype == 'strand' and len(set(list(filter(None, values)))) != 2:
                         break
                     # Test if date respect a date format
                     if stype == 'datetime' and not all(date_regex.match(val) for val in values):
@@ -174,16 +187,12 @@ class CsvFile(File):
         if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
             return "goterm"
 
-        threshold = 10
-        if len(values) < 30:
-            threshold = 5
-
         # Finaly, check numerical/text/category
         if all(self.is_decimal(val) for val in values):
             if all(val == "" for val in values):
                 return "text"
             return "numeric"
-        elif len(set(values)) < threshold:
+        elif len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3) or len(values) == 1:
             return "category"
 
         return "text"  # default

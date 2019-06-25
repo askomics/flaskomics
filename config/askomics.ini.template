@@ -17,6 +17,9 @@ footer_message = Welcome to AskOmics!
 data_directory = /tmp/flaskomics
 database_path = /tmp/flaskomics/database.db
 
+# Number of line preview (integration)
+npreview = 30
+
 # Authentication
 
 # Salt for user password. Use a random string
