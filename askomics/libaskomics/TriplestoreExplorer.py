@@ -107,16 +107,18 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_label ?attribute_uri ?attribute_label ?attribute_type ?property_uri ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_label ?node_type ?attribute_uri ?attribute_label ?attribute_type ?property_uri ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph :public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 # Entities
-                ?entity_uri a :entity .
-                ?entity_uri a :startPoint .
-                ?entity_uri rdfs:label ?entity_label .
+                ?entity_uri a ?node_type .
+                VALUES ?node_type {{ :entity :bnode }} .
+                OPTIONAL {{
+                    ?entity_uri rdfs:label ?entity_label .
+                }}
                 # Attributes
                 OPTIONAL {{
                     ?attribute_uri a owl:DatatypeProperty .
@@ -161,9 +163,12 @@ class TriplestoreExplorer(Params):
                 # New entity
                 entities_list.append(result["entity_uri"])
                 # Uri, graph and label
+                label = "" if "entity_label" not in result else result["entity_label"]
+                node_type = "bnode" if result["node_type"] == "{}bnode".format(self.settings.get("triplestore", "prefix")) else "node"
                 entity = {
                     "uri": result["entity_uri"],
-                    "label": result["entity_label"],
+                    "type": node_type,
+                    "label": label,
                     "graphs": [result["graph"]],
                 }
 
@@ -199,7 +204,7 @@ class TriplestoreExplorer(Params):
             index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
-            if "property_uri" in result and result["property_type"] == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory":
+            if "property_uri" in result and result["property_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")):
                 attr_tpl = (result["property_uri"], result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
@@ -229,7 +234,7 @@ class TriplestoreExplorer(Params):
                         attributes[index_attribute]["categories"].append(value)
 
             # Relation
-            if "property_uri" in result and result["property_type"] == "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsRelation":
+            if "property_uri" in result and result["property_type"] == "{}AskomicsRelation".format(self.settings.get("triplestore", "prefix")):
                 rel_tpl = (result["property_uri"], result["entity_uri"], result["range_uri"])
                 if rel_tpl not in relations_list:
                     relations_list.append(rel_tpl)

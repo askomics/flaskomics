@@ -89,6 +89,17 @@ export default class Query extends Component {
     return label
   }
 
+  getType (uri) {
+    let type = this.state.abstraction.entities.map(node => {
+      if (node.uri == uri) {
+        return node.type
+      } else {
+        return null
+      }
+    }).filter(type => type != null).reduce(type => type)
+    return type
+  }
+
   getGraphs (uri) {
     let graphs = []
     this.state.abstraction.entities.forEach(node => {
@@ -104,12 +115,32 @@ export default class Query extends Component {
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
       return 'decimal'
     }
-    if (typeUri == 'http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory') {
+    if (typeUri == 'http://nextprot.org/rdf#AskomicsCategory') {
       return 'category'
     }
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {
       return 'text'
     }
+  }
+
+  attributeExistInAbstraction (attrUri, entityUri) {
+    let result = false
+    this.state.abstraction.attributes.forEach(attr => {
+      if (attr.uri == attrUri && attr.entityUri == entityUri) {
+        result = true
+      }
+    })
+    return result
+  }
+
+  isBnode (nodeId) {
+    let result = false
+    this.state.graphState.nodes.forEach(node => {
+      if (node.id == nodeId && node.type == "bnode") {
+        result = true
+      }
+    })
+    return result
   }
 
   attributeExist (attrUri, nodeId) {
@@ -125,11 +156,17 @@ export default class Query extends Component {
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
 
+    let labelExist = this.attributeExistInAbstraction("rdf:label", nodeId)
+    let isBnode = this.isBnode(nodeId)
+
+    // if bnode without uri, first attribute is visible
+    let firstAttrVisibleForBnode = isBnode
+
     // create uri and label attributes
-    if (!this.attributeExist('rdf:type', nodeId)) {
+    if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: false,
+        visible: !labelExist,
         nodeId: nodeId,
         uri: 'rdf:type',
         label: 'Uri',
@@ -143,10 +180,10 @@ export default class Query extends Component {
       })
     }
 
-    if (!this.attributeExist('rdfs:label', nodeId)) {
+    if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: true,
+        visible: firstAttrVisibleForBnode,
         nodeId: nodeId,
         uri: 'rdfs:label',
         label: 'Label',
@@ -158,6 +195,7 @@ export default class Query extends Component {
         optional: false,
         negative: false
       })
+      firstAttrVisibleForBnode = false
     }
 
     this.state.abstraction.attributes.forEach(attr => {
@@ -166,7 +204,7 @@ export default class Query extends Component {
           let nodeAttribute = {}
           let attributeType = this.getAttributeType(attr.type)
           nodeAttribute.id = this.getId()
-          nodeAttribute.visible = false
+          nodeAttribute.visible = firstAttrVisibleForBnode
           nodeAttribute.nodeId = nodeId
           nodeAttribute.uri = attr.uri
           nodeAttribute.label = attr.label
@@ -175,6 +213,8 @@ export default class Query extends Component {
           nodeAttribute.type = attributeType
           nodeAttribute.optional = false
           nodeAttribute.negative = false
+
+          firstAttrVisibleForBnode = false
 
           if (attributeType == 'decimal') {
             nodeAttribute.filterSign = '='
@@ -205,6 +245,7 @@ export default class Query extends Component {
     let nodeId = this.getId()
     let node = {
       uri: uri,
+      type: this.getType(uri),
       graphs: this.getGraphs(uri),
       id: nodeId,
       label: this.getLabel(uri),
@@ -290,6 +331,7 @@ export default class Query extends Component {
           // Push suggested target
           this.graphState.nodes.push({
             uri: relation.target,
+            type: this.getType(relation.target),
             graphs: this.getGraphs(relation.target),
             id: targetId,
             label: this.getLabel(relation.target),
@@ -316,6 +358,7 @@ export default class Query extends Component {
           // Push suggested source
           this.graphState.nodes.push({
             uri: relation.source,
+            type: this.getType(relation.source),
             graphs: this.getGraphs(relation.source),
             id: sourceId,
             label: this.getLabel(relation.source),

@@ -103,7 +103,7 @@ class SparqlQueryBuilder(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30):
+    def format_query(self, query, limit=30, replace_froms=True):
         """Format the Sparql query
 
         - remove all FROM
@@ -122,7 +122,9 @@ class SparqlQueryBuilder(Params):
         string
             formatted sparql query
         """
-        froms = self.get_froms()
+        froms = ''
+        if replace_froms:
+            froms = self.get_froms()
         query_lines = query.split('\n')
 
         new_query = ''
@@ -236,6 +238,26 @@ class SparqlQueryBuilder(Params):
         """
         return "?{}".format(name.replace("/", "_s_").replace(":", "_c_").replace("-", "_"))
 
+    def is_bnode(self, uri, entities):
+        """Check if a node uri is a blank node
+
+        Parameters
+        ----------
+        uri : string
+            node uri
+        entities : list
+            all the entities
+
+        Returns
+        -------
+        Bool
+            True if uri correspond to a blank node
+        """
+        for entity in entities:
+            if entity["uri"] == uri and entity["type"] == "bnode":
+                return True
+        return False
+
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -269,7 +291,8 @@ class SparqlQueryBuilder(Params):
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = attribute["entityUri"]
-                triples.append("{} {} <{}> .".format(subject, predicate, obj))
+                if not self.is_bnode(attribute["entityUri"], json_query["nodes"]):
+                    triples.append("{} {} <{}> .".format(subject, predicate, obj))
                 if attribute["visible"]:
                     self.selects.append(subject)
                 # filters

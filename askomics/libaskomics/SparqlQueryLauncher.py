@@ -20,7 +20,7 @@ class SparqlQueryLauncher(Params):
         triplesotre (virtuoso, fuseki ...)
     """
 
-    def __init__(self, app, session):
+    def __init__(self, app, session, get_result_query=False):
         """init
 
         Parameters
@@ -34,8 +34,20 @@ class SparqlQueryLauncher(Params):
 
         self.query_time = None
 
-        url_endpoint = self.settings.get('triplestore', 'endpoint')
-        url_updatepoint = self.settings.get('triplestore', 'updatepoint')
+        self.external_endpoint = None
+
+        try:
+            self.external_endpoint = self.settings.get('triplestore', 'external_endpoint')
+        except Exception:
+            pass
+
+        if get_result_query and self.external_endpoint is not None:
+            url_endpoint = self.external_endpoint
+            url_updatepoint = self.external_endpoint
+        else:
+            url_endpoint = self.settings.get('triplestore', 'endpoint')
+            url_updatepoint = self.settings.get('triplestore', 'updatepoint')
+
         self.endpoint = SPARQLWrapper(url_endpoint, url_updatepoint)
 
         try:

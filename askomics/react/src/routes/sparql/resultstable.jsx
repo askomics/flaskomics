@@ -15,6 +15,14 @@ export default class ResultsTable extends Component {
     return (res !== null)
   }
 
+  splitUrl(url) {
+    let splitList = url.split('/')
+    // take last elem
+    let last = splitList[splitList.length - 1]
+    let splitList2 = last.split('#')
+    return splitList2[splitList2.length - 1]
+  }
+
   render () {
     let columns = this.props.header.map((colName, index) => {
       return ({
@@ -24,7 +32,7 @@ export default class ResultsTable extends Component {
         index: index,
         formatter: (cell, row) => {
           if (this.isValidURL(cell)) {
-            return <a href={cell}>{cell.split('#')[1]}</a>
+            return <a href={cell}>{this.splitUrl(cell)}</a>
           }
           return cell
         }

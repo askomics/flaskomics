@@ -29,6 +29,7 @@ export default class Visualization extends Component {
     this.colorFirebrick = '#cc0000'
     this.lineWidth = 0.5
     this.nodeSize = 3
+    this.blankNodeSize = 1
     this.arrowLength = 7
 
     this.cancelRequest
@@ -96,7 +97,7 @@ export default class Visualization extends Component {
 
   drawNode (node, ctx, globalScale) {
     // node style
-    ctx.fillStyle = this.stringToHexColor(node.uri)
+    ctx.fillStyle = node.type == "node" ? this.stringToHexColor(node.uri) : "#ffffff"
     ctx.lineWidth = this.lineWidth
     ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
     ctx.globalAlpha = node.suggested ? 0.5 : 1
