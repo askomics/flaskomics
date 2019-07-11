@@ -66,8 +66,13 @@ export default class Routes extends Component {
 
   render () {
 
+    let admin = false
+    if (this.state.user) {
+      admin = this.state.user.admin
+    }
+
     let integrationRoutes
-    if (!this.state.config.disableIntegration || this.state.user.admin) {
+    if (!this.state.config.disableIntegration || admin) {
       integrationRoutes = (
         <>
           <Route path="/files" exact component={() => (<Upload waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
