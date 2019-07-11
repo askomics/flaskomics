@@ -65,6 +65,19 @@ export default class Routes extends Component {
   }
 
   render () {
+
+    let integrationRoutes
+    if (!this.state.config.disableIntegration || this.state.user.admin) {
+      integrationRoutes = (
+        <>
+          <Route path="/files" exact component={() => (<Upload waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+          <Route path="/datasets" exact component={() => (<Datasets waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+          <Route path="/integration" exact component={Integration} />
+        </>
+      )
+    }
+
+
     return (
       <Router history={history}>
         <div>
@@ -77,12 +90,10 @@ export default class Routes extends Component {
             <Route path="/logout" exact component={() => (<Logout waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/account" exact component={() => (<Account waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/files" exact component={() => (<Upload waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
-            <Route path="/datasets" exact component={() => (<Datasets waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
-            <Route path="/integration" exact component={Integration} />
             <Route path="/query" exact component={Query} />
             <Route path="/results" exact component={() => (<Results waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/sparql" exact component={Sparql} />
+            {integrationRoutes}
           </Switch>
           <br />
           <br />
