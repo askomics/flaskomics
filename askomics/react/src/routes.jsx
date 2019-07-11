@@ -33,7 +33,8 @@ export default class Routes extends Component {
       error: false,
       errorMessage: null,
       logged: false,
-      user: {}
+      user: {},
+      config: {}
     }
     this.cancelRequest
   }
@@ -48,8 +49,7 @@ export default class Routes extends Component {
           errorMessage: null,
           user: response.data.user,
           logged: response.data.logged,
-          version: response.data.version,
-          footerMessage: response.data.footer_message,
+          config: response.data.config,
           waiting: false
         })
       })
@@ -68,7 +68,7 @@ export default class Routes extends Component {
     return (
       <Router history={history}>
         <div>
-          <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user}/>
+          <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user} disableIntegration={this.state.config.disableIntegration}/>
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
             <Route path="/about" exact component={() => (<About />)} />
@@ -86,7 +86,7 @@ export default class Routes extends Component {
           </Switch>
           <br />
           <br />
-          <AskoFooter version={this.state.version} message={this.state.footerMessage} />
+          <AskoFooter version={this.state.config.version} message={this.state.config.footerMessage} />
         </div>
       </Router>
     )

@@ -23,7 +23,6 @@ def hello():
         errorMessage: the error message of error, else an empty string
         message: a welcome message
     """
-
     try:
         message = "Welcome to AskOmics" if 'user' not in session else "Hello {} {}, Welcome to AskOmics!".format(
             session["user"]["fname"], session["user"]["lname"])
@@ -53,18 +52,24 @@ def start():
         Information about a eventualy logged user, and the AskOmics version
         and a footer message
     """
-
     try:
         starter = Start(current_app, session)
         starter.start()
+
+        config = {
+            "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
+            "version": get_distribution('askomics').version,
+            "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
+            "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
+            "namespace": current_app.iniconfig.get('triplestore', 'namespace')
+        }
 
         json = {
             "error": False,
             "errorMessage": '',
             "user": None,
             "logged": False,
-            "version": get_distribution('askomics').version,
-            "footer_message": current_app.iniconfig.get('askomics', 'footer_message')
+            "config": config
         }
 
         if 'user' in session:
@@ -84,6 +89,5 @@ def start():
             "errorMessage": str(e),
             "user": None,
             "logged": False,
-            "version": '',
-            "footer_message": ''
+            "config": {}
         }), 500

@@ -46,11 +46,19 @@ export default class AskoNavbar extends Component {
             </DropdownItem>
           )
         }
+        let integrationLinks
+        if (!this.props.disableIntegration || this.props.user.admin) {
+          integrationLinks = (
+            <>
+            <NavItem><Link className="nav-link" to="/files"><i className="fas fa-file"></i> Files</Link></NavItem>
+            <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
+            </>
+          )
+        }
         links = (
           <>
           <NavItem><Link className="nav-link" to="/results"><i className="fas fa-tasks"></i> Results</Link></NavItem>
-          <NavItem><Link className="nav-link" to="/files"><i className="fas fa-file"></i> Files</Link></NavItem>
-          <NavItem><Link className="nav-link" to="/datasets"><i className="fas fa-database"></i> Datasets</Link></NavItem>
+          {integrationLinks}
           <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
           <NavItem>
             <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
