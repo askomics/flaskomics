@@ -47,16 +47,15 @@ class SparqlQueryLauncher(Params):
         else:
             url_endpoint = self.settings.get('triplestore', 'endpoint')
             url_updatepoint = self.settings.get('triplestore', 'updatepoint')
+            try:
+                self.endpoint.setCredentials(
+                    self.settings.get('triplestore', 'username'),
+                    self.settings.get('triplestore', 'password')
+                )
+            except Exception:
+                pass
 
         self.endpoint = SPARQLWrapper(url_endpoint, url_updatepoint)
-
-        try:
-            self.endpoint.setCredentials(
-                self.settings.get('triplestore', 'username'),
-                self.settings.get('triplestore', 'password')
-            )
-        except Exception:
-            pass
 
         self.triplestore = self.settings.get('triplestore', 'triplestore')
 
