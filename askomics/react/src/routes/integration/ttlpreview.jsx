@@ -84,6 +84,7 @@ export default class TtlPreview extends Component {
                 fontSize={14}
                 showPrintMargin={true}
                 showGutter={true}
+                highlightActiveLine={false}
                 value={this.props.file.data.preview}
                 height={300}
                 width={'auto'}
