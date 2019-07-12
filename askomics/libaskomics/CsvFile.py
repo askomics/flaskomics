@@ -167,10 +167,10 @@ class CsvFile(File):
                 epression_regexp = ".*{}.*".format(expression)
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
                     # Test if organism is a category
-                    if stype == "organism" and not len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                    if stype == "organism" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
                         break
                     # Test if chromosome is a category
-                    if stype == "chromosome" and not len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                    if stype == "chromosome" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
                         break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
@@ -179,7 +179,7 @@ class CsvFile(File):
                     if stype == 'strand' and len(set(list(filter(None, values)))) != 2:
                         break
                     # Test if date respect a date format
-                    if stype == 'datetime' and not all(date_regex.match(val) for val in values):
+                    if stype == 'datetime' and all(date_regex.match(val) for val in values):
                         break
                     return stype
 

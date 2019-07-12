@@ -31,14 +31,21 @@ class TestApi(AskomicsTestCase):
         # Non logged
         response = client_no_db.get('/api/start')
 
+        expected_config = {
+            'footerMessage': app.iniconfig.get('askomics', 'footer_message'),
+            'version': get_distribution('askomics').version,
+            "disableIntegration": app.iniconfig.getboolean('askomics', 'disable_integration'),
+            "prefix": app.iniconfig.get('triplestore', 'prefix'),
+            "namespace": app.iniconfig.get('triplestore', 'namespace')
+        }
+
         assert response.status_code == 200
         assert response.json == {
             "error": False,
             "errorMessage": '',
             "user": None,
             "logged": False,
-            "version": get_distribution('askomics').version,
-            "footer_message": app.iniconfig.get('askomics', 'footer_message')
+            "config": expected_config
         }
 
         # Jdoe (admin) logged
@@ -60,8 +67,7 @@ class TestApi(AskomicsTestCase):
                 'apikey': "0000000000"
             },
             "logged": True,
-            "version": get_distribution('askomics').version,
-            "footer_message": app.iniconfig.get('askomics', 'footer_message')
+            "config": expected_config
         }
 
         # jsmith (non admin) logged
@@ -83,6 +89,5 @@ class TestApi(AskomicsTestCase):
                 'apikey': "0000000000"
             },
             "logged": True,
-            "version": get_distribution('askomics').version,
-            "footer_message": app.iniconfig.get('askomics', 'footer_message')
+            "config": expected_config
         }

@@ -103,6 +103,7 @@ export default class AskoNavbar extends Component {
 
 AskoNavbar.propTypes = {
   waitForStart: PropTypes.bool,
+  disableIntegration: PropTypes.bool,
   logged: PropTypes.bool,
   user: PropTypes.object
 }

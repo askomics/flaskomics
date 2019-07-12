@@ -166,7 +166,7 @@ class TestApiFile(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'previewFiles': [{
-                'csv_data': {
+                'data': {
                     'columns_type': [
                         'start_entity',
                         'organism',
