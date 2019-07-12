@@ -67,7 +67,7 @@ class CsvFile(File):
             'type': self.type,
             'id': self.id,
             'name': self.name,
-            'csv_data': {
+            'data': {
                 'header': self.header,
                 'content_preview': self.preview,
                 'columns_type': self.columns_type

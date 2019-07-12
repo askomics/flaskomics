@@ -58,8 +58,10 @@ def integrate(self, session, data, host_url):
             dataset = Dataset(app, session, dataset_info)
             dataset.save_in_db()
 
-            file.integrate(data['columns_type'], public=data['public'])
-
+            if file.type == "csv/tsv":
+                file.integrate(data['columns_type'], public=data['public'])
+            elif file.type == "turtle":
+                file.integrate(public=data["public"])
             # done
             dataset.update_in_db(ntriples=file.ntriples)
         except Exception as e:

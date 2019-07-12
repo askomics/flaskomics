@@ -11,8 +11,8 @@ export default class CsvTable extends Component {
     this.state = {
       name: props.file.name,
       id: props.file.id,
-      header: props.file.csv_data.header,
-      columns_type: props.file.csv_data.columns_type,
+      header: props.file.data.header,
+      columns_type: props.file.data.columns_type,
       integrated: false,
       publicTick: false,
       privateTick: false
@@ -133,7 +133,7 @@ export default class CsvTable extends Component {
             wrapperClasses="asko-table-wrapper"
             bootstrap4
             keyField={this.state.header[0]}
-            data={this.props.file.csv_data.content_preview}
+            data={this.props.file.data.content_preview}
             columns={columns}
           />
         </div>

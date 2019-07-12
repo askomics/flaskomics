@@ -2,6 +2,7 @@ import os
 import time
 
 from askomics.libaskomics.CsvFile import CsvFile
+from askomics.libaskomics.RdfFile import RdfFile
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
@@ -55,6 +56,8 @@ class FilesHandler(Params):
         for file in files_infos:
             if file['type'] == 'csv/tsv':
                 self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url))
+            elif file['type'] == 'turtle':
+                self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url))
 
     def get_files_infos(self, files_id=None, return_path=False):
         """Get files info
@@ -168,6 +171,8 @@ class FilesHandler(Params):
         # Type
         if filetype == 'text/tab-separated-values':
             filetype = 'csv/tsv'
+        elif filetype == 'text/turtle':
+            filetype = 'turtle'
         else:
             # Default is csv/tsv
             filetype = 'csv/tsv'

@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import CsvTable from './csvtable'
+import TtlPreview from './ttlpreview'
 import PropTypes from 'prop-types'
 
 export default class Integration extends Component {
@@ -73,6 +74,9 @@ export default class Integration extends Component {
             console.log(file)
             if (file.type == 'csv/tsv') {
               return <CsvTable key={file.name} file={file} />
+            }
+            if (file.type == 'turtle') {
+              return <TtlPreview file={file} />
             }
           })
         }

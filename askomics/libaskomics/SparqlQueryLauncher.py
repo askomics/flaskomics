@@ -160,6 +160,31 @@ class SparqlQueryLauncher(Params):
             ttl += "<{}> <{}> <{}> .\n".format(s, p, o)
         return ttl
 
+    def insert_ttl_string(self, ttl_string, graph):
+        """Insert ttl into the triplestore
+
+        Parameters
+        ----------
+        ttl_string : string
+            ttl triples to insert
+        graph : string
+            Insert in the named graph
+
+        Returns
+        -------
+        dict?
+            query result
+        """
+        query = '''
+        INSERT DATA {{
+            GRAPH <{}> {{
+                {}
+            }}
+        }}
+        '''.format(graph, ttl_string)
+
+        return self.execute_query(query)
+
     def insert_data(self, ttl, graph, metadata=False):
         """Insert data into the triplesotre using INSERT
 
