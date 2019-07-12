@@ -4,12 +4,18 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import brace from 'brace'
+import AceEditor from 'react-ace'
+
+import 'brace/mode/turtle'
+import 'brace/theme/tomorrow'
 
 export default class TtlPreview extends Component {
   constructor (props) {
     super(props)
     this.state = {
       name: props.file.name,
+      preview: props.file.data.preview,
       id: props.file.id,
       integrated: false,
       publicTick: false,
@@ -17,6 +23,15 @@ export default class TtlPreview extends Component {
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
+    this.handleCodeChange = this.handleCodeChange.bind(this)
+  }
+
+  handleCodeChange (event) {
+    // FIXME: we use this to prevent editing
+    this.setState({
+        preview: this.state.preview
+    })
+
   }
 
   integrate (event) {
@@ -59,8 +74,23 @@ export default class TtlPreview extends Component {
     return (
       <div>
         <h4>{this.state.name} (preview)</h4>
-        <br /><br />
+        <br />
         <div className="center-div">
+            <div>
+              <AceEditor
+                mode="turtle"
+                theme="tomorrow"
+                name="ttl_preview"
+                fontSize={14}
+                showPrintMargin={true}
+                showGutter={true}
+                value={this.props.file.data.preview}
+                height={300}
+                width={'auto'}
+                onChange={this.handleCodeChange}
+              />
+            </div>
+          <br />
           <ButtonGroup>
             <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
             <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
