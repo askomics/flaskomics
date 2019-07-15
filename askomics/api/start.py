@@ -1,3 +1,4 @@
+import git
 import sys
 import traceback
 
@@ -56,9 +57,19 @@ def start():
         starter = Start(current_app, session)
         starter.start()
 
+        # Get commmit hash
+        sha = None
+        if current_app.iniconfig.getboolean('askomics', 'display_commit_hash'):
+            try:
+                repo = git.Repo(search_parent_directories=True)
+                sha = repo.head.object.hexsha[:10]
+            except Exception:
+                pass
+
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "version": get_distribution('askomics').version,
+            "commit": sha,
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
             "namespace": current_app.iniconfig.get('triplestore', 'namespace')

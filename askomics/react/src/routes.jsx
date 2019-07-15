@@ -102,7 +102,7 @@ export default class Routes extends Component {
           </Switch>
           <br />
           <br />
-          <AskoFooter version={this.state.config.version} message={this.state.config.footerMessage} />
+          <AskoFooter version={this.state.config.version} commit={this.state.config.commit} message={this.state.config.footerMessage} />
         </div>
       </Router>
     )

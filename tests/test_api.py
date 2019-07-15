@@ -1,3 +1,4 @@
+import git
 from pkg_resources import get_distribution
 
 from . import AskomicsTestCase
@@ -31,9 +32,18 @@ class TestApi(AskomicsTestCase):
         # Non logged
         response = client_no_db.get('/api/start')
 
+        # Get commmit hash
+        sha = None
+        try:
+            repo = git.Repo(search_parent_directories=True)
+            sha = repo.head.object.hexsha[:10]
+        except Exception:
+            pass
+
         expected_config = {
             'footerMessage': app.iniconfig.get('askomics', 'footer_message'),
             'version': get_distribution('askomics').version,
+            "commit": sha,
             "disableIntegration": app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": app.iniconfig.get('triplestore', 'prefix'),
             "namespace": app.iniconfig.get('triplestore', 'namespace')

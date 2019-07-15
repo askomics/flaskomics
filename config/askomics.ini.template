@@ -12,6 +12,7 @@ debug = true
 debug_ttl = false
 
 footer_message = Welcome to AskOmics!
+display_commit_hash = false
 
 # data directory
 data_directory = /tmp/flaskomics
