@@ -201,7 +201,7 @@ class TriplestoreExplorer(Params):
                     if result["graph"] not in attributes[index_attribute]["graphs"]:
                         attributes[index_attribute]["graphs"].append(result["graph"])
 
-            index_attribute = attributes_list.index(attr_tpl)
+                index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
             if "property_uri" in result and result["property_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")):
