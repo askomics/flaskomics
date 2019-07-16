@@ -82,6 +82,7 @@ class Result(Params):
             new_node = {
                 "uri": node["uri"],
                 "graphs": node["graphs"],
+                "type": node["type"],
                 "id": node["id"],
                 "label": node["label"],
                 "selected": node["selected"],
