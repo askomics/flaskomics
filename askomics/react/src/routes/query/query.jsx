@@ -289,6 +289,14 @@ export default class Query extends Component {
     })
   }
 
+  removeAttributes(id){
+    this.state.graphState.attr.forEach((attr, index, gstate) => {
+      if (attr.nodeId == id) {
+        gstate.splice(index, 1)
+      }
+    })
+  }
+
   getNodesAndLinksIdToDelete (id, nodesAndLinks={nodes: [], links: []}) {
     /*
     recusriveky get nodes and link to remove from the graphState
@@ -535,6 +543,8 @@ export default class Query extends Component {
     nodeAndLinksToDelete.links.forEach(id => {
       this.removeLink(id)
     })
+    // remove attributes
+    this.removeAttributes(this.currentSelected.id)
 
     // unselect node
     this.manageCurrentPreviousSelected(null)
