@@ -83,6 +83,8 @@ class Result(Params):
                 "uri": node["uri"],
                 "graphs": node["graphs"],
                 "type": node["type"],
+                "filterNode": node["filterNode"],
+                "filterLink": node["filterLink"],
                 "id": node["id"],
                 "label": node["label"],
                 "selected": node["selected"],

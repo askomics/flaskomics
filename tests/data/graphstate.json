@@ -151,6 +151,8 @@
                 "label": "Gene",
                 "selected": true,
                 "suggested": false,
+                "filterNode": "",
+                "filterLink": "",
                 "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
             }
         ]

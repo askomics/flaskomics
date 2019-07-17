@@ -10,6 +10,8 @@
             "type": "entity",
             "selected": true,
             "suggested": false,
+            "filterNode": "",
+            "filterLink": "",
             "__indexColor": "#ec0001",
             "index": 0,
             "x": 0,

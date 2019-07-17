@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, Row, Col, ButtonGroup } from 'reactstrap'
+import { Alert, Button, Row, Col, ButtonGroup, Input } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
+import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
 
@@ -55,6 +56,8 @@ export default class Query extends Component {
     this.handlePreview = this.handlePreview.bind(this)
     this.handleQuery = this.handleQuery.bind(this)
     this.handleRemoveNode = this.handleRemoveNode.bind(this)
+    this.handleFilterNodes = this.handleFilterNodes.bind(this)
+    this.handleFilterLinks = this.handleFilterLinks.bind(this)
   }
 
   resetIcons() {
@@ -246,6 +249,8 @@ export default class Query extends Component {
     let node = {
       uri: uri,
       type: this.getType(uri),
+      filterNode: "",
+      filterLink: "",
       graphs: this.getGraphs(uri),
       id: nodeId,
       label: this.getLabel(uri),
@@ -323,31 +328,45 @@ export default class Query extends Component {
     let targetId
     let sourceId
     let linkId
+    let label
+    let resFilterNode
+    let resFilterLink
+
+    let reNode = new RegExp(this.currentSelected.filterNode, 'g')
+    let reLink = new RegExp(this.currentSelected.filterLink, 'g')
+
     this.state.abstraction.relations.forEach(relation => {
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
           linkId = this.getId()
-          // Push suggested target
-          this.graphState.nodes.push({
-            uri: relation.target,
-            type: this.getType(relation.target),
-            graphs: this.getGraphs(relation.target),
-            id: targetId,
-            label: this.getLabel(relation.target),
-            selected: false,
-            suggested: true
-          })
-          // push suggested link
-          this.graphState.links.push({
-            uri: relation.uri,
-            id: linkId,
-            label: relation.label,
-            source: node.id,
-            target: targetId,
-            selected: false,
-            suggested: true
-          })
+          label = this.getLabel(relation.target)
+          resFilterNode = label.toLowerCase().match(reNode)
+          resFilterLink = relation.label.toLowerCase().match(reLink)
+          if (resFilterNode && resFilterLink) {
+            // Push suggested target
+            this.graphState.nodes.push({
+              uri: relation.target,
+              type: this.getType(relation.target),
+              filterNode: "",
+              filterLink: "",
+              graphs: this.getGraphs(relation.target),
+              id: targetId,
+              label: label,
+              selected: false,
+              suggested: true
+            })
+            // push suggested link
+            this.graphState.links.push({
+              uri: relation.uri,
+              id: linkId,
+              label: relation.label,
+              source: node.id,
+              target: targetId,
+              selected: false,
+              suggested: true
+            })
+          }
         }
       }
 
@@ -355,26 +374,33 @@ export default class Query extends Component {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
-          // Push suggested source
-          this.graphState.nodes.push({
-            uri: relation.source,
-            type: this.getType(relation.source),
-            graphs: this.getGraphs(relation.source),
-            id: sourceId,
-            label: this.getLabel(relation.source),
-            selected: false,
-            suggested: true
-          })
-          // push suggested link
-          this.graphState.links.push({
-            uri: relation.uri,
-            id: this.getId(),
-            label: relation.label,
-            source: sourceId,
-            target: node.id,
-            selected: false,
-            suggested: true
-          })
+          label = this.getLabel(relation.source)
+          resFilterNode = label.toLowerCase().match(reNode)
+          resFilterLink = relation.label.toLowerCase().match(reLink)
+          if (resFilterNode && resFilterLink) {
+            // Push suggested source
+            this.graphState.nodes.push({
+              uri: relation.source,
+              type: this.getType(relation.source),
+              filterNode: "",
+              filterLink: "",
+              graphs: this.getGraphs(relation.source),
+              id: sourceId,
+              label: label,
+              selected: false,
+              suggested: true
+            })
+            // push suggested link
+            this.graphState.links.push({
+              uri: relation.uri,
+              id: this.getId(),
+              label: relation.label,
+              source: sourceId,
+              target: node.id,
+              selected: false,
+              suggested: true
+            })
+          }
         }
       }
     })
@@ -483,6 +509,8 @@ export default class Query extends Component {
     }
     // update graph state
     this.updateGraphState()
+    // // manage node filter
+    // this.manageFilterNodes(this.currentSelected.filter)
   }
 
   handleRemoveNode () {
@@ -535,6 +563,36 @@ export default class Query extends Component {
 
   initGraph () {
     this.insertNode(this.state.startpoint, true, false)
+    this.insertSuggestion(this.currentSelected)
+    this.updateGraphState()
+  }
+
+
+  // Filter nodes --------------------------
+  handleFilterNodes (event) {
+    // Store the filter
+    this.state.graphState.nodes.map(node => {
+      if (this.currentSelected.id == node.id) {
+        node.filterNode = event.target.value
+      }
+    })
+    // Reset suggestion
+    this.removeAllSuggestion()
+    this.insertSuggestion(this.currentSelected)
+    this.updateGraphState()
+  }
+
+
+  // Filter links --------------------------
+  handleFilterLinks (event) {
+    // Store the filter
+    this.state.graphState.nodes.map(node => {
+      if (this.currentSelected.id == node.id) {
+        node.filterLink = event.target.value
+      }
+    })
+    // Reset suggestion
+    this.removeAllSuggestion()
     this.insertSuggestion(this.currentSelected)
     this.updateGraphState()
   }
@@ -746,6 +804,7 @@ export default class Query extends Component {
     let previewButton
     let launchQueryButton
     let removeButton
+    let graphFilters
 
     if (!this.state.waiting) {
       // attribute boxes (right view)
@@ -794,6 +853,18 @@ export default class Query extends Component {
           </ButtonGroup>
         )
       }
+
+      // Filters
+      graphFilters = (
+        <GraphFilters
+          graph={this.state.graphState}
+          current={this.currentSelected}
+          handleFilterNodes={this.handleFilterNodes}
+          handleFilterLinks={this.handleFilterLinks}
+        />
+      )
+
+
     }
 
     // preview
@@ -812,6 +883,8 @@ export default class Query extends Component {
         <WaitingDiv waiting={this.state.waiting} center />
         <Row>
           <Col xs="7">
+            {graphFilters}
+            <br />
             <div>
               {visualizationDiv}
             </div>
