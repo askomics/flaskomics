@@ -88,7 +88,7 @@ export default class Routes extends Component {
         <div>
           <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user} disableIntegration={this.state.config.disableIntegration}/>
           <Switch>
-            <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+            <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} config={this.state.config} />)} />
             <Route path="/about" exact component={() => (<About />)} />
             <Route path="/login" exact component={() => (<Login waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/signup" exact component={() => (<Signup waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />

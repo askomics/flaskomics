@@ -104,6 +104,7 @@ export default class Ask extends Component {
       redirectQueryBuilder = <Redirect to={{
         pathname: '/query',
         state: {
+          config: this.props.config,
           startpoint: this.state.selected,
           user: this.props.user,
           logged: this.props.logged

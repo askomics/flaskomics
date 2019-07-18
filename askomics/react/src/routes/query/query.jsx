@@ -16,6 +16,7 @@ export default class Query extends Component {
     super(props)
     this.state = {
       logged: this.props.location.state.logged,
+      config: this.props.location.state.config,
       user: this.props.location.state.user,
       startpoint: this.props.location.state.startpoint,
       abstraction: [],
@@ -118,7 +119,7 @@ export default class Query extends Component {
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
       return 'decimal'
     }
-    if (typeUri == 'http://nextprot.org/rdf#AskomicsCategory') {
+    if (typeUri == this.state.config.prefix + 'AskomicsCategory') {
       return 'category'
     }
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {
@@ -486,7 +487,13 @@ export default class Query extends Component {
     this.setNodeAttributes(node.uri, node.id)
   }
 
+
+
+
+
+
   handleNodeSelection (clickedNode) {
+    console.log("clickedNode", clickedNode)
     // case 1 : clicked node is selected, so deselect it
     if (clickedNode.selected) {
       // update current and previous
@@ -773,7 +780,7 @@ export default class Query extends Component {
           if (this.props.location.state.redo) {
           // redo a query
             this.graphState = this.props.location.state.graphState
-            this.setCurrentSelected()
+            // this.setCurrentSelected()
             this.updateGraphState()
             console.log("graphState", this.state.graphState)
             console.log("current", this.currentSelected)
