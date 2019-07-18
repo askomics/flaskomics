@@ -437,7 +437,7 @@ export default class Query extends Component {
     let newLink = {}
 
     this.state.graphState.links.forEach(link => {
-      if (link.source.id == node1.id && relation.target.id == node2.id) {
+      if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
           id: this.getId(),
@@ -775,6 +775,9 @@ export default class Query extends Component {
             this.graphState = this.props.location.state.graphState
             this.setCurrentSelected()
             this.updateGraphState()
+            console.log("graphState", this.state.graphState)
+            console.log("current", this.currentSelected)
+            console.log("previous", this.previousSelected)
           } else {
             this.initGraph()
           }
