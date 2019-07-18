@@ -434,14 +434,14 @@ export default class Query extends Component {
   }
 
   insertLinkIfExists (node1, node2) {
-    let link = {}
+    let newLink = {}
 
-    this.state.abstraction.relations.forEach(relation => {
-      if (relation.source == node1.uri && relation.target == node2.uri) {
-        link = {
-          uri: relation.uri,
+    this.state.graphState.links.forEach(link => {
+      if (link.source.id == node1.id && relation.target.id == node2.id) {
+        newLink = {
+          uri: link.uri,
           id: this.getId(),
-          label: relation.label,
+          label: link.label,
           source: node1.id,
           target: node2.id,
           selected: false,
@@ -449,11 +449,11 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.source == node2.uri && relation.target == node1.uri) {
-        link = {
-          uri: relation.uri,
+      if (link.source.id == node2.id && link.target.id == node1.id) {
+        newLink = {
+          uri: link.uri,
           id: this.getId(),
-          label: relation.label,
+          label: link.label,
           source: node2.id,
           target: node1.id,
           selected: false,
@@ -461,7 +461,7 @@ export default class Query extends Component {
         }
       }
     })
-    this.graphState.links.push(link)
+    this.graphState.links.push(newLink)
   }
 
   manageCurrentPreviousSelected (currentNode) {
@@ -506,12 +506,12 @@ export default class Query extends Component {
       this.unselectAllNodes()
       // select and instanciate the new node
       this.selectAndInstanciateNode(clickedNode)
-      // remove all suggestion
-      this.removeAllSuggestion()
       // instanciate link only if clicked node is suggested
       if (suggested) {
         this.insertLinkIfExists(this.currentSelected, this.previousSelected)
       }
+      // remove all suggestion
+      this.removeAllSuggestion()
       // insert suggestion
       this.insertSuggestion(this.currentSelected)
     }
