@@ -168,5 +168,6 @@ export default class Ask extends Component {
 Ask.propTypes = {
   waitForStart: PropTypes.bool,
   user: PropTypes.object,
+  config: PropTypes.object,
   logged: PropTypes.bool
 }
