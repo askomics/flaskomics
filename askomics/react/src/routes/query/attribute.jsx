@@ -175,7 +175,6 @@ export default class AttributeBox extends Component {
 
   render () {
     let box = null
-    console.log(this.props.attribute.label, this.props.attribute.type)
     if (this.props.attribute.type == 'text' || this.props.attribute.type == 'uri') {
       box = this.renderText()
     }

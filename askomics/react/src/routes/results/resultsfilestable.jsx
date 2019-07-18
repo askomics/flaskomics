@@ -190,6 +190,7 @@ export default class ResultsFilesTable extends Component {
         pathname: '/query',
         state: {
           redo: true,
+          config: this.props.config,
           graphState: this.state.graphState,
           user: this.props.user,
           logged: this.props.logged
@@ -315,5 +316,6 @@ ResultsFilesTable.propTypes = {
   logged: PropTypes.bool,
   waiting: PropTypes.bool,
   results: PropTypes.object,
+  config: PropTypes.object,
   maxRows: PropTypes.number
 }

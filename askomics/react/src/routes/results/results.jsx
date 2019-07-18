@@ -131,7 +131,7 @@ export default class Results extends Component {
         {redirectLogin}
         <h2>Results</h2>
         <hr />
-        <ResultsFilesTable user={this.props.user} logged={this.props.logged} maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+        <ResultsFilesTable config={this.props.config} user={this.props.user} logged={this.props.logged} maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <Button disabled={this.isDisabled()} onClick={this.deleteSelectedResults} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <br /><br />
         {resultsTable}
@@ -144,5 +144,6 @@ export default class Results extends Component {
 Results.propTypes = {
   waitForStart: PropTypes.bool,
   user: PropTypes.object,
+  config: PropTypes.object,
   logged: PropTypes.bool
 }

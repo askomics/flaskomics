@@ -79,6 +79,9 @@ class Result(Params):
 
         for node in d3_graph_state["nodes"]:
 
+            if node["suggested"]:
+                continue
+
             new_node = {
                 "uri": node["uri"],
                 "graphs": node["graphs"],
@@ -94,6 +97,9 @@ class Result(Params):
             new_nodes.append(new_node)
 
         for link in d3_graph_state["links"]:
+
+            if link["suggested"]:
+                continue
 
             new_link = {
                 "uri": link["uri"],

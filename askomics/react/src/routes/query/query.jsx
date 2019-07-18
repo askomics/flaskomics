@@ -67,6 +67,23 @@ export default class Query extends Component {
     })
   }
 
+  initId () {
+    let listId = new Set()
+    this.graphState.nodes.forEach(node => {
+      listId.add(node.id)
+    })
+
+    this.graphState.links.forEach(link => {
+      listId.add(link.id)
+    })
+
+    this.graphState.attr.forEach(attr => {
+      listId.add(attr.id)
+    })
+
+    this.idNumber = Math.max(...listId)
+  }
+
   getId () {
     this.idNumber += 1
     return this.idNumber
@@ -341,8 +358,8 @@ export default class Query extends Component {
     let resFilterNode
     let resFilterLink
 
-    let reNode = new RegExp(this.currentSelected.filterNode, 'g')
-    let reLink = new RegExp(this.currentSelected.filterLink, 'g')
+    let reNode = new RegExp(node.filterNode, 'g')
+    let reLink = new RegExp(node.filterLink, 'g')
 
     this.state.abstraction.relations.forEach(relation => {
       if (relation.source == node.uri) {
@@ -487,13 +504,7 @@ export default class Query extends Component {
     this.setNodeAttributes(node.uri, node.id)
   }
 
-
-
-
-
-
   handleNodeSelection (clickedNode) {
-    console.log("clickedNode", clickedNode)
     // case 1 : clicked node is selected, so deselect it
     if (clickedNode.selected) {
       // update current and previous
@@ -778,13 +789,12 @@ export default class Query extends Component {
           })
         }).then(response => {
           if (this.props.location.state.redo) {
-          // redo a query
+            // redo a query
             this.graphState = this.props.location.state.graphState
-            // this.setCurrentSelected()
+            this.initId()
+            this.setCurrentSelected()
+            this.insertSuggestion(this.currentSelected)
             this.updateGraphState()
-            console.log("graphState", this.state.graphState)
-            console.log("current", this.currentSelected)
-            console.log("previous", this.previousSelected)
           } else {
             this.initGraph()
           }
