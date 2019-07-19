@@ -243,7 +243,8 @@ class Result(Params):
             ?,
             NULL,
             NULL,
-            ?
+            ?,
+            NULL
         )
         '''
 
@@ -339,3 +340,21 @@ class Result(Params):
             os.remove(self.file_path)
         except Exception:
             self.log.debug("Impossible to delete {}".format(self.file_path))
+
+    def publish_query(self, description, public):
+        """Insert query id and desc in the published_query table"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        public=?,
+        description=?
+        WHERE user_id=? AND id=?
+        '''
+
+        database.execute_sql_query(query, (
+            public,
+            description,
+            self.session["user"]["id"],
+            self.id
+        ))

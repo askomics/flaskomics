@@ -50,10 +50,10 @@ class ResultsHandler(Params):
         query = '''
         SELECT id, status, path, start, end, graph_state, nrows, error, public
         FROM results
-        WHERE user_id = ? OR public = ?
+        WHERE user_id = ?
         '''
 
-        rows = database.execute_sql_query(query, (self.session["user"]["id"], True))
+        rows = database.execute_sql_query(query, (self.session["user"]["id"], ))
 
         files = []
 
@@ -71,3 +71,31 @@ class ResultsHandler(Params):
             })
 
         return files
+
+    def get_public_queries(self):
+        """Get id and description of published queries
+
+        Returns
+        -------
+        List
+            List of published queries (id and description)
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT id, description
+        FROM results
+        WHERE public = ?
+        '''
+
+        rows = database.execute_sql_query(query, (True, ))
+
+        queries = []
+
+        for row in rows:
+            queries.append({
+                "id": row[0],
+                "description": row[1]
+            })
+
+        return queries

@@ -2,6 +2,7 @@ import sys
 import traceback
 
 from askomics.api.auth import login_required
+from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -25,17 +26,22 @@ def query():
     """
     try:
         tse = TriplestoreExplorer(current_app, session)
+        results_handler = ResultsHandler(current_app, session)
+
         startpoints = tse.get_startpoints()
+        public_queries = results_handler.get_public_queries()
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({
             'startpoints': [],
+            "publicQueries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'startpoints': startpoints,
+        "publicQueries": public_queries,
         'error': False,
         'errorMessage': ''
     })

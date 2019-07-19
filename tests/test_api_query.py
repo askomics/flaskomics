@@ -28,7 +28,8 @@ class TestApiStartpoints(AskomicsTestCase):
                 }],
                 'private': True,
                 'public': False
-            }]
+            }],
+            'publicQueries': []
         }
         case.assertCountEqual(response.json, expected)
 

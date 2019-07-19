@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, InputGroupAddon, Input, InputGroup } from 'reactstrap'
+import { Alert, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -16,12 +16,14 @@ export default class Ask extends Component {
       errorMessage: null,
       startpoints: [],
       selected: null,
-      startSession: false
+      startSession: false,
+      publicQueries: []
     }
     this.cancelRequest
     this.handleClick = this.handleClick.bind(this)
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
+    this.handleClickPublicQuery = this.handleClickPublicQuery.bind(this)
   }
 
   componentDidMount () {
@@ -40,7 +42,9 @@ export default class Ask extends Component {
               private: startpoint.private,
               hidden: false,
               selected: false
-            }))
+            })),
+            publicQueries: response.data.publicQueries,
+            startSessionWithExemple: false
           })
         })
         .catch(error => {
@@ -72,6 +76,30 @@ export default class Ask extends Component {
     this.setState({
       startSession: true
     })
+  }
+
+  handleClickPublicQuery (event) {
+    // request api to get a preview of file
+    let requestUrl = '/api/results/graphstate'
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          startSessionWithExemple: true,
+          graphState: response.data.graphState
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
   }
 
   disabledStartButton () {
@@ -112,6 +140,20 @@ export default class Ask extends Component {
       }} />
     }
 
+    if (this.state.startSessionWithExemple) {
+      redirectQueryBuilder = <Redirect to={{
+        pathname: '/query',
+        state: {
+          redo: true,
+          config: this.props.config,
+          graphState: this.state.graphState,
+          user: this.props.user,
+          logged: this.props.logged
+        }
+      }} />
+    }
+
+
     let errorDiv
     if (this.state.error) {
       errorDiv = (
@@ -119,6 +161,20 @@ export default class Ask extends Component {
           <Alert color="danger">
             <i className="fas fa-exclamation-circle"></i> {this.state.errorMessage}
           </Alert>
+        </div>
+      )
+    }
+
+    let exempleQueries
+    if (!this.state.waiting && this.state.publicQueries.length > 0) {
+      exempleQueries = (
+        <div>
+          <p>Or start with an exemple:</p>
+            <ListGroup>
+              {this.state.publicQueries.map(query => (
+                <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+              ))}
+            </ListGroup>
         </div>
       )
     }
@@ -158,7 +214,14 @@ export default class Ask extends Component {
         <h2>Ask!</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
-        {startpoints}
+          <Row>
+            <Col xs="4">
+              {startpoints}
+            </Col>
+            <Col xs="8">
+              {exempleQueries}
+            </Col>
+          </Row>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
-import { Badge, Button, ButtonGroup, FormGroup, CustomInput } from 'reactstrap'
+import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
 
@@ -13,7 +13,10 @@ export default class ResultsFilesTable extends Component {
     super(props)
     this.state = {
       redirectQueryBuilder: false,
-      graphState: []
+      graphState: [],
+      modal: false,
+      idToPublish: null,
+      description: ''
     }
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
@@ -21,7 +24,11 @@ export default class ResultsFilesTable extends Component {
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
+    // this.handlePublish = this.handlePublish.bind(this)
+    this.handlePublishClick = this.handlePublishClick.bind(this)
+    this.handleDescChange = this.handleDescChange.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
+    this.toggleModal = this.toggleModal.bind(this)
   }
 
   humanDate (date) {
@@ -145,6 +152,71 @@ export default class ResultsFilesTable extends Component {
   }
 
   togglePublicQuery(event) {
+    if (event.target.value == 0) {
+      // Publish
+      this.setState({
+        idToPublish: event.target.id,
+        newPublishStatus: true
+      })
+      this.toggleModal()
+    } else {
+      // Unpublish
+      this.setState({
+        idToPublish: event.target.id,
+        newPublishStatus: false,
+        description: ''
+      }, () => {
+        this.publish()
+      })
+    }
+  }
+
+  toggleModal () {
+    this.setState({
+      modal: !this.state.modal
+    })
+  }
+
+  handlePublishClick(event) {
+    this.publish()
+  }
+
+  publish() {
+    let requestUrl = '/api/results/publish'
+    let data = {
+      id: this.state.idToPublish,
+      description: this.state.description,
+      public: this.state.newPublishStatus
+    }
+    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.setState({
+        modal: false,
+        description: '',
+        idToPublish: null
+      })
+      this.props.setStateResults({
+        results: response.data.files,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
+
+  handleDescChange(event) {
+    this.setState({
+      description: event.target.value
+    })
+  }
+
+  togglePublicQuery_OLD(event) {
     let newPublic = false
     if (event.target.value == 0) {
       newPublic = true
@@ -212,11 +284,12 @@ export default class ResultsFilesTable extends Component {
       dataField: 'public',
       text: 'Public',
       sort: true,
+      hidden: this.props.user.admin === 1 ? false : true,
       formatter: (cell, row) => {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={this.props.user.admin === 1 ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -270,7 +343,8 @@ export default class ResultsFilesTable extends Component {
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
           </ButtonGroup>
         )
-      }
+      },
+      headerStyle: () => { return { width: '25%' } }
     }]
 
     let defaultSorted = [{
@@ -292,19 +366,39 @@ export default class ResultsFilesTable extends Component {
 
     return (
       <div>
-        {redirectQueryBuilder}{redirectSparqlEditor}
-        <BootstrapTable
-          tabIndexCell
-          bootstrap4
-          keyField='id'
-          data={this.props.results}
-          columns={columns}
-          defaultSorted={defaultSorted}
-          pagination={paginationFactory()}
-          noDataIndication={noDataIndication}
-          selectRow={ selectRow }
-        />
+        <div className="asko-table-div">
+          {redirectQueryBuilder}{redirectSparqlEditor}
+          <BootstrapTable
+            tabIndexCell
+            bootstrap4
+            keyField='id'
+            data={this.props.results}
+            columns={columns}
+            defaultSorted={defaultSorted}
+            pagination={paginationFactory()}
+            noDataIndication={noDataIndication}
+            selectRow={ selectRow }
+          />
+        </div>
+        <div>
+          <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
+            <ModalHeader toggle={this.toggleModal}>Publish query {this.state.idToPublish}</ModalHeader>
+            <ModalBody>
+            <div>
+              <Input type="title" name="title" id="title" placeholder="Query description" value={this.state.description} onChange={this.handleDescChange} />
+            </div>
+            <br />
+            <div>
+              <Button onClick={this.handlePublishClick}>Publish</Button>
+            </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={this.toggleModal}>Close</Button>
+            </ModalFooter>
+          </Modal>
+        </div>
       </div>
+
     )
   }
 }

@@ -1,5 +1,4 @@
-"""Contain the Database class
-"""
+"""Contain the Database class"""
 import sqlite3
 import textwrap
 
@@ -9,6 +8,7 @@ from askomics.libaskomics.Params import Params
 class Database(Params):
     """
     Manage Database connection
+
     Attributes
     ----------
     database_path : str
@@ -47,7 +47,6 @@ class Database(Params):
         List
             Result of the query, or last row id
         """
-
         connection = sqlite3.connect("file:" + self.database_path, uri=True)
         if self.settings.getboolean('askomics', 'debug'):
             connection.set_trace_callback(self.log.debug)
@@ -67,8 +66,7 @@ class Database(Params):
         return rows
 
     def init_database(self):
-        """Create all tables
-        """
+        """Create all tables"""
         self.create_user_table()
         self.create_galaxy_table()
         self.create_integration_table()
@@ -78,8 +76,7 @@ class Database(Params):
         self.create_datasets_table()
 
     def create_user_table(self):
-        """Create the user table
-        """
+        """Create the user table"""
         query = '''
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,8 +95,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_galaxy_table(self):
-        """Create the galaxy table
-        """
+        """Create the galaxy table"""
         query = '''
         CREATE TABLE IF NOT EXISTS galaxy_accounts (
             galaxy_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,8 +108,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_datasets_table(self):
-        """Create the datasets table
-        """
+        """Create the datasets table"""
         query = '''
         CREATE TABLE IF NOT EXISTS datasets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -135,8 +130,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_integration_table(self):
-        """Create the integration table
-        """
+        """Create the integration table"""
         query = '''
         CREATE TABLE IF NOT EXISTS integration (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,8 +146,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_results_table(self):
-        """Create the results table
-        """
+        """Create the results table"""
         query = '''
         CREATE TABLE IF NOT EXISTS results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -167,14 +160,30 @@ class Database(Params):
             nrows int,
             error text,
             public boolean,
+            description text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
         self.execute_sql_query(query)
+        self.update_results_table()
+
+    def update_results_table(self):
+        """Add the description col on the results table
+
+        Update the results table for the instance who don't have this column
+        """
+        query = '''
+        ALTER TABLE results
+                ADD description text NULL
+            DEFAULT ('')
+        '''
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
 
     def create_endpoints_table(self):
-        """Create the endpoints table
-        """
+        """Create the endpoints table"""
         query = '''
         CREATE TABLE IF NOT EXISTS endpoints (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -188,8 +197,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_files_table(self):
-        """Create the files table
-        """
+        """Create the files table"""
         query = '''
         CREATE TABLE IF NOT EXISTS files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

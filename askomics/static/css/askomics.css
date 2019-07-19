@@ -60,7 +60,7 @@ i.inactive {
 
 div.startpoints-div {
     height: 200px;
-    width: 30%;
+    /*width: 30%;*/
     overflow-y: scroll;
     border:1px solid #ccc;
     border-radius: 4px;
@@ -68,7 +68,7 @@ div.startpoints-div {
 }
 
 div.startpoints-filter-div {
-    width: 30%;
+    /*width: 30%;*/
 }
 
 label.startpoint-label {
