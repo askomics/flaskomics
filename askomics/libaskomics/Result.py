@@ -160,10 +160,10 @@ class Result(Params):
             query = '''
             SELECT celery_id, path, graph_state, start, end, nrows
             FROM results
-            WHERE user_id = ? AND id = ?
+            WHERE (user_id = ? OR public = ?) AND id = ?
             '''
 
-            rows = database.execute_sql_query(query, (self.session["user"]["id"], self.id))
+            rows = database.execute_sql_query(query, (self.session["user"]["id"], True, self.id))
 
         else:
             query = '''
