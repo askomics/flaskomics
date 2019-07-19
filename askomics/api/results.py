@@ -127,7 +127,6 @@ def get_preview():
     })
 
 
-@login_required
 @results_bp.route('/api/results/graphstate', methods=['POST'])
 def get_graph_state():
     """Summary

@@ -41,11 +41,12 @@ class Result(Params):
         """
         Params.__init__(self, app, session)
 
-        self.result_path = "{}/{}_{}/results".format(
-            self.settings.get("askomics", "data_directory"),
-            self.session['user']['id'],
-            self.session['user']['username']
-        )
+        if "user" in self.session:
+            self.result_path = "{}/{}_{}/results".format(
+                self.settings.get("askomics", "data_directory"),
+                self.session['user']['id'],
+                self.session['user']['username']
+            )
 
         if "id" in result_info:
             self.id = result_info["id"]
@@ -155,13 +156,23 @@ class Result(Params):
         """Set result info from the db"""
         database = Database(self.app, self.session)
 
-        query = '''
-        SELECT celery_id, path, graph_state, start, end, nrows
-        FROM results
-        WHERE (user_id = ? OR public = ?) AND id = ?
-        '''
+        if "user" in self.session:
+            query = '''
+            SELECT celery_id, path, graph_state, start, end, nrows
+            FROM results
+            WHERE user_id = ? AND id = ?
+            '''
 
-        rows = database.execute_sql_query(query, (self.session["user"]["id"], True, self.id))
+            rows = database.execute_sql_query(query, (self.session["user"]["id"], self.id))
+
+        else:
+            query = '''
+            SELECT celery_id, path, graph_state, start, end, nrows
+            FROM results
+            WHERE public = ? AND id = ?
+            '''
+
+            rows = database.execute_sql_query(query, (True, self.id))
 
         self.celery_id = rows[0][0] if rows[0][0] else ''
         self.file_path = rows[0][1] if rows[0][1] else ''
