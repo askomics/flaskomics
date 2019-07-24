@@ -9,6 +9,9 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
 
    README
    deployment
+   usage
+   usage_external
+   devdoc
    api/askomics
 
 
