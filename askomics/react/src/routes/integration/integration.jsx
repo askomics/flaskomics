@@ -6,6 +6,7 @@ import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import CsvTable from './csvtable'
 import TtlPreview from './ttlpreview'
+import GffPreview from './gffpreview'
 import PropTypes from 'prop-types'
 
 export default class Integration extends Component {
@@ -77,6 +78,9 @@ export default class Integration extends Component {
             }
             if (file.type == 'turtle') {
               return <TtlPreview file={file} />
+            }
+            if (file.type == 'gff/gff3') {
+              return <GffPreview file={file} />
             }
           })
         }
