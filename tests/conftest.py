@@ -128,7 +128,7 @@ def load_file(dir_path, file_path, file_name, file_type, user_session):
     }
 
 
-def interate_dataset(dir_path, file_info, user_session, public):
+def integrate_dataset(dir_path, file_info, user_session, public):
     """integrate some files"""
     current_app = create_app(config='config/askomics.test.ini')
 
@@ -439,7 +439,7 @@ def client_logged_as_jdoe_with_data():
         "columns_type": ["start_entity", "organism", "chromosome", "strand", "start", "end"]
     }
 
-    gene_timestamp = interate_dataset(dir_path, file_info, user_session, False)
+    gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)
     client.gene_timestamp = gene_timestamp
 
     yield client
@@ -501,7 +501,8 @@ def client_logged_as_jdoe_with_data_and_result():
         "columns_type": ["start_entity", "organism", "chromosome", "strand", "start", "end"]
     }
 
-    gene_timestamp = interate_dataset(dir_path, file_info, user_session, False)
+    gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)
+    integrate_dataset(dir_path, file_info, user_session, True)
     client.gene_timestamp = gene_timestamp
 
     # save a result

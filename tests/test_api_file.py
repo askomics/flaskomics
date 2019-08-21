@@ -323,15 +323,18 @@ class TestApiFile(AskomicsTestCase):
     def test_integrate(self, client_logged_as_jdoe_with_data):
         """Test /api/files/integrate route"""
         tsv_data = {
-            "fileId": 1
+            "fileId": 1,
+            "public": False
         }
 
         gff_data = {
-            "fileId": 2
+            "fileId": 2,
+            "public": True
         }
 
         wrong_data = {
-            "fileId": 42
+            "fileId": 42,
+            "public": False
         }
 
         response = client_logged_as_jdoe_with_data.post('/api/files/integrate', json=wrong_data)
