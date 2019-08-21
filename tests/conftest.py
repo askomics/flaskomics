@@ -82,7 +82,7 @@ def create_users(dir_path):
     auth.create_user_directories(user_2["id"], user_2["username"])
 
 
-def load_file(dir_path, file_path, user_session):
+def load_file(dir_path, file_path, file_name, file_type, user_session):
     """Load a file into AskOmics
 
     Parameters
@@ -113,8 +113,8 @@ def load_file(dir_path, file_path, user_session):
         "first": True,
         "last": True,
         "chunk": content,
-        "name": "gene",
-        "type": "csv/tsv",
+        "name": file_name,
+        "type": file_type,
         "size": os.path.getsize(file_path)
     }
 
@@ -424,9 +424,14 @@ def client_logged_as_jdoe_with_data():
         user_session = sess
 
     # Upload people.tsv
-    file = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    file = load_file(dir_path, 'test-data/gene.tsv', 'gene.tsv', 'text/tab-separated-values', user_session)
     client.gene_file_path = file["filepath"]
     client.gene_file_date = file["filedate"]
+
+    # upload gene.gff
+    gff_file = load_file(dir_path, 'test-data/gene.gff3', 'gene.gff3', '', user_session)
+    client.gff_file_path = gff_file["filepath"]
+    client.gff_file_date = gff_file["filedate"]
 
     # Integrate
     file_info = {
@@ -486,7 +491,7 @@ def client_logged_as_jdoe_with_data_and_result():
         user_session = sess
 
     # Upload people.tsv
-    file = load_file(dir_path, 'test-data/gene.tsv', user_session)
+    file = load_file(dir_path, 'test-data/gene.tsv', "gene.tsv", "text/tab-separated-values", user_session)
     client.gene_file_path = file["filepath"]
     client.gene_file_date = file["filedate"]
 

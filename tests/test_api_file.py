@@ -11,6 +11,7 @@ class TestApiFile(AskomicsTestCase):
         """test the /api/files route"""
         response = client_logged_as_jdoe_with_data.get('/api/files')
         assert response.status_code == 200
+        # print(response.json)
         assert response.json == {
             'error': False,
             'errorMessage': '',
@@ -18,8 +19,14 @@ class TestApiFile(AskomicsTestCase):
                 'date': client_logged_as_jdoe_with_data.gene_file_date,
                 'id': 1,
                 'size': 394,
-                'name': 'gene',
+                'name': 'gene.tsv',
                 'type': 'csv/tsv'
+            }, {
+                'date': client_logged_as_jdoe_with_data.gff_file_date,
+                'id': 2,
+                'size': 2267,
+                'name': 'gene.gff3',
+                'type': 'gff/gff3'
             }]
         }
 
@@ -29,12 +36,12 @@ class TestApiFile(AskomicsTestCase):
         }
 
         wrong_data = {
-            "filesId": [2, ]
+            "filesId": [42, ]
         }
 
         response = client_logged_as_jdoe_with_data.post('/api/files', json=data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert response.json == {
             'error': False,
             'errorMessage': '',
@@ -42,14 +49,14 @@ class TestApiFile(AskomicsTestCase):
                 'date': client_logged_as_jdoe_with_data.gene_file_date,
                 'id': 1,
                 'size': 394,
-                'name': 'gene',
+                'name': 'gene.tsv',
                 'type': 'csv/tsv'
             }]
         }
 
         response = client_logged_as_jdoe_with_data.post('/api/files', json=wrong_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert response.json == {
             'error': False,
             'errorMessage': '',
@@ -74,7 +81,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe.post("/api/files/upload_chunk", json=chunk0_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -99,7 +106,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe.post("/api/files/upload_chunk", json=chunk1_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -117,7 +124,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe.post("/api/files/upload_chunk", json=chunk2_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -135,7 +142,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe.post("/api/files/upload_chunk", json=chunk3_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -161,7 +168,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe_with_data.post('/api/files/preview', json=ok_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert response.json == {
             'error': False,
             'errorMessage': '',
@@ -235,7 +242,7 @@ class TestApiFile(AskomicsTestCase):
                     'header': ['Gene', 'organism', 'chromosome', 'strand', 'start', 'end']
                 },
                 'id': 1,
-                'name': 'gene',
+                'name': 'gene.tsv',
                 'type': 'csv/tsv'
             }]}
 
@@ -245,13 +252,17 @@ class TestApiFile(AskomicsTestCase):
             "filesIdToDelete": [1, ]
         }
 
+        ok_data_2 = {
+            "filesIdToDelete": [2, ]
+        }
+
         fake_data = {
             "filesIdToDelete": [42, ]
         }
 
         response = client_logged_as_jdoe_with_data.post('/api/files/delete', json=fake_data)
         assert response.status_code == 500
-        print(response.json)
+        # print(response.json)
         assert response.json == {
             'error': True,
             'errorMessage': 'list index out of range',
@@ -260,7 +271,22 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe_with_data.post('/api/files/delete', json=ok_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'files': [{
+                'date': client_logged_as_jdoe_with_data.gff_file_date,
+                'id': 2,
+                'size': 2267,
+                'name': 'gene.gff3',
+                'type': 'gff/gff3'
+            }]
+        }
+
+        response = client_logged_as_jdoe_with_data.post('/api/files/delete', json=ok_data_2)
+        assert response.status_code == 200
+        # print(response.json)
         assert response.json == {
             'error': False,
             'errorMessage': '',
@@ -279,7 +305,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe_with_data.post('/api/files/integrate', json=wrong_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -287,7 +313,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client_logged_as_jdoe_with_data.post('/api/files/integrate', json=ok_data)
         assert response.status_code == 200
-        print(response.json)
+        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
@@ -305,5 +331,5 @@ class TestApiFile(AskomicsTestCase):
         response = client_logged_as_jdoe_with_data.get('/api/files/ttl/1/jdoe/{}'.format(filename))
 
         assert response.status_code == 200
-        print(response.data.decode("utf-8"))
+        # print(response.data.decode("utf-8"))
         assert response.data.decode("utf-8") == content

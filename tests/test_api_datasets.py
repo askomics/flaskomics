@@ -14,7 +14,7 @@ class TestApiDatasets(AskomicsTestCase):
         assert len(response.json["datasets"]) == 1
         assert len(response.json["datasets"][0]) == 8
         assert response.json["datasets"][0]["id"] == 1
-        assert response.json["datasets"][0]["name"] == "gene"
+        assert response.json["datasets"][0]["name"] == "gene.tsv"
         assert not response.json["datasets"][0]["public"]
         assert response.json["datasets"][0]["status"] == 'success'
         assert type(response.json["datasets"][0]["start"]) == int
