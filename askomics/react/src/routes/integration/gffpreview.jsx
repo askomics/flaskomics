@@ -86,8 +86,8 @@ export default class GffPreview extends Component {
         <br />
             <div>
               <FormGroup check>
-                {this.state.availableEntities.map(entity => {
-                  return (<p><Input value={entity} onClick={this.handleSelection} type="checkbox" /> {entity}</p>)
+                {this.state.availableEntities.map((entity, index) => {
+                  return (<p key={entity + "_" + index}><Input value={entity} onClick={this.handleSelection} type="checkbox" /> {entity}</p>)
                 })}
               </FormGroup>
             </div>
@@ -99,4 +99,8 @@ export default class GffPreview extends Component {
       </div>
     )
   }
+}
+
+GffPreview.propTypes = {
+  file: PropTypes.object
 }
