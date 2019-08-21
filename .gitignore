@@ -13,6 +13,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# VScode
+.vscode/
+
+# ipython  notebooks
+*.ipynb
+
 # C extensions
 *.so
 

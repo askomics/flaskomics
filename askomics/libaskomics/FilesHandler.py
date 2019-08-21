@@ -2,6 +2,7 @@ import os
 import time
 
 from askomics.libaskomics.CsvFile import CsvFile
+from askomics.libaskomics.GffFile import GffFile
 from askomics.libaskomics.RdfFile import RdfFile
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
@@ -56,6 +57,8 @@ class FilesHandler(Params):
         for file in files_infos:
             if file['type'] == 'csv/tsv':
                 self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url))
+            elif file['type'] == 'gff/gff3':
+                self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url))
             elif file['type'] == 'turtle':
                 self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url))
 
@@ -173,6 +176,8 @@ class FilesHandler(Params):
             filetype = 'csv/tsv'
         elif filetype == 'text/turtle':
             filetype = 'turtle'
+        elif filetype == "":
+            filetype = self.get_type(os.path.splitext(name)[1])
         else:
             # Default is csv/tsv
             filetype = 'csv/tsv'
@@ -243,9 +248,11 @@ class FilesHandler(Params):
         if file_ext in ('.csv', '.tsv', '.tabular'):
             return 'csv/tsv'
         elif file_ext in ('.gff', '.gff2', '.gff3'):
-            return 'gff'
+            return 'gff/gff3'
         elif file_ext in ('.bed', ):
             return 'bed'
+        elif file_ext in ('.ttl', '.turtle'):
+            return 'turtle'
 
         # Default is csv
         return 'csv/tsv'

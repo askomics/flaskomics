@@ -268,6 +268,16 @@ class CsvFile(File):
         self.force_columns_type(forced_columns_type)
         File.integrate(self)
 
+    def get_rdf_abstraction_domain_knowledge(self):
+        """Get intersection of abstraction and domain knowledge
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        return self.get_rdf_abstraction() + self.get_rdf_domain_knowledge()
+
     def get_rdf_domain_knowledge(self):
         """Get the domain knowledge
 
@@ -448,26 +458,3 @@ class CsvFile(File):
                     rdf_graph.add((entity, relation, attribute))
 
                 yield rdf_graph
-
-    def convert_type(self, value):
-        """Convert a value to a int or float or text
-
-        Parameters
-        ----------
-        value : string
-            The value to convert
-
-        Returns
-        -------
-        string/float/int
-            the converted value
-        """
-        try:
-            return int(value)
-        except ValueError:
-            try:
-                return float(value)
-            except ValueError:
-                return value
-
-        return value

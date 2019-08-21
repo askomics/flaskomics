@@ -254,9 +254,7 @@ class File(Params):
             sparql.insert_data(graph_chunk, self.file_graph)
 
         # Content is inserted, now insert abstraction and domain_knowledge
-        abstraction = self.get_rdf_abstraction()
-        domain_knowledge = self.get_rdf_domain_knowledge()
-        abstraction_domain_knowledge = abstraction + domain_knowledge
+        abstraction_domain_knowledge = self.get_rdf_abstraction_domain_knowledge()
 
         if method == 'load':
 
@@ -271,3 +269,51 @@ class File(Params):
             sparql.insert_data(abstraction_domain_knowledge, self.file_graph)
 
         self.set_triples_number()
+
+    def get_rdf_type(self, value):
+        """get xsd type of a value
+
+        Parameters
+        ----------
+        value :
+            The value to get type
+
+        Returns
+        -------
+        TYPE
+            rdflib.XSD.string or rdflib.XSD.decimal
+        """
+        try:
+            int(value)
+            return rdflib.XSD.decimal
+        except ValueError:
+            try:
+                float(value)
+                return rdflib.XSD.decimal
+            except ValueError:
+                return rdflib.XSD.string
+
+        return rdflib.XSD.string
+
+    def convert_type(self, value):
+        """Convert a value to a int or float or text
+
+        Parameters
+        ----------
+        value : string
+            The value to convert
+
+        Returns
+        -------
+        string/float/int
+            the converted value
+        """
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+
+        return value

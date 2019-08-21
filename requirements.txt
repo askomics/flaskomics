@@ -14,3 +14,5 @@ pytest-cov
 coveralls
 flake8
 gitpython
+biopython
+bcbio-gff

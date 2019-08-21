@@ -27,6 +27,7 @@ export default class GffPreview extends Component {
     let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
     let data = {
       fileId: this.state.id,
+      entities: [...this.state.entitiesToIntegrate],
       public: event.target.value == 'public',
       type: 'gff/gff3'
     }
@@ -49,34 +50,24 @@ export default class GffPreview extends Component {
   }
 
   handleSelection (event) {
-    // console.log("value", event.target.value)
-    // console.log(event)
 
     let value = event.target.value
 
-    console.log("deal with", value)
-    console.log(this.state.entitiesToIntegrate)
-
-
     if (!this.state.entitiesToIntegrate.has(value)) {
       this.setState({
-        entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]).add(value)
+        entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]).add(value),
+        publicTick: false,
+        privateTick: false
       })
     }else {
+      this.state.entitiesToIntegrate.delete(value)
       this.setState({
-        entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]).delete(value)
+        entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]),
+        publicTick: false,
+        privateTick: false
       })
     }
-
-    console.log(this.state.entitiesToIntegrate)
-
-
-
   }
-
-
-
-
 
   render () {
 

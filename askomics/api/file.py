@@ -57,6 +57,8 @@ def upload_chunk():
     """
     data = request.get_json()
 
+    current_app.logger.debug(data)
+
     try:
         files = FilesHandler(current_app, session)
         path = files.persist_chunk(data)
