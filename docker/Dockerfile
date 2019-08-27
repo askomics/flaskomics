@@ -8,6 +8,7 @@ WORKDIR /askomics
 ENV DEPMODE="prod"
 
 RUN apk add --no-cache \
+    gcc g++ \
     python3 python3-dev \
     nodejs nodejs-npm \
     git bash && \
