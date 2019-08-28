@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Router, Route, Switch } from 'react-router-dom'
+import React, { Component, createContext } from 'react'
+import { BrowserRouter, Router, Route, Switch } from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import axios from 'axios'
 
@@ -19,6 +19,7 @@ import Query from './routes/query/query'
 import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
+import AskoContext from './components/context'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -26,6 +27,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 const history = createBrowserHistory()
 
 export default class Routes extends Component {
+
+  static contextType = AskoContext
+
   constructor (props) {
     super(props)
     this.state = {
@@ -40,8 +44,9 @@ export default class Routes extends Component {
   }
 
   componentDidMount () {
+
     let requestUrl = '/api/start'
-    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -84,7 +89,7 @@ export default class Routes extends Component {
 
 
     return (
-      <Router history={history}>
+      <BrowserRouter basename={this.context.proxyPath} history={history}>
         <div>
           <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user} disableIntegration={this.state.config.disableIntegration}/>
           <Switch>
@@ -104,7 +109,7 @@ export default class Routes extends Component {
           <br />
           <AskoFooter version={this.state.config.version} commit={this.state.config.commit} message={this.state.config.footerMessage} />
         </div>
-      </Router>
+      </BrowserRouter>
     )
   }
 }

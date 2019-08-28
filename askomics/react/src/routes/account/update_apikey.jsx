@@ -3,8 +3,10 @@ import axios from 'axios'
 import { Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon } from 'reactstrap'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class UpdateApiKey extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {}
@@ -15,7 +17,7 @@ export default class UpdateApiKey extends Component {
   handleSubmit (event) {
     let requestUrl = '/api/auth/apikey'
 
-    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

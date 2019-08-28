@@ -5,11 +5,13 @@ import { Redirect } from 'react-router-dom'
 import ResultsFilesTable from './resultsfilestable'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
+import AskoContext from '../../components/context'
 import update from 'react-addons-update'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
 
 export default class Results extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -37,7 +39,7 @@ export default class Results extends Component {
     let data = {
       filesIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -77,7 +79,7 @@ export default class Results extends Component {
 
   getResults () {
     let requestUrl = '/api/results'
-    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

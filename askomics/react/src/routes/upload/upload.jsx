@@ -6,8 +6,10 @@ import ErrorDiv from '../error/error'
 import UploadModal from './uploadmodal'
 import FilesTable from './filestable'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class Upload extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -28,7 +30,7 @@ export default class Upload extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/files'
-      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -59,7 +61,7 @@ export default class Upload extends Component {
     let data = {
       filesIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

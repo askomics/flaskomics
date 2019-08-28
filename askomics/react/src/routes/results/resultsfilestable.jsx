@@ -4,11 +4,13 @@ import { Redirect } from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
+import AskoContext from '../../components/context'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
 
 export default class ResultsFilesTable extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -65,7 +67,7 @@ export default class ResultsFilesTable extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/preview'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
@@ -89,7 +91,7 @@ export default class ResultsFilesTable extends Component {
   handleDownload (event) {
     let requestUrl = '/api/results/download'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then((response) => {
         console.log(requestUrl, response.data)
         FileDownload(response.data, 'result.csv')
@@ -109,7 +111,7 @@ export default class ResultsFilesTable extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
@@ -132,7 +134,7 @@ export default class ResultsFilesTable extends Component {
   handleEditQuery (event) {
     let requestUrl = '/api/results/sparqlquery'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -188,7 +190,7 @@ export default class ResultsFilesTable extends Component {
       description: this.state.description,
       public: this.state.newPublishStatus
     }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.setState({
         modal: false,
@@ -223,7 +225,7 @@ export default class ResultsFilesTable extends Component {
     }
     let requestUrl = '/api/results/setpublic'
     let data = {fileId: event.target.id, public: newPublic}
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.props.setStateResults({
         results: response.data.files,

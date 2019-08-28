@@ -131,6 +131,9 @@ class SparqlQueryLauncher(Params):
         except Exception:
             load_url = host_url
 
+        if not load_url.endswith('/'):
+            load_url = load_url + "/"
+
         file_url = '{}api/files/ttl/{}/{}/{}'.format(
             load_url,
             self.session['user']['id'],

@@ -1,6 +1,5 @@
-"""Render route
-"""
-from flask import (Blueprint, render_template)
+"""Render route"""
+from flask import (Blueprint, render_template, current_app)
 
 
 view_bp = Blueprint('view', __name__, url_prefix='/')
@@ -16,4 +15,10 @@ def home(path):
     html
         Html code of AskOmics
     """
-    return render_template('index.html', project="AskOmics")
+    proxy_path = "/"
+    try:
+        proxy_path = current_app.iniconfig.get('askomics', 'reverse_proxy_path')
+    except Exception:
+        pass
+
+    return render_template('index.html', project="AskOmics", proxy_path=proxy_path)

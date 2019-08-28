@@ -22,6 +22,8 @@ from flask import Flask
 
 from flask_ini import FlaskIni
 
+from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
+
 
 __all__ = ('create_app', 'create_celery')
 
@@ -62,13 +64,21 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
     with app.app_context():
 
         app.iniconfig.read(config)
-        app.secret_key = app.iniconfig.get('flask', 'secret_key')
+        proxy_path = None
+        try:
+            proxy_path = app.iniconfig.get('askomics', 'reverse_proxy_path')
+            app.config['REVERSE_PROXY_PATH'] = proxy_path
+        except Exception:
+            pass
 
         if blueprints is None:
             blueprints = BLUEPRINTS
 
         for blueprint in blueprints:
             app.register_blueprint(blueprint)
+
+    if proxy_path:
+        ReverseProxyPrefixFix(app)
 
     return app
 

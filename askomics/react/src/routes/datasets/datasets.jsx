@@ -3,8 +3,10 @@ import axios from 'axios'
 import DatasetsTable from './datasetstable'
 import { Button } from 'reactstrap'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class Datasets extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -40,7 +42,7 @@ export default class Datasets extends Component {
 
   getDatasets () {
     let requestUrl = '/api/datasets'
-    axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -68,7 +70,7 @@ export default class Datasets extends Component {
     let data = {
       datasetsIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -77,6 +79,10 @@ export default class Datasets extends Component {
           waiting: false
         })
       })
+  }
+
+  componentWillUnmount () {
+    this.cancelRequest()
   }
 
   render () {

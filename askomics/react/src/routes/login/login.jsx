@@ -4,8 +4,10 @@ import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
 import { Redirect, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
+import AskoContext from '../../components/context'
 
 export default class Login extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = { isLoading: true,
@@ -17,6 +19,7 @@ export default class Login extends Component {
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.cancelRequest
   }
 
   handleChange (event) {
@@ -36,7 +39,7 @@ export default class Login extends Component {
       password: this.state.password
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -63,6 +66,10 @@ export default class Login extends Component {
         })
       })
     event.preventDefault()
+  }
+
+  componentWillUnmount () {
+    this.cancelRequest()
   }
 
   render () {

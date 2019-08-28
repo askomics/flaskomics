@@ -4,12 +4,14 @@ import { Alert, Input, Button, ButtonGroup } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
+import AskoContext from '../../components/context'
 import CsvTable from './csvtable'
 import TtlPreview from './ttlpreview'
 import GffPreview from './gffpreview'
 import PropTypes from 'prop-types'
 
 export default class Integration extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -30,7 +32,7 @@ export default class Integration extends Component {
       let data = {
         filesId: this.state.filesId
       }
-      axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({

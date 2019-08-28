@@ -4,8 +4,10 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class GffPreview extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -31,7 +33,7 @@ export default class GffPreview extends Component {
       public: event.target.value == 'public',
       type: 'gff/gff3'
     }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

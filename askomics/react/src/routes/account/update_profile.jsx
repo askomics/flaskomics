@@ -3,8 +3,10 @@ import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class UpdateProfile extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -43,9 +45,9 @@ export default class UpdateProfile extends Component {
       newEmail: this.state.newEmail
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
-        console.log(requestUrl, response.data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        console.log(requestUrl, response.data)
         this.setState({
           isLoading: false,
           error: response.data.error,

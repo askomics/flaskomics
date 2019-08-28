@@ -6,8 +6,10 @@ import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class Ask extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -27,9 +29,10 @@ export default class Ask extends Component {
   }
 
   componentDidMount () {
+
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/startpoints'
-      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -82,7 +85,7 @@ export default class Ask extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview

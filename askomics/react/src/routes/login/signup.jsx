@@ -5,8 +5,10 @@ import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class Signup extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = { isLoading: true,
@@ -26,6 +28,7 @@ export default class Signup extends Component {
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.cancelRequest
   }
 
   handleChangeFname (event) {
@@ -75,7 +78,7 @@ export default class Signup extends Component {
       passwordconf: this.state.passwordconf
     }
 
-    axios.post(requestUrl, data)
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -108,6 +111,10 @@ export default class Signup extends Component {
         })
       })
     event.preventDefault()
+  }
+
+  componentWillUnmount () {
+    this.cancelRequest()
   }
 
   render () {

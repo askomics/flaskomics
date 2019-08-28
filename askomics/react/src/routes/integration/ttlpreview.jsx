@@ -6,11 +6,13 @@ import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import brace from 'brace'
 import AceEditor from 'react-ace'
+import AskoContext from '../../components/context'
 
 import 'brace/mode/turtle'
 import 'brace/theme/tomorrow'
 
 export default class TtlPreview extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -42,7 +44,7 @@ export default class TtlPreview extends Component {
       public: event.target.value == 'public',
       type: 'turtle'
     }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

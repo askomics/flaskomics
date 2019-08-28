@@ -10,8 +10,11 @@ import AttributeBox from './attribute'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
+import AskoContext from '../../components/context'
 
 export default class Query extends Component {
+  static contextType = AskoContext
+
   constructor (props) {
     super(props)
     this.state = {
@@ -720,7 +723,7 @@ export default class Query extends Component {
       disablePreview: true,
       previewIcon: "spinner"
     })
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -748,7 +751,7 @@ export default class Query extends Component {
     let data = {
       graphState: this.state.graphState
     }
-    axios.post(requestUrl, data, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -772,7 +775,7 @@ export default class Query extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/abstraction'
-      axios.get(requestUrl, { cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
