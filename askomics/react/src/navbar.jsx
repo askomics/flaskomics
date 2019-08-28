@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Collapse, Navbar, NavbarBrand, Nav, NavItem, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap'
 import PropTypes from 'prop-types'
+import AskoContext from './components/context'
 
 export default class AskoNavbar extends Component {
+  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.toggle = this.toggle.bind(this)
@@ -86,7 +88,7 @@ export default class AskoNavbar extends Component {
       <div>
         <Navbar color="dark" dark expand="md">
           <div className="container">
-            <NavbarBrand href="/">AskOmics</NavbarBrand>
+            <NavbarBrand href={this.context.proxyPath == "/" ? "/" : this.context.proxyPath + "/"}>AskOmics</NavbarBrand>
             <Collapse navbar>
               <Nav className="ml-auto" navbar>
                 {askLink}
