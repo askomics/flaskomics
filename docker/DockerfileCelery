@@ -12,6 +12,7 @@ RUN apk add --no-cache \
     python3 python3-dev \
     git bash && \
     /askomics/install.sh -i js && \
+    apk del gcc g++ && \
     rm -rf /var/cache/apk/* && \
     rm -rf /root/.cache/* && \
     rm -rf /root/.npm/*

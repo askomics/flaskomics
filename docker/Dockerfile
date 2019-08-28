@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     git bash && \
     /askomics/install.sh && \
     /askomics/build.sh && \
+    apk del gcc g++ && \
     rm -rf /var/cache/apk/* && \
     rm -rf /root/.cache/* && \
     rm -rf /root/.npm/*
