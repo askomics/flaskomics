@@ -1,5 +1,5 @@
 import React, { Component, createContext } from 'react'
-import { BrowserRouter, Router, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Router, Route, Switch, Redirect } from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import axios from 'axios'
 
@@ -71,6 +71,11 @@ export default class Routes extends Component {
 
   render () {
 
+    let redirectRoot
+    if (this.context.redirect == "/") {
+      redirectRoot = <Redirect to="/" />
+    }
+
     let admin = false
     if (this.state.user) {
       admin = this.state.user.admin
@@ -91,6 +96,7 @@ export default class Routes extends Component {
     return (
       <BrowserRouter basename={this.context.proxyPath} history={history}>
         <div>
+          {redirectRoot}
           <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user} disableIntegration={this.state.config.disableIntegration}/>
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} config={this.state.config} />)} />

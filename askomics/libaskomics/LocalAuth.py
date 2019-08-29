@@ -235,6 +235,51 @@ class LocalAuth(Params):
 
         return rows[0][0]
 
+    def authenticate_user_with_apikey(self, apikey):
+        """
+        Return the user associated with the API key
+
+        Parameters
+        ----------
+        inputs : string
+            API key
+
+        Returns
+        -------
+        dict
+            user info if authentication success
+        """
+        database = Database(self.app, self.session)
+        query = '''
+        SELECT * FROM users
+        WHERE apikey = ?
+        '''
+
+        error = False
+        error_messages = []
+        user = {}
+
+        rows = database.execute_sql_query(query, (apikey, ))
+
+        if len(rows) > 0:
+
+            user = {
+                'id': rows[0][0],
+                'ldap': rows[0][1],
+                'fname': rows[0][2],
+                'lname': rows[0][3],
+                'username': rows[0][4],
+                'email': rows[0][5],
+                'admin': rows[0][9],
+                'blocked': rows[0][10],
+                'apikey': rows[0][8]
+            }
+        else:
+            error = True
+            error_messages.append('No user with this API key')
+
+        return {'error': error, 'error_messages': error_messages, 'user': user}
+
     def authenticate_user(self, inputs):
         """
         check if the password is the good password associate with the email
@@ -249,7 +294,6 @@ class LocalAuth(Params):
         dict
             user info if authentication success
         """
-
         database_field = 'username'
         if validate_email(inputs['login']):
             database_field = 'email'

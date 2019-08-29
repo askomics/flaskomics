@@ -9,16 +9,20 @@ import AskoContext from './components/context'
 class App extends React.Component {
   render () {
 
-    let value = {
-      proxyPath: proxy_path.getAttribute('proxy_path')
+    let values = {
+      proxyPath: proxy_path.getAttribute('proxy_path'),
+      redirect: redirect.getAttribute('redirect')
     }
 
     return (
-      <AskoContext.Provider value={value}>
+      <AskoContext.Provider value={values}>
         <Routes />
       </AskoContext.Provider>
     )
   }
 }
 
-ReactDOM.render(<App proxyPath={ document.getElementById('proxy_path').getAttribute('proxy_path') } />, document.getElementById('app'))
+ReactDOM.render(<App
+                    proxyPath={ document.getElementById('proxy_path').getAttribute('proxy_path') }
+                    redirect={ document.getElementById('redirect').getAttribute('redirect') }
+                />, document.getElementById('app'))

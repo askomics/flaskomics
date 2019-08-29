@@ -1,21 +1,19 @@
-"""Authentication routes
-"""
+"""Authentication routes"""
 
 from functools import wraps
 
 from askomics.libaskomics.LocalAuth import LocalAuth
 
-from flask import (Blueprint, current_app, jsonify, request, session)
+from flask import (Blueprint, current_app, jsonify, request, session, render_template)
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/')
 
 
 def login_required(f):
+    """Login required function"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        """Login required decorator
-        """
-
+        """Login required decorator"""
         if 'user' in session:
             if not session['user']['blocked']:
                 return f(*args, **kwargs)
@@ -26,11 +24,10 @@ def login_required(f):
 
 
 def admin_required(f):
+    """Login required function"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        """Login required decorator
-        """
-
+        """Login required decorator"""
         if 'user' in session:
             if session['user']['admin']:
                 return f(*args, **kwargs)
@@ -49,7 +46,6 @@ def signup():
     json
         Info about the user
     """
-
     user = {}
 
     data = request.get_json()
@@ -91,6 +87,43 @@ def login():
         'errorMessage': authentication['error_messages'],
         'user': authentication['user']
     })
+
+
+@auth_bp.route('/loginapikey/<path:key>', methods=["GET"])
+def login_api_key(key):
+    """Log user with his API key
+
+    Parameters
+    ----------
+    key : string
+        User API key
+
+    Returns
+    -------
+    json
+        Information about the logged user
+    """
+    local_auth = LocalAuth(current_app, session)
+    authentication = local_auth.authenticate_user_with_apikey(key)
+
+    if not authentication["error"]:
+        session["user"] = authentication["user"]
+
+        proxy_path = "/"
+        try:
+            proxy_path = current_app.iniconfig.get('askomics', 'reverse_proxy_path')
+        except Exception:
+            pass
+
+        return render_template('index.html', project="AskOmics", proxy_path=proxy_path, redirect="/")
+
+    else:
+
+        return jsonify({
+            'error': authentication['error'],
+            'errorMessage': authentication['error_messages'],
+            'user': authentication['user']
+        })
 
 
 @auth_bp.route('/api/auth/profile', methods=['POST'])
