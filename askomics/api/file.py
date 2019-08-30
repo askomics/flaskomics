@@ -1,5 +1,4 @@
-"""Api routes
-"""
+"""Api routes"""
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
 
@@ -57,8 +56,6 @@ def upload_chunk():
     """
     data = request.get_json()
 
-    current_app.logger.debug(data)
-
     try:
         files = FilesHandler(current_app, session)
         path = files.persist_chunk(data)
@@ -71,6 +68,33 @@ def upload_chunk():
         }), 500
     return jsonify({
         "path": path,
+        "error": False,
+        "errorMessage": ""
+    })
+
+
+@file_bp.route('/api/files/upload_url', methods=["POST"])
+def upload_url():
+    """Upload a distant file with an URL
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+
+    try:
+        files = FilesHandler(current_app, session)
+        files.download_url(data["url"])
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            "error": True,
+            "errorMessage": str(e)
+        }), 500
+    return jsonify({
         "error": False,
         "errorMessage": ""
     })

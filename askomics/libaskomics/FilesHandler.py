@@ -1,5 +1,6 @@
 import os
 import time
+import requests
 
 from askomics.libaskomics.CsvFile import CsvFile
 from askomics.libaskomics.GffFile import GffFile
@@ -229,6 +230,27 @@ class FilesHandler(Params):
             except Exception:
                 pass
             raise(e)
+
+    def download_url(self, url):
+        """Download a file from an URL and insert info in database
+
+        Parameters
+        ----------
+        url : string
+            The file url
+        """
+        # Get name, path; est and type
+        name = url.split("/")[-1]
+        file_name = self.get_file_name()
+        path = "{}/{}".format(self.upload_path, file_name)
+
+        # Get file
+        req = requests.get(url)
+        with open(path, 'wb') as file:
+            file.write(req.content)
+
+        # insert in db
+        self.store_file_info_in_db(name, "", file_name, os.path.getsize(path))
 
     def get_type(self, file_ext):
         """Get files type, based on extension

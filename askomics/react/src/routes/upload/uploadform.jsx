@@ -79,7 +79,7 @@ export default class UploadForm extends Component {
           type: this.state.new_files[i].file.type,
           size: totalSize
         }
-        axios.post(requestUrlUpload, data)
+        axios.post(requestUrlUpload, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
           .then(response => {
             console.log(requestUrlUpload, response.data)
             first = false
