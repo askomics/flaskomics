@@ -1,10 +1,10 @@
-"""Contain the Database class
-"""
+"""Contain the Database class"""
 
 import hashlib
 import os
 
 from askomics.libaskomics.Database import Database
+from askomics.libaskomics.Galaxy import Galaxy
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 
@@ -12,9 +12,18 @@ from validate_email import validate_email
 
 
 class LocalAuth(Params):
+    """Manage user authentication"""
 
     def __init__(self, app, session):
+        """init
 
+        Parameters
+        ----------
+        app : Flask
+            flask app
+        session :
+            AskOmics session, contain the user
+        """
         Params.__init__(self, app, session)
 
     def check_inputs(self, inputs):
@@ -29,7 +38,6 @@ class LocalAuth(Params):
             User inputs
 
         """
-
         if not inputs['fname']:
             self.error = True
             self.error_message.append('First name empty')
@@ -76,7 +84,6 @@ class LocalAuth(Params):
         bool
             True if the user exist
         """
-
         database = Database(self.app, self.session)
         query = '''
         SELECT username, password FROM users
@@ -103,7 +110,6 @@ class LocalAuth(Params):
         bool
             True if the email exist
         """
-
         database = Database(self.app, self.session)
         query = '''
         SELECT email FROM users
@@ -132,7 +138,6 @@ class LocalAuth(Params):
         dict
             The user
         """
-
         database = Database(self.app, self.session)
 
         # Check if user is the first. if yes, set him admin
@@ -188,11 +193,20 @@ class LocalAuth(Params):
             'email': inputs['email'],
             'admin': admin,
             'blocked': blocked,
-            'apikey': api_key
+            'apikey': api_key,
+            'galaxy': None
         }
 
     def create_user_directories(self, user_id, username):
+        """Create the User directory
 
+        Parameters
+        ----------
+        user_id : int
+            User id
+        username : string
+            username
+        """
         userdir_path = "{}/{}_{}".format(
             self.settings.get("askomics", "data_directory"),
             user_id,
@@ -209,7 +223,13 @@ class LocalAuth(Params):
         self.create_directory(results_path)
 
     def create_directory(self, directory_path):
+        """Create a directory
 
+        Parameters
+        ----------
+        directory_path : string
+            Path
+        """
         try:
             os.makedirs(directory_path)
         except FileExistsError:
@@ -221,10 +241,13 @@ class LocalAuth(Params):
                     directory_path)
 
     def get_number_of_users(self):
-        """
-        get the number of users in the TS
-        """
+        """get the number of users in the DB
 
+        Returns
+        -------
+        int
+            Number of user in the Database
+        """
         database = Database(self.app, self.session)
         query = '''
         SELECT COUNT(*)
@@ -272,7 +295,8 @@ class LocalAuth(Params):
                 'email': rows[0][5],
                 'admin': rows[0][9],
                 'blocked': rows[0][10],
-                'apikey': rows[0][8]
+                'apikey': rows[0][8],
+                'galaxy': None
             }
         else:
             error = True
@@ -332,7 +356,8 @@ class LocalAuth(Params):
                     'email': rows[0][5],
                     'admin': rows[0][9],
                     'blocked': rows[0][10],
-                    'apikey': rows[0][8]
+                    'apikey': rows[0][8],
+                    'galaxy': None
                 }
         else:
             error = True
@@ -355,7 +380,6 @@ class LocalAuth(Params):
         dict
             error, error message and updated user
         """
-
         error = False
         error_message = ''
 
@@ -486,14 +510,113 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
-    def get_user(self, username):
+    def update_galaxy_account(self, user, url, apikey):
+        """Update a Galaxy account
 
+        Parameters
+        ----------
+        user : dict
+            Previous user info
+        url : string
+            Galaxy URL
+        apikey : string
+            Galaxy API key
+
+        Returns
+        -------
+        dict
+            Updated user
+        """
+        database = Database(self.app, self.session)
+        galaxy = Galaxy(self.app, self.session, url, apikey)
+
+        valid = galaxy.check_galaxy_instance()
+        error_message = "Not a valid Galaxy"
+
+        if valid:
+            error_message = ""
+
+            query = '''
+            UPDATE galaxy_accounts SET
+            url = ?,
+            apikey = ?
+            WHERE user_id = ?
+            '''
+
+            database.execute_sql_query(query, (url, apikey, self.session["user"]["id"]))
+
+            user["galaxy"] = {
+                "url": url,
+                "key": apikey
+            }
+
+        return {"error": not valid, "error_message": error_message, "user": user}
+
+    def add_galaxy_account(self, user, url, apikey):
+        """Add a Galaxy account
+
+        Parameters
+        ----------
+        user : dict
+            Previous user info
+        url : string
+            Galaxy URL
+        apikey : string
+            Galaxy API key
+
+        Returns
+        -------
+        dict
+            Updated user
+        """
+        database = Database(self.app, self.session)
+        galaxy = Galaxy(self.app, self.session, url, apikey)
+
+        valid = galaxy.check_galaxy_instance()
+        error_message = "Not a valid Galaxy"
+
+        if valid:
+            error_message = ""
+
+            query = '''
+            INSERT INTO galaxy_accounts VALUES(
+                NULL,
+                ?,
+                ?,
+                ?
+            )
+            '''
+
+            database.execute_sql_query(query, (self.session["user"]["id"], url, apikey))
+
+            user["galaxy"] = {
+                "url": url,
+                "key": apikey
+            }
+
+        return {"error": not valid, "error_message": error_message, "user": user}
+
+    def get_user(self, username):
+        """Get a specific user by his username
+
+        Parameters
+        ----------
+        username : string
+            User username
+
+        Returns
+        -------
+        dict
+            The corresponding user
+        """
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT *
-        FROM users
-        WHERE username=?
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        FROM users u
+        LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
+        WHERE username = ?
+        GROUP BY u.user_id
         '''
 
         rows = database.execute_sql_query(query, (username, ))
@@ -507,19 +630,34 @@ class LocalAuth(Params):
         user['lname'] = rows[0][3]
         user['username'] = rows[0][4]
         user['email'] = rows[0][5]
-        user['admin'] = rows[0][9]
-        user['blocked'] = rows[0][10]
-        user['apikey'] = rows[0][8]
+        user['apikey'] = rows[0][6]
+        user['admin'] = rows[0][7]
+        user['blocked'] = rows[0][8]
+        user['galaxy'] = None
+
+        if rows[0][9] is not None and rows[0][10] is not None:
+            user['galaxy'] = {
+                'url': rows[0][9],
+                'apikey': rows[0][10]
+            }
 
         return user
 
     def get_all_users(self):
+        """Get all user info
 
+        Returns
+        -------
+        list
+            All user info
+        """
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT user_id, ldap, fname, lname, username, email, admin, blocked
-        FROM users
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, g.url, g.apikey
+        FROM users u
+        LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
+        GROUP BY u.user_id
         '''
 
         rows = database.execute_sql_query(query)
@@ -536,12 +674,28 @@ class LocalAuth(Params):
                 user['email'] = row[5]
                 user['admin'] = row[6]
                 user['blocked'] = row[7]
+                user['galaxy'] = None
+
+                if row[8] is not None and row[9] is not None:
+                    user['galaxy'] = {
+                        'url': row[8],
+                        'apikey': row[9]
+                    }
+
                 users.append(user)
 
         return users
 
     def set_admin(self, new_status, username):
+        """Set a new admin status to a user
 
+        Parameters
+        ----------
+        new_status : boolean
+            True for an admin
+        username : string
+            The concerned username
+        """
         database = Database(self.app, self.session)
 
         query = '''
@@ -553,7 +707,15 @@ class LocalAuth(Params):
         database.execute_sql_query(query, (new_status, username))
 
     def set_blocked(self, new_status, username):
+        """Set a new blocked status to a user
 
+        Parameters
+        ----------
+        new_status : boolean
+            True for blocked
+        username : string
+            The concerned username
+        """
         database = Database(self.app, self.session)
 
         query = '''

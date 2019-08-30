@@ -17,3 +17,4 @@ flake8
 gitpython
 biopython
 bcbio-gff
+bioblend

@@ -5,6 +5,7 @@ import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import UpdateProfile from './update_profile'
 import UpdatePassword from './update_password'
+import UpdateGalaxyAccount from './update_galaxy'
 import UpdateApiKey from './update_apikey'
 import PropTypes from 'prop-types'
 
@@ -25,6 +26,8 @@ export default class Account extends Component {
         <UpdateProfile user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
         <hr />
         <UpdatePassword user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
+        <hr />
+        <UpdateGalaxyAccount user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
         <hr />
         <UpdateApiKey user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
       </div>

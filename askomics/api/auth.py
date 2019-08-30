@@ -194,6 +194,30 @@ def update_apikey():
     })
 
 
+@auth_bp.route('/api/auth/galaxy', methods=['POST'])
+def update_galaxy():
+    """Update the user apikey
+
+    Returns
+    -------
+    json
+        The user with his new apikey
+    """
+    data = request.get_json()
+
+    local_auth = LocalAuth(current_app, session)
+    if session["user"]["galaxy"]:
+        updated_user = local_auth.update_galaxy_account(session["user"], data["gurl"], data["gkey"])
+    else:
+        updated_user = local_auth.add_galaxy_account(session["user"], data["gurl"], data["gkey"])
+
+    return jsonify({
+        'error': updated_user['error'],
+        'errorMessage': updated_user['error_message'],
+        'user': updated_user['user']
+    })
+
+
 @auth_bp.route('/api/auth/logout', methods=['GET'])
 def logout():
     """Logout the current user
