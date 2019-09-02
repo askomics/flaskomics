@@ -65,7 +65,8 @@ class TestApi(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             },
             "logged": True,
             "config": expected_config
@@ -87,7 +88,8 @@ class TestApi(AskomicsTestCase):
                 'email': "jsmith@askomics.org",
                 'admin': False,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             },
             "logged": True,
             "config": expected_config

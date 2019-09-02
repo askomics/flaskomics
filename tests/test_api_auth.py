@@ -13,7 +13,8 @@ class TestApiAuth(AskomicsTestCase):
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
             "email": "jwick@askomics.org",
-            'apikey': "0000000000"
+            'apikey': "0000000000",
+            "galaxy": None
         }
 
         empty_fname_data = {
@@ -22,7 +23,8 @@ class TestApiAuth(AskomicsTestCase):
             "username": "jwick",
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
-            "email": "jwick@askomics.org"
+            "email": "jwick@askomics.org",
+            "galaxy": None
         }
 
         empty_lname_data = {
@@ -31,7 +33,8 @@ class TestApiAuth(AskomicsTestCase):
             "username": "jwick",
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
-            "email": "jwick@askomics.org"
+            "email": "jwick@askomics.org",
+            "galaxy": None
         }
 
         empty_username_data = {
@@ -40,7 +43,8 @@ class TestApiAuth(AskomicsTestCase):
             "username": "",
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
-            "email": "jwick@askomics.org"
+            "email": "jwick@askomics.org",
+            "galaxy": None
         }
 
         unvalid_email_data = {
@@ -49,7 +53,8 @@ class TestApiAuth(AskomicsTestCase):
             "username": "jwick",
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
-            "email": "xx"
+            "email": "xx",
+            "galaxy": None
         }
 
         diff_password_data = {
@@ -58,7 +63,8 @@ class TestApiAuth(AskomicsTestCase):
             "username": "jwick",
             "password": "dontkillmydog",
             "passwordconf": "dontstillmycar",
-            "email": "jwick@askomics.org"
+            "email": "jwick@askomics.org",
+            "galaxy": None
         }
 
         # fname empty
@@ -121,7 +127,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jwick@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -137,7 +144,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jwick@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
         # Re-insert same user
@@ -224,7 +232,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -243,7 +252,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -259,7 +269,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
     def test_update_profile(self, client_logged_as_jdoe):
@@ -302,7 +313,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
         # Assert database is untouched
@@ -320,7 +332,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
         response = client_logged_as_jdoe.post("/api/auth/profile", json=update_lname_data)
@@ -337,7 +350,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
         # Assert database is updated
@@ -355,7 +369,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
         response = client_logged_as_jdoe.post("/api/auth/profile", json=update_email_data)
@@ -372,7 +387,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdodo@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
         # Assert database is updated
@@ -390,7 +406,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdodo@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
         response = client_logged_as_jdoe.post("/api/auth/profile", json=update_all_data)
@@ -407,7 +424,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdododo@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
         # Assert database is updated
@@ -425,7 +443,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdododo@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
 
     def test_update_password(self, client_logged_as_jdoe):
@@ -468,7 +487,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -486,7 +506,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -504,7 +525,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -522,7 +544,8 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
-                'apikey': "0000000000"
+                'apikey': "0000000000",
+                'galaxy': None
             }
         }
 
@@ -534,7 +557,7 @@ class TestApiAuth(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["user"]) == 9
+        assert len(response.json["user"]) == 10
         assert response.json["user"]["id"] == 1
         assert not response.json["user"]["ldap"]
         assert response.json["user"]["fname"] == "John"
@@ -544,6 +567,7 @@ class TestApiAuth(AskomicsTestCase):
         assert response.json["user"]["admin"]
         assert not response.json["user"]["blocked"]
         assert not response.json["user"]["apikey"] == "0000000000"
+        assert response.json["user"]["galaxy"] is None
 
     def test_logout(self, client_logged_as_jdoe):
         """test /api/auth/logout route"""

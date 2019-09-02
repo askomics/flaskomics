@@ -63,7 +63,8 @@ def create_users(dir_path):
         "password": "iamjohndoe",
         "salt": "0000000000",
         "email": "jdoe@askomics.org",
-        "apikey": "0000000000"
+        "apikey": "0000000000",
+        "galaxy": None
     }
     uinfo_2 = {
         "fname": "Jane",
@@ -72,7 +73,8 @@ def create_users(dir_path):
         "password": "iamjanesmith",
         "salt": "0000000000",
         "email": "jsmith@askomics.org",
-        "apikey": "0000000000"
+        "apikey": "0000000000",
+        "galaxy": None
     }
 
     auth = LocalAuth(current_app, {})
@@ -335,7 +337,8 @@ def client_logged_as_jdoe():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
-            'apikey': "0000000000"
+            'apikey': "0000000000",
+            "galaxy": None
         }
 
     yield client
@@ -375,7 +378,8 @@ def client_logged_as_jsmith():
             'email': "jsmith@askomics.org",
             'admin': False,
             'blocked': False,
-            'apikey': "0000000000"
+            'apikey': "0000000000",
+            "galaxy": None
         }
 
     yield client
@@ -419,7 +423,8 @@ def client_logged_as_jdoe_with_data():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
-            'apikey': "0000000000"
+            'apikey': "0000000000",
+            "galaxy": None
         }
         user_session = sess
 
@@ -486,7 +491,8 @@ def client_logged_as_jdoe_with_data_and_result():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
-            'apikey': "0000000000"
+            'apikey': "0000000000",
+            "galaxy": None
         }
         user_session = sess
 
