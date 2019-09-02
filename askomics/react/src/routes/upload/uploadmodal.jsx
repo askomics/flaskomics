@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, Input } from 'reactstrap'
 import UploadForm from './uploadform'
 import UploadUrlForm from './uploadurlform'
+import UploadGalaxyForm from './uploadgalaxyform'
 import PropTypes from 'prop-types'
 
 export default class UploadModal extends Component {
@@ -10,10 +11,12 @@ export default class UploadModal extends Component {
 
     this.state = {
       modalComputer: false,
-      modalUrl: false
+      modalUrl: false,
+      modalGalaxy: false
     }
     this.toggleModalComputer = this.toggleModalComputer.bind(this)
     this.toggleModalUrl = this.toggleModalUrl.bind(this)
+    this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
   }
 
   toggleModalComputer () {
@@ -28,6 +31,12 @@ export default class UploadModal extends Component {
     })
   }
 
+  toggleModalGalaxy () {
+    this.setState({
+      modalGalaxy: !this.state.modalGalaxy
+    })
+  }
+
   render () {
     return (
 
@@ -35,7 +44,7 @@ export default class UploadModal extends Component {
         <ButtonGroup>
           <Button color="secondary" onClick={this.toggleModalComputer}><i className="fas fa-upload"></i> Computer</Button>
           <Button color="secondary" onClick={this.toggleModalUrl}><i className="fas fa-upload"></i> URL</Button>
-          <Button color="secondary"><i className="fas fa-upload"></i> Galaxy</Button>
+          <Button color="secondary" onClick={this.toggleModalGalaxy}><i className="fas fa-upload"></i> Galaxy</Button>
         </ButtonGroup>
 
         <Modal isOpen={this.state.modalComputer} toggle={this.toggleModalComputer}>
@@ -58,6 +67,15 @@ export default class UploadModal extends Component {
           </ModalFooter>
         </Modal>
 
+        <Modal isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
+          <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
+          <ModalBody>
+            <UploadGalaxyForm setStateUpload={this.props.setStateUpload} />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     )
   }
