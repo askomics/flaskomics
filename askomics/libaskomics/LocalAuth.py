@@ -273,9 +273,13 @@ class LocalAuth(Params):
             user info if authentication success
         """
         database = Database(self.app, self.session)
+
         query = '''
-        SELECT * FROM users
-        WHERE apikey = ?
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        FROM users u
+        LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
+        WHERE u.apikey = ?
+        GROUP BY u.user_id
         '''
 
         error = False
@@ -293,11 +297,18 @@ class LocalAuth(Params):
                 'lname': rows[0][3],
                 'username': rows[0][4],
                 'email': rows[0][5],
-                'admin': rows[0][9],
-                'blocked': rows[0][10],
-                'apikey': rows[0][8],
+                'apikey': rows[0][6],
+                'admin': rows[0][7],
+                'blocked': rows[0][8],
                 'galaxy': None
             }
+
+            if rows[0][9] is not None and rows[0][10] is not None:
+                user['galaxy'] = {
+                    'url': rows[0][9],
+                    'apikey': rows[0][10]
+                }
+
         else:
             error = True
             error_messages.append('No user with this API key')
@@ -332,6 +343,14 @@ class LocalAuth(Params):
         WHERE {}=?
         '''.format(database_field)
 
+        query = '''
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        FROM users u
+        LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
+        WHERE {} = ?
+        GROUP BY u.user_id
+        '''.format(database_field)
+
         rows = database.execute_sql_query(query, (inputs['login'], ))
 
         if len(rows) > 0:
@@ -354,11 +373,18 @@ class LocalAuth(Params):
                     'lname': rows[0][3],
                     'username': rows[0][4],
                     'email': rows[0][5],
+                    'apikey': rows[0][8],
                     'admin': rows[0][9],
                     'blocked': rows[0][10],
-                    'apikey': rows[0][8],
                     'galaxy': None
                 }
+
+            if rows[0][11] is not None and rows[0][12] is not None:
+                user['galaxy'] = {
+                    'url': rows[0][11],
+                    'apikey': rows[0][12]
+                }
+
         else:
             error = True
             error_messages.append('Wrong username')
@@ -547,7 +573,7 @@ class LocalAuth(Params):
 
             user["galaxy"] = {
                 "url": url,
-                "key": apikey
+                "apikey": apikey
             }
 
         return {"error": not valid, "error_message": error_message, "user": user}
@@ -591,7 +617,7 @@ class LocalAuth(Params):
 
             user["galaxy"] = {
                 "url": url,
-                "key": apikey
+                "apikey": apikey
             }
 
         return {"error": not valid, "error_message": error_message, "user": user}

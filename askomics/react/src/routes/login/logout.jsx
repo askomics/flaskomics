@@ -14,7 +14,7 @@ export default class logout extends Component {
 
   componentDidMount () {
     let requestUrl = '/api/auth/logout'
-    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.context.proxyPath })
       .then(response => {
         console.log(requestUrl, response.data)
         this.props.setStateNavbar({
@@ -25,10 +25,6 @@ export default class logout extends Component {
       .catch(error => {
         console.log(error)
       })
-  }
-
-  componentWillUnmount () {
-    this.cancelRequest()
   }
 
   render () {

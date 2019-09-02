@@ -89,7 +89,7 @@ export default class UpdateGalaxyAccount extends Component {
           </FormGroup>
           <FormGroup>
             <Label for="lname">Galaxy API key</Label>
-            <Input type="text" name="gkey" id="gkey" placeholder={this.props.user.galaxy ? this.props.user.galaxy.key : "Enter a Galaxy API key"} value={this.state.gkey} onChange={this.handleChange} />
+            <Input type="text" name="gkey" id="gkey" placeholder={this.props.user.galaxy ? this.props.user.galaxy.apikey : "Enter a Galaxy API key"} value={this.state.gkey} onChange={this.handleChange} />
           </FormGroup>
           <Button disabled={!this.validateForm()}>Update Galaxy account {successTick}</Button>
         </Form>
