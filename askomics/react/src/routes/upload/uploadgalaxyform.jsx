@@ -205,5 +205,6 @@ export default class UploadGalaxyForm extends Component {
 }
 
 UploadGalaxyForm.propTypes = {
-  setStateUpload: PropTypes.func
+  setStateUpload: PropTypes.func,
+  waiting: PropTypes.bool
 }

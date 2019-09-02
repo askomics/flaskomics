@@ -20,7 +20,7 @@ class Galaxy(Params):
         ----------
         app : Flask
             flask app
-        session : 
+        session :
             AskOmics session, contain the user
         url : string
             Galaxy url
