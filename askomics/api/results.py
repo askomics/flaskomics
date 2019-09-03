@@ -305,7 +305,7 @@ def send2galaxy():
         json = request.get_json()
         result_info = {"id": json["fileId"]}
         result = Result(current_app, session, result_info)
-        result.send2galaxy()
+        result.send2galaxy(json["fileToSend"])
     except Exception as e:
         current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)

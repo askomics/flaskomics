@@ -155,28 +155,13 @@ export default class ResultsFilesTable extends Component {
 
   handleSendToGalaxy (event) {
     let requestUrl = '/api/results/send2galaxy'
-    let data = {fileId: event.target.id}
-    // this.setState({
-    //   galaxy_wait: true,
-    //   galaxy_error: false,
-    //   galaxy_ok: false
-    // })
+    let data = {fileId: event.target.id, fileToSend: event.target.name}
     axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
-      // this.setState({
-      //   galaxy_wait: false,
-      //   galaxy_error: false,
-      //   galaxy_ok: true
-      // })
       console.log(requestUrl, response.data)
     })
     .catch(error => {
       console.log(error)
-      // this.setState({
-      //   galaxy_wait: false,
-      //   galaxy_error: true,
-      //   galaxy_ok: false
-      // })
     })
   }
 
@@ -302,8 +287,7 @@ export default class ResultsFilesTable extends Component {
     let columns = [{
       text: 'Id',
       sort: true,
-      formatter: (cell, row) => { return row.id },
-      headerStyle: () => { return { width: '5%' } }
+      formatter: (cell, row) => { return row.id }
     }, {
       dataField: 'start',
       text: 'Creation date',
@@ -322,8 +306,7 @@ export default class ResultsFilesTable extends Component {
             </div>
           </FormGroup>
         )
-      },
-      headerStyle: () => { return { width: '10%' } }
+      }
     }, {
       dataField: 'status',
       text: 'Status',
@@ -339,7 +322,6 @@ export default class ResultsFilesTable extends Component {
         }
         return <Badge color="danger">Failure</Badge>
       },
-      headerStyle: () => { return { width: '8%' } },
       sort: true
     }, {
       dataField: "nrows",
@@ -354,12 +336,10 @@ export default class ResultsFilesTable extends Component {
         } else {
           return formattedNrows
         }
-      },
-      headerStyle: () => { return { width: '10%' } }
+      }
     }, {
       dataField: 'error_message',
-      text: 'Message',
-      headerStyle: () => { return { width: '15%' } }
+      text: 'Message'
     }, {
       // buttons
       text: 'Actions',
@@ -370,11 +350,11 @@ export default class ResultsFilesTable extends Component {
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
-            {this.props.user.galaxy ? <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Galaxy</Button> : null}
+            {this.props.user.galaxy ? <Button name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
+            {this.props.user.galaxy ? <Button name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
-      },
-      headerStyle: () => { return { width: this.props.user.galaxy ? '30%' : '25%' } }
+      }
     }]
 
     let defaultSorted = [{
@@ -399,6 +379,8 @@ export default class ResultsFilesTable extends Component {
         <div className="asko-table-div">
           {redirectQueryBuilder}{redirectSparqlEditor}
           <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
             tabIndexCell
             bootstrap4
             keyField='id'

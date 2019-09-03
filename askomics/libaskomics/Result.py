@@ -372,10 +372,28 @@ class Result(Params):
             self.id
         ))
 
-    def send2galaxy(self):
+    def send2galaxy(self, file2send):
+        """Send files to Galaxy"""
+        if file2send == "result":
+            self.send_result_to_galaxy()
+        elif file2send == "query":
+            self.send_query_to_galaxy()
+
+    def send_result_to_galaxy(self):
         """Send a result file to Galaxy"""
-        filename = "AskOmics_result_{}".format(self.file_name)
+        filename = "AskOmics_result_{}.tsv".format(self.id)
 
         galaxy_instance = galaxy.GalaxyInstance(self.session["user"]["galaxy"]["url"], self.session["user"]["galaxy"]["apikey"])
         last_history = galaxy_instance.histories.get_most_recently_used_history()
         galaxy_instance.tools.upload_file(self.file_path, last_history['id'], file_name=filename, file_type='tabular')
+
+    def send_query_to_galaxy(self):
+        """Send the json query to a galaxy dataset"""
+        galaxy_instance = galaxy.GalaxyInstance(self.session["user"]["galaxy"]["url"], self.session["user"]["galaxy"]["apikey"])
+        last_history_id = galaxy_instance.histories.get_most_recently_used_history()['id']
+
+        # Name of the json file
+        name = "AskOmics_query_{}.json".format(self.id)
+
+        # Load the file into Galaxy
+        galaxy_instance.tools.paste_content(json.dumps(self.get_graph_state(formated=True)), last_history_id, file_type='json', file_name=name)
