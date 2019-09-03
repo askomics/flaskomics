@@ -288,3 +288,34 @@ def publish_query():
         'error': False,
         'errorMessage': ''
     })
+
+
+@results_bp.route('/api/results/send2galaxy', methods=['POST'])
+@login_required
+def send2galaxy():
+    """Send a result file into Galaxy
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result_info = {"id": json["fileId"]}
+        result = Result(current_app, session, result_info)
+        result.send2galaxy()
+    except Exception as e:
+        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
+
+        return jsonify({
+            'error': True,
+            'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })

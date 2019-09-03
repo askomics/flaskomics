@@ -3,6 +3,8 @@ import csv
 import json
 import time
 
+from bioblend import galaxy
+
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
@@ -369,3 +371,11 @@ class Result(Params):
             self.session["user"]["id"],
             self.id
         ))
+
+    def send2galaxy(self):
+        """Send a result file to Galaxy"""
+        filename = "AskOmics_result_{}".format(self.file_name)
+
+        galaxy_instance = galaxy.GalaxyInstance(self.session["user"]["galaxy"]["url"], self.session["user"]["galaxy"]["apikey"])
+        last_history = galaxy_instance.histories.get_most_recently_used_history()
+        galaxy_instance.tools.upload_file(self.file_path, last_history['id'], file_name=filename, file_type='tabular')

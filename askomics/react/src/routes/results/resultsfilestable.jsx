@@ -26,7 +26,7 @@ export default class ResultsFilesTable extends Component {
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
-    // this.handlePublish = this.handlePublish.bind(this)
+    this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.handlePublishClick = this.handlePublishClick.bind(this)
     this.handleDescChange = this.handleDescChange.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
@@ -150,6 +150,33 @@ export default class ResultsFilesTable extends Component {
         status: error.response.status,
         waiting: false
       })
+    })
+  }
+
+  handleSendToGalaxy (event) {
+    let requestUrl = '/api/results/send2galaxy'
+    let data = {fileId: event.target.id}
+    // this.setState({
+    //   galaxy_wait: true,
+    //   galaxy_error: false,
+    //   galaxy_ok: false
+    // })
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      // this.setState({
+      //   galaxy_wait: false,
+      //   galaxy_error: false,
+      //   galaxy_ok: true
+      // })
+      console.log(requestUrl, response.data)
+    })
+    .catch(error => {
+      console.log(error)
+      // this.setState({
+      //   galaxy_wait: false,
+      //   galaxy_error: true,
+      //   galaxy_ok: false
+      // })
     })
   }
 
@@ -343,10 +370,11 @@ export default class ResultsFilesTable extends Component {
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
+            {this.props.user.galaxy ? <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Galaxy</Button> : null}
           </ButtonGroup>
         )
       },
-      headerStyle: () => { return { width: '25%' } }
+      headerStyle: () => { return { width: this.props.user.galaxy ? '30%' : '25%' } }
     }]
 
     let defaultSorted = [{
