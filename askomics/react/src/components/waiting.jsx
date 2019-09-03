@@ -6,7 +6,8 @@ export default class WaitingDiv extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      center: this.props.center ? 'center' : ''
+      center: this.props.center ? 'center' : '',
+      size: this.props.size ? this.props.size : ''
     }
   }
 
@@ -14,7 +15,7 @@ export default class WaitingDiv extends Component {
     if (this.props.waiting) {
       return (
         <div className={this.state.center}>
-          <Spinner color="secondary" />
+          <Spinner size = {this.state.size} color="secondary" />
         </div>
       )
     }
@@ -24,5 +25,6 @@ export default class WaitingDiv extends Component {
 
 WaitingDiv.propTypes = {
   center: PropTypes.bool,
-  waiting: PropTypes.bool
+  waiting: PropTypes.bool,
+  size: PropTypes.string
 }

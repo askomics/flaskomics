@@ -1,5 +1,7 @@
 from bioblend import galaxy
+from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Utils import Utils
 
 
 class Galaxy(Params):
@@ -58,13 +60,11 @@ class Galaxy(Params):
 
         return True
 
-    def get_datasets_and_histories(self, allowed_files, history_id=None):
+    def get_datasets_and_histories(self, history_id=None):
         """Get Galaxy datasets of the current history and all histories
 
         Parameters
         ----------
-        allowed_files : list
-            Allowed files
         history_id : int, optional
             A history id
 
@@ -73,6 +73,8 @@ class Galaxy(Params):
         dict
             Datasets and histories
         """
+        allowed_files = ['tabular', 'tsv', 'ttl', 'gff', 'gff3', 'gff2', 'bed']
+
         galaxy_instance = galaxy.GalaxyInstance(self.url, self.apikey)
         results = {}
 
@@ -108,3 +110,24 @@ class Galaxy(Params):
         results['histories'] = histories_list
 
         return results
+
+    def download_datasets(self, datasets_id):
+        """Download galaxy datasets into AskOmics
+
+        Parameters
+        ----------
+        datasets_id : list
+            List of Galaxy datasets id
+        """
+        galaxy_instance = galaxy.GalaxyInstance(self.url, self.apikey)
+        files_handler = FilesHandler(self.app, self.session)
+
+        for dataset_id in datasets_id:
+            dataset = galaxy_instance.datasets.show_dataset(dataset_id)
+            file_name = Utils.get_random_string(10)
+            path = "{}/{}".format(self.upload_path, file_name)
+            filetype = dataset["file_ext"]
+            size = dataset["file_size"]
+
+            galaxy_instance.datasets.download_dataset(dataset_id, file_path=path, use_default_filename=False)
+            files_handler.store_file_info_in_db(dataset["name"], filetype, file_name, size)

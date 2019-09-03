@@ -177,11 +177,8 @@ class FilesHandler(Params):
             filetype = 'csv/tsv'
         elif filetype == 'text/turtle':
             filetype = 'turtle'
-        elif filetype == "":
-            filetype = self.get_type(os.path.splitext(name)[1])
         else:
-            # Default is csv/tsv
-            filetype = 'csv/tsv'
+            filetype = self.get_type(os.path.splitext(name)[1])
 
         self.date = int(time.time())
 

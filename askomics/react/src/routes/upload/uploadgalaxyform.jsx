@@ -15,7 +15,8 @@ export default class UploadGalaxyForm extends Component {
     this.state = {
       selected: [],
       disabled: false,
-      waiting: true
+      waiting: true,
+      uploading: false
     }
 
 
@@ -74,11 +75,17 @@ export default class UploadGalaxyForm extends Component {
   }
 
   handleSubmit (event) {
-    console.log("upload", this.state.selected)
+    this.setState({
+      uploading: true,
+      selected: []
+    })
     let data = {datasets_id: this.state.selected}
     let requestUrl = '/api/galaxy/upload_datasets'
     axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
+      this.setState({
+        uploading: false
+      })
       console.log(requestUrl, response.data)
       let requestUrlFiles = '/api/files'
       axios.get(requestUrlFiles, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -107,17 +114,17 @@ export default class UploadGalaxyForm extends Component {
   handleSelection (row, isSelect) {
     if (isSelect) {
       this.setState(() => ({
-        selected: [...this.state.selected, row.dataset_id]
+        selected: [...this.state.selected, row.id]
       }))
     } else {
       this.setState(() => ({
-        selected: this.state.selected.filter(x => x !== row.dataset_id)
+        selected: this.state.selected.filter(x => x !== row.id)
       }))
     }
   }
 
   handleSelectionAll (isSelect, rows) {
-    const ids = rows.map(r => r.dataset_id)
+    const ids = rows.map(r => r.id)
     if (isSelect) {
       this.setState(() => ({
         selected: ids
@@ -178,7 +185,7 @@ export default class UploadGalaxyForm extends Component {
           <BootstrapTable
             tabIndexCell
             bootstrap4
-            keyField='dataset_id'
+            keyField='id'
             data={this.state.datasets}
             columns={columns}
             defaultSorted={defaultSorted}
@@ -198,7 +205,10 @@ export default class UploadGalaxyForm extends Component {
         </center>
         {historyForm}
         {DatasetsTable}
-        <Button disabled={this.state.selected.length > 0 ? false : true} onClick={this.handleSubmit} color="secondary">Upload</Button>
+        <div className="clearfix">
+          <Button className="float-left" disabled={this.state.selected.length > 0 ? false : true} onClick={this.handleSubmit} color="secondary">Upload</Button>
+          <WaitingDiv className="float-right" waiting={this.state.uploading} size='xm' />
+        </div>
       </div>
     )
   }

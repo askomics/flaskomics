@@ -211,6 +211,8 @@ def update_galaxy():
     else:
         updated_user = local_auth.add_galaxy_account(session["user"], data["gurl"], data["gkey"])
 
+    session["user"] = updated_user
+
     return jsonify({
         'error': updated_user['error'],
         'errorMessage': updated_user['error_message'],

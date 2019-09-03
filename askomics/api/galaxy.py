@@ -25,7 +25,7 @@ def get_datasets():
 
     try:
         galaxy = Galaxy(current_app, session)
-        ginfo = galaxy.get_datasets_and_histories(["tabular"], history_id)
+        ginfo = galaxy.get_datasets_and_histories(history_id)
     except Exception as e:
         current_app.logger.error(str(e))
         return jsonify({
@@ -38,6 +38,36 @@ def get_datasets():
     return jsonify({
         'datasets': ginfo['datasets'],
         'histories': ginfo['histories'],
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@galaxy_bp.route('/api/galaxy/upload_datasets', methods=['POST'])
+@login_required
+def upload_datasets():
+    """Download a galaxy datasets into AskOmics
+
+    Returns
+    -------
+    json
+
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    datasets_id = request.get_json()["datasets_id"]
+
+    try:
+        galaxy = Galaxy(current_app, session)
+        galaxy.download_datasets(datasets_id)
+    except Exception as e:
+        current_app.logger.error(str(e))
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
         'error': False,
         'errorMessage': ''
     })

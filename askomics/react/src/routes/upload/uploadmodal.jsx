@@ -38,13 +38,30 @@ export default class UploadModal extends Component {
   }
 
   render () {
-    return (
 
+    let galaxyForm
+    let galaxyButton
+    if (this.props.user.galaxy) {
+      galaxyForm = (
+        <Modal isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
+          <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
+          <ModalBody>
+            <UploadGalaxyForm setStateUpload={this.props.setStateUpload} />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
+          </ModalFooter>
+        </Modal>
+      )
+      galaxyButton = <Button color="secondary" onClick={this.toggleModalGalaxy}><i className="fas fa-upload"></i> Galaxy</Button>
+    }
+
+    return (
       <div>
         <ButtonGroup>
           <Button color="secondary" onClick={this.toggleModalComputer}><i className="fas fa-upload"></i> Computer</Button>
           <Button color="secondary" onClick={this.toggleModalUrl}><i className="fas fa-upload"></i> URL</Button>
-          <Button color="secondary" onClick={this.toggleModalGalaxy}><i className="fas fa-upload"></i> Galaxy</Button>
+          {galaxyButton}
         </ButtonGroup>
 
         <Modal isOpen={this.state.modalComputer} toggle={this.toggleModalComputer}>
@@ -66,21 +83,13 @@ export default class UploadModal extends Component {
             <Button color="secondary" onClick={this.toggleModalUrl}>Close</Button>
           </ModalFooter>
         </Modal>
-
-        <Modal isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
-          <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
-          <ModalBody>
-            <UploadGalaxyForm setStateUpload={this.props.setStateUpload} />
-          </ModalBody>
-          <ModalFooter>
-            <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
-          </ModalFooter>
-        </Modal>
+        {galaxyForm}
       </div>
     )
   }
 }
 
 UploadModal.propTypes = {
-  setStateUpload: PropTypes.func
+  setStateUpload: PropTypes.func,
+  user: PropTypes.object
 }

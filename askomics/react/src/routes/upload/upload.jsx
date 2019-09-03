@@ -117,7 +117,7 @@ export default class Upload extends Component {
         {redirectIntegration}
         <h2>Upload</h2>
         <hr />
-        <UploadModal setStateUpload={p => this.setState(p)} />
+        <UploadModal setStateUpload={p => this.setState(p)} user={this.props.user} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <br />
