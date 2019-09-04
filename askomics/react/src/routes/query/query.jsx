@@ -179,8 +179,6 @@ export default class Query extends Component {
 
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
-
-    let labelExist = this.attributeExistInAbstraction("rdf:label", nodeId)
     let isBnode = this.isBnode(nodeId)
 
     // if bnode without uri, first attribute is visible
@@ -190,7 +188,7 @@ export default class Query extends Component {
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: !labelExist,
+        visible: false,
         nodeId: nodeId,
         uri: 'rdf:type',
         label: 'Uri',
@@ -204,10 +202,10 @@ export default class Query extends Component {
       })
     }
 
-    if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
+    if (!this.attributeExist('rdfs:label', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: firstAttrVisibleForBnode,
+        visible: true,
         nodeId: nodeId,
         uri: 'rdfs:label',
         label: 'Label',
