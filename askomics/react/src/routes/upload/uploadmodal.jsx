@@ -43,10 +43,10 @@ export default class UploadModal extends Component {
     let galaxyButton
     if (this.props.user.galaxy) {
       galaxyForm = (
-        <Modal isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
+        <Modal size="lg" isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
           <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
           <ModalBody>
-            <UploadGalaxyForm setStateUpload={this.props.setStateUpload} />
+            <UploadGalaxyForm getQueries={false} setStateUpload={this.props.setStateUpload} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>

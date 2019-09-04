@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress } from 'reactstrap'
 import axios from 'axios'
+import { Redirect } from 'react-router-dom'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import BootstrapTable from 'react-bootstrap-table-next'
@@ -19,7 +20,6 @@ export default class UploadGalaxyForm extends Component {
       uploading: false
     }
 
-
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleSelection = this.handleSelection.bind(this)
@@ -28,8 +28,10 @@ export default class UploadGalaxyForm extends Component {
   }
 
   componentDidMount () {
-
     let requestUrl = '/api/galaxy/datasets'
+    if (this.props.getQueries) {
+      requestUrl = '/api/galaxy/queries'
+    }
     axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -55,6 +57,9 @@ export default class UploadGalaxyForm extends Component {
     })
     let data = {history_id: event.target.value}
     let requestUrl = '/api/galaxy/datasets'
+    if (this.props.getQueries) {
+      requestUrl = '/api/galaxy/queries'
+    }
     axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
@@ -75,6 +80,39 @@ export default class UploadGalaxyForm extends Component {
   }
 
   handleSubmit (event) {
+    if (this.props.getQueries) {
+      this.handleSubmitQuery (event)
+    } else {
+      this.handleSubmitUpload(event)
+    }
+  }
+
+
+  handleSubmitQuery (event) {
+    let requestUrl = '/api/galaxy/getdatasetcontent'
+    let data = {dataset_id: this.state.selected[0]}
+    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          redirectQueryBuilder: true,
+          graphState: response.data.dataset_content
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
+
+
+  handleSubmitUpload (event) {
     this.setState({
       uploading: true,
       selected: []
@@ -112,6 +150,7 @@ export default class UploadGalaxyForm extends Component {
 
 
   handleSelection (row, isSelect) {
+    console.log("handle selection")
     if (isSelect) {
       this.setState(() => ({
         selected: [...this.state.selected, row.id]
@@ -140,7 +179,7 @@ export default class UploadGalaxyForm extends Component {
 
     let columns = [{
       dataField: 'name',
-      text: 'Dataset name',
+      text: this.props.getQueries ? 'Query name' : 'Dataset name',
       sort: true
     }, {
       dataField: 'extension',
@@ -154,13 +193,13 @@ export default class UploadGalaxyForm extends Component {
     }]
 
     let selectRow = {
-      mode: 'checkbox',
+      mode: this.props.getQueries ? 'radio' : 'checkbox',
       selected: this.state.selected,
       onSelect: this.handleSelection,
       onSelectAll: this.handleSelectionAll
     }
 
-    let noDataIndication = 'No dataset in this history'
+    let noDataIndication = this.props.getQueries ? 'No AskOmics queries in this history' : 'No dataset in this history'
     if (this.props.waiting) {
       noDataIndication = <WaitingDiv waiting={this.state.waiting} />
     }
@@ -197,8 +236,23 @@ export default class UploadGalaxyForm extends Component {
       )
     }
 
+    let redirectQueryBuilder
+    if (this.state.redirectQueryBuilder) {
+      redirectQueryBuilder = <Redirect to={{
+        pathname: '/query',
+        state: {
+          redo: true,
+          config: this.props.config,
+          graphState: this.state.graphState,
+          user: this.props.user,
+          logged: this.props.logged
+        }
+      }} />
+    }
+
     return (
       <div>
+        {redirectQueryBuilder}
         <br />
         <center>
           <WaitingDiv waiting={this.state.waiting} />
@@ -206,7 +260,9 @@ export default class UploadGalaxyForm extends Component {
         {historyForm}
         {DatasetsTable}
         <div className="clearfix">
-          <Button className="float-left" disabled={this.state.selected.length > 0 ? false : true} onClick={this.handleSubmit} color="secondary">Upload</Button>
+          <Button className="float-left" disabled={this.state.selected.length > 0 ? false : true} onClick={this.handleSubmit} color="secondary">
+            {this.props.getQueries ? 'Start query' : 'Upload'}
+          </Button>
           <WaitingDiv className="float-right" waiting={this.state.uploading} size='xm' />
         </div>
       </div>

@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem } from 'reactstrap'
+import { Alert, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AskoContext from '../../components/context'
+import UploadGalaxyForm from '../upload/uploadgalaxyform'
+
 
 export default class Ask extends Component {
   static contextType = AskoContext
@@ -19,13 +21,15 @@ export default class Ask extends Component {
       startpoints: [],
       selected: null,
       startSession: false,
-      publicQueries: []
+      publicQueries: [],
+      modalGalaxy: false
     }
     this.cancelRequest
     this.handleClick = this.handleClick.bind(this)
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
     this.handleClickPublicQuery = this.handleClickPublicQuery.bind(this)
+    this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
   }
 
   componentDidMount () {
@@ -105,6 +109,12 @@ export default class Ask extends Component {
       })
   }
 
+  toggleModalGalaxy (event) {
+    this.setState({
+      modalGalaxy: !this.state.modalGalaxy
+    })
+  }
+
   disabledStartButton () {
     return !this.state.selected
   }
@@ -182,6 +192,34 @@ export default class Ask extends Component {
       )
     }
 
+    let galaxyImport
+    if (!this.state.waiting && this.props.user.galaxy) {
+      galaxyImport = (
+        <div>
+          <br/>
+          <p>Or import a query from Galaxy</p>
+          <Button onClick={this.toggleModalGalaxy} color="secondary">Import Query</Button>
+        </div>
+      )
+    }
+
+    let galaxyForm
+    if (this.props.user.galaxy) {
+      galaxyForm = (
+        <Modal size="lg" isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
+          <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
+          <ModalBody>
+            <UploadGalaxyForm config={this.props.config} getQueries={true} setStateUpload={this.props.setStateUpload} />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
+          </ModalFooter>
+        </Modal>
+      )
+    }
+
+
+
     let startpoints
     if (!this.state.waiting) {
       startpoints = (
@@ -220,6 +258,8 @@ export default class Ask extends Component {
           <Row>
             <Col xs="4">
               {startpoints}
+              {galaxyImport}
+              {galaxyForm}
             </Col>
             <Col xs="8">
               {exempleQueries}

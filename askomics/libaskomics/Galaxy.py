@@ -60,20 +60,24 @@ class Galaxy(Params):
 
         return True
 
-    def get_datasets_and_histories(self, history_id=None):
+    def get_datasets_and_histories(self, history_id=None, query=False):
         """Get Galaxy datasets of the current history and all histories
 
         Parameters
         ----------
         history_id : int, optional
             A history id
+        query : bool, optional
+            Get Datasets, or json datasets for query
 
         Returns
         -------
         dict
             Datasets and histories
         """
-        allowed_files = ['tabular', 'tsv', 'ttl', 'gff', 'gff3', 'gff2', 'bed']
+        allowed_files = ['json']
+        if not query:
+            allowed_files = ['tabular', 'tsv', 'ttl', 'gff', 'gff3', 'gff2', 'bed']
 
         galaxy_instance = galaxy.GalaxyInstance(self.url, self.apikey)
         results = {}
@@ -131,3 +135,21 @@ class Galaxy(Params):
 
             galaxy_instance.datasets.download_dataset(dataset_id, file_path=path, use_default_filename=False)
             files_handler.store_file_info_in_db(dataset["name"], filetype, file_name, size)
+
+    def get_dataset_content(self, dataset_id):
+        """Get Galaxy dataset content
+
+        Parameters
+        ----------
+        dataset_id : string
+            dataset ID
+
+        Returns
+        -------
+        string
+            Content of the dataset
+        """
+        galaxy_instance = galaxy.GalaxyInstance(self.url, self.apikey)
+        dataset = galaxy_instance.datasets.download_dataset(dataset_id).decode('utf-8')
+
+        return dataset
