@@ -209,7 +209,7 @@ export default class Ask extends Component {
         <Modal size="lg" isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
           <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
           <ModalBody>
-            <UploadGalaxyForm config={this.props.config} getQueries={true} setStateUpload={this.props.setStateUpload} />
+            <UploadGalaxyForm config={this.props.config} getQueries={true} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
