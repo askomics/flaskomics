@@ -81,10 +81,6 @@ export default class Datasets extends Component {
       })
   }
 
-  componentWillUnmount () {
-    this.cancelRequest()
-  }
-
   render () {
     return (
       <div>

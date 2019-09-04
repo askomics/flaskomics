@@ -32,6 +32,7 @@ def query():
         public_queries = results_handler.get_public_queries()
     except Exception as e:
         current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'startpoints': [],
             "publicQueries": [],

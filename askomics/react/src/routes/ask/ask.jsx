@@ -22,7 +22,8 @@ export default class Ask extends Component {
       selected: null,
       startSession: false,
       publicQueries: [],
-      modalGalaxy: false
+      modalGalaxy: false,
+      showGalaxyButton: false
     }
     this.cancelRequest
     this.handleClick = this.handleClick.bind(this)
@@ -33,6 +34,14 @@ export default class Ask extends Component {
   }
 
   componentDidMount () {
+
+    if (this.props.user) {
+      if (this.props.user.galaxy) {
+        this.setState({
+          showGalaxyButton: true
+        })
+      }
+    }
 
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/startpoints'
@@ -193,18 +202,18 @@ export default class Ask extends Component {
     }
 
     let galaxyImport
-    if (!this.state.waiting && this.props.user.galaxy) {
+    if (!this.state.waiting && this.state.showGalaxyButton) {
       galaxyImport = (
         <div>
           <br/>
-          <p>Or import a query from Galaxy</p>
+          <p>Or import a query from <a href={this.props.user.galaxy.url}>Galaxy</a></p>
           <Button onClick={this.toggleModalGalaxy} color="secondary">Import Query</Button>
         </div>
       )
     }
 
     let galaxyForm
-    if (this.props.user.galaxy) {
+    if (this.state.showGalaxyButton) {
       galaxyForm = (
         <Modal size="lg" isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
           <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
