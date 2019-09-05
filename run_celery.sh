@@ -29,9 +29,11 @@ done
 case $depmode in
     prod|production|"")
         flask_depmod="production"
+        celery_command="celery -A askomics.tasks.celery worker -l info"
     ;;
     dev|development)
         flask_depmod="development"
+        celery_command="watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -l info"
     ;;
     *)
         echo "-d $depmode: wrong deployment mode"
@@ -73,3 +75,4 @@ done
 
 echo "Starting Celery ..."
 celery -A askomics.tasks.celery worker -l info
+$celery_command

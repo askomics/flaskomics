@@ -8,7 +8,7 @@ broker_url = redis://localhost:6379
 result_backend = redis://localhost:6379
 
 [askomics]
-debug = true
+debug = false
 debug_ttl = false
 
 # If Askomics is running under a sub path (like http://example.org/askomics, subpath is /askomics)

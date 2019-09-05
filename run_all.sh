@@ -30,12 +30,14 @@ case $depmode in
     prod|production|"")
         flask_depmod="production"
         npm_depmode="prod"
-        flask_command="gunicorn -b localhost:5000 app"
+        flask_command="gunicorn -b 0.0.0.0:5000 app"
+        celery_command="celery -A askomics.tasks.celery worker -l info"
     ;;
     dev|development)
         flask_depmod="development"
         npm_depmode="dev"
         flask_command="flask run --host=0.0.0.0"
+        celery_command="watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -l info"
     ;;
     *)
         echo "-d $depmode: wrong deployment mode"
@@ -80,7 +82,7 @@ trap 'kill 0' INT
 echo "Building JS ..."
 npm run $npm_depmode &
 echo "Starting celery ..."
-watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns="*.pyc" -- celery -A askomics.tasks.celery worker -l info &
+$celery_command &
 
 echo "Starting server ..."
 $flask_command &
