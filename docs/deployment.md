@@ -11,7 +11,7 @@
 
 AskOmics work with an RDF triplestore.
 
-[Compile virtuoso](https://github.com/openlink/virtuoso-opensource/blob/develop/7/README) or install it with [docker](https://github.com/askomics/docker-virtuoso)
+[Compile virtuoso](https://github.com/openlink/virtuoso-opensource/blob/develop/7/README.md) or install it with [docker](https://github.com/askomics/docker-virtuoso)
 
 ##### Python3/venv/npm
 
@@ -50,6 +50,42 @@ sudo docker-compose up -d
 ```
 
 AskOmics will be available at [localhost](localhost).
+
+### Installation with a single docker
+
+Docker image [xgaia/full-flaskomics](https://cloud.docker.com/repository/docker/xgaia/full-flaskomics) contain AskOmics with all his dependencies (Redis, virtuoso, celery ...).
+
+```bash
+# Pull image
+docker pull xgaia/full-flaskomics
+# run image
+docker run -d xgaia/full-flaskomics
+```
+
+If you need a persistent volume, run
+
+```bash
+docker run -d -v ./flaskomics-data:/tmp/flaskomics xgaia/full-flaskomics
+```
+
+The image create a default user at the first run. You can update this user by setting the following environment variables:
+
+|ENV|User field|default value|
+|----|----|----|
+|`USER_FIRST_NAME`|First name|Ad|
+|`USER_LAST_NAME`|Last name|Min|
+|`USERNAME`|Username|admin|
+|`USER_EMAIL`|Email|admin@example.org|
+|`USER_PASSWORD`|Password (clear)|admin|
+|`USER_APIKEY`|User api key|admin|
+|`GALAXY_URL`|Galaxy url (optional)| |
+|`GALAXY_API_KEY`|Galaxy api key (optional)| |
+
+For example:
+
+```bash
+docker run -d -v ./flaskomics-data:/tmp/flaskomics -e USER_FIRST_NAME="John" -e USER_LAST_NAME="Wick" -e USERNAME="jwick" xgaia/full-flaskomics
+```
 
 ## Developer
 
