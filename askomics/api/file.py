@@ -160,7 +160,6 @@ def get_preview():
             results.append(res)
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
-        raise e
         return jsonify({
             'previewFiles': [],
             'error': True,
