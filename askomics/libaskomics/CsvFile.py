@@ -478,7 +478,7 @@ class CsvFile(File):
 
                     rdf_graph.add((entity, relation, attribute))
 
-                if self.faldo_entity:
+                if self.faldo_entity and faldo_start and faldo_end:
                     faldo_relation = self.faldo.location
                     location = BNode()
                     begin = BNode()
