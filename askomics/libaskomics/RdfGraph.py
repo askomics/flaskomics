@@ -78,7 +78,7 @@ class RdfGraph(Params):
         self.graph += other_graph.graph
         self.ntriple += other_graph.ntriple
 
-    def serialize(self, format, encoding, destination):
+    def serialize(self, destination=None, format='xml', base=None, encoding=None, **args):
         """Serialize the graph into a file
 
         Parameters
@@ -90,4 +90,7 @@ class RdfGraph(Params):
         destination : string
             File destination
         """
-        self.graph.serialize(format=format, encoding=encoding, destination=destination)
+        result = self.graph.serialize(destination=destination, format=format, base=base, encoding=encoding, **args)
+
+        if destination is None:
+            return result
