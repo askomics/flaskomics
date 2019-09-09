@@ -37,6 +37,9 @@ class RdfGraph(Params):
         self.graph = rdflib.Graph()
         self.graph.bind('', self.askomics_prefix)
         self.graph.bind('askomics', self.askomics_namespace)
+        self.graph.bind('faldo', "http://biohackathon.org/resource/faldo/")
+        self.graph.bind('dc', 'http://purl.org/dc/elements/1.1/')
+        self.graph.bind('prov', 'http://www.w3.org/ns/prov#')
         self.ntriple = 0
 
     def add(self, triple):

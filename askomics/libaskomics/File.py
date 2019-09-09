@@ -23,8 +23,14 @@ class File(Params):
         AskOmics namespace askomics:
     askomics_prefix : Namespace
         AskOmics prefix :
+    dc : Namespace
+        dc namespace
     default_graph : string
         Default rdf graph
+    faldo : Namespace
+        faldo namespace
+    faldo_entity : bool
+        True if entity is a faldo entity
     file_graph : string
         File graph containing the file
     host_url : string
@@ -40,9 +46,11 @@ class File(Params):
     now : datetime
         timestamp of the current time
     ntriples : int
-        Description
+        Number of triples
     path : string
         Path of the file
+    prov : Namespace
+        prov namespace
     public : bool
         True if the file is public
     size : int
@@ -109,6 +117,12 @@ class File(Params):
         self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
         self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
 
+        self.faldo = Namespace('http://biohackathon.org/resource/faldo/')
+        self.prov = Namespace('http://www.w3.org/ns/prov#')
+        self.dc = Namespace('http://purl.org/dc/elements/1.1/')
+
+        self.faldo_entity = False
+
         self.method = self.settings.get('triplestore', 'upload_method')
         self.max_chunk_size = self.settings.getint('triplestore', 'chunk_size')
 
@@ -126,23 +140,15 @@ class File(Params):
         Graph
             graph containing metadata of the file
         """
-        # FIXME: find another way and don't hardcode this urls
-        prov_uri = 'http://www.w3.org/ns/prov#'
-        dc_uri = 'http://purl.org/dc/elements/1.1/'
-
         rdf_graph = RdfGraph(self.app, self.session)
-        prov = Namespace(prov_uri)
-        rdf_graph.bind('prov', prov_uri)
-        dc = Namespace(dc_uri)
-        rdf_graph.bind('dc', dc_uri)
         local_endpoint = rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
 
-        rdf_graph.add((rdflib.Literal(self.file_graph), prov.atLocation, local_endpoint))
-        rdf_graph.add((rdflib.Literal(self.file_graph), prov.generatedAtTime, rdflib.Literal(self.now)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), dc.creator, rdflib.Literal(self.session['user']['username'])))
-        rdf_graph.add((rdflib.Literal(self.file_graph), prov.wasDerivedFrom, rdflib.Literal(self.name)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), prov.describesService, rdflib.Literal(os.uname()[1])))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.atLocation, local_endpoint))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
 
         if self.public:
             rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
@@ -261,6 +267,27 @@ class File(Params):
             sparql.insert_data(abstraction_domain_knowledge, self.file_graph)
 
         self.set_triples_number()
+
+    def get_faldo_strand(self, raw_strand):
+        """Get faldo strand
+
+        Parameters
+        ----------
+        raw_strand : string
+            raw value of strand
+
+        Returns
+        -------
+        rdf term
+            Faldo "Foward", "Reverse" or "Both" uri
+        """
+        if raw_strand in ("+", "plus", "1"):
+            return self.faldo.ForwardStrandPosition
+
+        if raw_strand in ("-", "minus", "moins", "-1"):
+            return self.faldo.ReverseStrandPosition
+
+        return self.faldo.BothStrandPosition
 
     def get_rdf_type(self, value):
         """get xsd type of a value

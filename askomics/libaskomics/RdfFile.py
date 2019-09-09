@@ -94,3 +94,5 @@ class RdfFile(File):
             with open(self.path) as ttl_file:
                 ttl_content = ttl_file.read()
                 sparql.insert_ttl_string(ttl_content, self.user_graph)
+
+        self.set_triples_number()

@@ -1,12 +1,13 @@
 import csv
 import re
+import rdflib
+
 from urllib.parse import quote
+from rdflib import BNode
 
 from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
 from askomics.libaskomics.RdfGraph import RdfGraph
-
-import rdflib
 
 
 class CsvFile(File):
@@ -330,6 +331,8 @@ class CsvFile(File):
 
         rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
         rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
+        if self.faldo_entity:
+            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix["faldo"]))
         rdf_graph.add((entity, rdflib.RDFS.label, entity_label))
         if self.columns_type[0] == 'start_entity':
             rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
@@ -404,8 +407,8 @@ class CsvFile(File):
             else:
                 entity_type = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
 
-            # TODO: Faldo
-            # is_faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
+            # Faldo
+            self.faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
 
             # Loop on lines
             for row_number, row in enumerate(reader):
@@ -420,6 +423,12 @@ class CsvFile(File):
                 entity = self.askomics_prefix[self.format_uri(row[0])]
                 rdf_graph.add((entity, rdflib.RDF.type, entity_type))
                 rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
+
+                # Faldo
+                faldo_reference = None
+                faldo_strand = None
+                faldo_start = None
+                faldo_end = None
 
                 # For attributes, loop on cell
                 for column_number, cell in enumerate(row):
@@ -446,11 +455,19 @@ class CsvFile(File):
                             self.category_values[current_header].add(cell)
                         relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = self.askomics_prefix[self.format_uri(cell)]
+                        if current_type == 'chromosome':
+                            faldo_reference = self.askomics_prefix[self.format_uri(cell)]
+                        if current_type == 'strand':
+                            faldo_strand = self.get_faldo_strand(cell)
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):
                         relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = rdflib.Literal(self.convert_type(cell))
+                        if current_type == "start":
+                            faldo_start = rdflib.Literal(self.convert_type(cell))
+                        if current_type == "end":
+                            faldo_end = rdflib.Literal(self.convert_type(cell))
 
                     # TODO: datetime
 
@@ -460,5 +477,31 @@ class CsvFile(File):
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     rdf_graph.add((entity, relation, attribute))
+
+                if self.faldo_entity:
+                    faldo_relation = self.faldo.location
+                    location = BNode()
+                    begin = BNode()
+                    end = BNode()
+
+                    rdf_graph.add((entity, faldo_relation, location))
+
+                    rdf_graph.add((location, rdflib.RDF.type, self.faldo.region))
+                    rdf_graph.add((location, self.faldo.begin, begin))
+                    rdf_graph.add((location, self.faldo.end, end))
+
+                    rdf_graph.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
+                    rdf_graph.add((begin, self.faldo.position, faldo_start))
+
+                    rdf_graph.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+                    rdf_graph.add((end, self.faldo.position, faldo_end))
+
+                    if faldo_reference:
+                        rdf_graph.add((begin, self.faldo.reference, faldo_reference))
+                        rdf_graph.add((end, self.faldo.reference, faldo_reference))
+
+                    if faldo_strand:
+                        rdf_graph.add((begin, rdflib.RDF.type, faldo_strand))
+                        rdf_graph.add((end, rdflib.RDF.type, faldo_strand))
 
                 yield rdf_graph
