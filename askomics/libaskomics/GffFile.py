@@ -1,5 +1,6 @@
 import rdflib
 
+from rdflib import BNode
 from BCBio.GFF import GFFExaminer
 from BCBio import GFF
 
@@ -40,6 +41,8 @@ class GffFile(File):
         self.attributes = {}
 
         self.attribute_abstraction = []
+
+        self.faldo_entity = True
 
     def set_preview(self):
         """Summary"""
@@ -97,6 +100,7 @@ class GffFile(File):
         for entity in self.entities_to_integrate:
             rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
             rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
+            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
             rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
             rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
@@ -137,7 +141,11 @@ class GffFile(File):
                 # Entity type
                 entity_type = self.askomics_prefix[self.format_uri(feature.type, remove_space=True)]
 
-                # TODO: faldo??
+                # Faldo
+                faldo_reference = None
+                faldo_strand = None
+                faldo_start = None
+                faldo_end = None
 
                 rdf_graph = RdfGraph(self.app, self.session)
 
@@ -167,6 +175,7 @@ class GffFile(File):
                 self.category_values["chromosome"] = {rec.id, }
                 relation = self.askomics_prefix[self.format_uri("chromosome")]
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
+                faldo_reference = self.askomics_prefix[self.format_uri(rec.id)]
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "chromosome") not in attribute_list:
@@ -188,6 +197,7 @@ class GffFile(File):
                 # Start
                 relation = self.askomics_prefix[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
+                faldo_start = rdflib.Literal(self.convert_type(feature.location.start))
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
@@ -203,6 +213,7 @@ class GffFile(File):
                 # End
                 relation = self.askomics_prefix[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
+                faldo_end = rdflib.Literal(self.convert_type(feature.location.end))
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
@@ -220,11 +231,13 @@ class GffFile(File):
                     self.category_values["strand"] = {"+", }
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("+")]
+                    faldo_strand = self.get_faldo_strand("+")
                     rdf_graph.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("-")]
+                    faldo_strand = self.get_faldo_strand("-")
                     rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "strand") not in attribute_list:
@@ -272,5 +285,28 @@ class GffFile(File):
                                 })
 
                         rdf_graph.add((entity, relation, attribute))
+
+                location = BNode()
+                begin = BNode()
+                end = BNode()
+
+                rdf_graph.add((entity, self.faldo.location, location))
+
+                rdf_graph.add((location, rdflib.RDF.type, self.faldo.region))
+                rdf_graph.add((location, self.faldo.begin, begin))
+                rdf_graph.add((location, self.faldo.end, end))
+
+                rdf_graph.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
+                rdf_graph.add((begin, self.faldo.position, faldo_start))
+
+                rdf_graph.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+                rdf_graph.add((end, self.faldo.position, faldo_end))
+
+                rdf_graph.add((begin, self.faldo.reference, faldo_reference))
+                rdf_graph.add((end, self.faldo.reference, faldo_reference))
+
+                if faldo_strand:
+                    rdf_graph.add((begin, rdflib.RDF.type, faldo_strand))
+                    rdf_graph.add((end, rdflib.RDF.type, faldo_strand))
 
                 yield rdf_graph
