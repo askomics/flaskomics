@@ -1,6 +1,7 @@
 import os
 import rdflib
 
+from rdflib import BNode
 from pybedtools import BedTool
 
 from askomics.libaskomics.File import File
@@ -36,6 +37,7 @@ class BedFile(File):
         self.category_values = {}
         self.attributes = {}
         self.attribute_abstraction = []
+        self.faldo_entity = True
 
     def set_preview(self):
         """Set entity name preview"""
@@ -84,6 +86,8 @@ class BedFile(File):
         # Abstraction
         rdf_graph.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
         rdf_graph.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
+        rdf_graph.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
+
         rdf_graph.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
         rdf_graph.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(self.entity_name)))
 
@@ -133,10 +137,17 @@ class BedFile(File):
             rdf_graph.add((entity, rdflib.RDF.type, entity_type))
             rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
 
+            # Faldo
+            faldo_reference = None
+            faldo_strand = None
+            faldo_start = None
+            faldo_end = None
+
             # Chromosome
             self.category_values["chromosome"] = {feature.chrom, }
             relation = self.askomics_prefix[self.format_uri("chromosome")]
             attribute = self.askomics_prefix[self.format_uri(feature.chrom)]
+            faldo_reference = attribute
             rdf_graph.add((entity, relation, attribute))
 
             if "chromosome" not in attribute_list:
@@ -158,6 +169,7 @@ class BedFile(File):
             # Start
             relation = self.askomics_prefix[self.format_uri("start")]
             attribute = rdflib.Literal(self.convert_type(feature.start + 1))  # +1 because bed is 0 based
+            faldo_start = attribute
             rdf_graph.add((entity, relation, attribute))
 
             if "start" not in attribute_list:
@@ -173,6 +185,7 @@ class BedFile(File):
             # End
             relation = self.askomics_prefix[self.format_uri("end")]
             attribute = rdflib.Literal(self.convert_type(feature.end))
+            faldo_end = attribute
             rdf_graph.add((entity, relation, attribute))
 
             if "end" not in attribute_list:
@@ -191,12 +204,14 @@ class BedFile(File):
                 self.category_values["strand"] = {"+", }
                 relation = self.askomics_prefix[self.format_uri("strand")]
                 attribute = self.askomics_prefix[self.format_uri("+")]
+                faldo_strand = self.get_faldo_strand("+")
                 rdf_graph.add((entity, relation, attribute))
                 strand = True
             elif feature.strand == "-":
                 self.category_values["strand"] = {"-", }
                 relation = self.askomics_prefix[self.format_uri("strand")]
                 attribute = self.askomics_prefix[self.format_uri("-")]
+                faldo_strand = self.get_faldo_strand("-")
                 rdf_graph.add((entity, relation, attribute))
                 strand = True
 
@@ -227,5 +242,28 @@ class BedFile(File):
                         "domain": entity_type,
                         "range": rdflib.XSD.decimal
                     })
+
+            location = BNode()
+            begin = BNode()
+            end = BNode()
+
+            rdf_graph.add((entity, self.faldo.location, location))
+
+            rdf_graph.add((location, rdflib.RDF.type, self.faldo.region))
+            rdf_graph.add((location, self.faldo.begin, begin))
+            rdf_graph.add((location, self.faldo.end, end))
+
+            rdf_graph.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
+            rdf_graph.add((begin, self.faldo.position, faldo_start))
+
+            rdf_graph.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+            rdf_graph.add((end, self.faldo.position, faldo_end))
+
+            rdf_graph.add((begin, self.faldo.reference, faldo_reference))
+            rdf_graph.add((end, self.faldo.reference, faldo_reference))
+
+            if faldo_strand:
+                rdf_graph.add((begin, rdflib.RDF.type, faldo_strand))
+                rdf_graph.add((end, rdflib.RDF.type, faldo_strand))
 
             yield rdf_graph

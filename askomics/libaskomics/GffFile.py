@@ -175,7 +175,7 @@ class GffFile(File):
                 self.category_values["chromosome"] = {rec.id, }
                 relation = self.askomics_prefix[self.format_uri("chromosome")]
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
-                faldo_reference = self.askomics_prefix[self.format_uri(rec.id)]
+                faldo_reference = attribute
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "chromosome") not in attribute_list:
@@ -197,7 +197,7 @@ class GffFile(File):
                 # Start
                 relation = self.askomics_prefix[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
-                faldo_start = rdflib.Literal(self.convert_type(feature.location.start))
+                faldo_start = attribute
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
@@ -213,7 +213,7 @@ class GffFile(File):
                 # End
                 relation = self.askomics_prefix[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
-                faldo_end = rdflib.Literal(self.convert_type(feature.location.end))
+                faldo_end = attribute
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
