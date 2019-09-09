@@ -29,10 +29,10 @@ def hello():
             session["user"]["fname"], session["user"]["lname"])
 
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
-            'errorMessage': '',
+            'errorMessage': str(e),
             'message': ''
         }), 500
 
@@ -93,7 +93,6 @@ def start():
         return jsonify(json)
 
     except Exception as e:
-        current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             "error": True,

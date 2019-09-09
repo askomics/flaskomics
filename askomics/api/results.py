@@ -33,7 +33,7 @@ def get_results():
         except Exception:
             pass
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'files': [],
             'triplestoreMaxRows': triplestore_max_rows,
@@ -73,7 +73,7 @@ def set_public():
         except Exception:
             triplestore_max_rows = None
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'files': [],
             'triplestoreMaxRows': triplestore_max_rows,
@@ -109,7 +109,7 @@ def get_preview():
         headers, preview = result.get_file_preview()
 
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'preview': [],
             'header': [],
@@ -146,7 +146,7 @@ def get_graph_state():
         graph_state = result.get_graph_state(formated=True)
 
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'graphState': {},
             'id': file_id,
@@ -174,7 +174,7 @@ def download_result():
         file_name = result.get_file_name()
 
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e)
@@ -200,7 +200,7 @@ def delete_result():
         results_handler = ResultsHandler(current_app, session)
         remaining_files = results_handler.delete_results(files_id)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'remainingFiles': {},
             'error': True,
@@ -237,7 +237,6 @@ def get_sparql_query():
         query = query_builder.build_query_from_json(graph_state, for_editor=True)
 
     except Exception as e:
-        current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'query': {},
@@ -274,9 +273,7 @@ def publish_query():
         files = results_handler.get_files_info()
 
     except Exception as e:
-        current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)
-
         return jsonify({
             'files': [],
             'error': True,
@@ -307,9 +304,7 @@ def send2galaxy():
         result = Result(current_app, session, result_info)
         result.send2galaxy(json["fileToSend"])
     except Exception as e:
-        current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)
-
         return jsonify({
             'error': True,
             'errorMessage': 'Failed to publish query: \n{}'.format(str(e))

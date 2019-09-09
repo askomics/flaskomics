@@ -1,4 +1,7 @@
 """Api routes"""
+import sys
+import traceback
+
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
 
@@ -28,7 +31,7 @@ def get_files():
         files_handler = FilesHandler(current_app, session)
         files = files_handler.get_files_infos(files_id=files_id)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'files': [],
             'error': True,
@@ -60,7 +63,7 @@ def upload_chunk():
         files = FilesHandler(current_app, session)
         path = files.persist_chunk(data)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             "path": '',
             "error": True,
@@ -89,7 +92,7 @@ def upload_url():
         files = FilesHandler(current_app, session)
         files.download_url(data["url"])
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             "error": True,
             "errorMessage": str(e)
@@ -118,7 +121,7 @@ def upload():
         files = FilesHandler(current_app, session)
         uploaded_files = files.persist_files(inputs)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'uploadedFiles': [],
             'error': True,
@@ -156,7 +159,7 @@ def get_preview():
             res = file.get_preview()
             results.append(res)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         raise e
         return jsonify({
             'previewFiles': [],
@@ -189,7 +192,7 @@ def delete_files():
         files = FilesHandler(current_app, session)
         remaining_files = files.delete_files(data['filesIdToDelete'])
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'files': [],
             'error': True,

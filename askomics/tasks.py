@@ -73,7 +73,6 @@ def integrate(self, session, data, host_url):
             dataset.update_in_db(ntriples=file.ntriples)
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
-            app.logger.error(str(e))
             dataset.update_in_db(error=True, error_message=str(e))
             # Rollback
             file.rollback()
@@ -111,7 +110,7 @@ def delete_datasets(self, session, datasets_info):
         datasets_handler.delete_datasets()
 
     except Exception as e:
-        app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return {
             'error': True,
             'errorMessage': str(e)
@@ -166,7 +165,7 @@ def query(self, session, graph_state):
         result.update_db_status()
 
     except Exception as e:
-        app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         result.update_db_status(error=True, error_message=str(e))
         result.rollback()
         return {

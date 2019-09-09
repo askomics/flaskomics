@@ -1,4 +1,7 @@
 """Api routes"""
+import sys
+import traceback
+
 import json
 
 from askomics.api.auth import login_required
@@ -29,7 +32,7 @@ def get_datasets():
         galaxy = Galaxy(current_app, session)
         ginfo = galaxy.get_datasets_and_histories(history_id)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'datasets': [],
             'histories': [],
@@ -65,7 +68,7 @@ def get_queries():
         galaxy = Galaxy(current_app, session)
         ginfo = galaxy.get_datasets_and_histories(history_id, query=True)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'datasets': [],
             'histories': [],
@@ -99,7 +102,7 @@ def upload_datasets():
         galaxy = Galaxy(current_app, session)
         galaxy.download_datasets(datasets_id)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e)
@@ -129,7 +132,7 @@ def get_dataset_content():
         galaxy = Galaxy(current_app, session)
         dataset_content = galaxy.get_dataset_content(dataset_id)
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'dataset_content': {},
             'error': True,

@@ -1,5 +1,7 @@
-"""Admin routes
-"""
+"""Admin routes"""
+import sys
+import traceback
+
 from askomics.api.auth import admin_required
 from askomics.libaskomics.LocalAuth import LocalAuth
 
@@ -25,7 +27,7 @@ def get_users():
         local_auth = LocalAuth(current_app, session)
         all_users = local_auth.get_all_users()
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'users': [],
             'error': True,
@@ -58,7 +60,7 @@ def set_admin():
         local_auth = LocalAuth(current_app, session)
         local_auth.set_admin(data['newAdmin'], data['username'])
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e)
@@ -87,7 +89,7 @@ def set_blocked():
         local_auth = LocalAuth(current_app, session)
         local_auth.set_blocked(data['newBlocked'], data['username'])
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e)

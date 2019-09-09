@@ -31,7 +31,6 @@ def query():
         startpoints = tse.get_startpoints()
         public_queries = results_handler.get_public_queries()
     except Exception as e:
-        current_app.logger.error(str(e))
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'startpoints': [],
@@ -133,6 +132,7 @@ def save_result():
         session_dict = {"user": session["user"]}
         task = current_app.celery.send_task("query", (session_dict, graph_state))
     except Exception as e:
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e),

@@ -1,5 +1,6 @@
-"""Api routes
-"""
+"""Api routes"""
+import sys
+import traceback
 
 from askomics.api.auth import login_required
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
@@ -26,7 +27,7 @@ def get_datasets():
         datasets_handler = DatasetsHandler(current_app, session)
         datasets = datasets_handler.get_datasets()
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'datasets': [],
             'error': True,
@@ -66,7 +67,7 @@ def delete_datasets():
         # Trigger the celery task to delete it in the ts, and in db
         current_app.celery.send_task('delete_datasets', (session_dict, datasets_info))
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'datasets': [],
             'error': True,

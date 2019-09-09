@@ -1,3 +1,6 @@
+import traceback
+import sys
+
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
@@ -21,7 +24,7 @@ def prefix():
         query = query_builder.get_default_query_with_prefix()
 
     except Exception as e:
-        current_app.logger.error(str(e))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e),
@@ -59,6 +62,7 @@ def query():
 
     except Exception as e:
         current_app.logger.error(str(e).replace('\\n', '\n'))
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e).replace('\\n', '\n'),
