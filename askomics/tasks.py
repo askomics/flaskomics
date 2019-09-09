@@ -7,6 +7,9 @@ app : Flask
 celery : Celery
     Celery object
 """
+import sys
+import traceback
+
 from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
@@ -69,7 +72,7 @@ def integrate(self, session, data, host_url):
             # done
             dataset.update_in_db(ntriples=file.ntriples)
         except Exception as e:
-            raise e
+            traceback.print_exc(file=sys.stdout)
             app.logger.error(str(e))
             dataset.update_in_db(error=True, error_message=str(e))
             # Rollback
