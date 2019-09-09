@@ -8,6 +8,7 @@ import AskoContext from '../../components/context'
 import CsvTable from './csvtable'
 import TtlPreview from './ttlpreview'
 import GffPreview from './gffpreview'
+import BedPreview from './bedpreview'
 import PropTypes from 'prop-types'
 
 export default class Integration extends Component {
@@ -83,6 +84,9 @@ export default class Integration extends Component {
             }
             if (file.type == 'gff/gff3') {
               return <GffPreview file={file} />
+            }
+            if (file.type = 'bed') {
+              return <BedPreview file={file} />
             }
           })
         }

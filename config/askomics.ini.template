@@ -51,7 +51,7 @@ password = dba
 # If the triplesotre and askomics are on different network, the loadurl is askomics url accessible by the triplesotre
 # load_url = 
 upload_method = load
-chunk_size = 4000
+chunk_size = 60000
 # Default askomics graph
 default_graph = urn:sparql:askomics
 # User graph

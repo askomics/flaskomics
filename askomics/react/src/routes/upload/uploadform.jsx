@@ -132,7 +132,7 @@ export default class UploadForm extends Component {
           <FormGroup>
             <CustomInput type="file" id="files" name="file" label={this.state.label} onChange={this.handleChange} multiple/>
             <FormText color="muted">
-              <p>Supported files: CSV/TSV, GFF and TTL</p>
+              <p>Supported files: CSV/TSV, GFF3, BED and TTL</p>
               <p>The maximum file size is 4GB</p>
             </FormText>
             {this.state.new_files.map(file => {

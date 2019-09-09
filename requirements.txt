@@ -18,3 +18,4 @@ gitpython
 biopython
 bcbio-gff
 bioblend
+pybedtools

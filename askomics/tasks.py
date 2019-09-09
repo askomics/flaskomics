@@ -61,15 +61,15 @@ def integrate(self, session, data, host_url):
             if file.type == "csv/tsv":
                 file.integrate(data['columns_type'], public=data['public'])
             elif file.type == "gff/gff3":
-                app.logger.debug("integrate gff3")
-                app.logger.debug(data)
-
                 file.integrate(data["entities"], public=data["public"])
             elif file.type == "turtle":
                 file.integrate(public=data["public"])
+            elif file.type == "bed":
+                file.integrate(data["entity_name"], public=data["public"])
             # done
             dataset.update_in_db(ntriples=file.ntriples)
         except Exception as e:
+            raise e
             app.logger.error(str(e))
             dataset.update_in_db(error=True, error_message=str(e))
             # Rollback
