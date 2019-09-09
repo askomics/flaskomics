@@ -158,7 +158,7 @@ class SparqlQueryLauncher(Params):
             ttl string
         """
         ttl = ""
-        for s, p, o in graph:
+        for s, p, o in graph.get_triple():
             ttl += "<{}> <{}> <{}> .\n".format(s, p, o)
         return ttl
 

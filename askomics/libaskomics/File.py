@@ -6,6 +6,7 @@ from urllib.parse import quote
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
+from askomics.libaskomics.RdfGraph import RdfGraph
 
 from pkg_resources import get_distribution
 
@@ -30,16 +31,24 @@ class File(Params):
         AskOmics url
     id : int
         database file id
+    max_chunk_size : int
+        Max number of triple to insert in one Load or insert
+    method : int
+        Load or insert
     name : string
         Name of the file
     now : datetime
         timestamp of the current time
+    ntriples : int
+        Description
     path : string
         Path of the file
     public : bool
         True if the file is public
     size : int
         file size
+    timestamp : TYPE
+        Description
     ttl_dir : string
         path to the ttl directory
     type : string
@@ -100,25 +109,14 @@ class File(Params):
         self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
         self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
 
+        self.method = self.settings.get('triplestore', 'upload_method')
+        self.max_chunk_size = self.settings.getint('triplestore', 'chunk_size')
+
     def format_uri(self, string, remove_space=False):
         """remove space and quote"""
         if remove_space:
             return quote(string.replace(' ', ''))
         return quote(string)
-
-    def rdf_graph(self):
-        """Initialize a rdf graph with akomics prefixes
-
-        Returns
-        -------
-        rdflib.graph.Graph
-            The rdf graph
-        """
-        rdf_graph = rdflib.Graph()
-        rdf_graph.bind('', self.askomics_prefix)
-        rdf_graph.bind('askomics', self.askomics_namespace)
-
-        return rdf_graph
 
     def get_metadata(self):
         """Get a rdflib graph of the metadata
@@ -132,7 +130,7 @@ class File(Params):
         prov_uri = 'http://www.w3.org/ns/prov#'
         dc_uri = 'http://purl.org/dc/elements/1.1/'
 
-        rdf_graph = self.rdf_graph()
+        rdf_graph = RdfGraph(self.app, self.session)
         prov = Namespace(prov_uri)
         rdf_graph.bind('prov', prov_uri)
         dc = Namespace(dc_uri)
@@ -201,27 +199,22 @@ class File(Params):
         """Integrate the file into the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
 
-        method = self.settings.get('triplestore', 'upload_method')
-        max_chunk_size = self.settings.getint('triplestore', 'chunk_size')
-
         # insert metadata
         sparql.insert_data(self.get_metadata(), self.user_graph, metadata=True)
 
         content_generator = self.generate_rdf_content()
 
         # Insert content
-        chunk_size = 0
         chunk_number = 0
-        graph_chunk = self.rdf_graph()
+        graph_chunk = RdfGraph(self.app, self.session)
 
         for rdf_data in content_generator:
 
-            graph_chunk += rdf_data
-            chunk_size += 1
+            graph_chunk.merge(rdf_data)
 
-            if chunk_size >= max_chunk_size:
+            if graph_chunk.ntriple >= self.max_chunk_size:
 
-                if method == 'load':
+                if self.method == 'load':
 
                     # write rdf into a tmpfile and load it
                     temp_file_name = 'tmp_{}_{}_chunk_{}.ttl'.format(
@@ -236,12 +229,11 @@ class File(Params):
                     # Insert
                     sparql.insert_data(graph_chunk, self.file_graph)
 
-                chunk_size = 0
                 chunk_number += 1
-                graph_chunk = self.rdf_graph()
+                graph_chunk = RdfGraph(self.app, self.session)
 
         # Load the last chunk
-        if method == 'load':
+        if self.method == 'load':
             temp_file_name = 'tmp_{}_{}_chunk_{}.ttl'.format(
                 Utils.get_random_string(5),
                 self.name,
@@ -256,7 +248,7 @@ class File(Params):
         # Content is inserted, now insert abstraction and domain_knowledge
         abstraction_domain_knowledge = self.get_rdf_abstraction_domain_knowledge()
 
-        if method == 'load':
+        if self.method == 'load':
 
             temp_file_name = 'tmp_{}_{}_abstraction_domain_knowledge.ttl'.format(
                 Utils.get_random_string(5),

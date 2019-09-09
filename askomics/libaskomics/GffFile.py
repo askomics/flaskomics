@@ -4,10 +4,11 @@ from BCBio.GFF import GFFExaminer
 from BCBio import GFF
 
 from askomics.libaskomics.File import File
+from askomics.libaskomics.RdfGraph import RdfGraph
 
 
 class GffFile(File):
-    """RDF (turtle) File
+    """GFF File
 
     Attributes
     ----------
@@ -90,7 +91,7 @@ class GffFile(File):
         Graph
             Abstraction and domain knowledge
         """
-        rdf_graph = self.rdf_graph()
+        rdf_graph = RdfGraph(self.app, self.session)
 
         # Abstraction
         for entity in self.entities_to_integrate:
@@ -138,7 +139,7 @@ class GffFile(File):
 
                 # TODO: faldo??
 
-                rdf_graph = self.rdf_graph()
+                rdf_graph = RdfGraph(self.app, self.session)
 
                 # Entity
                 if not feature.id:
@@ -227,7 +228,7 @@ class GffFile(File):
                     rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "strand") not in attribute_list:
-                    attribute_list.append((feature.type, "chromosome"))
+                    attribute_list.append((feature.type, "strand"))
                     self.attribute_abstraction.append({
                         "uri": self.askomics_prefix[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
@@ -272,4 +273,4 @@ class GffFile(File):
 
                         rdf_graph.add((entity, relation, attribute))
 
-            yield rdf_graph
+                yield rdf_graph

@@ -4,6 +4,7 @@ from urllib.parse import quote
 
 from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
+from askomics.libaskomics.RdfGraph import RdfGraph
 
 import rdflib
 
@@ -273,10 +274,13 @@ class CsvFile(File):
 
         Returns
         -------
-        TYPE
-            Description
+        Graph
+            Rdf graph (dk + abstraction)
         """
-        return self.get_rdf_abstraction() + self.get_rdf_domain_knowledge()
+        rdf = self.get_rdf_abstraction()
+        rdf.merge(self.get_rdf_domain_knowledge())
+
+        return rdf
 
     def get_rdf_domain_knowledge(self):
         """Get the domain knowledge
@@ -286,7 +290,7 @@ class CsvFile(File):
         Graph
             Graph of domain knowledge
         """
-        rdf_graph = self.rdf_graph()
+        rdf_graph = RdfGraph(self.app, self.session)
 
         for index, attribute in enumerate(self.header):
 
@@ -309,7 +313,7 @@ class CsvFile(File):
         Graph
             Abstraction
         """
-        rdf_graph = self.rdf_graph()
+        rdf_graph = RdfGraph(self.app, self.session)
 
         # Entity
         # Check subclass syntax (<)
@@ -406,7 +410,7 @@ class CsvFile(File):
             # Loop on lines
             for row_number, row in enumerate(reader):
 
-                rdf_graph = self.rdf_graph()
+                rdf_graph = RdfGraph(self.app, self.session)
 
                 # skip blank lines
                 if not row:

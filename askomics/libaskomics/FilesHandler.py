@@ -2,6 +2,7 @@ import os
 import time
 import requests
 
+from askomics.libaskomics.BedFile import BedFile
 from askomics.libaskomics.CsvFile import CsvFile
 from askomics.libaskomics.GffFile import GffFile
 from askomics.libaskomics.RdfFile import RdfFile
@@ -62,6 +63,8 @@ class FilesHandler(Params):
                 self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url))
             elif file['type'] == 'turtle':
                 self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url))
+            elif file['type'] == 'bed':
+                self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url))
 
     def get_files_infos(self, files_id=None, return_path=False):
         """Get files info
