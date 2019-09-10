@@ -93,7 +93,7 @@ def get_preview():
         query_builder = SparqlQueryBuilder(current_app, session)
         query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True)
 
-        query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=True)
+        query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
         header = query_builder.selects
         preview = []
         if query_builder.graphs:
