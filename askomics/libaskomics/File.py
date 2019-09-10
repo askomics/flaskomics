@@ -122,6 +122,18 @@ class File(Params):
         self.dc = Namespace('http://purl.org/dc/elements/1.1/')
 
         self.faldo_entity = False
+        self.faldo_abstraction = {
+            "start": None,
+            "end": None,
+            "strand": None,
+            "reference": None
+        }
+        self.faldo_abstraction_eq = {
+            "start": self.askomics_namespace["faldoStart"],
+            "end": self.askomics_namespace["faldoEnd"],
+            "strand": self.askomics_namespace["faldoStrand"],
+            "reference": self.askomics_namespace["faldoReference"]
+        }
 
         self.method = self.settings.get('triplestore', 'upload_method')
         self.max_chunk_size = self.settings.getint('triplestore', 'chunk_size')

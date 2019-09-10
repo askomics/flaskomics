@@ -383,6 +383,12 @@ class CsvFile(File):
             rdf_graph.add((attribute, rdflib.RDFS.domain, entity))
             rdf_graph.add((attribute, rdflib.RDFS.range, rdf_range))
 
+        # Faldo:
+        if self.faldo_entity:
+            for key, value in self.faldo_abstraction.items():
+                if value:
+                    rdf_graph.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+
         return rdf_graph
 
     def generate_rdf_content(self):
@@ -457,8 +463,10 @@ class CsvFile(File):
                         attribute = self.askomics_prefix[self.format_uri(cell)]
                         if current_type == 'chromosome':
                             faldo_reference = self.askomics_prefix[self.format_uri(cell)]
+                            self.faldo_abstraction["reference"] = relation
                         if current_type == 'strand':
                             faldo_strand = self.get_faldo_strand(cell)
+                            self.faldo_abstraction["strand"] = relation
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):
@@ -466,8 +474,10 @@ class CsvFile(File):
                         attribute = rdflib.Literal(self.convert_type(cell))
                         if current_type == "start":
                             faldo_start = rdflib.Literal(self.convert_type(cell))
+                            self.faldo_abstraction["start"] = relation
                         if current_type == "end":
                             faldo_end = rdflib.Literal(self.convert_type(cell))
+                            self.faldo_abstraction["end"] = relation
 
                     # TODO: datetime
 

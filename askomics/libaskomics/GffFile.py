@@ -118,6 +118,12 @@ class GffFile(File):
                     rdf_graph.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
                     rdf_graph.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
 
+        # Faldo:
+        if self.faldo_entity:
+            for key, value in self.faldo_abstraction.items():
+                if value:
+                    rdf_graph.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+
         return rdf_graph
 
     def generate_rdf_content(self):
@@ -176,6 +182,7 @@ class GffFile(File):
                 relation = self.askomics_prefix[self.format_uri("chromosome")]
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
                 faldo_reference = attribute
+                self.faldo_abstraction["reference"] = relation
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "chromosome") not in attribute_list:
@@ -198,6 +205,7 @@ class GffFile(File):
                 relation = self.askomics_prefix[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
+                self.faldo_abstraction["start"] = relation
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
@@ -214,6 +222,7 @@ class GffFile(File):
                 relation = self.askomics_prefix[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
+                self.faldo_abstraction["end"] = relation
                 rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
@@ -232,12 +241,14 @@ class GffFile(File):
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
+                    self.faldo_abstraction["strand"] = relation
                     rdf_graph.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
+                    self.faldo_abstraction["strand"] = relation
                     rdf_graph.add((entity, relation, attribute))
 
                 if (feature.type, "strand") not in attribute_list:

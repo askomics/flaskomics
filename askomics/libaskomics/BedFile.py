@@ -105,6 +105,12 @@ class BedFile(File):
                     rdf_graph.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
                     rdf_graph.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
 
+        # Faldo:
+        if self.faldo_entity:
+            for key, value in self.faldo_abstraction.items():
+                if value:
+                    rdf_graph.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+
         return rdf_graph
 
     def generate_rdf_content(self):
@@ -148,6 +154,7 @@ class BedFile(File):
             relation = self.askomics_prefix[self.format_uri("chromosome")]
             attribute = self.askomics_prefix[self.format_uri(feature.chrom)]
             faldo_reference = attribute
+            self.faldo_abstraction["reference"] = relation
             rdf_graph.add((entity, relation, attribute))
 
             if "chromosome" not in attribute_list:
@@ -170,6 +177,7 @@ class BedFile(File):
             relation = self.askomics_prefix[self.format_uri("start")]
             attribute = rdflib.Literal(self.convert_type(feature.start + 1))  # +1 because bed is 0 based
             faldo_start = attribute
+            self.faldo_abstraction["start"] = relation
             rdf_graph.add((entity, relation, attribute))
 
             if "start" not in attribute_list:
@@ -186,6 +194,7 @@ class BedFile(File):
             relation = self.askomics_prefix[self.format_uri("end")]
             attribute = rdflib.Literal(self.convert_type(feature.end))
             faldo_end = attribute
+            self.faldo_abstraction["end"] = relation
             rdf_graph.add((entity, relation, attribute))
 
             if "end" not in attribute_list:
@@ -205,6 +214,7 @@ class BedFile(File):
                 relation = self.askomics_prefix[self.format_uri("strand")]
                 attribute = self.askomics_prefix[self.format_uri("+")]
                 faldo_strand = self.get_faldo_strand("+")
+                self.faldo_abstraction["strand"] = relation
                 rdf_graph.add((entity, relation, attribute))
                 strand = True
             elif feature.strand == "-":
@@ -212,6 +222,7 @@ class BedFile(File):
                 relation = self.askomics_prefix[self.format_uri("strand")]
                 attribute = self.askomics_prefix[self.format_uri("-")]
                 faldo_strand = self.get_faldo_strand("-")
+                self.faldo_abstraction["strand"] = relation
                 rdf_graph.add((entity, relation, attribute))
                 strand = True
 
