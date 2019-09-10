@@ -102,7 +102,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph :public ?public .
@@ -111,6 +111,11 @@ class TriplestoreExplorer(Params):
                 # Entities
                 ?entity_uri a ?node_type .
                 VALUES ?node_type {{ :entity :bnode }} .
+                # Faldo
+                OPTIONAL {{
+                    ?entity_uri a ?entity_faldo .
+                    VALUES ?entity_faldo {{ :faldo }}
+                }}
                 OPTIONAL {{
                     ?entity_uri rdfs:label ?entity_label .
                 }}
@@ -174,6 +179,7 @@ class TriplestoreExplorer(Params):
                     "uri": result["entity_uri"],
                     "type": node_type,
                     "label": label,
+                    "faldo": True if "entity_faldo" in result else False,
                     "graphs": [result["graph"]],
                 }
 
