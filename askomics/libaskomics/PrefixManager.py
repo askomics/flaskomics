@@ -35,6 +35,7 @@ class PrefixManager(Params):
             'askomics:': self.settings.get('triplestore', 'namespace'),
             'prov:': 'http://www.w3.org/ns/prov#',
             'dc:': 'http://purl.org/dc/elements/1.1/',
+            'faldo': "http://biohackathon.org/resource/faldo/",
             'rdf:': str(rdflib.RDF),
             'rdfs:': str(rdflib.RDFS),
             'owl:': str(rdflib.OWL),
