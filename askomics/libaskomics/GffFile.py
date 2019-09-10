@@ -178,27 +178,27 @@ class GffFile(File):
                 rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
 
                 # Chrom
-                self.category_values["chromosome"] = {rec.id, }
-                relation = self.askomics_prefix[self.format_uri("chromosome")]
+                self.category_values["reference"] = {rec.id, }
+                relation = self.askomics_prefix[self.format_uri("reference")]
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
                 faldo_reference = attribute
                 self.faldo_abstraction["reference"] = relation
                 rdf_graph.add((entity, relation, attribute))
 
-                if (feature.type, "chromosome") not in attribute_list:
-                    attribute_list.append((feature.type, "chromosome"))
+                if (feature.type, "reference") not in attribute_list:
+                    attribute_list.append((feature.type, "reference"))
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("chromosome")],
-                        "label": rdflib.Literal("chromosome"),
+                        "uri": self.askomics_prefix[self.format_uri("reference")],
+                        "label": rdflib.Literal("reference"),
                         "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": self.askomics_prefix[self.format_uri("{}Category".format("chromosome"))],
+                        "range": self.askomics_prefix[self.format_uri("{}Category".format("reference"))],
                         "values": [rec.id]
                     })
                 else:
                     # add the value
                     for at in self.attribute_abstraction:
-                        if at["uri"] == self.askomics_prefix[self.format_uri("chromosome")] and at["domain"] == entity_type and rec.id not in at["values"]:
+                        if at["uri"] == self.askomics_prefix[self.format_uri("reference")] and at["domain"] == entity_type and rec.id not in at["values"]:
                             at["values"].append(rec.id)
 
                 # Start

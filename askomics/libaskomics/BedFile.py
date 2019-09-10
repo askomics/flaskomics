@@ -150,27 +150,27 @@ class BedFile(File):
             faldo_end = None
 
             # Chromosome
-            self.category_values["chromosome"] = {feature.chrom, }
-            relation = self.askomics_prefix[self.format_uri("chromosome")]
+            self.category_values["reference"] = {feature.chrom, }
+            relation = self.askomics_prefix[self.format_uri("reference")]
             attribute = self.askomics_prefix[self.format_uri(feature.chrom)]
             faldo_reference = attribute
             self.faldo_abstraction["reference"] = relation
             rdf_graph.add((entity, relation, attribute))
 
-            if "chromosome" not in attribute_list:
-                attribute_list.append("chromosome")
+            if "reference" not in attribute_list:
+                attribute_list.append("reference")
                 self.attribute_abstraction.append({
-                    "uri": self.askomics_prefix[self.format_uri("chromosome")],
-                    "label": rdflib.Literal("chromosome"),
+                    "uri": self.askomics_prefix[self.format_uri("reference")],
+                    "label": rdflib.Literal("reference"),
                     "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                     "domain": entity_type,
-                    "range": self.askomics_prefix[self.format_uri("{}Category".format("chromosome"))],
+                    "range": self.askomics_prefix[self.format_uri("{}Category".format("reference"))],
                     "values": [feature.chrom]
                 })
             else:
                 # add the value
                 for at in self.attribute_abstraction:
-                    if at["uri"] == self.askomics_prefix[self.format_uri("chromosome")] and at["domain"] == entity_type and feature.chrom not in at["values"]:
+                    if at["uri"] == self.askomics_prefix[self.format_uri("reference")] and at["domain"] == entity_type and feature.chrom not in at["values"]:
                         at["values"].append(feature.chrom)
 
             # Start
