@@ -61,9 +61,8 @@ export default class CsvTable extends Component {
               <option value="category" >Category</option>
               <option value="datetime" >Datetime</option>
             </optgroup>
-            <optgroup label="Position attributes">
-              <option value="organism" >Organism</option>
-              <option value="chromosome" >Chromosome</option>
+            <optgroup label="Faldo attributes">
+              <option value="reference" >Reference</option>
               <option value="strand" >Strand</option>
               <option value="start" >Start</option>
               <option value="end" >End</option>

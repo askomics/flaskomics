@@ -153,12 +153,11 @@ class CsvFile(File):
             return "general_relation"
 
         special_types = {
-            'organism': ('organism', 'taxon', 'species'),
-            'chromosome': ('chrom', ),
+            'reference': ('chrom', 'ref'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
-            'datetime': ('date', 'time', 'birthday')
+            'datetime': ('date', 'time', 'birthday', 'bday')
         }
 
         date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}')
@@ -168,11 +167,8 @@ class CsvFile(File):
             for expression in expressions:
                 epression_regexp = ".*{}.*".format(expression)
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if organism is a category
-                    if stype == "organism" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
-                        break
-                    # Test if chromosome is a category
-                    if stype == "chromosome" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                    # Test if reference is a category
+                    if stype == "reference" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
                         break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
@@ -295,7 +291,7 @@ class CsvFile(File):
 
         for index, attribute in enumerate(self.header):
 
-            if self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
+            if self.columns_type[index] in ('category', 'reference', 'strand'):
                 s = self.askomics_prefix["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.askomics_namespace["category"]
                 for value in self.category_values[self.header[index]]:
@@ -355,7 +351,7 @@ class CsvFile(File):
                 rdf_graph.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
 
             # Category
-            elif self.columns_type[index] in ('category', 'organism', 'chromosome', 'strand'):
+            elif self.columns_type[index] in ('category', 'reference', 'strand'):
                 attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
@@ -452,7 +448,7 @@ class CsvFile(File):
                         attribute = self.askomics_prefix[self.format_uri(cell)]
 
                     # Category
-                    elif current_type in ('category', 'organism', 'chromosome', 'strand'):
+                    elif current_type in ('category', 'reference', 'strand'):
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
@@ -461,7 +457,7 @@ class CsvFile(File):
                             self.category_values[current_header].add(cell)
                         relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = self.askomics_prefix[self.format_uri(cell)]
-                        if current_type == 'chromosome':
+                        if current_type == 'reference':
                             faldo_reference = self.askomics_prefix[self.format_uri(cell)]
                             self.faldo_abstraction["reference"] = relation
                         if current_type == 'strand':
