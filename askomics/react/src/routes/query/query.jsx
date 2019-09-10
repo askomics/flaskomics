@@ -167,6 +167,16 @@ export default class Query extends Component {
     return result
   }
 
+  isFaldoEntity (entityUri) {
+    let result = false
+    this.state.abstraction.entities.forEach(entity => {
+      if (entity.uri == entityUri && entity.faldo) {
+        result = true
+      }
+    })
+    return result
+  }
+
   attributeExist (attrUri, nodeId) {
     let result = false
     this.state.graphState.attr.forEach(attr => {
@@ -195,6 +205,7 @@ export default class Query extends Component {
         entityLabel: this.getLabel(nodeUri),
         entityUri: nodeUri,
         type: 'uri',
+        faldo: false,
         filterType: 'exact',
         filterValue: '',
         optional: false,
@@ -212,6 +223,7 @@ export default class Query extends Component {
         entityLabel: this.getLabel(nodeUri),
         entityUri: nodeUri,
         type: 'text',
+        faldo: false,
         filterType: 'exact',
         filterValue: '',
         optional: false,
@@ -233,6 +245,7 @@ export default class Query extends Component {
           nodeAttribute.entityLabel = this.getLabel(nodeUri)
           nodeAttribute.entityUri = attr.entityUri
           nodeAttribute.type = attributeType
+          nodeAttribute.faldo = attr.faldo
           nodeAttribute.optional = false
           nodeAttribute.negative = false
 
@@ -273,6 +286,7 @@ export default class Query extends Component {
       graphs: this.getGraphs(uri),
       id: nodeId,
       label: this.getLabel(uri),
+      faldo: this.isFaldoEntity(uri),
       selected: selected,
       suggested: suggested
     }
@@ -380,6 +394,7 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.target),
               id: targetId,
               label: label,
+              faldo: this.isFaldoEntity(relation.target),
               selected: false,
               suggested: true
             })
@@ -414,6 +429,7 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.source),
               id: sourceId,
               label: label,
+              faldo: this.isFaldoEntity(relation.source),
               selected: false,
               suggested: true
             })
