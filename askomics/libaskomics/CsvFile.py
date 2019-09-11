@@ -129,6 +129,21 @@ class CsvFile(File):
         if not (self.columns_type.count("start") == 1 and self.columns_type.count("end") == 1):
             self.columns_type = ["numeric" if ctype in ("start", "end") else ctype for ctype in self.columns_type]
 
+    def is_category(self, values):
+        """Check if a list af values are categories
+
+        Parameters
+        ----------
+        values : list
+            List of values
+
+        Returns
+        -------
+        bool
+            True if values are categories
+        """
+        return len(set(list(filter(None, values)))) <= int(len(list(filter(None, values))) / 3)
+
     def guess_column_type(self, values, header_index):
         """Guess the columns type
 
@@ -157,7 +172,7 @@ class CsvFile(File):
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
-            'datetime': ('date', 'time', 'birthday', 'bday')
+            'datetime': ('date', 'time', 'birthday', 'day')
         }
 
         date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}')
@@ -165,10 +180,10 @@ class CsvFile(File):
         # First, detect special type with header
         for stype, expressions in special_types.items():
             for expression in expressions:
-                epression_regexp = ".*{}.*".format(expression)
+                epression_regexp = ".*{}.*".format(expression.lower())
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
                     # Test if reference is a category
-                    if stype == "reference" and len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3):
+                    if stype == "reference" and not self.is_category(values):
                         break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
@@ -190,7 +205,7 @@ class CsvFile(File):
             if all(val == "" for val in values):
                 return "text"
             return "numeric"
-        elif len(set(list(filter(None, values)))) < int(len(list(filter(None, values))) / 3) or len(values) == 1:
+        elif self.is_category(values):
             return "category"
 
         return "text"  # default
