@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     rm -f config/askomics.ini && \
     /askomics/install.sh && \
     /askomics/build.sh && \
-    apk del gcc g++ && \
+    apk del gcc g++ make zlib-dev libzip-dev bzip2-dev xz-dev && \
     rm -rf /var/cache/apk/* && \
     rm -rf /root/.cache/* && \
     rm -rf /root/.npm/*

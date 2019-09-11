@@ -22,7 +22,7 @@ RUN apk update && apk del openssl openssl-dev && \
     /askomics/install.sh && \
     /askomics/build.sh && \
     mv /askomics/docker/start_all.sh /askomics/start_all.sh && \
-    apk del gcc g++ && \
+    apk del gcc g++ make zlib-dev libzip-dev bzip2-dev xz-dev && \
     rm -rf /var/cache/apk/* && \
     rm -rf /root/.cache/* && \
     rm -rf /root/.npm/*
