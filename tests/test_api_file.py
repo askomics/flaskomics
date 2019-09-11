@@ -180,8 +180,8 @@ class TestApiFile(AskomicsTestCase):
                 'data': {
                     'columns_type': [
                         'start_entity',
+                        'category',
                         'text',
-                        'reference',
                         'strand',
                         'start',
                         'end'
