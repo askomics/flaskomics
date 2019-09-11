@@ -441,7 +441,7 @@ def client_logged_as_jdoe_with_data():
     # Integrate
     file_info = {
         "id": 1,
-        "columns_type": ["start_entity", "organism", "chromosome", "strand", "start", "end"]
+        "columns_type": ["start_entity", "category", "reference", "strand", "start", "end"]
     }
 
     gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)
@@ -504,7 +504,7 @@ def client_logged_as_jdoe_with_data_and_result():
     # Integrate
     file_info = {
         "id": 1,
-        "columns_type": ["start_entity", "organism", "chromosome", "strand", "start", "end"]
+        "columns_type": ["start_entity", "category", "reference", "strand", "start", "end"]
     }
 
     gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)

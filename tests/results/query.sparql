@@ -1,6 +1,7 @@
 PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>
 PREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX faldo: <http://biohackathon.org/resource/faldo/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
