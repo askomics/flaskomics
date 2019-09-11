@@ -137,6 +137,8 @@ class File(Params):
 
         self.method = self.settings.get('triplestore', 'upload_method')
         self.max_chunk_size = self.settings.getint('triplestore', 'chunk_size')
+        self.serialization_format = self.settings.get('triplestore', 'serialization_format')
+        self.rdf_extention = 'ttl' if self.serialization_format == 'turtle' else self.serialization_format
 
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
@@ -188,7 +190,7 @@ class File(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
 
         temp_file_path = '{}/{}'.format(self.ttl_dir, tmp_file_name)
-        rdf_graph.serialize(format='turtle', encoding='utf-8', destination=temp_file_path)
+        rdf_graph.serialize(format=self.serialization_format, encoding='utf-8', destination=temp_file_path)
 
         # Load the chunk
         sparql.load_data(tmp_file_name, self.file_graph, self.host_url)
@@ -235,10 +237,11 @@ class File(Params):
                 if self.method == 'load':
 
                     # write rdf into a tmpfile and load it
-                    temp_file_name = 'tmp_{}_{}_chunk_{}.ttl'.format(
+                    temp_file_name = 'tmp_{}_{}_chunk_{}.{}'.format(
                         Utils.get_random_string(5),
                         self.name,
-                        chunk_number
+                        chunk_number,
+                        self.rdf_extention
                     )
 
                     self.load_graph(self.graph_chunk, temp_file_name)
@@ -251,10 +254,11 @@ class File(Params):
 
         # Load the last chunk
         if self.method == 'load':
-            temp_file_name = 'tmp_{}_{}_chunk_{}.ttl'.format(
+            temp_file_name = 'tmp_{}_{}_chunk_{}.{}'.format(
                 Utils.get_random_string(5),
                 self.name,
-                chunk_number
+                chunk_number,
+                self.rdf_extention
             )
 
             self.load_graph(self.graph_chunk, temp_file_name)
@@ -267,9 +271,10 @@ class File(Params):
 
         if self.method == 'load':
 
-            temp_file_name = 'tmp_{}_{}_abstraction_domain_knowledge.ttl'.format(
+            temp_file_name = 'tmp_{}_{}_abstraction_domain_knowledge.{}'.format(
                 Utils.get_random_string(5),
                 self.name,
+                self.rdf_extention
             )
 
             self.load_graph(self.graph_abstraction_dk, temp_file_name)

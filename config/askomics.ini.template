@@ -51,7 +51,13 @@ password = dba
 # If the triplesotre and askomics are on different network, the loadurl is askomics url accessible by the triplesotre
 # load_url = 
 upload_method = load
+# Number of triple to integrate in one request
 chunk_size = 60000
+# Serialization format: nt/xml/turtle
+# nt: fastest
+# turtle: more human readable
+# xml: no benefits
+serialization_format = nt
 # Default askomics graph
 default_graph = urn:sparql:askomics
 # User graph
