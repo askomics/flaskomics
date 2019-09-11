@@ -5,7 +5,6 @@ from BCBio.GFF import GFFExaminer
 from BCBio import GFF
 
 from askomics.libaskomics.File import File
-from askomics.libaskomics.RdfGraph import RdfGraph
 
 
 class GffFile(File):
@@ -86,45 +85,35 @@ class GffFile(File):
 
         File.integrate(self)
 
-    def get_rdf_abstraction_domain_knowledge(self):
-        """Get the abstraction and domain knowledge
-
-        Returns
-        -------
-        Graph
-            Abstraction and domain knowledge
-        """
-        rdf_graph = RdfGraph(self.app, self.session)
-
+    def set_rdf_abstraction_domain_knowledge(self):
+        """Set the abstraction and domain knowledge"""
         # Abstraction
         for entity in self.entities_to_integrate:
-            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
-            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
-            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
-            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
-            rdf_graph.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
+            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
+            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
+            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
+            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
+            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
         for attribute in self.attribute_abstraction:
             for attr_type in attribute["type"]:
-                rdf_graph.add((attribute["uri"], rdflib.RDF.type, attr_type))
-            rdf_graph.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-            rdf_graph.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-            rdf_graph.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
+                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
+            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
+            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
+            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
 
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
-                    rdf_graph.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
-                    rdf_graph.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    rdf_graph.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
+                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
 
         # Faldo:
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    rdf_graph.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
-
-        return rdf_graph
+                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
 
     def generate_rdf_content(self):
         """Generator of the rdf content
@@ -153,8 +142,6 @@ class GffFile(File):
                 faldo_start = None
                 faldo_end = None
 
-                rdf_graph = RdfGraph(self.app, self.session)
-
                 # Entity
                 if not feature.id:
                     if "ID" not in feature.qualifiers.keys():
@@ -174,8 +161,8 @@ class GffFile(File):
                     entity = self.askomics_prefix[self.format_uri(feature.id)]
                     entity_label = feature.id
 
-                rdf_graph.add((entity, rdflib.RDF.type, entity_type))
-                rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
+                self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
+                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
 
                 # Chrom
                 self.category_values["reference"] = {rec.id, }
@@ -183,7 +170,7 @@ class GffFile(File):
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
                 faldo_reference = attribute
                 self.faldo_abstraction["reference"] = relation
-                rdf_graph.add((entity, relation, attribute))
+                self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "reference") not in attribute_list:
                     attribute_list.append((feature.type, "reference"))
@@ -206,7 +193,7 @@ class GffFile(File):
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
                 self.faldo_abstraction["start"] = relation
-                rdf_graph.add((entity, relation, attribute))
+                self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
                     attribute_list.append((feature.type, "start"))
@@ -223,7 +210,7 @@ class GffFile(File):
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
                 self.faldo_abstraction["end"] = relation
-                rdf_graph.add((entity, relation, attribute))
+                self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
                     attribute_list.append((feature.type, "end"))
@@ -242,14 +229,14 @@ class GffFile(File):
                     attribute = self.askomics_prefix[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
                     self.faldo_abstraction["strand"] = relation
-                    rdf_graph.add((entity, relation, attribute))
+                    self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
-                    rdf_graph.add((entity, relation, attribute))
+                    self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "strand") not in attribute_list:
                     attribute_list.append((feature.type, "strand"))
@@ -295,29 +282,29 @@ class GffFile(File):
                                     "range": self.get_rdf_type(value)
                                 })
 
-                        rdf_graph.add((entity, relation, attribute))
+                        self.graph_chunk.add((entity, relation, attribute))
 
                 location = BNode()
                 begin = BNode()
                 end = BNode()
 
-                rdf_graph.add((entity, self.faldo.location, location))
+                self.graph_chunk.add((entity, self.faldo.location, location))
 
-                rdf_graph.add((location, rdflib.RDF.type, self.faldo.region))
-                rdf_graph.add((location, self.faldo.begin, begin))
-                rdf_graph.add((location, self.faldo.end, end))
+                self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
+                self.graph_chunk.add((location, self.faldo.begin, begin))
+                self.graph_chunk.add((location, self.faldo.end, end))
 
-                rdf_graph.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
-                rdf_graph.add((begin, self.faldo.position, faldo_start))
+                self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
+                self.graph_chunk.add((begin, self.faldo.position, faldo_start))
 
-                rdf_graph.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-                rdf_graph.add((end, self.faldo.position, faldo_end))
+                self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+                self.graph_chunk.add((end, self.faldo.position, faldo_end))
 
-                rdf_graph.add((begin, self.faldo.reference, faldo_reference))
-                rdf_graph.add((end, self.faldo.reference, faldo_reference))
+                self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
+                self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
 
                 if faldo_strand:
-                    rdf_graph.add((begin, rdflib.RDF.type, faldo_strand))
-                    rdf_graph.add((end, rdflib.RDF.type, faldo_strand))
+                    self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
+                    self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
-                yield rdf_graph
+                yield

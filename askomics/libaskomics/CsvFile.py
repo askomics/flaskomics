@@ -7,7 +7,6 @@ from rdflib import BNode
 
 from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
-from askomics.libaskomics.RdfGraph import RdfGraph
 
 
 class CsvFile(File):
@@ -281,29 +280,13 @@ class CsvFile(File):
         self.force_columns_type(forced_columns_type)
         File.integrate(self)
 
-    def get_rdf_abstraction_domain_knowledge(self):
-        """Get intersection of abstraction and domain knowledge
+    def set_rdf_abstraction_domain_knowledge(self):
+        """Set intersection of abstraction and domain knowledge"""
+        self.set_rdf_abstraction()
+        self.set_rdf_domain_knowledge()
 
-        Returns
-        -------
-        Graph
-            Rdf graph (dk + abstraction)
-        """
-        rdf = self.get_rdf_abstraction()
-        rdf.merge(self.get_rdf_domain_knowledge())
-
-        return rdf
-
-    def get_rdf_domain_knowledge(self):
-        """Get the domain knowledge
-
-        Returns
-        -------
-        Graph
-            Graph of domain knowledge
-        """
-        rdf_graph = RdfGraph(self.app, self.session)
-
+    def set_rdf_domain_knowledge(self):
+        """Set the domain knowledge"""
         for index, attribute in enumerate(self.header):
 
             if self.columns_type[index] in ('category', 'reference', 'strand'):
@@ -311,24 +294,14 @@ class CsvFile(File):
                 p = self.askomics_namespace["category"]
                 for value in self.category_values[self.header[index]]:
                     o = self.askomics_prefix[self.format_uri(value)]
-                    rdf_graph.add((s, p, o))
-                    rdf_graph.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
-                    rdf_graph.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((s, p, o))
+                    self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
+                    self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
                     if self.columns_type[index] == "strand":
-                        rdf_graph.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
+                        self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
 
-        return rdf_graph
-
-    def get_rdf_abstraction(self):
-        """Get the abstraction
-
-        Returns
-        -------
-        Graph
-            Abstraction
-        """
-        rdf_graph = RdfGraph(self.app, self.session)
-
+    def set_rdf_abstraction(self):
+        """Set the abstraction"""
         # Entity
         # Check subclass syntax (<)
         if self.header[0].find('<') > 0:
@@ -337,18 +310,18 @@ class CsvFile(File):
             entity_label = rdflib.Literal(splitted[0])
             mother_class = self.askomics_prefix[self.format_uri(splitted[1], remove_space=True)]
             # subClassOf
-            rdf_graph.add((entity, rdflib.RDFS.subClassOf, mother_class))
+            self.graph_abstraction_dk.add((entity, rdflib.RDFS.subClassOf, mother_class))
         else:
             entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
             entity_label = rdflib.Literal(self.header[0])
 
-        rdf_graph.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
-        rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
+        self.graph_abstraction_dk.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
+        self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
         if self.faldo_entity:
-            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix["faldo"]))
-        rdf_graph.add((entity, rdflib.RDFS.label, entity_label))
+            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix["faldo"]))
+        self.graph_abstraction_dk.add((entity, rdflib.RDFS.label, entity_label))
         if self.columns_type[0] == 'start_entity':
-            rdf_graph.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
+            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
 
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
@@ -365,7 +338,7 @@ class CsvFile(File):
                 label = rdflib.Literal(splitted[0])
                 rdf_range = self.askomics_prefix[quote(splitted[1])]
                 rdf_type = rdflib.OWL.ObjectProperty
-                rdf_graph.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
+                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
 
             # Category
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
@@ -373,7 +346,7 @@ class CsvFile(File):
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
-                rdf_graph.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsCategory"]))
+                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsCategory"]))
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
@@ -391,18 +364,16 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
 
-            rdf_graph.add((attribute, rdflib.RDF.type, rdf_type))
-            rdf_graph.add((attribute, rdflib.RDFS.label, label))
-            rdf_graph.add((attribute, rdflib.RDFS.domain, entity))
-            rdf_graph.add((attribute, rdflib.RDFS.range, rdf_range))
+            self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, rdf_type))
+            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.label, label))
+            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, entity))
+            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, rdf_range))
 
         # Faldo:
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    rdf_graph.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
-
-        return rdf_graph
+                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
 
     def generate_rdf_content(self):
         """Generator of the rdf content
@@ -432,16 +403,14 @@ class CsvFile(File):
             # Loop on lines
             for row_number, row in enumerate(reader):
 
-                rdf_graph = RdfGraph(self.app, self.session)
-
                 # skip blank lines
                 if not row:
                     continue
 
                 # Entity
                 entity = self.askomics_prefix[self.format_uri(row[0])]
-                rdf_graph.add((entity, rdflib.RDF.type, entity_type))
-                rdf_graph.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
+                self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
+                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
 
                 # Faldo
                 faldo_reference = None
@@ -507,31 +476,31 @@ class CsvFile(File):
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     if entity and relation and attribute:
-                        rdf_graph.add((entity, relation, attribute))
+                        self.graph_chunk.add((entity, relation, attribute))
 
                 if self.faldo_entity and faldo_start and faldo_end:
                     location = BNode()
                     begin = BNode()
                     end = BNode()
 
-                    rdf_graph.add((entity, self.faldo.location, location))
+                    self.graph_chunk.add((entity, self.faldo.location, location))
 
-                    rdf_graph.add((location, rdflib.RDF.type, self.faldo.region))
-                    rdf_graph.add((location, self.faldo.begin, begin))
-                    rdf_graph.add((location, self.faldo.end, end))
+                    self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
+                    self.graph_chunk.add((location, self.faldo.begin, begin))
+                    self.graph_chunk.add((location, self.faldo.end, end))
 
-                    rdf_graph.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
-                    rdf_graph.add((begin, self.faldo.position, faldo_start))
+                    self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((begin, self.faldo.position, faldo_start))
 
-                    rdf_graph.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-                    rdf_graph.add((end, self.faldo.position, faldo_end))
+                    self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((end, self.faldo.position, faldo_end))
 
                     if faldo_reference:
-                        rdf_graph.add((begin, self.faldo.reference, faldo_reference))
-                        rdf_graph.add((end, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
 
                     if faldo_strand:
-                        rdf_graph.add((begin, rdflib.RDF.type, faldo_strand))
-                        rdf_graph.add((end, rdflib.RDF.type, faldo_strand))
+                        self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
+                        self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
-                yield rdf_graph
+                yield

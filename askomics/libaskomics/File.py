@@ -138,6 +138,9 @@ class File(Params):
         self.method = self.settings.get('triplestore', 'upload_method')
         self.max_chunk_size = self.settings.getint('triplestore', 'chunk_size')
 
+        self.graph_chunk = RdfGraph(self.app, self.session)
+        self.graph_abstraction_dk = RdfGraph(self.app, self.session)
+
     def format_uri(self, string, remove_space=False):
         """remove space and quote"""
         if remove_space:
@@ -224,13 +227,10 @@ class File(Params):
 
         # Insert content
         chunk_number = 0
-        graph_chunk = RdfGraph(self.app, self.session)
 
-        for rdf_data in content_generator:
+        for _ in content_generator:
 
-            graph_chunk.merge(rdf_data)
-
-            if graph_chunk.ntriple >= self.max_chunk_size:
+            if self.graph_chunk.ntriple >= self.max_chunk_size:
 
                 if self.method == 'load':
 
@@ -241,14 +241,13 @@ class File(Params):
                         chunk_number
                     )
 
-                    self.load_graph(graph_chunk, temp_file_name)
-
+                    self.load_graph(self.graph_chunk, temp_file_name)
                 else:
                     # Insert
-                    sparql.insert_data(graph_chunk, self.file_graph)
+                    sparql.insert_data(self.graph_chunk, self.file_graph)
 
                 chunk_number += 1
-                graph_chunk = RdfGraph(self.app, self.session)
+                self.graph_chunk = RdfGraph(self.app, self.session)
 
         # Load the last chunk
         if self.method == 'load':
@@ -258,13 +257,13 @@ class File(Params):
                 chunk_number
             )
 
-            self.load_graph(graph_chunk, temp_file_name)
+            self.load_graph(self.graph_chunk, temp_file_name)
         else:
             # Insert
-            sparql.insert_data(graph_chunk, self.file_graph)
+            sparql.insert_data(self.graph_chunk, self.file_graph)
 
         # Content is inserted, now insert abstraction and domain_knowledge
-        abstraction_domain_knowledge = self.get_rdf_abstraction_domain_knowledge()
+        self.set_rdf_abstraction_domain_knowledge()
 
         if self.method == 'load':
 
@@ -273,10 +272,10 @@ class File(Params):
                 self.name,
             )
 
-            self.load_graph(abstraction_domain_knowledge, temp_file_name)
+            self.load_graph(self.graph_abstraction_dk, temp_file_name)
         else:
             # Insert
-            sparql.insert_data(abstraction_domain_knowledge, self.file_graph)
+            sparql.insert_data(self.graph_abstraction_dk, self.file_graph)
 
         self.set_triples_number()
 
