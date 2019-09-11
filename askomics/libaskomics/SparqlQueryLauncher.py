@@ -178,7 +178,7 @@ class SparqlQueryLauncher(Params):
             query result
         """
         query = '''
-        INSERT DATA {{
+        INSERT {{
             GRAPH <{}> {{
                 {}
             }}
@@ -207,7 +207,7 @@ class SparqlQueryLauncher(Params):
         triples = self.get_triples_from_graph(ttl) if metadata else ttl.serialize(format='nt').decode("utf-8")
 
         query = '''
-        INSERT DATA {{
+        INSERT {{
             GRAPH <{}> {{
                 {}
             }}
