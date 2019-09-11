@@ -299,6 +299,8 @@ class CsvFile(File):
                     rdf_graph.add((s, p, o))
                     rdf_graph.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     rdf_graph.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
+                    if self.columns_type[index] == "strand":
+                        rdf_graph.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
 
         return rdf_graph
 
@@ -437,6 +439,9 @@ class CsvFile(File):
                     current_type = self.columns_type[column_number]
                     current_header = self.header[column_number]
 
+                    attribute = None
+                    relation = None
+
                     # Skip entity and blank cells
                     if column_number == 0 or not cell:
                         continue
@@ -449,31 +454,35 @@ class CsvFile(File):
 
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
+                        potential_relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
                         else:
                             # add the cell in the set
                             self.category_values[current_header].add(cell)
-                        relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
-                        attribute = self.askomics_prefix[self.format_uri(cell)]
                         if current_type == 'reference':
                             faldo_reference = self.askomics_prefix[self.format_uri(cell)]
-                            self.faldo_abstraction["reference"] = relation
-                        if current_type == 'strand':
+                            self.faldo_abstraction["reference"] = potential_relation
+                        elif current_type == 'strand':
                             faldo_strand = self.get_faldo_strand(cell)
-                            self.faldo_abstraction["strand"] = relation
+                            self.faldo_abstraction["strand"] = potential_relation
+                        else:
+                            relation = potential_relation
+                            attribute = self.askomics_prefix[self.format_uri(cell)]
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):
-                        relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
-                        attribute = rdflib.Literal(self.convert_type(cell))
+                        potential_relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         if current_type == "start":
                             faldo_start = rdflib.Literal(self.convert_type(cell))
-                            self.faldo_abstraction["start"] = relation
-                        if current_type == "end":
+                            self.faldo_abstraction["start"] = potential_relation
+                        elif current_type == "end":
                             faldo_end = rdflib.Literal(self.convert_type(cell))
-                            self.faldo_abstraction["end"] = relation
+                            self.faldo_abstraction["end"] = potential_relation
+                        else:
+                            relation = potential_relation
+                            attribute = rdflib.Literal(self.convert_type(cell))
 
                     # TODO: datetime
 
@@ -482,7 +491,8 @@ class CsvFile(File):
                         relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         attribute = rdflib.Literal(self.convert_type(cell))
 
-                    rdf_graph.add((entity, relation, attribute))
+                    if entity and relation and attribute:
+                        rdf_graph.add((entity, relation, attribute))
 
                 if self.faldo_entity and faldo_start and faldo_end:
                     location = BNode()

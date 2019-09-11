@@ -339,7 +339,10 @@ class SparqlQueryBuilder(Params):
             if attribute["type"] == "decimal":
                 if attribute["visible"] or attribute["filterValue"] != "":
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
-                    predicate = "<{}>".format(attribute["uri"])
+                    if attribute["faldo"]:
+                        predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
+                    else:
+                        predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     triple_string = "{} {} {} .".format(subject, predicate, obj)
                     if attribute["optional"]:
@@ -354,19 +357,40 @@ class SparqlQueryBuilder(Params):
 
             # Category
             if attribute["type"] == "category":
+                triple_string_1 = ""
+                triple_string_2 = ""
+                triple_string_3 = ""
+                triple_string_4 = ""
                 if attribute["visible"] or attribute["filterSelectedValues"] != []:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
-                    category_name = "<{}>".format(attribute["uri"])
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    label = "rdfs:label"
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
-                    triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
+                    faldo_strand = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    label = "rdfs:label"
+                    if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
+                        category_name = 'faldo:location/faldo:begin/faldo:reference'
+                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
+                        triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
+                    elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
+                        category_name = 'faldo:location/faldo:begin/rdf:type'
+                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
+                        triple_string_2 = "{} a {} .".format(faldo_strand, category_value_uri)
+                        triple_string_3 = "{} rdfs:label {} .".format(faldo_strand, category_label)
+                        triple_string_4 = "VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri)
+                    else:
+                        category_name = "<{}>".format(attribute["uri"])
+                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
+                        triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
+
                     if attribute["optional"]:
                         triple_string_1 = "OPTIONAL {{{} {}}}".format(triple_string_1, triple_string_2)
                         triple_string_2 = ""
                     triples.append(triple_string_1)
                     triples.append(triple_string_2)
+                    if triple_string_3:
+                        triples.append(triple_string_3)
+                    if triple_string_4:
+                        triples.append(triple_string_4)
 
                     if attribute["visible"]:
                         self.selects.append(category_label)
@@ -374,7 +398,13 @@ class SparqlQueryBuilder(Params):
                 if attribute["filterSelectedValues"] != [] and not attribute["optional"]:
                     filter_substrings_list = []
                     for value in attribute["filterSelectedValues"]:
-                        filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))
+                        if attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
+                            faldo_strand_filter = self.format_sparql_variable("{}{}_{}_faldoStrand_filter".format(attribute["entityLabel"], attribute["nodeId"], Utils.get_random_string(5)))
+                            filter_substrings_list.append("({} = {})".format(category_value_uri, faldo_strand_filter))
+                            triples.append("<{}> a {}".format(value, faldo_strand_filter))
+                            triples.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} ".format(faldo_strand_filter))
+                        else:
+                            filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))
                     filter_substring = ' || '.join(filter_substrings_list)
                     filter_string = "FILTER ({})".format(filter_substring)
                     filters.append(filter_string)
