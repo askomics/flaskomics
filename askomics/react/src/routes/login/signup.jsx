@@ -114,7 +114,9 @@ export default class Signup extends Component {
   }
 
   componentWillUnmount () {
-    this.cancelRequest()
+    if (this.cancelRequest) {
+      this.cancelRequest()
+    }
   }
 
   render () {
