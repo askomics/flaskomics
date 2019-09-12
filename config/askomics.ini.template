@@ -1,5 +1,5 @@
 [flask]
-debug = true
+debug = false
 secret_key = askomics_secret_key
 session_timeout = 60
 
