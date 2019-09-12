@@ -51,7 +51,7 @@ export default class ResultsTable extends Component {
             data={this.props.data}
             columns={columns}
             pagination={paginationFactory()}
-            noDataIndication={'No results!'}
+            noDataIndication={'No results'}
           />
         </div>
       </div>
