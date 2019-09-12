@@ -96,6 +96,9 @@ class BedFile(File):
                     self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
                     self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
 
+                    if attribute["label"] == rdflib.Literal("strand"):
+                        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
+
         # Faldo:
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():

@@ -109,6 +109,9 @@ class GffFile(File):
                     self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
                     self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
 
+                    if attribute["label"] == rdflib.Literal("strand"):
+                        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
+
         # Faldo:
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
@@ -170,7 +173,7 @@ class GffFile(File):
                 attribute = self.askomics_prefix[self.format_uri(rec.id)]
                 faldo_reference = attribute
                 self.faldo_abstraction["reference"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "reference") not in attribute_list:
                     attribute_list.append((feature.type, "reference"))
@@ -193,7 +196,7 @@ class GffFile(File):
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
                 self.faldo_abstraction["start"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
                     attribute_list.append((feature.type, "start"))
@@ -210,7 +213,7 @@ class GffFile(File):
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
                 self.faldo_abstraction["end"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
                     attribute_list.append((feature.type, "end"))
@@ -229,14 +232,14 @@ class GffFile(File):
                     attribute = self.askomics_prefix[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
                     self.faldo_abstraction["strand"] = relation
-                    self.graph_chunk.add((entity, relation, attribute))
+                    # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
                     relation = self.askomics_prefix[self.format_uri("strand")]
                     attribute = self.askomics_prefix[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
-                    self.graph_chunk.add((entity, relation, attribute))
+                    # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "strand") not in attribute_list:
                     attribute_list.append((feature.type, "strand"))
