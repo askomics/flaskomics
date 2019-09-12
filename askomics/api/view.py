@@ -24,7 +24,7 @@ def home(path):
     title = "AskOmics"
     try:
         subtitle = current_app.iniconfig.get('askomics', 'subtitle')
-        title = "Askomics | {}".format(subtitle)
+        title = "AskOmics | {}".format(subtitle)
     except Exception:
         pass
 
