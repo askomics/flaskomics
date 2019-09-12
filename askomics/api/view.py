@@ -21,4 +21,11 @@ def home(path):
     except Exception:
         pass
 
-    return render_template('index.html', project="AskOmics", proxy_path=proxy_path)
+    title = "AskOmics"
+    try:
+        subtitle = current_app.iniconfig.get('askomics', 'subtitle')
+        title = "Askomics | {}".format(subtitle)
+    except Exception:
+        pass
+
+    return render_template('index.html', title=title, proxy_path=proxy_path)

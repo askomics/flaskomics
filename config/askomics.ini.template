@@ -14,6 +14,7 @@ debug_ttl = false
 # If Askomics is running under a sub path (like http://example.org/askomics, subpath is /askomics)
 #reverse_proxy_path = 
 
+# subtitle = 
 footer_message = Welcome to AskOmics!
 display_commit_hash = false
 
