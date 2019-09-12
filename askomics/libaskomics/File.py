@@ -190,7 +190,9 @@ class File(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
 
         temp_file_path = '{}/{}'.format(self.ttl_dir, tmp_file_name)
-        rdf_graph.serialize(format=self.serialization_format, encoding='utf-8', destination=temp_file_path)
+
+        encoding = 'utf-8' if self.serialization_format != 'nt' else None
+        rdf_graph.serialize(format=self.serialization_format, encoding=encoding, destination=temp_file_path)
 
         # Load the chunk
         sparql.load_data(tmp_file_name, self.file_graph, self.host_url)
