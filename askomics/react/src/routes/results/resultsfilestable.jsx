@@ -376,7 +376,7 @@ export default class ResultsFilesTable extends Component {
 
     return (
       <div>
-        <div className="asko-table-div">
+        <div className="asko-table-height-div">
           {redirectQueryBuilder}{redirectSparqlEditor}
           <BootstrapTable
             classes="asko-table"

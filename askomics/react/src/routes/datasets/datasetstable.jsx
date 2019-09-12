@@ -124,8 +124,10 @@ export default class DatasetsTable extends Component {
     }
 
     return (
-      <div>
+      <div className="asko-table-height-div">
         <BootstrapTable
+          classes="asko-table"
+          wrapperClasses="asko-table-wrapper"
           tabIndexCell
           bootstrap4
           keyField='id'

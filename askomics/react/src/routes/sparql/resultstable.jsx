@@ -41,7 +41,7 @@ export default class ResultsTable extends Component {
 
     return (
       <div>
-        <div className="asko-table-div">
+        <div className="asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"
@@ -51,7 +51,7 @@ export default class ResultsTable extends Component {
             data={this.props.data}
             columns={columns}
             pagination={paginationFactory()}
-            noDataIndication={'No results'}
+            noDataIndication={'No results!'}
           />
         </div>
       </div>

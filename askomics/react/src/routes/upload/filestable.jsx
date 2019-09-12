@@ -95,17 +95,21 @@ export default class FilesTable extends Component {
 
     return (
       <div>
-        <BootstrapTable
-          tabIndexCell
-          bootstrap4
-          keyField='id'
-          data={this.props.files}
-          columns={columns}
-          defaultSorted={defaultSorted}
-          pagination={paginationFactory()}
-          noDataIndication={noDataIndication}
-          selectRow={ selectRow }
-        />
+          <div className="asko-table-height-div">
+            <BootstrapTable
+              classes="asko-table"
+              wrapperClasses="asko-table-wrapper"
+              tabIndexCell
+              bootstrap4
+              keyField='id'
+              data={this.props.files}
+              columns={columns}
+              defaultSorted={defaultSorted}
+              pagination={paginationFactory()}
+              noDataIndication={noDataIndication}
+              selectRow={ selectRow }
+            />
+          </div>
       </div>
     )
   }

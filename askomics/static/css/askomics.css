@@ -45,6 +45,13 @@ i.inactive {
   max-height: 350px;
 }
 
+.asko-table-height-div {
+  width: auto;
+  display: block;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 .asko-table-wrapper {
   width: auto;
   white-space: nowrap;

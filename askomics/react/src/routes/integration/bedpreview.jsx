@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, Label, ButtonGroup, Button, Col } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'

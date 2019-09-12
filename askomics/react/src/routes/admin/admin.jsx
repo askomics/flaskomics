@@ -184,7 +184,18 @@ export default class Admin extends Component {
       <div className="container">
         <h2>Admin</h2>
         <hr />
-        <BootstrapTable bootstrap4 keyField='id' data={this.state.users} columns={columns} defaultSorted={defaultSorted} pagination={paginationFactory()} />
+        <div className=".asko-table-height-div">
+          <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
+            bootstrap4
+            keyField='id'
+            data={this.state.users}
+            columns={columns}
+            defaultSorted={defaultSorted}
+            pagination={paginationFactory()}
+          />
+        </div>
       </div>
     )
   }
