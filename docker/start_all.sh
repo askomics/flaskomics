@@ -58,7 +58,7 @@ while ! wget -O /dev/null http://localhost:8890/conductor; do
 done
 
 # Start Celery
-/askomics/run_celery.sh -d ${DEPMODE} &
+/askomics/run_celery.sh -d ${DEPMODE} -c ${CELERY_NTASKS} &
 
 # Start AskOmics
-/askomics/run_askomics.sh -d ${DEPMODE} 
+/askomics/run_askomics.sh -d ${DEPMODE}

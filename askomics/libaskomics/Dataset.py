@@ -77,7 +77,7 @@ class Dataset(Params):
             ?,
             ?,
             ?,
-            "started",
+            "queued",
             strftime('%s', 'now'),
             NULL,
             ?,
@@ -95,7 +95,7 @@ class Dataset(Params):
             0
         ), get_id=True)
 
-    def update_in_db(self, error=False, error_message=None, ntriples=0):
+    def update_in_db(self, status, error=False, error_message=None, ntriples=0):
         """Update the dataset when integration is done
 
         Parameters
@@ -107,7 +107,6 @@ class Dataset(Params):
         ntriples : int, optional
             Number of triples integrated
         """
-        status = "failure" if error else "success"
         message = error_message if error else ""
 
         database = Database(self.app, self.session)

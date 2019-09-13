@@ -89,8 +89,11 @@ export default class DatasetsTable extends Component {
       dataField: 'status',
       text: 'Status',
       formatter: (cell, row) => {
+        if (cell == 'queued') {
+          return <Badge color="secondary">Queued</Badge>
+        }
         if (cell == 'started') {
-          return <Badge color="info">Started...</Badge>
+          return <Badge color="info">Started</Badge>
         }
         if (cell == 'success') {
           return <Badge color="success">Success</Badge>

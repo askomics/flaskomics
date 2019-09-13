@@ -52,6 +52,7 @@ def integrate(self, session, data, host_url):
 
             dataset_info = {
                 "celery_id": self.request.id,
+                "id": data["dataset_id"],
                 "file_id": file.id,
                 "name": file.name,
                 "graph_name": file.file_graph,
@@ -59,7 +60,7 @@ def integrate(self, session, data, host_url):
             }
 
             dataset = Dataset(app, session, dataset_info)
-            dataset.save_in_db()
+            dataset.update_in_db(status="started")
 
             if file.type == "csv/tsv":
                 file.integrate(data['columns_type'], public=data['public'])
@@ -70,10 +71,10 @@ def integrate(self, session, data, host_url):
             elif file.type == "bed":
                 file.integrate(data["entity_name"], public=data["public"])
             # done
-            dataset.update_in_db(ntriples=file.ntriples)
+            dataset.update_in_db("success", ntriples=file.ntriples)
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
-            dataset.update_in_db(error=True, error_message=str(e))
+            dataset.update_in_db("failure", error=True, error_message=str(e))
             # Rollback
             file.rollback()
             return {

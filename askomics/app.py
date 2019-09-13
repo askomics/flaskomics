@@ -18,6 +18,7 @@ from askomics.api.results import results_bp
 from askomics.api.galaxy import galaxy_bp
 
 from celery import Celery
+from kombu import Exchange, Queue
 
 from flask import Flask
 
@@ -101,6 +102,13 @@ def create_celery(app):
     celery = Celery(app.import_name, broker=app.iniconfig.get("celery", "broker_url"))
     # celery.conf.update(app.config)
     task_base = celery.Task
+
+    default_exchange = Exchange('default', type='direct')
+
+    celery.conf.task_queues = (
+        Queue('default', default_exchange, routing_key='default'),
+    )
+    celery.conf.task_default_queue = 'default'
 
     class ContextTask(task_base):
         abstract = True

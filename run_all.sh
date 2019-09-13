@@ -5,15 +5,17 @@ dir_askomics=$(dirname "$0")
 dir_venv="$dir_askomics/venv"
 dir_node_modules="$dir_askomics/node_modules"
 activate="$dir_venv/bin/activate"
+ntasks=1
 
 error=0
 
 function usage() {
     echo "Usage: $0 (-d { dev | prod })"
     echo "    -d     deployment mode (default: production)"
+    echo "    -c     celery max parallel tasks (default: 1)"
 }
 
-while getopts "hd:" option; do
+while getopts "hd:c:" option; do
     case $option in
         h)
             usage
@@ -22,6 +24,10 @@ while getopts "hd:" option; do
 
         d)
             depmode=$OPTARG
+        ;;
+
+        c)
+            ntasks=$OPTARG
         ;;
     esac
 done
@@ -81,9 +87,9 @@ echo "Building JS ..."
 npm run $npm_depmode &
 echo "Starting celery ..."
 if [[ $flask_depmod == "development" ]]; then
-    watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -l info &
+    watchmedo auto-restart -d ${dir_askomics}/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -Q default -c ${ntasks} -n default -l info &
 else
-    celery -A askomics.tasks.celery worker -l info &
+    celery -A askomics.tasks.celery worker -Q default -c ${ntasks} -n default -l info &
 fi
 
 echo "Starting server ..."

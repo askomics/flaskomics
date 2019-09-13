@@ -4,6 +4,7 @@ import traceback
 
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.Dataset import Dataset
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
 
@@ -222,9 +223,28 @@ def integrate():
     session_dict = {'user': session['user']}
 
     try:
-        task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
-        # task = async_integrate.delay(data, request.host_url)
-        current_app.logger.debug(task)
+
+        files_handler = FilesHandler(current_app, session, host_url=request.host_url)
+        files_handler.handle_files([data["fileId"], ])
+
+        for file in files_handler.files:
+
+            dataset_info = {
+                "celery_id": None,
+                "file_id": file.id,
+                "name": file.name,
+                "graph_name": file.file_graph,
+                "public": data['public']
+            }
+
+            dataset = Dataset(current_app, session, dataset_info)
+            dataset.save_in_db()
+            data["dataset_id"] = dataset.id
+
+            task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
+
+            current_app.logger.debug(task)
+
     except Exception as e:
         return jsonify({
             'error': True,
