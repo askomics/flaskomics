@@ -31,4 +31,4 @@ class TestApiDatasets(AskomicsTestCase):
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert response.json["datasets"][0]["status"] == "deleting"
+        assert response.json["datasets"][0]["status"] == "queued"

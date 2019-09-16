@@ -221,6 +221,7 @@ def integrate():
     data = request.get_json()
 
     session_dict = {'user': session['user']}
+    task = None
 
     try:
 
@@ -249,13 +250,13 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': None
+            'task_id': ''
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id
+        'task_id': task.id if task else ''
     })
 
 

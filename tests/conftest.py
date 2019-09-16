@@ -159,7 +159,7 @@ def integrate_dataset(dir_path, file_info, user_session, public):
         file_timestamp = file.timestamp
 
         # done
-        dataset.update_in_db()
+        dataset.update_in_db("success")
 
         return file_timestamp
 
@@ -199,7 +199,7 @@ def save_query(dir_path, user_session, gene_timestamp):
     result.save_result_in_file(headers, results)
 
     # Update database status
-    result.update_db_status()
+    result.update_db_status("success")
 
     return {
         "id": result.id,

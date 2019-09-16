@@ -343,7 +343,7 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert len(response.json["task_id"]) == 0
 
         response = client_logged_as_jdoe_with_data.post('/api/files/integrate', json=tsv_data)
         assert response.status_code == 200
