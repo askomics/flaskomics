@@ -326,12 +326,15 @@ class CsvFile(File):
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
 
+            symetric_relation = False
+
             # Skip entity
             if index == 0:
                 continue
 
             # Relation
-            if self.columns_type[index] in ('general_relation', ):
+            if self.columns_type[index] in ('general_relation', 'symetric_relation'):
+                symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
                 splitted = attribute_name.split('@')
 
                 attribute = self.askomics_prefix[quote(splitted[0])]
@@ -368,6 +371,9 @@ class CsvFile(File):
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.label, label))
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, entity))
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, rdf_range))
+            if symetric_relation:
+                self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, rdf_range))
+                self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, entity))
 
         # Faldo:
         if self.faldo_entity:
@@ -425,13 +431,15 @@ class CsvFile(File):
 
                     attribute = None
                     relation = None
+                    symetric_relation = False
 
                     # Skip entity and blank cells
                     if column_number == 0 or not cell:
                         continue
 
                     # Relation
-                    if current_type == 'general_relation':
+                    if current_type in ('general_relation', 'symetric_relation'):
+                        symetric_relation = True if current_type == 'symetric_relation' else False
                         splitted = current_header.split('@')
                         relation = self.askomics_prefix[self.format_uri(splitted[0])]
                         attribute = self.askomics_prefix[self.format_uri(cell)]
@@ -477,6 +485,8 @@ class CsvFile(File):
 
                     if entity and relation and attribute:
                         self.graph_chunk.add((entity, relation, attribute))
+                        if symetric_relation:
+                            self.graph_chunk.add((attribute, relation, entity))
 
                 if self.faldo_entity and faldo_start and faldo_end:
                     location = BNode()
