@@ -99,7 +99,7 @@ export default class DatasetsTable extends Component {
           return <Badge color="success">Success</Badge>
         }
         if (cell == 'deleting') {
-          return <Badge color="warning">Deleting...</Badge>
+          return <Badge color="warning">Deleting</Badge>
         }
         return <Badge color="danger">Failure</Badge>
       },

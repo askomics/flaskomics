@@ -60,12 +60,22 @@ def delete_datasets():
     session_dict = {'user': session['user']}
 
     try:
-        # Change status into database
+        # Change status to queued for all datasets
         datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
         datasets_handler.handle_datasets()
-        datasets = datasets_handler.update_status_in_db('deleting')
-        # Trigger the celery task to delete it in the ts, and in db
-        current_app.celery.send_task('delete_datasets', (session_dict, datasets_info))
+        datasets_handler.update_status_in_db('queued')
+
+        # Launch a celery task for each datasets to delete
+        for dataset in datasets_handler.datasets:
+            dataset_info = [{
+                "id": dataset.id
+            }, ]
+            current_app.logger.debug(dataset_info)
+            # Trigger the celery task
+            current_app.celery.send_task('delete_datasets', (session_dict, dataset_info))
+
+        datasets = datasets_handler.get_datasets()
+
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({

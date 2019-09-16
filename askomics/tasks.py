@@ -60,7 +60,7 @@ def integrate(self, session, data, host_url):
             }
 
             dataset = Dataset(app, session, dataset_info)
-            dataset.update_in_db(status="started")
+            dataset.update_in_db(status="started", update_celery=True)
 
             if file.type == "csv/tsv":
                 file.integrate(data['columns_type'], public=data['public'])
@@ -108,6 +108,7 @@ def delete_datasets(self, session, datasets_info):
     try:
         datasets_handler = DatasetsHandler(app, session, datasets_info=datasets_info)
         datasets_handler.handle_datasets()
+        datasets_handler.update_status_in_db("deleting")
         datasets_handler.delete_datasets()
 
     except Exception as e:
@@ -124,7 +125,7 @@ def delete_datasets(self, session, datasets_info):
 
 
 @celery.task(bind=True, name="query")
-def query(self, session, graph_state):
+def query(self, session, info):
     """Save the query results in filesystem and db
 
     Parameters
@@ -141,19 +142,17 @@ def query(self, session, graph_state):
         errorMessage: the error message of error, else an empty string
     """
     try:
-        info = {
-            "graph_state": graph_state,
-            "celery_id": self.request.id
-        }
-        result = Result(app, session, info)
+        info["celery_id"] = self.request.id
+        result = Result(app, session, info, force_no_db=True)
 
         # Save job in database database
-        result.save_in_db()
+        result.set_celery_id(self.request.id)
+        result.update_db_status("started", update_celery=True)
 
         # launch query
         query_builder = SparqlQueryBuilder(app, session)
         query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
-        query = query_builder.build_query_from_json(graph_state, for_editor=False)
+        query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
         headers = query_builder.selects
         results = []
         if query_builder.graphs:
@@ -163,11 +162,11 @@ def query(self, session, graph_state):
         result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status()
+        result.update_db_status("success")
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
-        result.update_db_status(error=True, error_message=str(e))
+        result.update_db_status("error", error=True, error_message=str(e))
         result.rollback()
         return {
             'error': True,

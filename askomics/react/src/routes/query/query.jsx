@@ -889,9 +889,9 @@ export default class Query extends Component {
       )
 
       // buttons
-      previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Preview results</Button>
+      previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
       if (this.state.logged) {
-        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Save Query</Button>
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {
         removeButton = (

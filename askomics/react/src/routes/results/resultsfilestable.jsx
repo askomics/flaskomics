@@ -302,7 +302,7 @@ export default class ResultsFilesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -311,8 +311,11 @@ export default class ResultsFilesTable extends Component {
       dataField: 'status',
       text: 'Status',
       formatter: (cell, row) => {
+        if (cell == 'queued') {
+          return <Badge color="secondary">Queued</Badge>
+        }
         if (cell == 'started') {
-          return <Badge color="info">Started...</Badge>
+          return <Badge color="info">Started</Badge>
         }
         if (cell == 'success') {
           return <Badge color="success">Success</Badge>
@@ -346,12 +349,12 @@ export default class ResultsFilesTable extends Component {
       formatter: (cell, row) => {
         return (
           <ButtonGroup>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
-            {this.props.user.galaxy ? <Button name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
-            {this.props.user.galaxy ? <Button name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
+            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
+            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
+            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
+            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
+            {this.props.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
+            {this.props.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
       }

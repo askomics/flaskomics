@@ -29,7 +29,7 @@ class Result(Params):
         results directory path
     """
 
-    def __init__(self, app, session, result_info):
+    def __init__(self, app, session, result_info, force_no_db=False):
         """init object
 
         Parameters
@@ -50,10 +50,11 @@ class Result(Params):
                 self.session['user']['username']
             )
 
-        if "id" in result_info:
+        if "id" in result_info and not force_no_db:
             self.id = result_info["id"]
             self.set_info_from_db_with_id()
         else:
+            self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
@@ -154,6 +155,16 @@ class Result(Params):
             return self.format_graph_state(self.graph_state)
         return self.graph_state
 
+    def set_celery_id(self, celery_id):
+        """Set celery id
+
+        Parameters
+        ----------
+        celery_id : string
+            The celery id
+        """
+        self.celery_id = celery_id
+
     def set_info_from_db_with_id(self):
         """Set result info from the db"""
         database = Database(self.app, self.session)
@@ -249,7 +260,7 @@ class Result(Params):
             NULL,
             ?,
             ?,
-            "started",
+            "queued",
             NULL,
             ?,
             NULL,
@@ -268,6 +279,8 @@ class Result(Params):
             json.dumps(self.graph_state),
             False
         ), get_id=True)
+
+        return self.id
 
     def update_public_status(self, public):
         """Change public status
@@ -291,7 +304,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, error=False, error_message=None):
+    def update_db_status(self, status, update_celery=False, error=False, error_message=None):
         """Update status of results in db
 
         Parameters
@@ -301,31 +314,47 @@ class Result(Params):
         error_message : bool, optional
             Error string if error is True
         """
-        status = "failure" if error else "success"
         message = error_message if error else ""
+        update_celery_substr = ""
+        if update_celery:
+            update_celery_substr = "celery_id=?,"
+
         self.end = int(time.time())
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE results SET
+        {}
         status=?,
         end=?,
         path=?,
         nrows=?,
         error=?
         WHERE user_id=? AND id=?
-        '''
+        '''.format(update_celery_substr)
 
-        database.execute_sql_query(query, (
-            status,
-            self.end,
-            self.file_path,
-            self.nrows,
-            message,
-            self.session["user"]["id"],
-            self.id
-        ))
+        if update_celery:
+            database.execute_sql_query(query, (
+                self.celery_id,
+                status,
+                self.end,
+                self.file_path,
+                self.nrows,
+                message,
+                self.session["user"]["id"],
+                self.id
+            ))
+        else:
+            database.execute_sql_query(query, (
+                status,
+                self.end,
+                self.file_path,
+                self.nrows,
+                message,
+                self.session["user"]["id"],
+                self.id
+            ))
 
     def rollback(self):
         """Delete file"""

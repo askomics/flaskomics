@@ -3,6 +3,7 @@ import traceback
 
 from askomics.api.auth import login_required
 from askomics.libaskomics.ResultsHandler import ResultsHandler
+from askomics.libaskomics.Result import Result
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -129,8 +130,17 @@ def save_result():
     """
     try:
         graph_state = request.get_json()["graphState"]
+
+        info = {
+            "graph_state": graph_state,
+            "celery_id": None
+        }
+
+        result = Result(current_app, session, info)
+        info["id"] = result.save_in_db()
+
         session_dict = {"user": session["user"]}
-        task = current_app.celery.send_task("query", (session_dict, graph_state))
+        task = current_app.celery.send_task("query", (session_dict, info))
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({

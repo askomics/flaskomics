@@ -95,7 +95,7 @@ class Dataset(Params):
             0
         ), get_id=True)
 
-    def update_in_db(self, status, error=False, error_message=None, ntriples=0):
+    def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0):
         """Update the dataset when integration is done
 
         Parameters
@@ -108,19 +108,24 @@ class Dataset(Params):
             Number of triples integrated
         """
         message = error_message if error else ""
+        update_celery_id_substr = "celery_id=?," if update_celery else ""
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE datasets SET
+        {}
         status=?,
         end=strftime('%s', 'now'),
         ntriples=?,
         error_message=?
         WHERE user_id = ? AND id=?
-        '''
+        '''.format(update_celery_id_substr)
 
-        database.execute_sql_query(query, (status, ntriples, message, self.session['user']['id'], self.id))
+        if update_celery:
+            database.execute_sql_query(query, (self.celery_id, status, ntriples, message, self.session['user']['id'], self.id))
+        else:
+            database.execute_sql_query(query, (status, ntriples, message, self.session['user']['id'], self.id))
 
     def delete_from_db(self):
         """Delete a dataset from the database"""
