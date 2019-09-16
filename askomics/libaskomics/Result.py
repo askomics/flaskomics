@@ -268,7 +268,7 @@ class Result(Params):
             NULL,
             NULL,
             ?,
-            NULL
+            ?
         )
         '''
 
@@ -277,7 +277,8 @@ class Result(Params):
             self.celery_id,
             self.start,
             json.dumps(self.graph_state),
-            False
+            False,
+            "Query"  # FIXME: use id here
         ), get_id=True)
 
         return self.id
@@ -383,19 +384,33 @@ class Result(Params):
         except Exception:
             self.log.debug("Impossible to delete {}".format(self.file_path))
 
-    def publish_query(self, description, public):
+    def publish_query(self, public):
         """Insert query id and desc in the published_query table"""
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE results SET
-        public=?,
-        description=?
+        public=?
         WHERE user_id=? AND id=?
         '''
 
         database.execute_sql_query(query, (
             public,
+            self.session["user"]["id"],
+            self.id
+        ))
+
+    def update_description(self, description):
+        """Change the result description"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        description=?
+        WHERE user_id=? AND id=?
+        '''
+
+        database.execute_sql_query(query, (
             description,
             self.session["user"]["id"],
             self.id

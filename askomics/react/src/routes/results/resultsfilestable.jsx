@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Redirect } from 'react-router-dom'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import cellEditFactory from 'react-bootstrap-table2-editor'
 import WaitingDiv from '../../components/waiting'
 import AskoContext from '../../components/context'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
@@ -27,10 +28,7 @@ export default class ResultsFilesTable extends Component {
     this.handleRedo = this.handleRedo.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
-    this.handlePublishClick = this.handlePublishClick.bind(this)
-    this.handleDescChange = this.handleDescChange.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
-    this.toggleModal = this.toggleModal.bind(this)
   }
 
   humanDate (date) {
@@ -166,47 +164,26 @@ export default class ResultsFilesTable extends Component {
   }
 
   togglePublicQuery(event) {
-    if (event.target.value == 0) {
-      // Publish
-      this.setState({
-        idToPublish: event.target.id,
-        newPublishStatus: true
-      })
-      this.toggleModal()
-    } else {
-      // Unpublish
-      this.setState({
-        idToPublish: event.target.id,
-        newPublishStatus: false,
-        description: ''
-      }, () => {
-        this.publish()
-      })
-    }
-  }
-
-  toggleModal () {
+    // Unpublish
     this.setState({
-      modal: !this.state.modal
+      idToPublish: event.target.id,
+      newPublishStatus: event.target.value == 1 ? false : true,
+      description: ''
+    }, () => {
+      this.publish()
     })
-  }
-
-  handlePublishClick(event) {
-    this.publish()
   }
 
   publish() {
     let requestUrl = '/api/results/publish'
     let data = {
       id: this.state.idToPublish,
-      description: this.state.description,
       public: this.state.newPublishStatus
     }
     axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.setState({
         modal: false,
-        description: '',
         idToPublish: null
       })
       this.props.setStateResults({
@@ -224,29 +201,23 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
-  handleDescChange(event) {
-    this.setState({
-      description: event.target.value
-    })
-  }
+  saveNewDescription (oldValue, newValue, row) {
 
-  togglePublicQuery_OLD(event) {
-    let newPublic = false
-    if (event.target.value == 0) {
-      newPublic = true
+    if (newValue === oldValue) {return}
+
+    let requestUrl = '/api/results/description'
+    let data = {
+      id: row.id,
+      newDesc: newValue
     }
-    let requestUrl = '/api/results/setpublic'
-    let data = {fileId: event.target.id, public: newPublic}
     axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.props.setStateResults({
         results: response.data.files,
-        triplestoreMaxRows: response.data.triplestoreMaxRows,
         waiting: false
       })
     })
     .catch(error => {
-      console.log(error, error.response.data.errorMessage)
       this.setState({
         error: true,
         errorMessage: error.response.data.errorMessage,
@@ -287,12 +258,18 @@ export default class ResultsFilesTable extends Component {
     let columns = [{
       text: 'Id',
       sort: true,
-      formatter: (cell, row) => { return row.id }
+      formatter: (cell, row) => { return row.id },
+      editable: false
+    }, {
+      dataField: 'description',
+      text: 'Description',
+      sort: true
     }, {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
-      formatter: (cell, row) => { return this.humanDate(cell) }
+      formatter: (cell, row) => { return this.humanDate(cell) },
+      editable: false
     }, {
       dataField: 'public',
       text: 'Public',
@@ -306,7 +283,8 @@ export default class ResultsFilesTable extends Component {
             </div>
           </FormGroup>
         )
-      }
+      },
+      editable: false
     }, {
       dataField: 'status',
       text: 'Status',
@@ -325,7 +303,8 @@ export default class ResultsFilesTable extends Component {
         }
         return <Badge color="danger">Failure</Badge>
       },
-      sort: true
+      sort: true,
+      editable: false
     }, {
       dataField: "nrows",
       text: "Row's number",
@@ -339,10 +318,8 @@ export default class ResultsFilesTable extends Component {
         } else {
           return formattedNrows
         }
-      }
-    }, {
-      dataField: 'error_message',
-      text: 'Message'
+      },
+      editable: false
     }, {
       // buttons
       text: 'Actions',
@@ -357,7 +334,12 @@ export default class ResultsFilesTable extends Component {
             {this.props.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
-      }
+      },
+      editable: false
+    }, {
+      dataField: 'error_message',
+      text: 'Error message',
+      editable: false
     }]
 
     let defaultSorted = [{
@@ -393,24 +375,11 @@ export default class ResultsFilesTable extends Component {
             pagination={paginationFactory()}
             noDataIndication={noDataIndication}
             selectRow={ selectRow }
+            cellEdit={ cellEditFactory({
+              mode: 'click',
+              beforeSaveCell: (oldValue, newValue, row) => { this.saveNewDescription(oldValue, newValue, row) },
+            })}
           />
-        </div>
-        <div>
-          <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
-            <ModalHeader toggle={this.toggleModal}>Publish query {this.state.idToPublish}</ModalHeader>
-            <ModalBody>
-            <div>
-              <Input type="title" name="title" id="title" placeholder="Query description" value={this.state.description} onChange={this.handleDescChange} />
-            </div>
-            <br />
-            <div>
-              <Button onClick={this.handlePublishClick}>Publish</Button>
-            </div>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="secondary" onClick={this.toggleModal}>Close</Button>
-            </ModalFooter>
-          </Modal>
         </div>
       </div>
 

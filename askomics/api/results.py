@@ -251,6 +251,44 @@ def get_sparql_query():
     })
 
 
+@login_required
+@results_bp.route('/api/results/description', methods=['POST'])
+def set_description():
+    """Update a result description
+
+    Returns
+    -------
+    json
+        files: all files
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result_info = {"id": json["id"]}
+        new_desc = json["newDesc"]
+
+        result = Result(current_app, session, result_info)
+        result.update_description(new_desc)
+
+        results_handler = ResultsHandler(current_app, session)
+        files = results_handler.get_files_info()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @admin_required
 @results_bp.route('/api/results/publish', methods=['POST'])
 def publish_query():
@@ -267,7 +305,7 @@ def publish_query():
         result_info = {"id": json["id"]}
 
         result = Result(current_app, session, result_info)
-        result.publish_query(json["description"], json["public"])
+        result.publish_query(json["public"])
 
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()
