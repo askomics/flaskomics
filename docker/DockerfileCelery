@@ -20,4 +20,4 @@ RUN apk add --no-cache \
     rm -rf /root/.cache/* && \
     rm -rf /root/.npm/*
 
-ENTRYPOINT /askomics/run_celery.sh -d ${DEPMODE}
+ENTRYPOINT /askomics/run_celery.sh -d ${DEPMODE} -c {MAX_CELERY_QUEUE}
