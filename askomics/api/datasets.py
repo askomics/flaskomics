@@ -2,7 +2,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import login_required
+from askomics.api.auth import login_required, admin_required
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 
 from flask import (Blueprint, current_app, jsonify, request, session)
@@ -73,6 +73,46 @@ def delete_datasets():
             current_app.logger.debug(dataset_info)
             # Trigger the celery task
             current_app.celery.send_task('delete_datasets', (session_dict, dataset_info))
+
+        datasets = datasets_handler.get_datasets()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@datasets_bp.route('/api/datasets/public', methods=['POST'])
+@admin_required
+def toogle_public():
+    """Toggle public status of a dataset
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    datasets_info = [{'id': data["id"]}]
+
+    try:
+        # Change status to queued for all datasets
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets()
+
+        for dataset in datasets_handler.datasets:
+            current_app.logger.debug(data["newStatus"])
+            dataset.toggle_public(data["newStatus"])
 
         datasets = datasets_handler.get_datasets()
 

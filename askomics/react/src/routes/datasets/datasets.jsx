@@ -87,7 +87,7 @@ export default class Datasets extends Component {
         <div className="container">
           <h2>Datasets</h2>
           <hr />
-          <DatasetsTable datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+          <DatasetsTable user={this.props.user} datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
           <br />
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>

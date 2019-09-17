@@ -1,6 +1,6 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
-
+from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 
 class Dataset(Params):
 
@@ -94,6 +94,23 @@ class Dataset(Params):
             self.public,
             0
         ), get_id=True)
+
+    def toggle_public(self, new_status):
+
+        # Update in TS
+        self.log.debug(self.graph_name)
+        query_builder = SparqlQueryBuilder(self.app, self.session)
+        string_status = "true" if new_status else "false"
+        query_builder.toggle_public(self.graph_name, string_status)
+
+        # Update in DB
+        database = Database(self.app, self.session)
+        query = '''
+        UPDATE datasets SET
+        public=?
+        WHERE user_id = ? AND id = ?
+        '''
+        database.execute_sql_query(query, (new_status, self.session["user"]["id"], self.id))
 
     def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0):
         """Update the dataset when integration is done

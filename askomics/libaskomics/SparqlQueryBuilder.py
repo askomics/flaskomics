@@ -89,6 +89,38 @@ class SparqlQueryBuilder(Params):
             query
         )
 
+    def toggle_public(self, graph, public):
+        """Change public status of data into the triplestore
+
+        Parameters
+        ----------
+        graph : string
+            Graph to update public status
+        public : string
+            true or false (string)
+        """
+        user_graph = "{}:{}_{}".format(
+            self.settings.get('triplestore', 'default_graph'),
+            self.session['user']['id'],
+            self.session['user']['username']
+        )
+
+        query = '''
+        WITH GRAPH <{user_graph}>
+        DELETE {{
+            <{graph}> :public ?public .
+        }}
+        INSERT {{
+            <{graph}> :public <{public}> .
+        }}
+        WHERE {{
+            <{graph}> :public ?public .
+        }}
+        '''.format(user_graph=user_graph, graph=graph, public=public)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_launcher.process_query(self.prefix_query(query))
+
     def get_default_query_with_prefix(self):
         """Get default query with the prefixes
 
