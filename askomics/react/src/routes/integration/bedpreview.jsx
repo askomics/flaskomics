@@ -95,5 +95,6 @@ export default class BedPreview extends Component {
 }
 
 BedPreview.propTypes = {
-  file: PropTypes.object
+  file: PropTypes.object,
+  user: PropTypes.object
 }

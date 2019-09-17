@@ -2,8 +2,8 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 
-class Dataset(Params):
 
+class Dataset(Params):
     """Dataset
 
     Attributes
@@ -44,8 +44,7 @@ class Dataset(Params):
         self.public = dataset_info["public"] if "public" in dataset_info else False
 
     def set_info_from_db(self):
-        """Set the info in from the database
-        """
+        """Set the info in from the database"""
         database = Database(self.app, self.session)
 
         query = '''
@@ -64,8 +63,7 @@ class Dataset(Params):
         self.public = rows[0][4]
 
     def save_in_db(self):
-        """Save the dataset into the database
-        """
+        """Save the dataset into the database"""
         database = Database(self.app, self.session)
 
         query = '''
@@ -96,9 +94,14 @@ class Dataset(Params):
         ), get_id=True)
 
     def toggle_public(self, new_status):
+        """Change public status of a dataset (triplestore and db)
 
+        Parameters
+        ----------
+        new_status : bool
+            True if public
+        """
         # Update in TS
-        self.log.debug(self.graph_name)
         query_builder = SparqlQueryBuilder(self.app, self.session)
         string_status = "true" if new_status else "false"
         query_builder.toggle_public(self.graph_name, string_status)

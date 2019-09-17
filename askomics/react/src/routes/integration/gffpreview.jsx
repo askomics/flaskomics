@@ -107,5 +107,6 @@ export default class GffPreview extends Component {
 }
 
 GffPreview.propTypes = {
-  file: PropTypes.object
+  file: PropTypes.object,
+  user: PropTypes.object
 }

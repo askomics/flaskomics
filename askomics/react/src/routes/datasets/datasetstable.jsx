@@ -61,7 +61,6 @@ export default class DatasetsTable extends Component {
   }
 
   togglePublicDataset (event) {
-    console.log(event.target)
     let requestUrl = '/api/datasets/public'
     let data = {
       id: event.target.id,
@@ -182,5 +181,6 @@ DatasetsTable.propTypes = {
   setStateDatasets: PropTypes.func,
   selected: PropTypes.object,
   waiting: PropTypes.bool,
-  datasets: PropTypes.object
+  datasets: PropTypes.object,
+  user: PropTypes.object
 }

@@ -156,5 +156,6 @@ export default class CsvTable extends Component {
 }
 
 CsvTable.propTypes = {
-  file: PropTypes.object
+  file: PropTypes.object,
+  user: PropTypes.object
 }

@@ -109,5 +109,6 @@ export default class TtlPreview extends Component {
 }
 
 TtlPreview.propTypes = {
-  file: PropTypes.object
+  file: PropTypes.object,
+  user: PropTypes.object
 }
