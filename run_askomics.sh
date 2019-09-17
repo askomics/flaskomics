@@ -34,6 +34,7 @@ case $depmode in
     dev|development)
         flask_depmod="development"
         flask_command="flask run --host=0.0.0.0"
+        npm run dev &
     ;;
     *)
         echo "-d $depmode: wrong deployment mode"
