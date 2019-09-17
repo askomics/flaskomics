@@ -46,6 +46,8 @@ def integrate(self, session, data, host_url):
     files_handler = FilesHandler(app, session, host_url=host_url)
     files_handler.handle_files([data["fileId"], ])
 
+    public = data["public"] if session["user"]["admin"] else False
+
     for file in files_handler.files:
 
         try:
@@ -56,20 +58,20 @@ def integrate(self, session, data, host_url):
                 "file_id": file.id,
                 "name": file.name,
                 "graph_name": file.file_graph,
-                "public": data['public']
+                "public": public
             }
 
             dataset = Dataset(app, session, dataset_info)
             dataset.update_in_db(status="started", update_celery=True)
 
             if file.type == "csv/tsv":
-                file.integrate(data['columns_type'], public=data['public'])
+                file.integrate(data['columns_type'], public=public)
             elif file.type == "gff/gff3":
-                file.integrate(data["entities"], public=data["public"])
+                file.integrate(data["entities"], public=public)
             elif file.type == "turtle":
-                file.integrate(public=data["public"])
+                file.integrate(public=public)
             elif file.type == "bed":
-                file.integrate(data["entity_name"], public=data["public"])
+                file.integrate(data["entity_name"], public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
         except Exception as e:

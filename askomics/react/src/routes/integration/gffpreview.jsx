@@ -80,6 +80,10 @@ export default class GffPreview extends Component {
     if (this.state.publicTick) {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
+    let publicButton
+    if (this.props.user.admin) {
+      publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
+    }
 
     return (
       <div>
@@ -95,7 +99,7 @@ export default class GffPreview extends Component {
           <br />
           <ButtonGroup>
             <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
-            <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
+            {publicButton}
           </ButtonGroup>
       </div>
     )

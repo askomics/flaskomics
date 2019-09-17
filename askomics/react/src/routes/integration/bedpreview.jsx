@@ -69,6 +69,11 @@ export default class BedPreview extends Component {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
 
+    let publicButton
+    if (this.props.user.admin) {
+      publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
+    }
+
     return (
       <div>
         <h4>{this.state.name} (preview)</h4>
@@ -82,7 +87,7 @@ export default class BedPreview extends Component {
         <br />
         <ButtonGroup>
           <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
-          <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
+          {publicButton}
         </ButtonGroup>
       </div>
     )

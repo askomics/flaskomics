@@ -77,16 +77,16 @@ export default class Integration extends Component {
           this.state.previewFiles.map(file => {
             console.log(file)
             if (file.type == 'csv/tsv') {
-              return <CsvTable key={file.name} file={file} />
+              return <CsvTable user={this.state.user} key={file.name} file={file} />
             }
             if (file.type == 'turtle') {
-              return <TtlPreview file={file} />
+              return <TtlPreview user={this.state.user} file={file} />
             }
             if (file.type == 'gff/gff3') {
-              return <GffPreview file={file} />
+              return <GffPreview user={this.state.user} file={file} />
             }
             if (file.type = 'bed') {
-              return <BedPreview file={file} />
+              return <BedPreview user={this.state.user} file={file} />
             }
           })
         }

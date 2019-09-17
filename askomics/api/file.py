@@ -235,7 +235,7 @@ def integrate():
                 "file_id": file.id,
                 "name": file.name,
                 "graph_name": file.file_graph,
-                "public": data['public']
+                "public": data["public"] if session["user"]["admin"] else False
             }
 
             dataset = Dataset(current_app, session, dataset_info)
