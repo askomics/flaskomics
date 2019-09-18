@@ -268,7 +268,7 @@ class SparqlQueryBuilder(Params):
         string
             The corresponding sparql variable
         """
-        return "?{}".format(name.replace("/", "_s_").replace(":", "_c_").replace("-", "_"))
+        return "?{}".format(''.join(e for e in name if e.isalnum()))
 
     def is_bnode(self, uri, entities):
         """Check if a node uri is a blank node
