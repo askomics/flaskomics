@@ -7,7 +7,7 @@
 
 Rebuild of [AskOmics](https://github.com/askomics/askomics)
 
-![AskOmics logo](static/askomics.png)
+![AskOmics logo](askomics.png)
 
 AskOmics is a visual SPARQL query interface supporting both intuitive data integration and querying while shielding the user from most of the technical difficulties underlying RDF and SPARQL.
 
