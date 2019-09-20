@@ -1,43 +1,17 @@
-# FlaskOmics
+# AskOmics
 
 [![Build Status](https://travis-ci.org/xgaia/flaskomics.svg?branch=master)](https://travis-ci.org/xgaia/flaskomics)
 [![Coverage Status](https://coveralls.io/repos/github/xgaia/flaskomics/badge.svg?branch=master)](https://coveralls.io/github/xgaia/flaskomics?branch=master)
+[![Docker Build](https://img.shields.io/docker/pulls/xgaia/flaskomics.svg)](https://hub.docker.com/r/xgaia/flaskomics/)
+[![Documentation Status](https://readthedocs.org/projects/flaskomics/badge/?version=latest)](https://flaskomics.readthedocs.io/en/latest/?badge=latest)
+
+Rebuild of [AskOmics](https://github.com/askomics/askomics)
+
+![AskOmics logo](static/askomics.png)
+
+AskOmics is a visual SPARQL query interface supporting both intuitive data integration and querying while shielding the user from most of the technical difficulties underlying RDF and SPARQL.
 
 
-FlaskOmics is the future of [AskOmics](https://github.com/askomics/askomics).
+## Documentation
 
-## Dependencies
-
-FlAskOmics need a triplestore and a redos database to run.
-
-### Redis
-
-```bash
-sudo apt install redis
-```
-
-### Virtuoso
-
-[virtuoso](https://github.com/openlink/virtuoso-opensource)
-
-
-## Requirements
-
-Python3, Python3 virtual env and npm
-
-```bash
-sudo apt install python3 python3-venv npm
-```
-
-## Install
-```bash
-./install.sh
-```
-
-## Run
-
-```bash
-run_all.sh -d dev
-```
-
-FlaskOmics is available at http://localhost:5000
+All documentation, included installation instruction is [here](https://flaskomics.readthedocs.io/en/latest/)
