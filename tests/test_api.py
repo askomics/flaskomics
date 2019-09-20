@@ -33,7 +33,7 @@ class TestApi(AskomicsTestCase):
             'footerMessage': app.iniconfig.get('askomics', 'footer_message'),
             "version": get_distribution('askomics').version,
             "commit": None,
-            "gitUrl": "https://github.com/xgaia/flaskomics",
+            "gitUrl": "https://github.com/askomics/flaskomics",
             "disableIntegration": app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": app.iniconfig.get('triplestore', 'prefix'),
             "namespace": app.iniconfig.get('triplestore', 'namespace'),

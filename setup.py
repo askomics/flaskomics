@@ -19,7 +19,7 @@ setup(
     ],
     maintainer='Xavier Garnier',
     maintainer_email='xavier.garnier@irisa.fr',
-    url='https://github.com/xgaia/flaskomics',
+    url='https://github.com/askomics/flaskomics',
     keyword='rdf sparql query data integration',
     packages=find_packages(),
     include_package_data=True,

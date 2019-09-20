@@ -2,16 +2,16 @@
 
 ## Issues
 
-If you have an idea for a feature to add or an approach for a bugfix, it is best to communicate with developers early. The most common venues for this are [GitHub issues](https://github.com/xgaia/flaskomics/issues/).
+If you have an idea for a feature to add or an approach for a bugfix, it is best to communicate with developers early. The most common venues for this are [GitHub issues](https://github.com/askomics/flaskomics/issues/).
 
 ## Pull requests
 
 All changes to AskOmics should be made through pull requests to this repository.
 
-For the [askomics repository](https://github.com/xgaia/flaskomics) to your account. To keep your copy up to date, you need to frequently [sync your fork](https://help.github.com/articles/syncing-a-fork/):
+For the [askomics repository](https://github.com/askomics/flaskomics) to your account. To keep your copy up to date, you need to frequently [sync your fork](https://help.github.com/articles/syncing-a-fork/):
 
 ```bash
-git remote add upstream https://github.com/xgaia/flaskomics
+git remote add upstream https://github.com/askomics/flaskomics
 git fetch upstream
 git checkout master
 git merge upstream/master
@@ -58,7 +58,7 @@ We follow [W3 JavaScript Style Guide and Coding Conventions](https://www.w3schoo
 
 ## Contribute to docs
 
-all the documentation (including what you are reading) can be found [here](https://flaskomics.readthedocs.io). Files are on the [AskOmics repository](https://github.com/xgaia/flaskomics/tree/master/docs).
+all the documentation (including what you are reading) can be found [here](https://flaskomics.readthedocs.io). Files are on the [AskOmics repository](https://github.com/askomics/flaskomics/tree/master/docs).
 
 To preview the docs, run
 

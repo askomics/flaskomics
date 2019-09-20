@@ -31,17 +31,17 @@ Install AskOmics with `install.sh` and run it with `run_all.sh`. AskOmics will b
 
 ### Installation with docker-compose
 
-Clone the [askomics-docker-compose](https://github.com/xgaia/flaskomics-docker-compose) repository
+Clone the [askomics-docker-compose](https://github.com/askomics/flaskomics-docker-compose) repository
 
 
 ```bash
 # clone
-git clone https://github.com/xgaia/flaskomics-docker-compose.git
+git clone https://github.com/askomics/flaskomics-docker-compose.git
 # cd
 cd flaskomics-docker-compose
 ```
 
-Update config (see [README](https://github.com/xgaia/flaskomics-docker-compose/blob/master/README.md))
+Update config (see [README](https://github.com/askomics/flaskomics-docker-compose/blob/master/README.md))
 
 Run
 
@@ -53,19 +53,19 @@ AskOmics will be available at [localhost](localhost).
 
 ### Installation with a single docker
 
-Docker image [xgaia/full-flaskomics](https://cloud.docker.com/repository/docker/xgaia/full-flaskomics) contain AskOmics with all his dependencies (Redis, virtuoso, celery ...).
+Docker image [askomics/full-flaskomics](https://cloud.docker.com/repository/docker/askomics/full-flaskomics) contain AskOmics with all his dependencies (Redis, virtuoso, celery ...).
 
 ```bash
 # Pull image
-docker pull xgaia/full-flaskomics
+docker pull askomics/full-flaskomics
 # run image
-docker run -d xgaia/full-flaskomics
+docker run -d askomics/full-flaskomics
 ```
 
 If you need a persistent volume, run
 
 ```bash
-docker run -d -v ./flaskomics-data:/tmp/flaskomics xgaia/full-flaskomics
+docker run -d -v ./flaskomics-data:/tmp/flaskomics askomics/full-flaskomics
 ```
 
 The image create a default user at the first run. You can update this user by setting the following environment variables:
@@ -84,7 +84,7 @@ The image create a default user at the first run. You can update this user by se
 For example:
 
 ```bash
-docker run -d -v ./flaskomics-data:/tmp/flaskomics -e USER_FIRST_NAME="John" -e USER_LAST_NAME="Wick" -e USERNAME="jwick" xgaia/full-flaskomics
+docker run -d -v ./flaskomics-data:/tmp/flaskomics -e USER_FIRST_NAME="John" -e USER_LAST_NAME="Wick" -e USERNAME="jwick" askomics/full-flaskomics
 ```
 
 ## Developer
