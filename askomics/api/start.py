@@ -77,7 +77,7 @@ def start():
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "version": get_distribution('askomics').version,
             "commit": sha,
-            "gitUrl": "https://github.com/xgaia/flaskomics",
+            "gitUrl": "https://github.com/askomics/flaskomics",
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
             "namespace": current_app.iniconfig.get('triplestore', 'namespace'),

@@ -5,7 +5,7 @@ AskOmics can be use to explore external endpoint such as [NeXtProt](https://spar
 
 ## Build external endpoint abstraction
 
-First, build AskOmics abstraction of the external enpoint with [Abstractor](https://github.com/xgaia/abstractor).
+First, build AskOmics abstraction of the external enpoint with [Abstractor](https://github.com/askomics/abstractor).
 
 Install Abstractor in a python virtual env
 

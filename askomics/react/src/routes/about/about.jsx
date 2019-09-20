@@ -44,15 +44,15 @@ export default class About extends Component {
             <a target="_newtab" rel="noopener noreferrer" href="https://flaskomics.readthedocs.io">Docs</a>
           </div>
           <div>
-            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics">Github repository</a>
+            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/askomics/flaskomics">Github repository</a>
           </div>
           <div>
-            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics-docker-compose">Github docker-compose repository</a>
+            <a target="_newtab" rel="noopener noreferrer" href="https://github.com/askomics/flaskomics-docker-compose">Github docker-compose repository</a>
           </div>
         </p>
         <h4>Need help?</h4>
         <p>
-          Use <a target="_newtab" rel="noopener noreferrer" href="https://github.com/xgaia/flaskomics/issues">Github issues</a> to report a bug, get help or request for a new feature.
+          Use <a target="_newtab" rel="noopener noreferrer" href="https://github.com/askomics/flaskomics/issues">Github issues</a> to report a bug, get help or request for a new feature.
         </p>
       </div>
     )
