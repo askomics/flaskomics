@@ -4,16 +4,18 @@
     "dev": "webpack --mode development --watch"
   },
   "keywords": [
-    "ementic web",
+    "Sementic web",
     "ontology"
   ],
+  "name": "AskOmics",
+  "version": "3.0.0",
+  "description": "Visual SPARQL query builder",
   "author": "Xavier Garnier",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/askomics/askomics.git"
   },
-  "description": "Visual SPARQL query builder",
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
