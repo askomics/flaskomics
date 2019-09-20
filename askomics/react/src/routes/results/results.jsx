@@ -5,13 +5,11 @@ import { Redirect } from 'react-router-dom'
 import ResultsFilesTable from './resultsfilestable'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
-import AskoContext from '../../components/context'
 import update from 'react-addons-update'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
 
 export default class Results extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -39,7 +37,7 @@ export default class Results extends Component {
     let data = {
       filesIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -79,7 +77,7 @@ export default class Results extends Component {
 
   getResults () {
     let requestUrl = '/api/results'
-    axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -133,7 +131,7 @@ export default class Results extends Component {
         {redirectLogin}
         <h2>Results</h2>
         <hr />
-        <ResultsFilesTable config={this.props.config} user={this.props.user} logged={this.props.logged} maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+        <ResultsFilesTable config={this.props.config} maxRows={this.state.triplestoreMaxRows} results={this.state.results} setStateResults={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <Button disabled={this.isDisabled()} onClick={this.deleteSelectedResults} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <br /><br />
         {resultsTable}
@@ -145,7 +143,5 @@ export default class Results extends Component {
 
 Results.propTypes = {
   waitForStart: PropTypes.bool,
-  user: PropTypes.object,
-  config: PropTypes.object,
-  logged: PropTypes.bool
+  config: PropTypes.object
 }

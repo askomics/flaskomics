@@ -9,19 +9,18 @@ export default class AskoFooter extends Component {
   }
 
   render () {
-    // FIXME: don't hardcode github url
       let commitLink
-      if (this.props.commit) {
-        commitLink = (<>- <a href={"https://github.com/xgaia/flaskomics/commit/" + this.props.commit}>{this.props.commit}</a></>)
+      if (this.props.config.commit) {
+        commitLink = (<>- <a href={this.props.config.gitUrl + "/" + this.props.config.commit}>{this.props.config.commit}</a></>)
       }
     return (
       <footer className="footer footer-content">
         <div className="container">
           <div className="footer-left">
-            AskOmics {this.props.version} {commitLink}
+            AskOmics {this.props.config.version} {commitLink}
           </div>
           <div className="footer-right">
-            {this.props.message}
+            {this.props.config.footerMessage}
           </div>
         </div>
       </footer>
@@ -30,7 +29,5 @@ export default class AskoFooter extends Component {
 }
 
 AskoFooter.propTypes = {
-  version: PropTypes.string,
-  message: PropTypes.string,
-  commit: PropTypes.string
+  config: PropTypes.object
 }

@@ -4,7 +4,6 @@ import { Alert, Input, Button, ButtonGroup } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
-import AskoContext from '../../components/context'
 import CsvTable from './csvtable'
 import TtlPreview from './ttlpreview'
 import GffPreview from './gffpreview'
@@ -12,15 +11,13 @@ import BedPreview from './bedpreview'
 import PropTypes from 'prop-types'
 
 export default class Integration extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
       waiting: true,
       error: false,
       errorMessage: null,
-      logged: this.props.location.state.logged,
-      user: this.props.location.state.user,
+      config: this.props.location.state.config,
       filesId: this.props.location.state.filesId,
       previewFiles: []
     }
@@ -33,7 +30,7 @@ export default class Integration extends Component {
       let data = {
         filesId: this.state.filesId
       }
-      axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -77,16 +74,16 @@ export default class Integration extends Component {
           this.state.previewFiles.map(file => {
             console.log(file)
             if (file.type == 'csv/tsv') {
-              return <CsvTable user={this.state.user} key={file.name} file={file} />
+              return <CsvTable config={this.state.config} key={file.name} file={file} />
             }
             if (file.type == 'turtle') {
-              return <TtlPreview user={this.state.user} file={file} />
+              return <TtlPreview config={this.state.config} file={file} />
             }
             if (file.type == 'gff/gff3') {
-              return <GffPreview user={this.state.user} file={file} />
+              return <GffPreview config={this.state.config} file={file} />
             }
             if (file.type = 'bed') {
-              return <BedPreview user={this.state.user} file={file} />
+              return <BedPreview config={this.state.config} file={file} />
             }
           })
         }

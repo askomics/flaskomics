@@ -5,13 +5,11 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import WaitingDiv from '../../components/waiting'
-import AskoContext from '../../components/context'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
 
 export default class ResultsFilesTable extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -65,7 +63,7 @@ export default class ResultsFilesTable extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/preview'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
@@ -89,7 +87,7 @@ export default class ResultsFilesTable extends Component {
   handleDownload (event) {
     let requestUrl = '/api/results/download'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then((response) => {
         console.log(requestUrl, response.data)
         FileDownload(response.data, 'result.csv')
@@ -109,7 +107,7 @@ export default class ResultsFilesTable extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
@@ -132,7 +130,7 @@ export default class ResultsFilesTable extends Component {
   handleEditQuery (event) {
     let requestUrl = '/api/results/sparqlquery'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -154,7 +152,7 @@ export default class ResultsFilesTable extends Component {
   handleSendToGalaxy (event) {
     let requestUrl = '/api/results/send2galaxy'
     let data = {fileId: event.target.id, fileToSend: event.target.name}
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
     })
@@ -180,7 +178,7 @@ export default class ResultsFilesTable extends Component {
       id: this.state.idToPublish,
       public: this.state.newPublishStatus
     }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.setState({
         modal: false,
@@ -210,7 +208,7 @@ export default class ResultsFilesTable extends Component {
       id: row.id,
       newDesc: newValue
     }
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.props.setStateResults({
         results: response.data.files,
@@ -235,8 +233,7 @@ export default class ResultsFilesTable extends Component {
         state: {
           redo: true,
           sparqlQuery: this.state.sparqlQuery,
-          user: this.props.user,
-          logged: this.props.logged
+          config: this.props.config
         }
       }} />
     }
@@ -248,14 +245,13 @@ export default class ResultsFilesTable extends Component {
         state: {
           redo: true,
           config: this.props.config,
-          graphState: this.state.graphState,
-          user: this.props.user,
-          logged: this.props.logged
+          graphState: this.state.graphState
         }
       }} />
     }
 
     let columns = [{
+      dataField: 'id',
       text: 'Id',
       sort: true,
       formatter: (cell, row) => { return row.id },
@@ -274,7 +270,7 @@ export default class ResultsFilesTable extends Component {
       dataField: 'public',
       text: 'Public',
       sort: true,
-      hidden: this.props.user.admin === 1 ? false : true,
+      hidden: this.props.config.user.admin === 1 ? false : true,
       formatter: (cell, row) => {
         return (
           <FormGroup>
@@ -322,6 +318,7 @@ export default class ResultsFilesTable extends Component {
       editable: false
     }, {
       // buttons
+      dataField: "end", // FIXME: we don't need end dataFiel, but dataField have to be set
       text: 'Actions',
       formatter: (cell, row) => {
         return (
@@ -330,8 +327,8 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
-            {this.props.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
-            {this.props.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
+            {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
+            {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
       },
@@ -389,11 +386,9 @@ export default class ResultsFilesTable extends Component {
 
 ResultsFilesTable.propTypes = {
   setStateResults: PropTypes.func,
-  selected: PropTypes.object,
-  user: PropTypes.object,
-  logged: PropTypes.bool,
+  selected: PropTypes.array,
   waiting: PropTypes.bool,
-  results: PropTypes.object,
+  results: PropTypes.array,
   config: PropTypes.object,
   maxRows: PropTypes.number
 }

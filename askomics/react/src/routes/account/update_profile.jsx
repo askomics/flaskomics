@@ -3,10 +3,9 @@ import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
+import update from 'immutability-helper'
 
 export default class UpdateProfile extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -45,7 +44,7 @@ export default class UpdateProfile extends Component {
       newEmail: this.state.newEmail
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -57,8 +56,7 @@ export default class UpdateProfile extends Component {
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
-            user: this.state.user,
-            logged: true
+            config: update(this.props.config, {user: {$set: this.state.user}})
           })
         }
       })
@@ -88,19 +86,19 @@ export default class UpdateProfile extends Component {
             <Col md={6}>
               <FormGroup>
                 <Label for="fname">First name</Label>
-                <Input type="text" name="fname" id="newFname" placeholder={this.props.user.fname} value={this.state.newFname} onChange={this.handleChange} />
+                <Input type="text" name="fname" id="newFname" placeholder={this.props.config.user.fname} value={this.state.newFname} onChange={this.handleChange} />
               </FormGroup>
             </Col>
             <Col md={6}>
               <FormGroup>
                 <Label for="lname">Last name</Label>
-                <Input type="text" name="lname" id="newLname" placeholder={this.props.user.lname} value={this.state.newLname} onChange={this.handleChange} />
+                <Input type="text" name="lname" id="newLname" placeholder={this.props.config.user.lname} value={this.state.newLname} onChange={this.handleChange} />
               </FormGroup>
             </Col>
           </Row>
           <FormGroup>
             <Label for="email">Email</Label>
-            <Input type="email" name="email" id="newEmail" placeholder={this.props.user.email} value={this.state.newEmail} onChange={this.handleChange} />
+            <Input type="email" name="email" id="newEmail" placeholder={this.props.config.user.email} value={this.state.newEmail} onChange={this.handleChange} />
           </FormGroup>
           <Button disabled={!this.validateForm()}>Update profile {successTick}</Button>
         </Form>

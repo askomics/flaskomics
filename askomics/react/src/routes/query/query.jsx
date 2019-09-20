@@ -10,17 +10,13 @@ import AttributeBox from './attribute'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class Query extends Component {
-  static contextType = AskoContext
 
   constructor (props) {
     super(props)
     this.state = {
-      logged: this.props.location.state.logged,
       config: this.props.location.state.config,
-      user: this.props.location.state.user,
       startpoint: this.props.location.state.startpoint,
       abstraction: [],
       graphState: {
@@ -737,7 +733,7 @@ export default class Query extends Component {
       disablePreview: true,
       previewIcon: "spinner"
     })
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -765,7 +761,7 @@ export default class Query extends Component {
     let data = {
       graphState: this.state.graphState
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -789,7 +785,7 @@ export default class Query extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/abstraction'
-      axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -881,8 +877,7 @@ export default class Query extends Component {
           divHeight={this.divHeight}
           abstraction={this.state.abstraction}
           graphState={this.state.graphState}
-          logged={this.state.logged}
-          user={this.state.user}
+          config={this.state.config}
           waiting={this.state.waiting}
           handleNodeSelection={p => this.handleNodeSelection(p)}
         />
@@ -890,7 +885,7 @@ export default class Query extends Component {
 
       // buttons
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
-      if (this.state.logged) {
+      if (this.state.config.logged) {
         launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {

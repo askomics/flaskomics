@@ -21,21 +21,21 @@ export default class Account extends Component {
   render () {
     return (
       <div className="container">
-        <h2>{this.props.user.fname} {this.props.user.lname}</h2>
+        <h2>{this.props.config.user.fname} {this.props.config.user.lname}</h2>
         <hr />
-        <UpdateProfile user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
+        <UpdateProfile config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
         <hr />
-        <UpdatePassword user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
+        <UpdatePassword config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
         <hr />
-        <UpdateGalaxyAccount user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
+        <UpdateGalaxyAccount config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
         <hr />
-        <UpdateApiKey user={this.props.user} setStateNavbar={this.props.setStateNavbar} />
+        <UpdateApiKey config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
       </div>
     )
   }
 }
 
 Account.propTypes = {
-  user: PropTypes.object,
+  config: PropTypes.object,
   setStateNavbar: PropTypes.func
 }

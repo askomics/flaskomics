@@ -5,10 +5,8 @@ import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class Signup extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = { isLoading: true,
@@ -78,20 +76,18 @@ export default class Signup extends Component {
       passwordconf: this.state.passwordconf
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           isLoading: false,
           error: response.data.error,
           errorMessage: response.data.errorMessage,
-          user: response.data.user,
-          logged: !response.data.error
+          config: update(this.props.config, {user: {$set: response.data.user}}, {logged: {$set: !response.data.error}})
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
-            user: this.state.user,
-            logged: this.state.logged
+            config: update(this.props.config, {user: {$set: this.state.config.user}}, {logged: {$set: this.state.config.logged}})
           })
         }
       })

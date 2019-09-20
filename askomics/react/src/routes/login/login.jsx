@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
+import update from 'immutability-helper'
 import { Redirect, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
-import AskoContext from '../../components/context'
 
 export default class Login extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = { isLoading: true,
@@ -39,7 +38,7 @@ export default class Login extends Component {
       password: this.state.password
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -51,8 +50,10 @@ export default class Login extends Component {
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
-            user: this.state.user,
-            logged: this.state.logged
+            config: update(this.props.config, {
+              user: {$set: this.state.user},
+              logged: {$set: this.state.logged}
+            })
           })
         }
       })

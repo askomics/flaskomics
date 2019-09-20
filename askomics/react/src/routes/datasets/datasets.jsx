@@ -3,17 +3,13 @@ import axios from 'axios'
 import DatasetsTable from './datasetstable'
 import { Button } from 'reactstrap'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class Datasets extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
       error: false,
       errorMessage: null,
-      logged: props.logged,
-      user: props.user,
       waiting: true,
       datasets: [],
       selected: []
@@ -42,7 +38,7 @@ export default class Datasets extends Component {
 
   getDatasets () {
     let requestUrl = '/api/datasets'
-    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -70,7 +66,7 @@ export default class Datasets extends Component {
     let data = {
       datasetsIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -87,7 +83,7 @@ export default class Datasets extends Component {
         <div className="container">
           <h2>Datasets</h2>
           <hr />
-          <DatasetsTable user={this.props.user} datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+          <DatasetsTable config={this.props.config} datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
           <br />
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
@@ -97,7 +93,6 @@ export default class Datasets extends Component {
 }
 
 Datasets.propTypes = {
-  logged: PropTypes.bool,
-  user: PropTypes.object,
+  config: PropTypes.object,
   waitForStart: PropTypes.bool
 }

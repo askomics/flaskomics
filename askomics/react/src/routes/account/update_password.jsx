@@ -2,10 +2,8 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText, Alert } from 'reactstrap'
 import ErrorDiv from '../error/error'
-import AskoContext from '../../components/context'
 
 export default class UpdateProfile extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -41,7 +39,7 @@ export default class UpdateProfile extends Component {
       confPassword: this.state.confPassword
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

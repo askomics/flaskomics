@@ -41,12 +41,12 @@ export default class UploadModal extends Component {
 
     let galaxyForm
     let galaxyButton
-    if (this.props.user.galaxy) {
+    if (this.props.config.user.galaxy) {
       galaxyForm = (
         <Modal size="lg" isOpen={this.state.modalGalaxy} toggle={this.toggleModalGalaxy}>
           <ModalHeader toggle={this.toggleModalGalaxy}>Upload Galaxy datasets</ModalHeader>
           <ModalBody>
-            <UploadGalaxyForm getQueries={false} setStateUpload={this.props.setStateUpload} />
+            <UploadGalaxyForm config={this.props.config} getQueries={false} setStateUpload={this.props.setStateUpload} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalGalaxy}>Close</Button>
@@ -67,7 +67,7 @@ export default class UploadModal extends Component {
         <Modal isOpen={this.state.modalComputer} toggle={this.toggleModalComputer}>
           <ModalHeader toggle={this.toggleModalComputer}>Upload files</ModalHeader>
           <ModalBody>
-            <UploadForm setStateUpload={this.props.setStateUpload} />
+            <UploadForm config={this.props.config} setStateUpload={this.props.setStateUpload} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalComputer}>Close</Button>
@@ -77,7 +77,7 @@ export default class UploadModal extends Component {
         <Modal isOpen={this.state.modalUrl} toggle={this.toggleModalUrl}>
           <ModalHeader toggle={this.toggleModalUrl}>Upload files by URL</ModalHeader>
           <ModalBody>
-            <UploadUrlForm setStateUpload={this.props.setStateUpload} />
+            <UploadUrlForm config={this.props.config} setStateUpload={this.props.setStateUpload} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalUrl}>Close</Button>
@@ -91,5 +91,5 @@ export default class UploadModal extends Component {
 
 UploadModal.propTypes = {
   setStateUpload: PropTypes.func,
-  user: PropTypes.object
+  config: PropTypes.object
 }

@@ -28,4 +28,4 @@ RUN apk update && apk del openssl openssl-dev && \
     rm -rf /root/.npm/*
 
 EXPOSE 5000
-ENTRYPOINT /askomics/start_all.sh -d ${DEPMODE} -c ${MAX_CELERY_QUEUE}
+ENTRYPOINT /askomics/start_all.sh

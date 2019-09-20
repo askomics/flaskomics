@@ -5,10 +5,8 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class Admin extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = { isLoading: true,
@@ -36,7 +34,7 @@ export default class Admin extends Component {
       newAdmin: newAdmin
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -72,7 +70,7 @@ export default class Admin extends Component {
       newBlocked: newBlocked
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -97,7 +95,7 @@ export default class Admin extends Component {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/admin/getusers'
 
-      axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({

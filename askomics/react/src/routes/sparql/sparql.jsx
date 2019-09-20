@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
-import AskoContext from '../../components/context'
 
 import brace from 'brace'
 import AceEditor from 'react-ace'
@@ -19,12 +18,10 @@ import dedent from 'dedent'
 import ResultsTable from './resultstable'
 
 export default class Sparql extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
-      logged: this.props.location.state.logged,
-      user: this.props.location.state.user,
+      config: this.props.location.config,
       results_data: [],
       results_header: [],
       error: false,
@@ -46,7 +43,7 @@ export default class Sparql extends Component {
     let data = {
       query: this.state.sparqlInput
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({

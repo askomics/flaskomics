@@ -2,10 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Collapse, Navbar, NavbarBrand, Nav, NavItem, Dropdown, DropdownMenu, DropdownToggle, DropdownItem } from 'reactstrap'
 import PropTypes from 'prop-types'
-import AskoContext from './components/context'
 
 export default class AskoNavbar extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.toggle = this.toggle.bind(this)
@@ -39,9 +37,9 @@ export default class AskoNavbar extends Component {
       )
 
 
-      if (this.props.logged) {
+      if (this.props.config.logged) {
         let adminLinks
-        if (this.props.user.admin) {
+        if (this.props.config.user.admin) {
           adminLinks = (
             <DropdownItem className="bg-dark" tag="Link">
               <Link className="nav-link" to="/admin"><i className="fas fa-chess-king"></i> Admin</Link>
@@ -49,7 +47,7 @@ export default class AskoNavbar extends Component {
           )
         }
         let integrationLinks
-        if (!this.props.disableIntegration || this.props.user.admin) {
+        if (!this.props.config.disableIntegration || this.props.config.user.admin) {
           integrationLinks = (
             <>
             <NavItem><Link className="nav-link" to="/files"><i className="fas fa-file"></i> Files</Link></NavItem>
@@ -65,7 +63,7 @@ export default class AskoNavbar extends Component {
           <NavItem>
             <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
               <DropdownToggle nav caret>
-                <i className="fas fa-user"></i> {this.props.user.fname} {this.props.user.lname}
+                <i className="fas fa-user"></i> {this.props.config.user.fname} {this.props.config.user.lname}
               </DropdownToggle>
               <DropdownMenu className="bg-dark">
                 <DropdownItem className="bg-dark" tag="Link">
@@ -88,7 +86,7 @@ export default class AskoNavbar extends Component {
       <div>
         <Navbar color="dark" dark expand="md">
           <div className="container">
-            <NavbarBrand href={this.context.proxyPath == "/" ? "/" : this.context.proxyPath + "/"}>AskOmics</NavbarBrand>
+            <NavbarBrand href={this.props.config.proxyPath == "/" ? "/" : this.props.config.proxyPath + "/"}>AskOmics</NavbarBrand>
             <Collapse navbar>
               <Nav className="ml-auto" navbar>
                 {askLink}
@@ -105,7 +103,5 @@ export default class AskoNavbar extends Component {
 
 AskoNavbar.propTypes = {
   waitForStart: PropTypes.bool,
-  disableIntegration: PropTypes.bool,
-  logged: PropTypes.bool,
-  user: PropTypes.object
+  config: PropTypes.object
 }

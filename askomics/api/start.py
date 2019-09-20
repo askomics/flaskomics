@@ -66,20 +66,29 @@ def start():
             except Exception:
                 pass
 
+        # get proxy path
+        proxy_path = None
+        try:
+            proxy_path = current_app.iniconfig.get("askomics", "reverse_proxy_path")
+        except Exception:
+            pass
+
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "version": get_distribution('askomics').version,
             "commit": sha,
+            "gitUrl": "https://github.com/xgaia/flaskomics",
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
-            "namespace": current_app.iniconfig.get('triplestore', 'namespace')
+            "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
+            "proxyPath": proxy_path,
+            "user": {},
+            "logged": False
         }
 
         json = {
             "error": False,
             "errorMessage": '',
-            "user": None,
-            "logged": False,
             "config": config
         }
 
@@ -87,8 +96,8 @@ def start():
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             session['user'] = user
-            json['user'] = user
-            json['logged'] = True
+            json['config']['user'] = user
+            json['config']['logged'] = True
 
         return jsonify(json)
 
@@ -97,7 +106,5 @@ def start():
         return jsonify({
             "error": True,
             "errorMessage": str(e),
-            "user": None,
-            "logged": False,
             "config": {}
         }), 500

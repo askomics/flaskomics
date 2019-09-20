@@ -1,6 +1,5 @@
 import React, { Component, createContext } from 'react'
-import { BrowserRouter, Router, Route, Switch, Redirect } from 'react-router-dom'
-import createBrowserHistory from 'history/createBrowserHistory'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 import Ask from './routes/ask/ask'
@@ -19,16 +18,11 @@ import Query from './routes/query/query'
 import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
-import AskoContext from './components/context'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-const history = createBrowserHistory()
-
 export default class Routes extends Component {
-
-  static contextType = AskoContext
 
   constructor (props) {
     super(props)
@@ -36,9 +30,18 @@ export default class Routes extends Component {
       waiting: true,
       error: false,
       errorMessage: null,
-      logged: false,
-      user: {},
-      config: {}
+      config: {
+        proxyPath: document.getElementById('proxy_path').getAttribute('proxy_path'),
+        user: {},
+        logged: false,
+        footerMessage: null,
+        version: null,
+        commit: null,
+        gitUrl: null,
+        disableIntegration: null,
+        prefix: null,
+        namespace: null
+      }
     }
     this.cancelRequest
   }
@@ -46,14 +49,12 @@ export default class Routes extends Component {
   componentDidMount () {
 
     let requestUrl = '/api/start'
-    axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, {baseURL: this.state.config.proxyPath , cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           error: false,
           errorMessage: null,
-          user: response.data.user,
-          logged: response.data.logged,
           config: response.data.config,
           waiting: false
         })
@@ -71,22 +72,17 @@ export default class Routes extends Component {
 
   render () {
 
-    let redirectRoot
-    if (this.context.redirect == "/") {
-      redirectRoot = <Redirect to="/" />
-    }
-
     let admin = false
-    if (this.state.user) {
-      admin = this.state.user.admin
+    if (this.state.config.user) {
+      admin = this.state.config.user.admin
     }
 
     let integrationRoutes
     if (!this.state.config.disableIntegration || admin) {
       integrationRoutes = (
         <>
-          <Route path="/files" exact component={() => (<Upload waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
-          <Route path="/datasets" exact component={() => (<Datasets waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} />)} />
+          <Route path="/files" exact component={() => (<Upload config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+          <Route path="/datasets" exact component={() => (<Datasets config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
           <Route path="/integration" exact component={Integration} />
         </>
       )
@@ -94,28 +90,27 @@ export default class Routes extends Component {
 
 
     return (
-      <BrowserRouter basename={this.context.proxyPath} history={history}>
+      <Router basename={this.state.config.proxyPath}>
         <div>
-          {redirectRoot}
-          <AskoNavbar waitForStart={this.state.waiting} logged={this.state.logged} user={this.state.user} disableIntegration={this.state.config.disableIntegration}/>
+          <AskoNavbar waitForStart={this.state.waiting} config={this.state.config} />
           <Switch>
-            <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} config={this.state.config} />)} />
+            <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} config={this.state.config} />)} />
             <Route path="/about" exact component={() => (<About />)} />
-            <Route path="/login" exact component={() => (<Login waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/signup" exact component={() => (<Signup waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/logout" exact component={() => (<Logout waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/account" exact component={() => (<Account waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
-            <Route path="/admin" exact component={() => (<Admin waitForStart={this.state.waiting} user={this.state.user} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/login" exact component={() => (<Login config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/signup" exact component={() => (<Signup config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/logout" exact component={() => (<Logout config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/account" exact component={() => (<Account config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/admin" exact component={() => (<Admin config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
-            <Route path="/results" exact component={() => (<Results waitForStart={this.state.waiting} user={this.state.user} logged={this.state.logged} config={this.state.config} />)} />
+            <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
             <Route path="/sparql" exact component={Sparql} />
             {integrationRoutes}
           </Switch>
           <br />
           <br />
-          <AskoFooter version={this.state.config.version} commit={this.state.config.commit} message={this.state.config.footerMessage} />
+          <AskoFooter config={this.state.config} />
         </div>
-      </BrowserRouter>
+      </Router>
     )
   }
 }

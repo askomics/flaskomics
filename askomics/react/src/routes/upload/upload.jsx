@@ -6,17 +6,13 @@ import ErrorDiv from '../error/error'
 import UploadModal from './uploadmodal'
 import FilesTable from './filestable'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class Upload extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
       error: false,
       errorMessage: null,
-      logged: props.logged,
-      user: props.user,
       integration: false,
       files: [],
       selected: [],
@@ -30,7 +26,7 @@ export default class Upload extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       let requestUrl = '/api/files'
-      axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -61,7 +57,7 @@ export default class Upload extends Component {
     let data = {
       filesIdToDelete: this.state.selected
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -105,8 +101,7 @@ export default class Upload extends Component {
         pathname: '/integration',
         state: {
           filesId: this.state.selected,
-          user: this.props.user,
-          logged: this.props.logged
+          config: this.props.config
         }
       }} />
     }
@@ -117,7 +112,7 @@ export default class Upload extends Component {
         {redirectIntegration}
         <h2>Upload</h2>
         <hr />
-        <UploadModal setStateUpload={p => this.setState(p)} user={this.props.user} />
+        <UploadModal setStateUpload={p => this.setState(p)} config={this.props.config} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <br />
@@ -132,7 +127,6 @@ export default class Upload extends Component {
 }
 
 Upload.propTypes = {
-  logged: PropTypes.bool,
-  user: PropTypes.object,
+  config: PropTypes.object,
   waitForStart: PropTypes.bool
 }

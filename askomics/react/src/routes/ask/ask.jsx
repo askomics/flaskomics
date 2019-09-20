@@ -6,12 +6,10 @@ import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 import UploadGalaxyForm from '../upload/uploadgalaxyform'
 
 
 export default class Ask extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -35,8 +33,8 @@ export default class Ask extends Component {
 
   componentDidMount () {
 
-    if (this.props.user) {
-      if (this.props.user.galaxy) {
+    if (this.props.config.user) {
+      if (this.props.config.user.galaxy) {
         this.setState({
           showGalaxyButton: true
         })
@@ -45,7 +43,7 @@ export default class Ask extends Component {
 
     if (!this.props.waitForStart) {
       let requestUrl = '/api/query/startpoints'
-      axios.get(requestUrl, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrl, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
@@ -98,7 +96,7 @@ export default class Ask extends Component {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
     let data = { fileId: event.target.id }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
@@ -155,9 +153,7 @@ export default class Ask extends Component {
         pathname: '/query',
         state: {
           config: this.props.config,
-          startpoint: this.state.selected,
-          user: this.props.user,
-          logged: this.props.logged
+          startpoint: this.state.selected
         }
       }} />
     }
@@ -168,9 +164,7 @@ export default class Ask extends Component {
         state: {
           redo: true,
           config: this.props.config,
-          graphState: this.state.graphState,
-          user: this.props.user,
-          logged: this.props.logged
+          graphState: this.state.graphState
         }
       }} />
     }
@@ -206,7 +200,7 @@ export default class Ask extends Component {
       galaxyImport = (
         <div>
           <br/>
-          <p>Or import a query from <a href={this.props.user.galaxy.url}>Galaxy</a></p>
+          <p>Or import a query from <a href={this.props.config.user.galaxy.url}>Galaxy</a></p>
           <Button onClick={this.toggleModalGalaxy} color="secondary">Import Query</Button>
         </div>
       )
@@ -282,7 +276,5 @@ export default class Ask extends Component {
 
 Ask.propTypes = {
   waitForStart: PropTypes.bool,
-  user: PropTypes.object,
   config: PropTypes.object,
-  logged: PropTypes.bool
 }

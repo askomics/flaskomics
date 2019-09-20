@@ -3,10 +3,8 @@ import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress 
 import axios from 'axios'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class UploadUrlForm extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
 
@@ -52,7 +50,7 @@ export default class UploadUrlForm extends Component {
       progressColor: "success"
     })
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -65,7 +63,7 @@ export default class UploadUrlForm extends Component {
 
         // load file component
         let requestUrlFiles = '/api/files'
-        axios.get(requestUrlFiles, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        axios.get(requestUrlFiles, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
           .then(response => {
             console.log(requestUrlFiles, response.data)
             this.props.setStateUpload({
@@ -102,5 +100,6 @@ export default class UploadUrlForm extends Component {
 }
 
 UploadUrlForm.propTypes = {
-  setStateUpload: PropTypes.func
+  setStateUpload: PropTypes.func,
+  config: PropTypes.object
 }

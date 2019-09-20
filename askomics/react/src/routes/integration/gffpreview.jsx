@@ -3,10 +3,8 @@ import axios from 'axios'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class GffPreview extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -32,7 +30,7 @@ export default class GffPreview extends Component {
       public: event.target.value == 'public',
       type: 'gff/gff3'
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -81,7 +79,7 @@ export default class GffPreview extends Component {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
     let publicButton
-    if (this.props.user.admin) {
+    if (this.props.config.user.admin) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
@@ -108,5 +106,5 @@ export default class GffPreview extends Component {
 
 GffPreview.propTypes = {
   file: PropTypes.object,
-  user: PropTypes.object
+  config: PropTypes.object
 }

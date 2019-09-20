@@ -5,10 +5,8 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
 import { Badge, FormGroup, CustomInput } from 'reactstrap'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
 
 export default class DatasetsTable extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.handleSelection = this.handleSelection.bind(this)
@@ -37,26 +35,26 @@ export default class DatasetsTable extends Component {
 
   handleSelection (row, isSelect) {
     if (isSelect) {
-      this.props.setStateDatasets(() => ({
+      this.props.setStateDatasets({
         selected: [...this.props.selected, row.id]
-      }))
+      })
     } else {
-      this.props.setStateDatasets(() => ({
+      this.props.setStateDatasets({
         selected: this.props.selected.filter(x => x !== row.id)
-      }))
+      })
     }
   }
 
   handleSelectionAll (isSelect, rows) {
     const ids = rows.map(r => r.id)
     if (isSelect) {
-      this.props.setStateDatasets(() => ({
+      this.props.setStateDatasets({
         selected: ids
-      }))
+      })
     } else {
-      this.props.setStateDatasets(() => ({
+      this.props.setStateDatasets({
         selected: []
-      }))
+      })
     }
   }
 
@@ -82,7 +80,6 @@ export default class DatasetsTable extends Component {
         })
       })
     })
-
   }
 
   render () {
@@ -104,7 +101,7 @@ export default class DatasetsTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={this.props.user.admin ? false : true} type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
+              <CustomInput disabled={this.props.config.user.admin ? false : true} type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -182,5 +179,5 @@ DatasetsTable.propTypes = {
   selected: PropTypes.object,
   waiting: PropTypes.bool,
   datasets: PropTypes.object,
-  user: PropTypes.object
+  config: PropTypes.object
 }

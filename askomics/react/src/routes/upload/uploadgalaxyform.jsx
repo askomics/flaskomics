@@ -7,10 +7,8 @@ import PropTypes from 'prop-types'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
-import AskoContext from '../../components/context'
 
 export default class UploadGalaxyForm extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {
@@ -32,7 +30,7 @@ export default class UploadGalaxyForm extends Component {
     if (this.props.getQueries) {
       requestUrl = '/api/galaxy/queries'
     }
-    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -60,7 +58,7 @@ export default class UploadGalaxyForm extends Component {
     if (this.props.getQueries) {
       requestUrl = '/api/galaxy/queries'
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -91,7 +89,7 @@ export default class UploadGalaxyForm extends Component {
   handleSubmitQuery (event) {
     let requestUrl = '/api/galaxy/getdatasetcontent'
     let data = {dataset_id: this.state.selected[0]}
-    axios.post(requestUrl, data, {baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -119,14 +117,14 @@ export default class UploadGalaxyForm extends Component {
     })
     let data = {datasets_id: this.state.selected}
     let requestUrl = '/api/galaxy/upload_datasets'
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       this.setState({
         uploading: false
       })
       console.log(requestUrl, response.data)
       let requestUrlFiles = '/api/files'
-      axios.get(requestUrlFiles, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.get(requestUrlFiles, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrlFiles, response.data)
           this.props.setStateUpload({
@@ -243,9 +241,7 @@ export default class UploadGalaxyForm extends Component {
         state: {
           redo: true,
           config: this.props.config,
-          graphState: this.state.graphState,
-          user: this.props.user,
-          logged: this.props.logged
+          graphState: this.state.graphState
         }
       }} />
     }
@@ -274,7 +270,5 @@ UploadGalaxyForm.propTypes = {
   setStateUpload: PropTypes.func,
   waiting: PropTypes.bool,
   getQueries: PropTypes.bool,
-  config: PropTypes.object,
-  user: PropTypes.object,
-  logged: PropTypes.bool
+  config: PropTypes.object
 }

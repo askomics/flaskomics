@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-// import ReactDOM from 'react-dom'
 import axios from 'axios'
 import { Alert, Button } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import * as d3 from 'd3'
 import { ForceGraph2D } from 'react-force-graph'
 import PropTypes from 'prop-types'
 

@@ -3,10 +3,9 @@ import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
+import update from 'immutability-helper'
 
 export default class UpdateGalaxyAccount extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -42,7 +41,7 @@ export default class UpdateGalaxyAccount extends Component {
       gkey: this.state.gkey
     }
 
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -54,13 +53,14 @@ export default class UpdateGalaxyAccount extends Component {
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
-            user: this.state.user,
-            logged: true
+            config: update(this.props.config, {
+              user: {$set: this.state.user}
+            })
           })
         }
       })
       .catch(error => {
-        console.log(error, error.response.data.errorMessage)
+        console.log(error)
         this.setState({
           error: true,
           errorMessage: error.response.data.errorMessage,
@@ -85,11 +85,11 @@ export default class UpdateGalaxyAccount extends Component {
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
             <Label for="fname">Galaxy URL</Label>
-            <Input type="url" name="gurl" id="gurl" placeholder={this.props.user.galaxy ? this.props.user.galaxy.url : "Enter a Galaxy URL"} value={this.state.gurl} onChange={this.handleChange} />
+            <Input type="url" name="gurl" id="gurl" placeholder={this.props.config.user.galaxy ? this.props.config.user.galaxy.url : "Enter a Galaxy URL"} value={this.state.gurl} onChange={this.handleChange} />
           </FormGroup>
           <FormGroup>
             <Label for="lname">Galaxy API key</Label>
-            <Input type="text" name="gkey" id="gkey" placeholder={this.props.user.galaxy ? this.props.user.galaxy.apikey : "Enter a Galaxy API key"} value={this.state.gkey} onChange={this.handleChange} />
+            <Input type="text" name="gkey" id="gkey" placeholder={this.props.config.user.galaxy ? this.props.config.user.galaxy.apikey : "Enter a Galaxy API key"} value={this.state.gkey} onChange={this.handleChange} />
           </FormGroup>
           <Button disabled={!this.validateForm()}>Update Galaxy account {successTick}</Button>
         </Form>

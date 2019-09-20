@@ -3,10 +3,9 @@ import axios from 'axios'
 import { Col, Button, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon } from 'reactstrap'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
-import AskoContext from '../../components/context'
+import update from 'immutability-helper'
 
 export default class UpdateApiKey extends Component {
-  static contextType = AskoContext
   constructor (props) {
     super(props)
     this.state = {}
@@ -17,7 +16,7 @@ export default class UpdateApiKey extends Component {
   handleSubmit (event) {
     let requestUrl = '/api/auth/apikey'
 
-    axios.get(requestUrl, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
@@ -29,8 +28,7 @@ export default class UpdateApiKey extends Component {
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
-            user: this.state.user,
-            logged: true
+            config: update(this.props.config, {user: {$set: this.state.user}})
           })
         }
       })
@@ -57,7 +55,7 @@ export default class UpdateApiKey extends Component {
         <h4>Manage API key</h4>
         <Form onSubmit={this.handleSubmit}>
           <InputGroup>
-            <Input value={this.props.user.apikey} />
+            <Input value={this.props.config.user.apikey} />
             <InputGroupAddon addonType="append">
               <Button >Create new</Button>
             </InputGroupAddon>
