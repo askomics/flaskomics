@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import { Col, Row, Button, Form, FormGroup, Label, Input, FormText, Alert } from 'reactstrap'
 import ErrorDiv from '../error/error'
+import PropTypes from 'prop-types'
 
-export default class UpdateProfile extends Component {
+export default class UpdatePassword extends Component {
   constructor (props) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
@@ -98,4 +99,9 @@ export default class UpdateProfile extends Component {
       </Col>
     )
   }
+}
+
+UpdatePassword.propTypes = {
+  setStateNavbar: PropTypes.func,
+  config: PropTypes.object
 }

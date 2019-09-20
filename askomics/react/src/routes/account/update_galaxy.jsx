@@ -102,5 +102,5 @@ export default class UpdateGalaxyAccount extends Component {
 
 UpdateGalaxyAccount.propTypes = {
   setStateNavbar: PropTypes.func,
-  user: PropTypes.object
+  config: PropTypes.object
 }

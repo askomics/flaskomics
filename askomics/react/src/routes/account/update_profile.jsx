@@ -111,5 +111,5 @@ export default class UpdateProfile extends Component {
 
 UpdateProfile.propTypes = {
   setStateNavbar: PropTypes.func,
-  user: PropTypes.object
+  config: PropTypes.object
 }

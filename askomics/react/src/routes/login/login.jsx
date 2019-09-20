@@ -105,5 +105,6 @@ export default class Login extends Component {
 }
 
 Login.propTypes = {
-  setStateNavbar: PropTypes.func
+  setStateNavbar: PropTypes.func,
+  config: PropTypes.object
 }

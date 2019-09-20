@@ -161,5 +161,6 @@ export default class Signup extends Component {
 }
 
 Signup.propTypes = {
-  setStateNavbar: PropTypes.func
+  setStateNavbar: PropTypes.func,
+  config: PropTypes.object
 }

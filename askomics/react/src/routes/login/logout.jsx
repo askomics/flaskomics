@@ -34,5 +34,6 @@ export default class logout extends Component {
 }
 
 logout.propTypes = {
-  setStateNavbar: PropTypes.func
+  setStateNavbar: PropTypes.func,
+  config: PropTypes.object
 }

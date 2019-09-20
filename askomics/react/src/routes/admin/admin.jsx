@@ -200,5 +200,6 @@ export default class Admin extends Component {
 }
 
 Admin.propTypes = {
-  waitForStart: PropTypes.bool
+  waitForStart: PropTypes.bool,
+  config: PropTypes.object
 }

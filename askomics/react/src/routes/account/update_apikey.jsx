@@ -70,5 +70,5 @@ export default class UpdateApiKey extends Component {
 
 UpdateApiKey.propTypes = {
   setStateNavbar: PropTypes.func,
-  user: PropTypes.object
+  config: PropTypes.object
 }
