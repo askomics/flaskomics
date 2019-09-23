@@ -64,7 +64,7 @@ export default class DatasetsTable extends Component {
       id: event.target.id,
       newStatus: event.target.value == "true" ? false : true
     }
-    axios.post(requestUrl, data, { baseURL: this.context.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
       this.props.setStateDatasets({
