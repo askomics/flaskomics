@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
+import update from 'immutability-helper'
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
 
@@ -19,8 +20,7 @@ export default class Signup extends Component {
       password: '',
       passwordconf: '',
       usernameFirstChar: '',
-      usernameLastChars: '',
-      logged: false
+      usernameLastChars: ''
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
@@ -79,20 +79,15 @@ export default class Signup extends Component {
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
-        this.setState({
-          isLoading: false,
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          config: update(this.props.config, {user: {$set: response.data.user}}, {logged: {$set: !response.data.error}})
-        })
-        if (!this.state.error) {
-          this.props.setStateNavbar({
-            config: update(this.props.config, {user: {$set: this.state.config.user}}, {logged: {$set: this.state.config.logged}})
+        this.props.setStateNavbar({
+          config: update(this.props.config,{
+            user: {$set: response.data.user},
+            logged: {$set: true}
           })
-        }
+        })
       })
       .catch(error => {
-        console.log(error, error.response.data.errorMessage)
+        console.log(error)
         this.setState({
           error: true,
           errorMessage: error.response.data.errorMessage,
@@ -117,7 +112,7 @@ export default class Signup extends Component {
 
   render () {
     let html = <Redirect to="/" />
-    if (!this.state.logged) {
+    if (!this.props.config.logged) {
       html = (
         <div className="container">
           <h2>Signup</h2>
