@@ -308,6 +308,7 @@ class SparqlQueryBuilder(Params):
         self.selects = []
         triples = []
         filters = []
+        start_end = []
 
         # Browse node to get graphs
         for node in json_query["nodes"]:
@@ -315,6 +316,66 @@ class SparqlQueryBuilder(Params):
                 entities.append(node["uri"])
 
         self.set_graphs(entities=entities)
+
+        # self.log.debug(json_query)
+
+        # Browse links (relations)
+        for link in json_query["links"]:
+            if not link["suggested"]:
+                source = self.format_sparql_variable("{}{}_uri".format(link["source"]["label"], link["source"]["id"]))
+                target = self.format_sparql_variable("{}{}_uri".format(link["target"]["label"], link["target"]["id"]))
+
+                # Position
+                if link["uri"] in ('included_in', 'overlap_with'):
+                    common_block = self.format_sparql_variable("block_{}_{}".format(link["source"]["id"], link["target"]["id"]))
+                    # Get start & end sparql variables
+                    for attr in json_query["attr"]:
+                        if not attr["faldo"]:
+                            continue
+                        if attr["nodeId"] == link["source"]["id"]:
+                            if attr["faldo"].endswith("faldoStart"):
+                                start_end.append(attr["id"])
+                                start_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                            if attr["faldo"].endswith("faldoEnd"):
+                                start_end.append(attr["id"])
+                                end_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                        if attr["nodeId"] == link["target"]["id"]:
+                            if attr["faldo"].endswith("faldoStart"):
+                                start_end.append(attr["id"])
+                                start_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                            if attr["faldo"].endswith("faldoEnd"):
+                                start_end.append(attr["id"])
+                                end_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                    triples.append("{} {} {} .".format(
+                        source,
+                        "askomics:{}".format("includeInRef" if link["sameRef"] else "includeIn"),
+                        common_block
+                    ))
+                    triples.append("{} {} {} .".format(
+                        target,
+                        "askomics:{}".format("includeInRef" if link["sameRef"] else "includeIn"),
+                        common_block
+                    ))
+
+                    if link["uri"] == "included_in":
+                        filters.append("FILTER ({start1} >= {start2} && {end1} <= {end2})".format(
+                            start1=start_1,
+                            start2=start_2,
+                            end1=end_1,
+                            end2=end_2
+                        ))
+                    elif link["uri"] == "overlap_with":
+                        filters.append("FILTER (({start2} >= {start1} && {start2} <= {end1}) || ({end2} >= {start1} && {end2} <= {end1}))".format(
+                            start1=start_1,
+                            start2=start_2,
+                            end1=end_1,
+                            end2=end_2
+                        ))
+
+                # Classic relation
+                else:
+                    relation = "<{}>".format(link["uri"])
+                    triples.append("{} {} {} .".format(source, relation, target))
 
         # Browse attributes
         for attribute in json_query["attr"]:
@@ -369,7 +430,7 @@ class SparqlQueryBuilder(Params):
 
             # Numeric
             if attribute["type"] == "decimal":
-                if attribute["visible"] or attribute["filterValue"] != "":
+                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in start_end:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
@@ -440,14 +501,6 @@ class SparqlQueryBuilder(Params):
                     filter_substring = ' || '.join(filter_substrings_list)
                     filter_string = "FILTER ({})".format(filter_substring)
                     filters.append(filter_string)
-
-        # Browse links
-        for link in json_query["links"]:
-            if not link["suggested"]:
-                source = self.format_sparql_variable("{}{}_uri".format(link["source"]["label"], link["source"]["id"]))
-                relation = "<{}>".format(link["uri"])
-                target = self.format_sparql_variable("{}{}_uri".format(link["target"]["label"], link["target"]["id"]))
-                triples.append("{} {} {} .".format(source, relation, target))
 
         from_string = self.get_froms_from_graphs(self.graphs)
 
