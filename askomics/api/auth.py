@@ -58,6 +58,9 @@ def signup():
         local_auth.create_user_directories(user['id'], user['username'])
         session['user'] = user
 
+    current_app.logger.debug(local_auth.get_error())
+    current_app.logger.debug(local_auth.get_error_message())
+
     return jsonify({
         'error': local_auth.get_error(),
         'errorMessage': local_auth.get_error_message(),

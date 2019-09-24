@@ -79,12 +79,19 @@ export default class Signup extends Component {
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
-        this.props.setStateNavbar({
-          config: update(this.props.config,{
-            user: {$set: response.data.user},
-            logged: {$set: true}
-          })
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
         })
+        if (!this.state.error) {
+          this.props.setStateNavbar({
+            config: update(this.props.config,{
+              user: {$set: response.data.user},
+              logged: {$set: !response.data.error}
+            })
+          })
+        }
       })
       .catch(error => {
         console.log(error)
