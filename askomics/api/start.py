@@ -67,7 +67,7 @@ def start():
                 pass
 
         # get proxy path
-        proxy_path = None
+        proxy_path = "/"
         try:
             proxy_path = current_app.iniconfig.get("askomics", "reverse_proxy_path")
         except Exception:
