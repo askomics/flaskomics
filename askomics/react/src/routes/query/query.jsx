@@ -399,6 +399,8 @@ export default class Query extends Component {
             this.graphState.links.push({
               uri: relation.uri,
               type: "link",
+              sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
+              sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               id: linkId,
               label: relation.label,
               source: node.id,
@@ -435,6 +437,8 @@ export default class Query extends Component {
             this.graphState.links.push({
               uri: relation.uri,
               type: "link",
+              sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
+              sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
               id: this.getId(),
               label: relation.label,
               source: sourceId,
@@ -470,8 +474,8 @@ export default class Query extends Component {
             uri: "included_in",
             type: "link",
             id: this.getId(),
-            sameStrand: true,
-            sameRef: true,
+            sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
+            sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
             strict: true,
             label: "Included in",
             source: node.id,
@@ -511,8 +515,8 @@ export default class Query extends Component {
         newLink = {
           uri: link.uri,
           type: "link",
-          sameStrand: true,
-          sameRef: true,
+          sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
+          sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
           id: this.getId(),
           label: link.label,
@@ -527,8 +531,8 @@ export default class Query extends Component {
         newLink = {
           uri: link.uri,
           type: "link",
-          sameStrand: true,
-          sameRef: true,
+          sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
+          sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
           id: this.getId(),
           label: link.label,
@@ -703,9 +707,14 @@ export default class Query extends Component {
         this.currentSelected = node
       }
     })
+    this.graphState.links.forEach(link => {
+      if (link.selected) {
+        this.currentSelected = link
+      }
+    })
   }
 
-  updateGraphState () {
+  updateGraphState (waiting=this.state.waiting) {
     this.setState({
       graphState: this.graphState,
       previewIcon: "table",
@@ -713,7 +722,8 @@ export default class Query extends Component {
       headerPreview: [],
       disableSave: false,
       disablePreview: false,
-      saveIcon: "play"
+      saveIcon: "play",
+      waiting: waiting
     })
   }
 
@@ -847,6 +857,11 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  mapLinks (event) {
+    this.state.graphState.links.map(link => {})
+    this.updateGraphState()
+  }
+
   handleClickReverse (event) {
     this.state.graphState.links.map(link => {
       if (link.id == event.target.id) {
@@ -883,6 +898,46 @@ export default class Query extends Component {
       }
     })
     this.updateGraphState()
+  }
+
+  nodesHaveRefs (link) {
+    let result = this.nodeHaveRef(link.source.uri) && this.nodeHaveRef(link.target.uri)
+    if (! result) {
+      link.sameRef = false
+    }
+    return result
+  }
+
+  nodeHaveRef (uri) {
+    let result = false
+    this.state.abstraction.attributes.map(attr => {
+      if (uri == attr.entityUri && attr.faldo) {
+        if (attr.faldo.endsWith("faldoReference")) {
+          result =  true
+        }
+      }
+    })
+    return result
+  }
+
+  nodesHaveStrands (link) {
+    let result = this.nodeHaveStrand(link.source.uri) && this.nodeHaveStrand(link.target.uri)
+    if (! result) {
+      link.sameStrand = false
+    }
+    return result
+  }
+
+  nodeHaveStrand (uri) {
+    let result = false
+    this.state.abstraction.attributes.map(attr => {
+      if (uri == attr.entityUri && attr.faldo) {
+        if (attr.faldo.endsWith("faldoStrand")) {
+          result =  true
+        }
+      }
+    })
+    return result
   }
 
   // ------------------------------------------------
@@ -971,7 +1026,9 @@ export default class Query extends Component {
             this.graphState = this.props.location.state.graphState
             this.initId()
             this.setCurrentSelected()
-            this.insertSuggestion(this.currentSelected)
+            if (this.currentSelected.type != "link") {
+              this.insertSuggestion(this.currentSelected)
+            }
             this.updateGraphState()
           } else {
             this.initGraph()
@@ -1037,13 +1094,26 @@ export default class Query extends Component {
         })
         // Link view (rightview)
         if (this.currentSelected.type == "link") {
+
+          let link = Object.assign(this.currentSelected)
+          this.state.graphState.nodes.map(node => {
+            if (node.id == this.currentSelected.target) {
+              link.target = node
+            }
+            if (node.id == this.currentSelected.source) {
+              link.source = node
+            }
+          })
+
           linkView = <LinkView
-            link={this.currentSelected}
+            link={link}
             handleChangePosition={p => this.handleChangePosition(p)}
             handleClickReverse={p => this.handleClickReverse(p)}
             handleChangeSameRef={p => this.handleChangeSameRef(p)}
             handleChangeSameStrand={p => this.handleChangeSameStrand(p)}
             handleChangeStrict={p => this.handleChangeStrict(p)}
+            nodesHaveRefs={p => this.nodesHaveRefs(p)}
+            nodesHaveStrands={p => this.nodesHaveStrands(p)}
           />
         }
       }

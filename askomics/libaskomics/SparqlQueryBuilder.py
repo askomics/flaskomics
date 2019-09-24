@@ -309,6 +309,7 @@ class SparqlQueryBuilder(Params):
         triples = []
         filters = []
         start_end = []
+        strands = []
 
         # Browse node to get graphs
         for node in json_query["nodes"]:
@@ -339,6 +340,9 @@ class SparqlQueryBuilder(Params):
                             if attr["faldo"].endswith("faldoEnd"):
                                 start_end.append(attr["id"])
                                 end_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                            if attr["faldo"].endswith("faldoStrand"):
+                                strand_1 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                                strands.append(attr["id"])
                         if attr["nodeId"] == link["target"]["id"]:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
@@ -346,30 +350,45 @@ class SparqlQueryBuilder(Params):
                             if attr["faldo"].endswith("faldoEnd"):
                                 start_end.append(attr["id"])
                                 end_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                            if attr["faldo"].endswith("faldoStrand"):
+                                strand_2 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
+                                strands.append(attr["id"])
                     triples.append("{} {} {} .".format(
                         source,
-                        "askomics:{}".format("includeInRef" if link["sameRef"] else "includeIn"),
+                        "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         common_block
                     ))
                     triples.append("{} {} {} .".format(
                         target,
-                        "askomics:{}".format("includeInRef" if link["sameRef"] else "includeIn"),
+                        "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         common_block
                     ))
 
+                    if link["sameStrand"]:
+                        filters.append("FILTER ({strand1} = {strand2}) .".format(
+                            strand1=strand_1,
+                            strand2=strand_2
+                        ))
+                    else:
+                        strands = []
+
+                        equal_sign = "" if link["strict"] else "="
+
                     if link["uri"] == "included_in":
-                        filters.append("FILTER ({start1} >= {start2} && {end1} <= {end2})".format(
+                        filters.append("FILTER ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}) .".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
-                            end2=end_2
+                            end2=end_2,
+                            equalsign=equal_sign
                         ))
                     elif link["uri"] == "overlap_with":
-                        filters.append("FILTER (({start2} >= {start1} && {start2} <= {end1}) || ({end2} >= {start1} && {end2} <= {end1}))".format(
+                        filters.append("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}))".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
-                            end2=end_2
+                            end2=end_2,
+                            equalsign=equal_sign
                         ))
 
                 # Classic relation
@@ -454,7 +473,7 @@ class SparqlQueryBuilder(Params):
                 triple_string_2 = ""
                 triple_string_3 = ""
                 triple_string_4 = ""
-                if attribute["visible"] or attribute["filterSelectedValues"] != []:
+                if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))

@@ -16,6 +16,8 @@ export default class LinkView extends Component {
     this.handleChangeSameRef = this.props.handleChangeSameRef.bind(this)
     this.handleChangeSameStrand = this.props.handleChangeSameStrand.bind(this)
     this.handleChangeStrict = this.props.handleChangeStrict.bind(this)
+    this.nodesHaveRefs = this.props.nodesHaveRefs.bind(this)
+    this.nodesHaveStrands = this.props.nodesHaveStrands.bind(this)
 
   }
 
@@ -42,8 +44,8 @@ export default class LinkView extends Component {
         <br />
         <h5>On the same</h5>
         <hr />
-        <CustomInput onChange={this.handleChangeSameRef} checked={this.props.link.sameRef ? true : false} value={this.props.link.sameRef ? true : false} type="checkbox" id={"sameref-" + this.props.link.id} label="Same reference" />
-        <CustomInput onChange={this.handleChangeSameStrand} checked={this.props.link.sameStrand ? true : false} value={this.props.link.sameStrand ? true : false} type="checkbox" id={"samestrand-" + this.props.link.id} label="Same strand" />
+        <CustomInput disabled={!this.nodesHaveRefs(this.props.link)} onChange={this.handleChangeSameRef} checked={this.props.link.sameRef ? true : false} value={this.props.link.sameRef ? true : false} type="checkbox" id={"sameref-" + this.props.link.id} label="Same reference" />
+        <CustomInput disabled={!this.nodesHaveStrands(this.props.link)} onChange={this.handleChangeSameStrand} checked={this.props.link.sameStrand ? true : false} value={this.props.link.sameStrand ? true : false} type="checkbox" id={"samestrand-" + this.props.link.id} label="Same strand" />
         <hr />
         <br />
         <CustomInput onChange={this.handleChangeStrict} checked={this.props.link.strict ? true : false} value={this.props.link.strict ? true : false} type="checkbox" id={"strict-" + this.props.link.id} label="Strict" />

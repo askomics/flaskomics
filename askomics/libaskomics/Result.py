@@ -63,6 +63,53 @@ class Result(Params):
             self.end = None
             self.nrows = 0
 
+    def clean_node(self, node):
+        """Clean a node by removing coordinates and other stuff
+
+        Parameters
+        ----------
+        node : dict
+            A graph node
+
+        Returns
+        -------
+        dict
+            Cleaned node
+        """
+        node.pop("__indexColor")
+        node.pop("index")
+        node.pop("x")
+        node.pop("y")
+        node.pop("vx")
+        node.pop("vy")
+
+        return node
+
+    def clean_link(self, link):
+        """Clean a link by removing coordinates and other stuff
+
+        Parameters
+        ----------
+        link : dict
+            A graph link
+
+        Returns
+        -------
+        dict
+            Cleaned link
+        """
+        link.pop("__indexColor")
+        link.pop("__controlPoints")
+        link.pop("index")
+
+        # link["source"] = self.clean_node(link["source"])
+        # link["target"] = self.clean_node(link["target"])
+
+        link["source"] = link["source"]["id"]
+        link["target"] = link["target"]["id"]
+
+        return link
+
     def format_graph_state(self, d3_graph_state):
         """Format Graph state
 
@@ -86,18 +133,7 @@ class Result(Params):
             if node["suggested"]:
                 continue
 
-            new_node = {
-                "uri": node["uri"],
-                "graphs": node["graphs"],
-                "type": node["type"],
-                "filterNode": node["filterNode"],
-                "filterLink": node["filterLink"],
-                "id": node["id"],
-                "label": node["label"],
-                "selected": node["selected"],
-                "suggested": node["suggested"]
-            }
-
+            new_node = self.clean_node(node)
             new_nodes.append(new_node)
 
         for link in d3_graph_state["links"]:
@@ -105,16 +141,7 @@ class Result(Params):
             if link["suggested"]:
                 continue
 
-            new_link = {
-                "uri": link["uri"],
-                "id": link["id"],
-                "label": link["label"],
-                "source": link["source"]["id"],
-                "target": link["target"]["id"],
-                "selected": link["selected"],
-                "suggested": link["suggested"]
-            }
-
+            new_link = self.clean_link(link)
             new_links.append(new_link)
 
         return {
