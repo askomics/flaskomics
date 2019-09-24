@@ -225,7 +225,7 @@ class File(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
 
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.user_graph, metadata=True)
+        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
 
         content_generator = self.generate_rdf_content()
 

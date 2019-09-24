@@ -73,7 +73,7 @@ class RdfFile(File):
         method = self.settings.get('triplestore', 'upload_method')
 
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.user_graph, metadata=True)
+        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
 
         if method == "load":
             # cp file into ttl dir

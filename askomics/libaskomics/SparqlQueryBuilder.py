@@ -99,14 +99,8 @@ class SparqlQueryBuilder(Params):
         public : string
             true or false (string)
         """
-        user_graph = "{}:{}_{}".format(
-            self.settings.get('triplestore', 'default_graph'),
-            self.session['user']['id'],
-            self.session['user']['username']
-        )
-
         query = '''
-        WITH GRAPH <{user_graph}>
+        WITH GRAPH <{graph}>
         DELETE {{
             <{graph}> :public ?public .
         }}
@@ -116,7 +110,7 @@ class SparqlQueryBuilder(Params):
         WHERE {{
             <{graph}> :public ?public .
         }}
-        '''.format(user_graph=user_graph, graph=graph, public=public)
+        '''.format(graph=graph, public=public)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_launcher.process_query(self.prefix_query(query))

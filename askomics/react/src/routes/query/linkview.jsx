@@ -38,7 +38,7 @@ export default class LinkView extends Component {
             </td>
             <td>{this.props.link.target.label}</td>
             <td>{"  "}</td>
-            <td><Button id={this.props.link.id} color="secondary" size="sm" onClick={this.handleClickReverse}><i class="fas fa-exchange-alt"></i> Reverse</Button></td>
+            <td><Button id={this.props.link.id} color="secondary" size="sm" onClick={this.handleClickReverse}><i className="fas fa-exchange-alt"></i> Reverse</Button></td>
           </tr>
         </table>
         <br />
@@ -52,4 +52,15 @@ export default class LinkView extends Component {
       </div>
     )
   }
+}
+
+LinkView.propTypes = {
+  link: PropTypes.object,
+  handleChangePosition: PropTypes.func,
+  handleClickReverse: PropTypes.func,
+  handleChangeSameRef: PropTypes.func,
+  handleChangeSameStrand: PropTypes.func,
+  handleChangeStrict: PropTypes.func,
+  nodesHaveRefs: PropTypes.func,
+  nodesHaveStrands: PropTypes.func
 }
