@@ -366,7 +366,7 @@ class SparqlQueryBuilder(Params):
                     else:
                         strands = []
 
-                        equal_sign = "" if link["strict"] else "="
+                    equal_sign = "" if link["strict"] else "="
 
                     if link["uri"] == "included_in":
                         filters.append("FILTER ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}) .".format(
