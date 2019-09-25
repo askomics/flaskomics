@@ -298,6 +298,8 @@ class SparqlQueryBuilder(Params):
             SPARQL query
         """
         entities = []
+        attributes = {}
+        linked_attributes = []
 
         self.selects = []
         triples = []
@@ -390,6 +392,16 @@ class SparqlQueryBuilder(Params):
                     relation = "<{}>".format(link["uri"])
                     triples.append("{} {} {} .".format(source, relation, target))
 
+        # Store linked attributes
+        for attribute in json_query["attr"]:
+            attributes[attribute["id"]] = {
+                "label": attribute["label"],
+                "entity_label": attribute["entityLabel"],
+                "entity_id": attribute["nodeId"]
+            }
+            if attribute["linked"]:
+                linked_attributes.extend((attribute["id"], attribute["linkedWith"]))
+
         # Browse attributes
         for attribute in json_query["attr"]:
             # URI ---
@@ -402,7 +414,7 @@ class SparqlQueryBuilder(Params):
                 if attribute["visible"]:
                     self.selects.append(subject)
                 # filters
-                if attribute["filterValue"] != "":
+                if attribute["filterValue"] != "" and not attribute["linked"]:
                     not_exist = ""
                     if attribute["negative"]:
                         not_exist = " NOT EXISTS"
@@ -412,10 +424,19 @@ class SparqlQueryBuilder(Params):
                     elif attribute["filterType"] == "exact":
                         filter_string = "FILTER{} (str({}) = '{}') .".format(not_exist, subject, attribute["filterValue"])
                         filters.append(filter_string)
+                if attribute["linked"]:
+                    filter_string = "FILTER ({} = {})".format(
+                        subject,
+                        self.format_sparql_variable("{}{}_uri".format(
+                            attributes[attribute["linkedWith"]]["entity_label"],
+                            attributes[attribute["linkedWith"]]["entity_id"]
+                        ))
+                    )
+                    filters.append(filter_string)
 
             # Text
             if attribute["type"] == "text":
-                if attribute["visible"] or attribute["filterValue"] != "":
+                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["uri"] == "rdfs:label":
                         predicate = attribute["uri"]
@@ -430,7 +451,7 @@ class SparqlQueryBuilder(Params):
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "" and not attribute["optional"]:
+                if attribute["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
                     negative = ""
                     if attribute["negative"]:
                         negative = "!"
@@ -440,10 +461,20 @@ class SparqlQueryBuilder(Params):
                     elif attribute["filterType"] == "exact":
                         filter_string = "FILTER (str({}) {}= '{}') .".format(obj, negative, attribute["filterValue"])
                         filters.append(filter_string)
+                if attribute["linked"]:
+                    filter_string = "FILTER ({} = {})".format(
+                        obj,
+                        self.format_sparql_variable("{}{}_{}".format(
+                            attributes[attribute["linkedWith"]]["entity_label"],
+                            attributes[attribute["linkedWith"]]["entity_id"],
+                            attributes[attribute["linkedWith"]]["label"]
+                        ))
+                    )
+                    filters.append(filter_string)
 
             # Numeric
             if attribute["type"] == "decimal":
-                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in start_end:
+                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in start_end or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
@@ -457,8 +488,18 @@ class SparqlQueryBuilder(Params):
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "" and not attribute["optional"]:
+                if attribute["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
                     filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
+                    filters.append(filter_string)
+                if attribute["linked"]:
+                    filter_string = "FILTER ({} = {})".format(
+                        obj,
+                        self.format_sparql_variable("{}{}_{}".format(
+                            attributes[attribute["linkedWith"]]["entity_label"],
+                            attributes[attribute["linkedWith"]]["entity_id"],
+                            attributes[attribute["linkedWith"]]["label"]
+                        ))
+                    )
                     filters.append(filter_string)
 
             # Category
@@ -467,7 +508,7 @@ class SparqlQueryBuilder(Params):
                 triple_string_2 = ""
                 triple_string_3 = ""
                 triple_string_4 = ""
-                if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands:
+                if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
@@ -501,7 +542,7 @@ class SparqlQueryBuilder(Params):
                     if attribute["visible"]:
                         self.selects.append(category_label)
                 # filters
-                if attribute["filterSelectedValues"] != [] and not attribute["optional"]:
+                if attribute["filterSelectedValues"] != [] and not attribute["optional"] and not attribute["linked"]:
                     filter_substrings_list = []
                     for value in attribute["filterSelectedValues"]:
                         if attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
@@ -513,6 +554,16 @@ class SparqlQueryBuilder(Params):
                             filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))
                     filter_substring = ' || '.join(filter_substrings_list)
                     filter_string = "FILTER ({})".format(filter_substring)
+                    filters.append(filter_string)
+                if attribute["linked"]:
+                    filter_string = "FILTER ({} = {})".format(
+                        category_value_uri,
+                        self.format_sparql_variable("{}{}_{}Category".format(
+                            attributes[attribute["linkedWith"]]["entity_label"],
+                            attributes[attribute["linkedWith"]]["entity_id"],
+                            attributes[attribute["linkedWith"]]["label"]
+                        ))
+                    )
                     filters.append(filter_string)
 
         from_string = self.get_froms_from_graphs(self.graphs)

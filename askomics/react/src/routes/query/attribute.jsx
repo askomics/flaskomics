@@ -21,6 +21,43 @@ export default class AttributeBox extends Component {
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
     this.handleFilterNumericSign = this.props.handleFilterNumericSign.bind(this)
     this.handleFilterNumericValue = this.props.handleFilterNumericValue.bind(this)
+    this.toggleLinkAttribute = this.props.toggleLinkAttribute.bind(this)
+    this.handleChangeLink = this.props.handleChangeLink.bind(this)
+  }
+
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
+  renderLinker () {
+    let options = []
+
+    this.props.graph.nodes.map(node => {
+      if (!node.suggested) {
+        options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)
+        this.props.graph.attr.map(attr => {
+          if (attr.id != this.props.attribute.id && attr.nodeId == node.id && attr.type == this.props.attribute.type) {
+            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false}>{attr.label}</option>)
+          }
+        })
+      }
+    })
+
+    return (
+        <CustomInput type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
+          <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
+          {options.map(opt => {
+            return opt
+          })}
+        </CustomInput>
+      )
   }
 
   renderText () {
@@ -39,6 +76,11 @@ export default class AttributeBox extends Component {
       negativIcon = 'attr-icon fas fa-not-equal'
     }
 
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
+    }
+
     let selected = {
       'exact': false,
       'regexp': false
@@ -51,13 +93,12 @@ export default class AttributeBox extends Component {
 
     selected[this.props.attribute.filterType] = true
 
-    return (
-      <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.label}</label>
-        <div className="attr-icons">
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
-        </div>
+    let form
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
         <table style={{ width: '100%' }}>
           <tr>
             <td>
@@ -79,6 +120,18 @@ export default class AttributeBox extends Component {
             </td>
           </tr>
         </table>
+      )
+    }
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        <div className="attr-icons">
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+        </div>
+        {form}
       </div>
     )
   }
@@ -92,6 +145,11 @@ export default class AttributeBox extends Component {
     let optionalIcon = 'attr-icon fas fa-question-circle inactive'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
+    }
+
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
     }
 
     let selected = {
@@ -114,13 +172,12 @@ export default class AttributeBox extends Component {
 
     selected[this.props.attribute.filterSign] = true
 
-    return (
-      <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.label}</label>
-        <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
-        </div>
+    let form
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
         <table style={{ width: '100%' }}>
           <tr>
             <td>
@@ -135,6 +192,18 @@ export default class AttributeBox extends Component {
             </td>
           </tr>
         </table>
+      )
+    }
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        <div className="attr-icons">
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+        </div>
+        {form}
       </div>
     )
   }
@@ -150,25 +219,37 @@ export default class AttributeBox extends Component {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let categoryFormGroup = (
-      <FormGroup>
-        <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
-          {this.props.attribute.filterValues.map(value => {
-            let selected = this.props.attribute.filterSelectedValues.includes(value.uri)
-            return (<option key={value.uri} attrId={this.props.attribute.uri} value={value.uri} selected={selected}>{value.label}</option>)
-          })}
-        </CustomInput>
-      </FormGroup>
-    )
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
+    }
+
+    let form
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
+        <FormGroup>
+          <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
+            {this.props.attribute.filterValues.map(value => {
+              let selected = this.props.attribute.filterSelectedValues.includes(value.uri)
+              return (<option key={value.uri} attrId={this.props.attribute.uri} value={value.uri} selected={selected}>{value.label}</option>)
+            })}
+          </CustomInput>
+        </FormGroup>
+      )
+    }
 
     return (
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
-        {categoryFormGroup}
+        {form}
       </div>
     )
   }

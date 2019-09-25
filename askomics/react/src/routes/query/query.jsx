@@ -216,7 +216,9 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        negative: false
+        negative: false,
+        linked: false,
+        linkedWith: null
       })
     }
 
@@ -234,7 +236,9 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        negative: false
+        negative: false,
+        linked: false,
+        linkedWith: null
       })
       firstAttrVisibleForBnode = false
     }
@@ -255,6 +259,8 @@ export default class Query extends Component {
           nodeAttribute.faldo = attr.faldo
           nodeAttribute.optional = false
           nodeAttribute.negative = false
+          nodeAttribute.linked = false
+          nodeAttribute.linkedWith = null
 
           firstAttrVisibleForBnode = false
 
@@ -861,6 +867,27 @@ export default class Query extends Component {
     }
   }
 
+  toggleLinkAttribute (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linked = !attr.linked
+        if (!attr.linked) {
+          attr.linkedWith = null
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleChangeLink (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedWith = parseInt(event.target.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
   // Link view methods -----------------------------
 
   handleChangePosition (event) {
@@ -1096,6 +1123,8 @@ export default class Query extends Component {
             return (
               <AttributeBox
                 attribute={attribute}
+                graph={this.state.graphState}
+                handleChangeLink={p => this.handleChangeLink(p)}
                 toggleVisibility={p => this.toggleVisibility(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
@@ -1104,6 +1133,7 @@ export default class Query extends Component {
                 handleFilterCategory={p => this.handleFilterCategory(p)}
                 handleFilterNumericSign={p => this.handleFilterNumericSign(p)}
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
+                toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
               />
             )
           }
