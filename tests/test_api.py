@@ -37,7 +37,7 @@ class TestApi(AskomicsTestCase):
             "disableIntegration": app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": app.iniconfig.get('triplestore', 'prefix'),
             "namespace": app.iniconfig.get('triplestore', 'namespace'),
-            "proxyPath": None,
+            "proxyPath": "/",
             "user": {},
             "logged": False
         }
