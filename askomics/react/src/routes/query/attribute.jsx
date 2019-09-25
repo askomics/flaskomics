@@ -278,5 +278,8 @@ AttributeBox.propTypes = {
   handleFilterCategory: PropTypes.func,
   handleFilterNumericSign: PropTypes.func,
   handleFilterNumericValue: PropTypes.func,
-  attribute: PropTypes.object
+  toggleLinkAttribute: PropTypes.func,
+  handleChangeLink: PropTypes.func,
+  attribute: PropTypes.object,
+  graph: PropTypes.object
 }

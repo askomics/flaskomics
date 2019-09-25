@@ -34,7 +34,9 @@
             "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
             "type": "uri",
             "filterType": "exact",
-            "filterValue": ""
+            "filterValue": "",
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 3,
@@ -48,7 +50,9 @@
             "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
             "type": "text",
             "filterType": "exact",
-            "filterValue": ""
+            "filterValue": "",
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 4,
@@ -62,7 +66,9 @@
             "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
             "type": "decimal",
             "filterSign": "=",
-            "filterValue": ""
+            "filterValue": "",
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 5,
@@ -85,7 +91,9 @@
                     "uri": "http://www.semanticweb.org/user/ontologies/2018/1#-"
                 }
             ],
-            "filterSelectedValues": []
+            "filterSelectedValues": [],
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 6,
@@ -99,7 +107,9 @@
             "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
             "type": "decimal",
             "filterSign": "=",
-            "filterValue": ""
+            "filterValue": "",
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 7,
@@ -134,7 +144,9 @@
                     "uri": "http://www.semanticweb.org/user/ontologies/2018/1#BN2"
                 }
             ],
-            "filterSelectedValues": []
+            "filterSelectedValues": [],
+            "linked": false,
+            "linkedWith": null
         },
         {
             "id": 8,
@@ -157,7 +169,9 @@
                     "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Brassica%20napus"
                 }
             ],
-            "filterSelectedValues": []
+            "filterSelectedValues": [],
+            "linked": false,
+            "linkedWith": null
         }
     ]
 }
