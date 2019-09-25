@@ -95,6 +95,19 @@ export default class Visualization extends Component {
     }
   }
 
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
+
+
   drawNode (node, ctx, globalScale) {
     // node style
     let unselectedColor = node.faldo ? this.colorGreen : this.colorGrey
@@ -116,7 +129,8 @@ export default class Visualization extends Component {
     ctx.font = this.nodeSize + 'px Sans-Serif'
     ctx.textAlign = 'middle'
     ctx.textBaseline = 'middle'
-    ctx.fillText(node.label, node.x + this.nodeSize, node.y + this.nodeSize)
+    let label = node.humanId ? node.label + " " + this.subNums(node.humanId) : node.label
+    ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
     ctx.closePath()
   }
 

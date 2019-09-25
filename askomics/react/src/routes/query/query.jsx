@@ -89,6 +89,16 @@ export default class Query extends Component {
     return this.idNumber
   }
 
+  getHumanNodeId (uri) {
+    let humanIds = [0, ]
+    this.state.graphState.nodes.map(node => {
+      if (node.uri == uri) {
+        humanIds.push(node.humanId)
+      }
+    })
+    return Math.max(...humanIds) + 1
+  }
+
   entityExist (uri) {
     let result = false
     this.state.abstraction.entities.forEach(entity => {
@@ -275,6 +285,7 @@ export default class Query extends Component {
     Insert a new node in the graphState
     */
     let nodeId = this.getId()
+    let humanId = this.getHumanNodeId(uri)
     let node = {
       uri: uri,
       type: this.getType(uri),
@@ -282,6 +293,7 @@ export default class Query extends Component {
       filterLink: "",
       graphs: this.getGraphs(uri),
       id: nodeId,
+      humanId: humanId,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -390,6 +402,7 @@ export default class Query extends Component {
               filterLink: "",
               graphs: this.getGraphs(relation.target),
               id: targetId,
+              humanId: null,
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
@@ -428,6 +441,7 @@ export default class Query extends Component {
               filterLink: "",
               graphs: this.getGraphs(relation.source),
               id: sourceId,
+              humanId: null,
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
@@ -464,6 +478,7 @@ export default class Query extends Component {
             filterLink: "",
             graphs: this.getGraphs(entity.uri),
             id: new_id,
+            humanId: null,
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
@@ -573,6 +588,7 @@ export default class Query extends Component {
       if (node.id == inode.id) {
         inode.selected = true
         inode.suggested = false
+        inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
     // get attributes
