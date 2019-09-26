@@ -182,6 +182,24 @@ class Result(Params):
             return self.format_graph_state(self.graph_state)
         return self.graph_state
 
+    def update_celery(self, celery_id):
+        """Update celery id of result in database
+
+        Parameters
+        ----------
+        celery_id : string
+            DescriThe celery idption
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        celery_id=?
+        WHERE user_id = ? AND id = ?
+        '''
+
+        database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
+
     def set_celery_id(self, celery_id):
         """Set celery id
 

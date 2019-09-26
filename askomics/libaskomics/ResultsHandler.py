@@ -33,6 +33,7 @@ class ResultsHandler(Params):
         """
         for file_id in files_id:
             result = Result(self.app, self.session, {"id": file_id})
+            self.app.celery.control.revoke(result.celery_id, terminate=True)
             result.delete_result()
 
         return self.get_files_info()

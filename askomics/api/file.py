@@ -244,7 +244,7 @@ def integrate():
 
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
 
-            current_app.logger.debug(task)
+            dataset.update_celery(task.id)
 
     except Exception as e:
         return jsonify({

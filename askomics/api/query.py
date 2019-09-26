@@ -141,6 +141,7 @@ def save_result():
 
         session_dict = {"user": session["user"]}
         task = current_app.celery.send_task("query", (session_dict, info))
+        result.update_celery(task.id)
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
