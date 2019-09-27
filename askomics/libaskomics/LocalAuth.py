@@ -163,6 +163,7 @@ class LocalAuth(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
@@ -181,7 +182,7 @@ class LocalAuth(Params):
         # Store user in db
         user_id = database.execute_sql_query(
             query, (ldap, inputs['fname'], inputs['lname'], inputs['username'],
-                    inputs['email'], sha512_pw, salt, api_key, admin, blocked), True)
+                    inputs['email'], sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
 
         # Return user infos
         return {
