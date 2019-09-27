@@ -22,7 +22,6 @@ def get_users():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-
     try:
         local_auth = LocalAuth(current_app, session)
         all_users = local_auth.get_all_users()
@@ -67,6 +66,39 @@ def set_admin():
         }), 500
 
     return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/setquota', methods=["POST"])
+@admin_required
+def set_quota():
+    """Change quota of a user
+
+    Returns
+    -------
+    json
+        users: updated users
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+
+    try:
+        local_auth = LocalAuth(current_app, session)
+        local_auth.set_quota(data['quota'], data['username'])
+        all_users = local_auth.get_all_users()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'users': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'users': all_users,
         'error': False,
         'errorMessage': ''
     })

@@ -38,6 +38,52 @@ class Utils():
         """return the union of two lists"""
         return list(set(a) | set(b))
 
+    @staticmethod
+    def humansize_to_bytes(hsize):
+        """Convert human-readable string into bytes
+
+        Parameters
+        ----------
+        hsize : string
+            Human readable string
+
+        Returns
+        -------
+        int
+            Bytes
+        """
+        units = {
+            "b": 1,
+            "kb": 10**3,
+            "mb": 10**6,
+            "gb": 10**9,
+            "tb": 10**12,
+            "o": 1,
+            "ko": 10**3,
+            "mo": 10**6,
+            "go": 10**9,
+            "to": 10**12,
+            "": 1,
+            "k": 10**3,
+            "m": 10**6,
+            "g": 10**9,
+            "t": 10**12
+        }
+
+        number = ""
+        unit = ""
+        for char in ''.join(hsize.lower().split()):
+
+            if char.isdigit():
+                number += char
+            else:
+                unit += char.lower()
+        number = int(number)
+
+        if number == 0:
+            return 0
+        return int(float(number) * units[unit])
+
 
 class cached_property(object):
     """Like @property on a member function, but also cache the calculation in

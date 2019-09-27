@@ -680,7 +680,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, u.quota, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         GROUP BY u.user_id
@@ -700,12 +700,13 @@ class LocalAuth(Params):
                 user['email'] = row[5]
                 user['admin'] = row[6]
                 user['blocked'] = row[7]
+                user['quota'] = row[8]
                 user['galaxy'] = None
 
-                if row[8] is not None and row[9] is not None:
+                if row[9] is not None and row[10] is not None:
                     user['galaxy'] = {
-                        'url': row[8],
-                        'apikey': row[9]
+                        'url': row[9],
+                        'apikey': row[10]
                     }
 
                 users.append(user)
@@ -751,3 +752,23 @@ class LocalAuth(Params):
         '''
 
         database.execute_sql_query(query, (new_status, username))
+
+    def set_quota(self, quota, username):
+        """Set a new quota to a user
+
+        Parameters
+        ----------
+        quota : int
+            New quota
+        username : string
+            The concerned username
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE users
+        SET quota=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (Utils.humansize_to_bytes(quota), username))

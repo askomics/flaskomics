@@ -3,6 +3,7 @@ import sqlite3
 import textwrap
 
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Utils import Utils
 
 
 class Database(Params):
@@ -89,10 +90,28 @@ class Database(Params):
             salt text,
             apikey text,
             admin boolean,
-            blocked boolean
+            blocked boolean,
+            quota INTEGER
         )
         '''
         self.execute_sql_query(query)
+        self.update_users_table()
+
+    def update_users_table(self):
+        """Add the quota col on the users table
+
+        Update the users table for the instance who don't have this column
+        """
+        default_quota = Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))
+
+        query = '''
+        ALTER TABLE users
+        ADD quota INTEGER NOT NULL DEFAULT {}
+        '''.format(default_quota)
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
 
     def create_galaxy_table(self):
         """Create the galaxy table"""
@@ -165,22 +184,6 @@ class Database(Params):
         )
         '''
         self.execute_sql_query(query)
-        self.update_results_table()
-
-    def update_results_table(self):
-        """Add the description col on the results table
-
-        Update the results table for the instance who don't have this column
-        """
-        query = '''
-        ALTER TABLE results
-                ADD description text NULL
-            DEFAULT ('')
-        '''
-        try:
-            self.execute_sql_query(query)
-        except Exception:
-            pass
 
     def create_endpoints_table(self):
         """Create the endpoints table"""
