@@ -64,7 +64,8 @@ def create_users(dir_path):
         "salt": "0000000000",
         "email": "jdoe@askomics.org",
         "apikey": "0000000000",
-        "galaxy": None
+        "galaxy": None,
+        "quota": 0
     }
     uinfo_2 = {
         "fname": "Jane",
@@ -74,7 +75,8 @@ def create_users(dir_path):
         "salt": "0000000000",
         "email": "jsmith@askomics.org",
         "apikey": "0000000000",
-        "galaxy": None
+        "galaxy": None,
+        "quota": 0
     }
 
     auth = LocalAuth(current_app, {})
