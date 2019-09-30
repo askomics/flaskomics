@@ -194,6 +194,7 @@ class LocalAuth(Params):
             'email': inputs['email'],
             'admin': admin,
             'blocked': blocked,
+            'quota': Utils.humansize_to_bytes(self.settings.get("askomics", "quota")),
             'apikey': api_key,
             'galaxy': None
         }
@@ -338,6 +339,8 @@ class LocalAuth(Params):
         error = False
         error_messages = []
         user = {}
+
+        database = Database(self.app, self.session)
 
         query = '''
         SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey

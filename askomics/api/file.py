@@ -4,6 +4,7 @@ import traceback
 
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
@@ -31,16 +32,19 @@ def get_files():
     try:
         files_handler = FilesHandler(current_app, session)
         files = files_handler.get_files_infos(files_id=files_id)
+        disk_space = files_handler.get_size_occupied_by_user()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'files': [],
+            'diskSpace': 0,
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'files': files,
+        'diskSpace': disk_space,
         'error': False,
         'errorMessage': ''
     })
@@ -58,6 +62,16 @@ def upload_chunk():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+    files_utils = FilesUtils(current_app, session)
+    disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+    if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+        return jsonify({
+            'errorMessage': "Exceeded quota",
+            "path": '',
+            "error": True
+        }), 500
+
     data = request.get_json()
 
     try:
@@ -87,6 +101,15 @@ def upload_url():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+    files_utils = FilesUtils(current_app, session)
+    disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+    if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+        return jsonify({
+            'errorMessage': "Exceeded quota",
+            "error": True
+        }), 500
+
     data = request.get_json()
 
     try:
@@ -116,6 +139,15 @@ def upload():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+    files_utils = FilesUtils(current_app, session)
+    disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+    if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+        return jsonify({
+            'errorMessage': "Exceeded quota",
+            "uploadedFiles": [],
+            "error": True
+        }), 500
     inputs = request.files
 
     try:

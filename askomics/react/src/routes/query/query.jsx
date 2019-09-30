@@ -1053,7 +1053,9 @@ export default class Query extends Component {
           console.log(requestUrl, response.data)
           this.setState({
             waiting: false,
-            abstraction: response.data.abstraction
+            abstraction: response.data.abstraction,
+            diskSpace: response.data.diskSpace,
+            exceededQuota: this.state.config.user.quota > 0 && response.data.diskSpace >= this.state.config.user.quota,
           })
         })
         .catch(error => {
@@ -1087,6 +1089,20 @@ export default class Query extends Component {
     }
   }
 
+  humanFileSize (bytes, si) {
+    let thresh = si ? 1000 : 1024
+    if (Math.abs(bytes) < thresh) {
+      return bytes + ' B'
+    }
+    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+    let u = -1
+    do {
+      bytes /= thresh
+      ++u
+    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
+    return bytes.toFixed(1) + ' ' + units[u]
+  }
+
   render () {
     // login page redirection
     let redirectLogin
@@ -1101,6 +1117,20 @@ export default class Query extends Component {
         <div>
           <Alert color="danger">
             <i className="fas fa-exclamation-circle"></i> {this.state.errorMessage}
+          </Alert>
+        </div>
+      )
+    }
+
+    // Warning disk space
+    let warningDiskSpace
+    if (this.state.exceededQuota) {
+      warningDiskSpace = (
+        <div>
+          <Alert color="warning">
+              Your files (uploaded files and results) take {this.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Please delete some before save queries or contact an admin to increase your quota
           </Alert>
         </div>
       )
@@ -1180,7 +1210,7 @@ export default class Query extends Component {
       // buttons
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
       if (this.state.config.logged) {
-        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {
         removeButton = (
@@ -1240,6 +1270,7 @@ export default class Query extends Component {
             </div>
           </Col>
         </Row>
+        {warningDiskSpace}
         <ButtonGroup>
           {previewButton}
           {launchQueryButton}

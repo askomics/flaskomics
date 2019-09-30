@@ -5,6 +5,7 @@ import traceback
 import json
 
 from askomics.api.auth import login_required
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Galaxy import Galaxy
 
 from flask import (Blueprint, current_app, jsonify, request, session)
@@ -96,6 +97,15 @@ def upload_datasets():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+    files_utils = FilesUtils(current_app, session)
+    disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+    if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+        return jsonify({
+            'errorMessage': "Exceeded quota",
+            "error": True
+        }), 500
+
     datasets_id = request.get_json()["datasets_id"]
 
     try:

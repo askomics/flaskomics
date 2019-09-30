@@ -2,6 +2,7 @@ import sys
 import traceback
 
 from askomics.api.auth import login_required
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
@@ -62,14 +63,18 @@ def get_abstraction():
     try:
         tse = TriplestoreExplorer(current_app, session)
         abstraction = tse.get_abstraction()
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
+            'diskSpace': disk_space,
             'abstraction': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
     return jsonify({
+        'diskSpace': disk_space,
         'abstraction': abstraction,
         'error': False,
         'errorMessage': ''
@@ -129,6 +134,16 @@ def save_result():
         errorMessage: the error message of error, else an empty string
     """
     try:
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+        if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+            return jsonify({
+                'error': True,
+                'errorMessage': "Exceeded quota",
+                'task_id': None
+            }), 500
+
         graph_state = request.get_json()["graphState"]
 
         info = {

@@ -15,6 +15,7 @@ export default class Upload extends Component {
       errorMessage: null,
       integration: false,
       files: [],
+      exceededQuota: false,
       selected: [],
       waiting: true
     }
@@ -30,6 +31,8 @@ export default class Upload extends Component {
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
+            diskSpace: response.data.diskSpace,
+            exceededQuota: this.props.config.user.quota > 0 && response.data.diskSpace >= this.props.config.user.quota,
             files: response.data.files,
             waiting: false
           })
@@ -89,6 +92,20 @@ export default class Upload extends Component {
     return this.state.selected.length == 0
   }
 
+  humanFileSize (bytes, si) {
+    let thresh = si ? 1000 : 1024
+    if (Math.abs(bytes) < thresh) {
+      return bytes + ' B'
+    }
+    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+    let u = -1
+    do {
+      bytes /= thresh
+      ++u
+    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
+    return bytes.toFixed(1) + ' ' + units[u]
+  }
+
   render () {
     let redirectLogin
     if (this.state.status == 401) {
@@ -106,13 +123,28 @@ export default class Upload extends Component {
       }} />
     }
 
+
+    let warningDiskSpace
+    if (this.state.exceededQuota) {
+      warningDiskSpace = (
+        <div>
+          <Alert color="warning">
+              Your files (uploaded files and results) take {this.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.humanFileSize(this.props.config.user.quota, true)} allowed). 
+              Please delete some before uploading or contact an admin to increase your quota
+          </Alert>
+        </div>
+      )
+    }
+
     return (
       <div className="container">
         {redirectLogin}
         {redirectIntegration}
         <h2>Upload</h2>
         <hr />
-        <UploadModal setStateUpload={p => this.setState(p)} config={this.props.config} />
+        {warningDiskSpace}
+        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <br />

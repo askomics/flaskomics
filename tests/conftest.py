@@ -339,6 +339,7 @@ def client_logged_as_jdoe():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
+            'quota': 0,
             'apikey': "0000000000",
             "galaxy": None
         }
@@ -380,6 +381,7 @@ def client_logged_as_jsmith():
             'email': "jsmith@askomics.org",
             'admin': False,
             'blocked': False,
+            'quota': 0,
             'apikey': "0000000000",
             "galaxy": None
         }
@@ -425,6 +427,7 @@ def client_logged_as_jdoe_with_data():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
+            'quota': 0,
             'apikey': "0000000000",
             "galaxy": None
         }
@@ -493,6 +496,7 @@ def client_logged_as_jdoe_with_data_and_result():
             'email': "jdoe@askomics.org",
             'admin': True,
             'blocked': False,
+            'quota': 0,
             'apikey': "0000000000",
             "galaxy": None
         }

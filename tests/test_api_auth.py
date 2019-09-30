@@ -127,6 +127,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jwick@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -144,6 +145,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jwick@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -232,6 +234,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -252,6 +255,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -269,6 +273,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -313,6 +318,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -332,6 +338,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -350,6 +357,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -369,6 +377,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -387,6 +396,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdodo@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -406,6 +416,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdodo@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -424,6 +435,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdododo@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -443,6 +455,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdododo@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -487,6 +500,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -506,6 +520,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -525,6 +540,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -544,6 +560,7 @@ class TestApiAuth(AskomicsTestCase):
                 'email': "jdoe@askomics.org",
                 'admin': True,
                 'blocked': False,
+                'quota': 0,
                 'apikey': "0000000000",
                 'galaxy': None
             }
@@ -557,7 +574,7 @@ class TestApiAuth(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["user"]) == 10
+        assert len(response.json["user"]) == 11
         assert response.json["user"]["id"] == 1
         assert not response.json["user"]["ldap"]
         assert response.json["user"]["fname"] == "John"
@@ -566,6 +583,7 @@ class TestApiAuth(AskomicsTestCase):
         assert response.json["user"]["email"] == "jdoe@askomics.org"
         assert response.json["user"]["admin"]
         assert not response.json["user"]["blocked"]
+        assert response.json["user"]["quota"] == 0
         assert not response.json["user"]["apikey"] == "0000000000"
         assert response.json["user"]["galaxy"] is None
 
