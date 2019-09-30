@@ -282,6 +282,11 @@ class Result(Params):
             List of results headers
         results : list
             Query results
+
+        Returns
+        -------
+        int
+            File size
         """
         with open(self.file_path, 'w') as file:
             writer = csv.writer(file, delimiter="\t")
@@ -293,6 +298,8 @@ class Result(Params):
                     for header, value in i.items():
                         row.append(value)
                     writer.writerow(row)
+
+        return os.path.getsize(self.file_path)
 
     def save_in_db(self):
         """Save results file info into the database"""
@@ -313,7 +320,8 @@ class Result(Params):
             NULL,
             NULL,
             ?,
-            ?
+            ?,
+            NULL
         )
         '''
 
@@ -350,7 +358,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, status, update_celery=False, error=False, error_message=None):
+    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None):
         """Update status of results in db
 
         Parameters
@@ -365,42 +373,43 @@ class Result(Params):
         if update_celery:
             update_celery_substr = "celery_id=?,"
 
+        size_string = ""
+        if size:
+            size_string = "size=?,"
+
         self.end = int(time.time())
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE results SET
-        {}
+        {celery}
+        {size}
         status=?,
         end=?,
         path=?,
         nrows=?,
         error=?
         WHERE user_id=? AND id=?
-        '''.format(update_celery_substr)
+        '''.format(celery=update_celery_substr, size=size_string)
+
+        variables = [
+            status,
+            self.end,
+            self.file_path,
+            self.nrows,
+            message,
+            self.session["user"]["id"],
+            self.id
+        ]
+
+        if size:
+            variables.insert(0, size)
 
         if update_celery:
-            database.execute_sql_query(query, (
-                self.celery_id,
-                status,
-                self.end,
-                self.file_path,
-                self.nrows,
-                message,
-                self.session["user"]["id"],
-                self.id
-            ))
-        else:
-            database.execute_sql_query(query, (
-                status,
-                self.end,
-                self.file_path,
-                self.nrows,
-                message,
-                self.session["user"]["id"],
-                self.id
-            ))
+            variables.insert(0, self.celery_id)
+
+        database.execute_sql_query(query, tuple(variables))
 
     def rollback(self):
         """Delete file"""

@@ -161,10 +161,10 @@ def query(self, session, info):
             headers, results = query_launcher.process_query(query)
 
         # write result to a file
-        result.save_result_in_file(headers, results)
+        file_size = result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status("success")
+        result.update_db_status("success", size=file_size)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

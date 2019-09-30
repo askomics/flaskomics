@@ -180,10 +180,24 @@ class Database(Params):
             error text,
             public boolean,
             description text,
+            size int,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
         self.execute_sql_query(query)
+        self.update_results_table()
+
+    def update_results_table(self):
+        """Add the size col on the results table"""
+        query = '''
+        ALTER TABLE results
+        ADD size int NULL
+        DEFAULT(null)
+        '''
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
 
     def create_endpoints_table(self):
         """Create the endpoints table"""

@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, description
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size
         FROM results
         WHERE user_id = ?
         '''
@@ -69,7 +69,8 @@ class ResultsHandler(Params):
                 'nrows': row[6],
                 'errorMessage': row[7],
                 'public': row[8],
-                'description': row[9]
+                'description': row[9],
+                'size': row[10]
             })
 
         return files
