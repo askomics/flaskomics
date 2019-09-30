@@ -74,15 +74,15 @@ class Utils():
         unit = ""
         for char in ''.join(hsize.lower().split()):
 
-            if char.isdigit():
+            if char.isdigit() or char == ".":
                 number += char
             else:
                 unit += char.lower()
-        number = int(number)
+        number = float(number)
 
         if number == 0:
             return 0
-        return int(float(number) * units[unit])
+        return int(number * units[unit])
 
 
 class cached_property(object):
