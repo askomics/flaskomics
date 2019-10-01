@@ -40,6 +40,9 @@ disable_integration = false
 # Exemple: 500M, 1G ...
 quota = 0
 
+# Github URL of the project
+github = https://github.com/askomics/flaskomics
+
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
