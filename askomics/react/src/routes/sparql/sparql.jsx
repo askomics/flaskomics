@@ -97,7 +97,7 @@ export default class Sparql extends Component {
         </div>
 
         <br />
-        <Button onClick={this.launchQuery} color="secondary">Launch query</Button>
+        <Button onClick={this.launchQuery} color="secondary">Preview results</Button>
         <br />
         <br />
 

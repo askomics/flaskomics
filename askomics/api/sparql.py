@@ -53,7 +53,7 @@ def query():
         query_builder = SparqlQueryBuilder(current_app, session)
         query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True)
 
-        query = query_builder.format_query(q, replace_froms=False)
+        query = query_builder.format_query(q, replace_froms=True)
         # header, data = query_launcher.process_query(query)
         header = query_builder.selects
         data = []
