@@ -21,7 +21,7 @@ export default class Sparql extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      config: this.props.location.config,
+      config: this.props.location.state.config,
       results_data: [],
       results_header: [],
       error: false,
