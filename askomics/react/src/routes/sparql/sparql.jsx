@@ -16,10 +16,12 @@ import 'brace/theme/tomorrow'
 import dedent from 'dedent'
 
 import ResultsTable from './resultstable'
+import Utils from '../../classes/utils'
 
 export default class Sparql extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       config: this.props.location.state.config,
       results_data: [],
@@ -27,8 +29,8 @@ export default class Sparql extends Component {
       error: false,
       errorMessage: null,
       sparqlInput: this.props.location.state.sparqlQuery,
-      exceededQuota: false,
-
+      exceededQuota: this.props.location.state.config.user.quota > 0 && this.props.location.state.diskSpace >= this.props.location.state.config.user.quota,
+      diskSpace: this.props.location.state.diskSpace,
       // save query icons
       disableSave: false,
       saveIcon: "play",
@@ -128,11 +130,26 @@ export default class Sparql extends Component {
       )
     }
 
+    // Warning disk space
+    let warningDiskSpace
+    if (this.state.exceededQuota) {
+      warningDiskSpace = (
+        <div>
+          <Alert color="warning">
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Please delete some before save queries or contact an admin to increase your quota
+          </Alert>
+        </div>
+      )
+    }
+
     return (
       <div className="container">
         <h2>SPARQL query</h2>
         <hr />
         <br />
+        {warningDiskSpace}
         <div>
           <AceEditor
             mode="sparql"

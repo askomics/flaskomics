@@ -132,7 +132,8 @@ export default class ResultsFilesTable extends Component {
       console.log(requestUrl, response.data)
       this.setState({
         redirectSparqlEditor: true,
-        sparqlQuery: response.data.query
+        sparqlQuery: response.data.query,
+        diskSpace: response.data.diskSpace
       })
     })
     .catch(error => {
@@ -228,7 +229,7 @@ export default class ResultsFilesTable extends Component {
       redirectSparqlEditor = <Redirect to={{
         pathname: '/sparql',
         state: {
-          redo: true,
+          diskSpace: this.state.diskSpace,
           sparqlQuery: this.state.sparqlQuery,
           config: this.props.config
         }

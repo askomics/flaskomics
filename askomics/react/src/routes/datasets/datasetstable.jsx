@@ -10,6 +10,7 @@ import Utils from '../../classes/utils'
 export default class DatasetsTable extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.togglePublicDataset = this.togglePublicDataset.bind(this)
