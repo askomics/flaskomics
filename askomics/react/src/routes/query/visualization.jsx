@@ -25,6 +25,7 @@ export default class Visualization extends Component {
     this.colorGrey = '#808080'
     this.colorDarkGrey = '#404040'
     this.colorFirebrick = '#cc0000'
+    this.colorGreen = '#005500FF'
     this.lineWidth = 0.5
     this.nodeSize = 3
     this.blankNodeSize = 1
@@ -32,6 +33,7 @@ export default class Visualization extends Component {
 
     this.cancelRequest
     this.handleNodeSelection = this.props.handleNodeSelection.bind(this)
+    this.handleLinkSelection = this.props.handleLinkSelection.bind(this)
     this.drawNode = this.drawNode.bind(this)
     this.drawLink = this.drawLink.bind(this)
   }
@@ -93,11 +95,26 @@ export default class Visualization extends Component {
     }
   }
 
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
+
+
   drawNode (node, ctx, globalScale) {
     // node style
+    let unselectedColor = node.faldo ? this.colorGreen : this.colorGrey
+    let unselectedColorText = node.faldo ? this.colorGreen : this.colorDarkGrey
     ctx.fillStyle = node.type == "node" ? this.stringToHexColor(node.uri) : "#ffffff"
     ctx.lineWidth = this.lineWidth
-    ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
+    ctx.strokeStyle = node.selected ? this.colorFirebrick : unselectedColor
     ctx.globalAlpha = node.suggested ? 0.5 : 1
     node.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
     // draw node
@@ -108,19 +125,25 @@ export default class Visualization extends Component {
     ctx.closePath()
     // draw text
     ctx.beginPath()
-    ctx.fillStyle = this.colorDarkGrey
+    ctx.fillStyle = unselectedColorText
     ctx.font = this.nodeSize + 'px Sans-Serif'
     ctx.textAlign = 'middle'
     ctx.textBaseline = 'middle'
-    ctx.fillText(node.label, node.x + this.nodeSize, node.y + this.nodeSize)
+    let label = node.humanId ? node.label + " " + this.subNums(node.humanId) : node.label
+    ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
     ctx.closePath()
   }
 
   drawLink (link, ctx, globalScale) {
     // link style
     link.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
-    ctx.strokeStyle = this.colorGrey
-    ctx.fillStyle = this.colorGrey
+
+    let greenArray = ["included_in", "overlap_with"]
+    let unselectedColor = greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorGrey
+    let unselectedColorText = greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorDarkGrey
+    ctx.strokeStyle = link.selected ? this.colorFirebrick : unselectedColor
+
+    ctx.fillStyle = link.selected ? this.colorFirebrick : greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorGrey
     ctx.globalAlpha = link.suggested ? 0.3 : 1
     ctx.lineWidth = this.lineWidth
     // draw link (from source to target)
@@ -141,7 +164,7 @@ export default class Visualization extends Component {
     ctx.closePath()
     // draw text
     ctx.beginPath()
-    ctx.fillStyle = this.colorDarkGrey
+    ctx.fillStyle = unselectedColorText
     ctx.font = this.nodeSize - 0.5 + 'px Sans-Serif'
     ctx.textAlign = 'middle'
     ctx.textBaseline = 'middle'
@@ -164,6 +187,7 @@ export default class Visualization extends Component {
           height={this.h}
           backgroundColor="Gainsboro"
           onNodeClick={this.handleNodeSelection}
+          onLinkClick={this.handleLinkSelection}
           nodeCanvasObject={this.drawNode}
           linkCanvasObject={this.drawLink}
         />
@@ -175,5 +199,6 @@ export default class Visualization extends Component {
 Visualization.propTypes = {
   divHeight: PropTypes.number,
   handleNodeSelection: PropTypes.object,
+  handleLinkSelection: PropTypes.object,
   graphState: PropTypes.object
 }

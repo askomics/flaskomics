@@ -4,14 +4,14 @@ import requests
 
 from askomics.libaskomics.BedFile import BedFile
 from askomics.libaskomics.CsvFile import CsvFile
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.GffFile import GffFile
 from askomics.libaskomics.RdfFile import RdfFile
 from askomics.libaskomics.Database import Database
-from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 
 
-class FilesHandler(Params):
+class FilesHandler(FilesUtils):
     """Handle files
 
     Attributes
@@ -36,7 +36,7 @@ class FilesHandler(Params):
         host_url : None, optional
             AskOmics url, for the triplestore
         """
-        Params.__init__(self, app, session)
+        FilesUtils.__init__(self, app, session)
         self.files = []
         self.host_url = host_url
         self.upload_path = "{}/{}_{}/upload".format(

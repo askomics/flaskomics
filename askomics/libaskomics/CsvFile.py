@@ -43,7 +43,7 @@ class CsvFile(File):
         File.__init__(self, app, session, file_info, host_url)
         self.preview_limit = 30
         try:
-            self.preview_limit = self.settings.get_int("askomics", "npreview")
+            self.preview_limit = self.settings.getint("askomics", "npreview")
         except Exception:
             pass
         self.header = []
@@ -424,6 +424,11 @@ class CsvFile(File):
                 faldo_start = None
                 faldo_end = None
 
+                # Position
+                start = None
+                end = None
+                reference = None
+
                 # For attributes, loop on cell
                 for column_number, cell in enumerate(row):
                     current_type = self.columns_type[column_number]
@@ -455,6 +460,7 @@ class CsvFile(File):
                             self.category_values[current_header].add(cell)
                         if current_type == 'reference':
                             faldo_reference = self.askomics_prefix[self.format_uri(cell)]
+                            reference = cell
                             self.faldo_abstraction["reference"] = potential_relation
                         elif current_type == 'strand':
                             faldo_strand = self.get_faldo_strand(cell)
@@ -468,9 +474,11 @@ class CsvFile(File):
                         potential_relation = self.askomics_prefix[self.format_uri(current_header, remove_space=True)]
                         if current_type == "start":
                             faldo_start = rdflib.Literal(self.convert_type(cell))
+                            start = cell
                             self.faldo_abstraction["start"] = potential_relation
                         elif current_type == "end":
                             faldo_end = rdflib.Literal(self.convert_type(cell))
+                            end = cell
                             self.faldo_abstraction["end"] = potential_relation
                         else:
                             relation = potential_relation
@@ -490,27 +498,38 @@ class CsvFile(File):
 
                 if self.faldo_entity and faldo_start and faldo_end:
                     location = BNode()
-                    begin = BNode()
-                    end = BNode()
+                    begin_node = BNode()
+                    end_node = BNode()
 
                     self.graph_chunk.add((entity, self.faldo.location, location))
 
                     self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
-                    self.graph_chunk.add((location, self.faldo.begin, begin))
-                    self.graph_chunk.add((location, self.faldo.end, end))
+                    self.graph_chunk.add((location, self.faldo.begin, begin_node))
+                    self.graph_chunk.add((location, self.faldo.end, end_node))
 
-                    self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
-                    self.graph_chunk.add((begin, self.faldo.position, faldo_start))
+                    self.graph_chunk.add((begin_node, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((begin_node, self.faldo.position, faldo_start))
 
-                    self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-                    self.graph_chunk.add((end, self.faldo.position, faldo_end))
+                    self.graph_chunk.add((end_node, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((end_node, self.faldo.position, faldo_end))
 
                     if faldo_reference:
-                        self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
-                        self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((begin_node, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((end_node, self.faldo.reference, faldo_reference))
 
                     if faldo_strand:
-                        self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
-                        self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
+                        self.graph_chunk.add((begin_node, rdflib.RDF.type, faldo_strand))
+                        self.graph_chunk.add((end_node, rdflib.RDF.type, faldo_strand))
+
+                    # blocks
+                    block_base = self.settings.getint("triplestore", "block_size")
+                    block_start = int(start) // block_base
+                    block_end = int(end) // block_base
+
+                    for slice_block in range(block_start, block_end + 1):
+                        self.graph_chunk.add((entity, self.askomics_namespace['includeIn'], rdflib.Literal(int(slice_block))))
+                        if reference:
+                            block_reference = self.askomics_prefix[self.format_uri("{}_{}".format(reference, slice_block))]
+                            self.graph_chunk.add((entity, self.askomics_namespace["includeInReference"], block_reference))
 
                 yield

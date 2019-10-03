@@ -99,7 +99,7 @@ def create_celery(app):
     Celery
         Celery object
     """
-    celery = Celery(app.import_name, broker=app.iniconfig.get("celery", "broker_url"))
+    celery = Celery(app.import_name, backend=app.iniconfig.get("celery", "result_backend"), broker=app.iniconfig.get("celery", "broker_url"))
     # celery.conf.update(app.config)
     task_base = celery.Task
 

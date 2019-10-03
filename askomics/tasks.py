@@ -62,7 +62,7 @@ def integrate(self, session, data, host_url):
             }
 
             dataset = Dataset(app, session, dataset_info)
-            dataset.update_in_db(status="started", update_celery=True)
+            dataset.update_in_db("started")
 
             if file.type == "csv/tsv":
                 file.integrate(data['columns_type'], public=public)
@@ -161,10 +161,66 @@ def query(self, session, info):
             headers, results = query_launcher.process_query(query)
 
         # write result to a file
-        result.save_result_in_file(headers, results)
+        file_size = result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status("success")
+        result.update_db_status("success", size=file_size)
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        result.update_db_status("error", error=True, error_message=str(e))
+        result.rollback()
+        return {
+            'error': True,
+            'errorMessage': str(e)
+        }
+    return {
+        'error': False,
+        'errorMessage': ''
+    }
+
+
+@celery.task(bind=True, name="sparql_query")
+def sparql_query(self, session, info):
+    """Save the sparql query results in filesystem and db
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    info : dict
+        sparql query
+
+    Returns
+    -------
+    dict
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        info["celery"] = self.request.id
+        result = Result(app, session, info, force_no_db=True)
+
+        # Save job in db
+        result.set_celery_id(self.request.id)
+        result.update_db_status("started", update_celery=True)
+
+        # launch query
+        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
+        query_builder = SparqlQueryBuilder(app, session)
+
+        query = query_builder.format_query(info["sparql_query"], replace_froms=True, limit=None)
+        # header, data = query_launcher.process_query(query)
+        header = query_builder.selects
+        data = []
+        if query_builder.graphs:
+            header, data = query_launcher.process_query(query)
+
+        # Write results in file
+        file_size = result.save_result_in_file(header, data)
+
+        # Update database status
+        result.update_db_status("success", size=file_size)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

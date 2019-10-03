@@ -38,6 +38,9 @@ class TestApiStartpoints(AskomicsTestCase):
         case = unittest.TestCase()
         gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
         response = client_logged_as_jdoe_with_data.get('/api/query/abstraction')
+
+        print(response.json)
+
         assert response.status_code == 200
         expected = {
             'abstraction': [{
@@ -101,6 +104,7 @@ class TestApiStartpoints(AskomicsTestCase):
                 'relations': [],
                 'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#Gene'
             }],
+            'diskSpace': 2661,
             'error': False,
             'errorMessage': ''
         }

@@ -56,12 +56,60 @@ class Result(Params):
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
+            self.sparql_query = result_info["sparql_query"] if "sparql_query" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
             self.start = None
             self.end = None
             self.nrows = 0
+
+    def clean_node(self, node):
+        """Clean a node by removing coordinates and other stuff
+
+        Parameters
+        ----------
+        node : dict
+            A graph node
+
+        Returns
+        -------
+        dict
+            Cleaned node
+        """
+        node.pop("__indexColor")
+        node.pop("index")
+        node.pop("x")
+        node.pop("y")
+        node.pop("vx")
+        node.pop("vy")
+
+        return node
+
+    def clean_link(self, link):
+        """Clean a link by removing coordinates and other stuff
+
+        Parameters
+        ----------
+        link : dict
+            A graph link
+
+        Returns
+        -------
+        dict
+            Cleaned link
+        """
+        link.pop("__indexColor")
+        link.pop("__controlPoints")
+        link.pop("index")
+
+        # link["source"] = self.clean_node(link["source"])
+        # link["target"] = self.clean_node(link["target"])
+
+        link["source"] = link["source"]["id"]
+        link["target"] = link["target"]["id"]
+
+        return link
 
     def format_graph_state(self, d3_graph_state):
         """Format Graph state
@@ -86,18 +134,7 @@ class Result(Params):
             if node["suggested"]:
                 continue
 
-            new_node = {
-                "uri": node["uri"],
-                "graphs": node["graphs"],
-                "type": node["type"],
-                "filterNode": node["filterNode"],
-                "filterLink": node["filterLink"],
-                "id": node["id"],
-                "label": node["label"],
-                "selected": node["selected"],
-                "suggested": node["suggested"]
-            }
-
+            new_node = self.clean_node(node)
             new_nodes.append(new_node)
 
         for link in d3_graph_state["links"]:
@@ -105,16 +142,7 @@ class Result(Params):
             if link["suggested"]:
                 continue
 
-            new_link = {
-                "uri": link["uri"],
-                "id": link["id"],
-                "label": link["label"],
-                "source": link["source"]["id"],
-                "target": link["target"]["id"],
-                "selected": link["selected"],
-                "suggested": link["suggested"]
-            }
-
+            new_link = self.clean_link(link)
             new_links.append(new_link)
 
         return {
@@ -155,6 +183,34 @@ class Result(Params):
             return self.format_graph_state(self.graph_state)
         return self.graph_state
 
+    def get_sparql_query(self):
+        """Get the sparql query if exists
+
+        Returns
+        -------
+        string
+            The sparql query
+        """
+        return self.sparql_query
+
+    def update_celery(self, celery_id):
+        """Update celery id of result in database
+
+        Parameters
+        ----------
+        celery_id : string
+            DescriThe celery idption
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        celery_id=?
+        WHERE user_id = ? AND id = ?
+        '''
+
+        database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
+
     def set_celery_id(self, celery_id):
         """Set celery id
 
@@ -171,7 +227,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
@@ -180,7 +236,7 @@ class Result(Params):
 
         else:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
             FROM results
             WHERE public = ? AND id = ?
             '''
@@ -194,6 +250,7 @@ class Result(Params):
         self.start = rows[0][3]
         self.end = rows[0][4]
         self.nrows = rows[0][5]
+        self.sparql_query = rows[0][6]
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -237,6 +294,11 @@ class Result(Params):
             List of results headers
         results : list
             Query results
+
+        Returns
+        -------
+        int
+            File size
         """
         with open(self.file_path, 'w') as file:
             writer = csv.writer(file, delimiter="\t")
@@ -248,6 +310,8 @@ class Result(Params):
                     for header, value in i.items():
                         row.append(value)
                     writer.writerow(row)
+
+        return os.path.getsize(self.file_path)
 
     def save_in_db(self):
         """Save results file info into the database"""
@@ -268,6 +332,8 @@ class Result(Params):
             NULL,
             NULL,
             ?,
+            ?,
+            NULL,
             ?
         )
         '''
@@ -278,7 +344,8 @@ class Result(Params):
             self.start,
             json.dumps(self.graph_state),
             False,
-            "Query"  # FIXME: use id here
+            "Query",
+            self.sparql_query
         ), get_id=True)
 
         return self.id
@@ -305,7 +372,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, status, update_celery=False, error=False, error_message=None):
+    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None):
         """Update status of results in db
 
         Parameters
@@ -320,42 +387,43 @@ class Result(Params):
         if update_celery:
             update_celery_substr = "celery_id=?,"
 
+        size_string = ""
+        if size:
+            size_string = "size=?,"
+
         self.end = int(time.time())
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE results SET
-        {}
+        {celery}
+        {size}
         status=?,
         end=?,
         path=?,
         nrows=?,
         error=?
         WHERE user_id=? AND id=?
-        '''.format(update_celery_substr)
+        '''.format(celery=update_celery_substr, size=size_string)
+
+        variables = [
+            status,
+            self.end,
+            self.file_path,
+            self.nrows,
+            message,
+            self.session["user"]["id"],
+            self.id
+        ]
+
+        if size:
+            variables.insert(0, size)
 
         if update_celery:
-            database.execute_sql_query(query, (
-                self.celery_id,
-                status,
-                self.end,
-                self.file_path,
-                self.nrows,
-                message,
-                self.session["user"]["id"],
-                self.id
-            ))
-        else:
-            database.execute_sql_query(query, (
-                status,
-                self.end,
-                self.file_path,
-                self.nrows,
-                message,
-                self.session["user"]["id"],
-                self.id
-            ))
+            variables.insert(0, self.celery_id)
+
+        database.execute_sql_query(query, tuple(variables))
 
     def rollback(self):
         """Delete file"""

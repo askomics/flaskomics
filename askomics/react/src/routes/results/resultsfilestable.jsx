@@ -5,6 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import WaitingDiv from '../../components/waiting'
+import Utils from '../../classes/utils'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
@@ -19,6 +20,7 @@ export default class ResultsFilesTable extends Component {
       idToPublish: null,
       description: ''
     }
+    this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.handlePreview = this.handlePreview.bind(this)
@@ -27,11 +29,6 @@ export default class ResultsFilesTable extends Component {
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
-  }
-
-  humanDate (date) {
-    let event = new Date(date * 1000)
-    return event.toUTCString()
   }
 
   handleSelection (row, isSelect) {
@@ -135,7 +132,8 @@ export default class ResultsFilesTable extends Component {
       console.log(requestUrl, response.data)
       this.setState({
         redirectSparqlEditor: true,
-        sparqlQuery: response.data.query
+        sparqlQuery: response.data.query,
+        diskSpace: response.data.diskSpace
       })
     })
     .catch(error => {
@@ -231,7 +229,7 @@ export default class ResultsFilesTable extends Component {
       redirectSparqlEditor = <Redirect to={{
         pathname: '/sparql',
         state: {
-          redo: true,
+          diskSpace: this.state.diskSpace,
           sparqlQuery: this.state.sparqlQuery,
           config: this.props.config
         }
@@ -264,7 +262,7 @@ export default class ResultsFilesTable extends Component {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
-      formatter: (cell, row) => { return this.humanDate(cell) },
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
       editable: false
     }, {
       dataField: 'public',
@@ -317,18 +315,26 @@ export default class ResultsFilesTable extends Component {
       },
       editable: false
     }, {
+      dataField: "size",
+      text: "Size",
+      sort: true,
+      formatter: (cell, row) => {
+        return cell ? this.utils.humanFileSize(cell, true) : ''
+      },
+      editable: false
+    }, {
       // buttons
-      dataField: "end", // FIXME: we don't need end dataFiel, but dataField have to be set
+      dataField: "end", // FIXME: we don't need end dataField, but dataField have to be set
       text: 'Actions',
       formatter: (cell, row) => {
         return (
           <ButtonGroup>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
-            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
+            <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
-            {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
+            {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != "null" ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
       },

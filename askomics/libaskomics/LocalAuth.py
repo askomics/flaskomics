@@ -163,6 +163,7 @@ class LocalAuth(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
@@ -181,7 +182,7 @@ class LocalAuth(Params):
         # Store user in db
         user_id = database.execute_sql_query(
             query, (ldap, inputs['fname'], inputs['lname'], inputs['username'],
-                    inputs['email'], sha512_pw, salt, api_key, admin, blocked), True)
+                    inputs['email'], sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
 
         # Return user infos
         return {
@@ -193,6 +194,7 @@ class LocalAuth(Params):
             'email': inputs['email'],
             'admin': admin,
             'blocked': blocked,
+            'quota': Utils.humansize_to_bytes(self.settings.get("askomics", "quota")),
             'apikey': api_key,
             'galaxy': None
         }
@@ -275,7 +277,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE u.apikey = ?
@@ -300,13 +302,14 @@ class LocalAuth(Params):
                 'apikey': rows[0][6],
                 'admin': rows[0][7],
                 'blocked': rows[0][8],
+                'quota': rows[0][9],
                 'galaxy': None
             }
 
-            if rows[0][9] is not None and rows[0][10] is not None:
+            if rows[0][10] is not None and rows[0][11] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][9],
-                    'apikey': rows[0][10]
+                    'url': rows[0][10],
+                    'apikey': rows[0][11]
                 }
 
         else:
@@ -338,13 +341,9 @@ class LocalAuth(Params):
         user = {}
 
         database = Database(self.app, self.session)
-        query = '''
-        SELECT * FROM users
-        WHERE {}=?
-        '''.format(database_field)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE {} = ?
@@ -376,13 +375,14 @@ class LocalAuth(Params):
                     'apikey': rows[0][8],
                     'admin': rows[0][9],
                     'blocked': rows[0][10],
+                    'quota': rows[0][11],
                     'galaxy': None
                 }
 
-            if rows[0][11] is not None and rows[0][12] is not None:
+            if rows[0][12] is not None and rows[0][13] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][11],
-                    'apikey': rows[0][12]
+                    'url': rows[0][12],
+                    'apikey': rows[0][13]
                 }
 
         else:
@@ -638,7 +638,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE username = ?
@@ -659,12 +659,13 @@ class LocalAuth(Params):
         user['apikey'] = rows[0][6]
         user['admin'] = rows[0][7]
         user['blocked'] = rows[0][8]
+        user['quota'] = rows[0][9]
         user['galaxy'] = None
 
-        if rows[0][9] is not None and rows[0][10] is not None:
+        if rows[0][10] is not None and rows[0][11] is not None:
             user['galaxy'] = {
-                'url': rows[0][9],
-                'apikey': rows[0][10]
+                'url': rows[0][10],
+                'apikey': rows[0][11]
             }
 
         return user
@@ -680,7 +681,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, u.quota, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         GROUP BY u.user_id
@@ -700,12 +701,13 @@ class LocalAuth(Params):
                 user['email'] = row[5]
                 user['admin'] = row[6]
                 user['blocked'] = row[7]
+                user['quota'] = row[8]
                 user['galaxy'] = None
 
-                if row[8] is not None and row[9] is not None:
+                if row[9] is not None and row[10] is not None:
                     user['galaxy'] = {
-                        'url': row[8],
-                        'apikey': row[9]
+                        'url': row[9],
+                        'apikey': row[10]
                     }
 
                 users.append(user)
@@ -751,3 +753,23 @@ class LocalAuth(Params):
         '''
 
         database.execute_sql_query(query, (new_status, username))
+
+    def set_quota(self, quota, username):
+        """Set a new quota to a user
+
+        Parameters
+        ----------
+        quota : int
+            New quota
+        username : string
+            The concerned username
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE users
+        SET quota=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (Utils.humansize_to_bytes(quota), username))

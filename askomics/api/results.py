@@ -2,6 +2,7 @@ import traceback
 import sys
 
 from askomics.api.auth import login_required, admin_required
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
@@ -227,25 +228,32 @@ def get_sparql_query():
         errorMessage: the error message of error, else an empty string
     """
     try:
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
         file_id = request.get_json()["fileId"]
         result_info = {"id": file_id}
 
         result = Result(current_app, session, result_info)
         query_builder = SparqlQueryBuilder(current_app, session)
 
-        graph_state = result.get_graph_state()
-        query = query_builder.build_query_from_json(graph_state, for_editor=True)
+        query = result.get_sparql_query()
+        if query is None:
+            graph_state = result.get_graph_state()
+            query = query_builder.build_query_from_json(graph_state, for_editor=True)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'query': {},
+            'diskSpace': 0,
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'query': query,
+        'diskSpace': disk_space,
         'error': False,
         'errorMessage': ''
     })

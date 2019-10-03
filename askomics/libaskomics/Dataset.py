@@ -115,6 +115,24 @@ class Dataset(Params):
         '''
         database.execute_sql_query(query, (new_status, self.session["user"]["id"], self.id))
 
+    def update_celery(self, celery_id):
+        """Update celery id of dataset in database
+
+        Parameters
+        ----------
+        celery_id : string
+            DescriThe celery idption
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE datasets SET
+        celery_id=?
+        WHERE user_id = ? AND id = ?
+        '''
+
+        database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
+
     def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0):
         """Update the dataset when integration is done
 

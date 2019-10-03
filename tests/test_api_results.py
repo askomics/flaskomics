@@ -146,6 +146,7 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == {
             'error': False,
+            'diskSpace': 394,
             'errorMessage': '',
             'query': content
         }

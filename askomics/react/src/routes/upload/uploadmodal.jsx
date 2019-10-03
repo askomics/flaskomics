@@ -53,14 +53,14 @@ export default class UploadModal extends Component {
           </ModalFooter>
         </Modal>
       )
-      galaxyButton = <Button color="secondary" onClick={this.toggleModalGalaxy}><i className="fas fa-upload"></i> Galaxy</Button>
+      galaxyButton = <Button disabled={this.props.disabled} color="secondary" onClick={this.toggleModalGalaxy}><i className="fas fa-upload"></i> Galaxy</Button>
     }
 
     return (
       <div>
         <ButtonGroup>
-          <Button color="secondary" onClick={this.toggleModalComputer}><i className="fas fa-upload"></i> Computer</Button>
-          <Button color="secondary" onClick={this.toggleModalUrl}><i className="fas fa-upload"></i> URL</Button>
+          <Button disabled={this.props.disabled} color="secondary" onClick={this.toggleModalComputer}><i className="fas fa-upload"></i> Computer</Button>
+          <Button disabled={this.props.disabled} color="secondary" onClick={this.toggleModalUrl}><i className="fas fa-upload"></i> URL</Button>
           {galaxyButton}
         </ButtonGroup>
 
@@ -91,5 +91,6 @@ export default class UploadModal extends Component {
 
 UploadModal.propTypes = {
   setStateUpload: PropTypes.func,
-  config: PropTypes.object
+  config: PropTypes.object,
+  disabled: PropTypes.bool
 }

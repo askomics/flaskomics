@@ -6,15 +6,18 @@ import ErrorDiv from '../error/error'
 import UploadModal from './uploadmodal'
 import FilesTable from './filestable'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class Upload extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       error: false,
       errorMessage: null,
       integration: false,
       files: [],
+      exceededQuota: false,
       selected: [],
       waiting: true
     }
@@ -30,6 +33,8 @@ export default class Upload extends Component {
         .then(response => {
           console.log(requestUrl, response.data)
           this.setState({
+            diskSpace: response.data.diskSpace,
+            exceededQuota: this.props.config.user.quota > 0 && response.data.diskSpace >= this.props.config.user.quota,
             files: response.data.files,
             waiting: false
           })
@@ -106,13 +111,28 @@ export default class Upload extends Component {
       }} />
     }
 
+
+    let warningDiskSpace
+    if (this.state.exceededQuota) {
+      warningDiskSpace = (
+        <div>
+          <Alert color="warning">
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.utils.humanFileSize(this.props.config.user.quota, true)} allowed). 
+              Please delete some before uploading or contact an admin to increase your quota
+          </Alert>
+        </div>
+      )
+    }
+
     return (
       <div className="container">
         {redirectLogin}
         {redirectIntegration}
         <h2>Upload</h2>
         <hr />
-        <UploadModal setStateUpload={p => this.setState(p)} config={this.props.config} />
+        {warningDiskSpace}
+        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
         <br />

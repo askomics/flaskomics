@@ -71,8 +71,15 @@ def delete_datasets():
                 "id": dataset.id
             }, ]
             current_app.logger.debug(dataset_info)
-            # Trigger the celery task
-            current_app.celery.send_task('delete_datasets', (session_dict, dataset_info))
+
+            # kill integration celery task
+            current_app.celery.control.revoke(dataset.celery_id, terminate=True)
+
+            # Trigger the celery task to delete the dataset
+            task = current_app.celery.send_task('delete_datasets', (session_dict, dataset_info))
+
+            # replace the task id with the new
+            dataset.update_celery(task.id)
 
         datasets = datasets_handler.get_datasets()
 

@@ -13,6 +13,7 @@ class TestApiFile(AskomicsTestCase):
         assert response.status_code == 200
         # print(response.json)
         assert response.json == {
+            'diskSpace': 2661,
             'error': False,
             'errorMessage': '',
             'files': [{
@@ -43,6 +44,7 @@ class TestApiFile(AskomicsTestCase):
         assert response.status_code == 200
         # print(response.json)
         assert response.json == {
+            'diskSpace': 2661,
             'error': False,
             'errorMessage': '',
             'files': [{
@@ -58,6 +60,7 @@ class TestApiFile(AskomicsTestCase):
         assert response.status_code == 200
         # print(response.json)
         assert response.json == {
+            'diskSpace': 2661,
             'error': False,
             'errorMessage': '',
             'files': []

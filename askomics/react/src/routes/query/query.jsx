@@ -7,14 +7,17 @@ import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
+import LinkView from './linkview'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class Query extends Component {
 
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       config: this.props.location.state.config,
       startpoint: this.props.location.state.startpoint,
@@ -86,6 +89,16 @@ export default class Query extends Component {
   getId () {
     this.idNumber += 1
     return this.idNumber
+  }
+
+  getHumanNodeId (uri) {
+    let humanIds = [0, ]
+    this.state.graphState.nodes.map(node => {
+      if (node.uri == uri) {
+        humanIds.push(node.humanId)
+      }
+    })
+    return Math.max(...humanIds) + 1
   }
 
   entityExist (uri) {
@@ -205,7 +218,9 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        negative: false
+        negative: false,
+        linked: false,
+        linkedWith: null
       })
     }
 
@@ -223,7 +238,9 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        negative: false
+        negative: false,
+        linked: false,
+        linkedWith: null
       })
       firstAttrVisibleForBnode = false
     }
@@ -244,6 +261,8 @@ export default class Query extends Component {
           nodeAttribute.faldo = attr.faldo
           nodeAttribute.optional = false
           nodeAttribute.negative = false
+          nodeAttribute.linked = false
+          nodeAttribute.linkedWith = null
 
           firstAttrVisibleForBnode = false
 
@@ -274,6 +293,7 @@ export default class Query extends Component {
     Insert a new node in the graphState
     */
     let nodeId = this.getId()
+    let humanId = this.getHumanNodeId(uri)
     let node = {
       uri: uri,
       type: this.getType(uri),
@@ -281,6 +301,7 @@ export default class Query extends Component {
       filterLink: "",
       graphs: this.getGraphs(uri),
       id: nodeId,
+      humanId: humanId,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -389,6 +410,7 @@ export default class Query extends Component {
               filterLink: "",
               graphs: this.getGraphs(relation.target),
               id: targetId,
+              humanId: null,
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
@@ -397,6 +419,9 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
+              type: "link",
+              sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
+              sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               id: linkId,
               label: relation.label,
               source: node.id,
@@ -424,6 +449,7 @@ export default class Query extends Component {
               filterLink: "",
               graphs: this.getGraphs(relation.source),
               id: sourceId,
+              humanId: null,
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
@@ -432,6 +458,9 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
+              type: "link",
+              sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
+              sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
               id: this.getId(),
               label: relation.label,
               source: sourceId,
@@ -443,6 +472,43 @@ export default class Query extends Component {
         }
       }
     })
+
+    // Position
+    if (node.faldo) {
+      this.state.abstraction.entities.forEach(entity => {
+        if (entity.faldo) {
+          let new_id = this.getId()
+          // Push suggested target
+          this.graphState.nodes.push({
+            uri: entity.uri,
+            type: this.getType(entity.uri),
+            filterNode: "",
+            filterLink: "",
+            graphs: this.getGraphs(entity.uri),
+            id: new_id,
+            humanId: null,
+            label: entity.label,
+            faldo: entity.faldo,
+            selected: false,
+            suggested: true
+          })
+          // push suggested link
+          this.graphState.links.push({
+            uri: "included_in",
+            type: "link",
+            id: this.getId(),
+            sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
+            sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
+            strict: true,
+            label: "Included in",
+            source: node.id,
+            target: new_id,
+            selected: false,
+            suggested: true
+          })
+        }
+      })
+    }
   }
 
   removeAllSuggestion () {
@@ -471,6 +537,10 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
+          type: "link",
+          sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
+          sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
+          strict: true,
           id: this.getId(),
           label: link.label,
           source: node1.id,
@@ -483,6 +553,10 @@ export default class Query extends Component {
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
+          type: "link",
+          sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
+          sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
+          strict: true,
           id: this.getId(),
           label: link.label,
           source: node2.id,
@@ -495,9 +569,9 @@ export default class Query extends Component {
     this.graphState.links.push(newLink)
   }
 
-  manageCurrentPreviousSelected (currentNode) {
+  manageCurrentPreviousSelected (currentObject) {
     this.previousSelected = this.currentSelected
-    this.currentSelected = currentNode
+    this.currentSelected = currentObject
   }
 
   unselectAllNodes () {
@@ -506,15 +580,76 @@ export default class Query extends Component {
     })
   }
 
+  unselectAllLinks () {
+    this.graphState.links.map(link => {
+      link.selected = false
+    })
+  }
+
+  unselectAllObjects () {
+    this.unselectAllNodes()
+    this.unselectAllLinks()
+  }
+
   selectAndInstanciateNode (node) {
     this.graphState.nodes.map(inode => {
       if (node.id == inode.id) {
         inode.selected = true
         inode.suggested = false
+        inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
     // get attributes
     this.setNodeAttributes(node.uri, node.id)
+  }
+
+  instanciateNode (node) {
+    this.graphState.nodes.map(inode => {
+      if (node.id == inode.id) {
+        inode.suggested = false
+      }
+    })
+    // get attributes
+    this.setNodeAttributes(node.uri, node.id)
+  }
+
+  selectAndInstanciateLink (link) {
+    this.graphState.links.map(ilinks => {
+      if (link.id == ilinks.id) {
+        ilinks.selected = true
+        ilinks.suggested = false
+      }
+    })
+  }
+
+  handleLinkSelection (clickedLink) {
+    // case 1: link is selected, so deselect it
+    if (clickedLink.selected) {
+      // Update current and previous
+      this.manageCurrentPreviousSelected(null)
+
+      // Deselect nodes and links
+      this.unselectAllObjects()
+
+      // Remove all suggestion
+      this.removeAllSuggestion()
+    } else {
+      // case 2: link is unselected, so select it
+      let suggested = clickedLink.suggested
+      // Update current and previous
+      this.manageCurrentPreviousSelected(clickedLink)
+      // Deselect nodes and links
+      this.unselectAllObjects()
+      // Select and instanciate the link
+      this.selectAndInstanciateLink(clickedLink)
+      // instanciate node only if node is suggested
+      if (suggested) {
+        this.instanciateNode(clickedLink.target)
+      }
+      // reload suggestions
+      this.removeAllSuggestion()
+    }
+    this.updateGraphState()
   }
 
   handleNodeSelection (clickedNode) {
@@ -523,8 +658,8 @@ export default class Query extends Component {
       // update current and previous
       this.manageCurrentPreviousSelected(null)
 
-      // deselect all
-      this.unselectAllNodes()
+      // Deselect nodes and links
+      this.unselectAllObjects()
 
       // remove all suggestion
       this.removeAllSuggestion()
@@ -533,8 +668,8 @@ export default class Query extends Component {
       let suggested = clickedNode.suggested
       // update current and previous
       this.manageCurrentPreviousSelected(clickedNode)
-      // unselect all nodes
-      this.unselectAllNodes()
+      // Deselect nodes and links
+      this.unselectAllObjects()
       // select and instanciate the new node
       this.selectAndInstanciateNode(clickedNode)
       // instanciate link only if clicked node is suggested
@@ -564,9 +699,17 @@ export default class Query extends Component {
       return
     }
 
-    this.removeNode(this.currentSelected.id)
+    let nodeIdToDelete
+    if (this.currentSelected.type == "link") {
+      if (this.currentSelected) {}
+      nodeIdToDelete =  Math.max(this.currentSelected.target.id, this.currentSelected.source.id)
+    } else {
+      nodeIdToDelete = this.currentSelected.id
+    }
 
-    let nodeAndLinksToDelete = this.getNodesAndLinksIdToDelete(this.currentSelected.id)
+    this.removeNode(nodeIdToDelete)
+
+    let nodeAndLinksToDelete = this.getNodesAndLinksIdToDelete(nodeIdToDelete)
 
     nodeAndLinksToDelete.nodes.forEach(id => {
       this.removeNode(id)
@@ -575,7 +718,7 @@ export default class Query extends Component {
       this.removeLink(id)
     })
     // remove attributes
-    this.removeAttributes(this.currentSelected.id)
+    this.removeAttributes(nodeIdToDelete)
 
     // unselect node
     this.manageCurrentPreviousSelected(null)
@@ -588,9 +731,14 @@ export default class Query extends Component {
         this.currentSelected = node
       }
     })
+    this.graphState.links.forEach(link => {
+      if (link.selected) {
+        this.currentSelected = link
+      }
+    })
   }
 
-  updateGraphState () {
+  updateGraphState (waiting=this.state.waiting) {
     this.setState({
       graphState: this.graphState,
       previewIcon: "table",
@@ -598,7 +746,8 @@ export default class Query extends Component {
       headerPreview: [],
       disableSave: false,
       disablePreview: false,
-      saveIcon: "play"
+      saveIcon: "play",
+      waiting: waiting
     })
   }
 
@@ -720,6 +869,122 @@ export default class Query extends Component {
     }
   }
 
+  toggleLinkAttribute (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linked = !attr.linked
+        if (!attr.linked) {
+          attr.linkedWith = null
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleChangeLink (event) {
+    this.state.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedWith = parseInt(event.target.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
+  // Link view methods -----------------------------
+
+  handleChangePosition (event) {
+    this.state.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.uri = event.target.value
+        link.label = event.target.value == 'included_in' ? "Included in" : "Overlap with"
+      }
+    })
+    this.updateGraphState()
+  }
+
+  mapLinks (event) {
+    this.state.graphState.links.map(link => {})
+    this.updateGraphState()
+  }
+
+  handleClickReverse (event) {
+    this.state.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        let old_target = link.target
+        link.target = link.source
+        link.source = old_target
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleChangeSameRef (event) {
+    this.state.graphState.links.map(link => {
+      if ("sameref-" + link.id == event.target.id) {
+        link.sameRef = event.target.checked
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleChangeSameStrand (event) {
+    this.state.graphState.links.map(link => {
+      if ("samestrand-" + link.id == event.target.id) {
+        link.sameStrand = event.target.checked
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleChangeStrict (event) {
+    this.state.graphState.links.map(link => {
+      if ("strict-" + link.id == event.target.id) {
+        link.strict = event.target.checked
+      }
+    })
+    this.updateGraphState()
+  }
+
+  nodesHaveRefs (link) {
+    let result = this.nodeHaveRef(link.source.uri) && this.nodeHaveRef(link.target.uri)
+    if (! result) {
+      link.sameRef = false
+    }
+    return result
+  }
+
+  nodeHaveRef (uri) {
+    let result = false
+    this.state.abstraction.attributes.map(attr => {
+      if (uri == attr.entityUri && attr.faldo) {
+        if (attr.faldo.endsWith("faldoReference")) {
+          result =  true
+        }
+      }
+    })
+    return result
+  }
+
+  nodesHaveStrands (link) {
+    let result = this.nodeHaveStrand(link.source.uri) && this.nodeHaveStrand(link.target.uri)
+    if (! result) {
+      link.sameStrand = false
+    }
+    return result
+  }
+
+  nodeHaveStrand (uri) {
+    let result = false
+    this.state.abstraction.attributes.map(attr => {
+      if (uri == attr.entityUri && attr.faldo) {
+        if (attr.faldo.endsWith("faldoStrand")) {
+          result =  true
+        }
+      }
+    })
+    return result
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -790,7 +1055,9 @@ export default class Query extends Component {
           console.log(requestUrl, response.data)
           this.setState({
             waiting: false,
-            abstraction: response.data.abstraction
+            abstraction: response.data.abstraction,
+            diskSpace: response.data.diskSpace,
+            exceededQuota: this.state.config.user.quota > 0 && response.data.diskSpace >= this.state.config.user.quota,
           })
         })
         .catch(error => {
@@ -806,7 +1073,9 @@ export default class Query extends Component {
             this.graphState = this.props.location.state.graphState
             this.initId()
             this.setCurrentSelected()
-            this.insertSuggestion(this.currentSelected)
+            if (this.currentSelected.type != "link") {
+              this.insertSuggestion(this.currentSelected)
+            }
             this.updateGraphState()
           } else {
             this.initGraph()
@@ -841,9 +1110,24 @@ export default class Query extends Component {
       )
     }
 
+    // Warning disk space
+    let warningDiskSpace
+    if (this.state.exceededQuota) {
+      warningDiskSpace = (
+        <div>
+          <Alert color="warning">
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Please delete some before save queries or contact an admin to increase your quota
+          </Alert>
+        </div>
+      )
+    }
+
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let linkView
     let previewButton
     let launchQueryButton
     let removeButton
@@ -857,6 +1141,8 @@ export default class Query extends Component {
             return (
               <AttributeBox
                 attribute={attribute}
+                graph={this.state.graphState}
+                handleChangeLink={p => this.handleChangeLink(p)}
                 toggleVisibility={p => this.toggleVisibility(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
@@ -865,10 +1151,35 @@ export default class Query extends Component {
                 handleFilterCategory={p => this.handleFilterCategory(p)}
                 handleFilterNumericSign={p => this.handleFilterNumericSign(p)}
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
+                toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
               />
             )
           }
         })
+        // Link view (rightview)
+        if (this.currentSelected.type == "link") {
+
+          let link = Object.assign(this.currentSelected)
+          this.state.graphState.nodes.map(node => {
+            if (node.id == this.currentSelected.target) {
+              link.target = node
+            }
+            if (node.id == this.currentSelected.source) {
+              link.source = node
+            }
+          })
+
+          linkView = <LinkView
+            link={link}
+            handleChangePosition={p => this.handleChangePosition(p)}
+            handleClickReverse={p => this.handleClickReverse(p)}
+            handleChangeSameRef={p => this.handleChangeSameRef(p)}
+            handleChangeSameStrand={p => this.handleChangeSameStrand(p)}
+            handleChangeStrict={p => this.handleChangeStrict(p)}
+            nodesHaveRefs={p => this.nodesHaveRefs(p)}
+            nodesHaveStrands={p => this.nodesHaveStrands(p)}
+          />
+        }
       }
 
       // visualization (left view)
@@ -880,18 +1191,19 @@ export default class Query extends Component {
           config={this.state.config}
           waiting={this.state.waiting}
           handleNodeSelection={p => this.handleNodeSelection(p)}
+          handleLinkSelection={p => this.handleLinkSelection(p)}
         />
       )
 
       // buttons
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
       if (this.state.config.logged) {
-        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
+        launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {
         removeButton = (
           <ButtonGroup>
-            <Button disabled={this.currentSelected.id == 1 ? true : false} onClick={this.handleRemoveNode} color="secondary" size="sm">Remove node</Button>
+            <Button disabled={this.currentSelected.id == 1 ? true : false} onClick={this.handleRemoveNode} color="secondary" size="sm">Remove {this.currentSelected.type == "link" ? "Link" : "Node"}</Button>
           </ButtonGroup>
         )
       }
@@ -926,19 +1238,27 @@ export default class Query extends Component {
         <Row>
           <Col xs="7">
             {graphFilters}
-            <br />
+          </Col>
+          <Col xs="5">
+            {removeButton}
+          </Col>
+        </Row>
+        <br />
+        <Row>
+          <Col xs="7">
             <div>
               {visualizationDiv}
             </div>
           </Col>
           <Col xs="5">
             <div style={{ display: 'block', height: this.divHeight + 'px', 'overflow-y': 'auto' }}>
-              {removeButton}
               {uriLabelBoxes}
               {AttributeBoxes}
+              {linkView}
             </div>
           </Col>
         </Row>
+        {warningDiskSpace}
         <ButtonGroup>
           {previewButton}
           {launchQueryButton}

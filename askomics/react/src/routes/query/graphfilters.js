@@ -19,12 +19,18 @@ export default class GraphFilters extends Component {
     let filterLinkValue
     let disabled = false
     if (this.props.current != null) {
-      this.props.graph.nodes.forEach(node => {
-        if (node.id == this.props.current.id) {
-          filterNodeValue = node.filterNode
-          filterLinkValue = node.filterLink
-        }
-      })
+      if (this.props.current.type != "link") {
+        this.props.graph.nodes.forEach(node => {
+          if (node.id == this.props.current.id) {
+            filterNodeValue = node.filterNode
+            filterLinkValue = node.filterLink
+          }
+        })
+      } else {
+        disabled = true
+        filterNodeValue = ""
+        filterLinkValue = ""
+      }
     } else {
       disabled = true
       filterNodeValue = ""

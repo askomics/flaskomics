@@ -33,6 +33,7 @@ class ResultsHandler(Params):
         """
         for file_id in files_id:
             result = Result(self.app, self.session, {"id": file_id})
+            self.app.celery.control.revoke(result.celery_id, terminate=True)
             result.delete_result()
 
         return self.get_files_info()
@@ -48,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, description
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size, sparql_query
         FROM results
         WHERE user_id = ?
         '''
@@ -68,7 +69,9 @@ class ResultsHandler(Params):
                 'nrows': row[6],
                 'errorMessage': row[7],
                 'public': row[8],
-                'description': row[9]
+                'description': row[9],
+                'size': row[10],
+                'sparqlQuery': row[11]
             })
 
         return files
