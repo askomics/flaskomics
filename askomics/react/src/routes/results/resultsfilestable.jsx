@@ -5,6 +5,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import WaitingDiv from '../../components/waiting'
+import Utils from '../../classes/utils'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
@@ -19,6 +20,7 @@ export default class ResultsFilesTable extends Component {
       idToPublish: null,
       description: ''
     }
+    this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.handlePreview = this.handlePreview.bind(this)
@@ -27,25 +29,6 @@ export default class ResultsFilesTable extends Component {
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
-  }
-
-  humanFileSize (bytes, si) {
-    let thresh = si ? 1000 : 1024
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B'
-    }
-    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-    let u = -1
-    do {
-      bytes /= thresh
-      ++u
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
-    return bytes.toFixed(1) + ' ' + units[u]
-  }
-
-  humanDate (date) {
-    let event = new Date(date * 1000)
-    return event.toUTCString()
   }
 
   handleSelection (row, isSelect) {
@@ -278,7 +261,7 @@ export default class ResultsFilesTable extends Component {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
-      formatter: (cell, row) => { return this.humanDate(cell) },
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
       editable: false
     }, {
       dataField: 'public',
@@ -335,7 +318,7 @@ export default class ResultsFilesTable extends Component {
       text: "Size",
       sort: true,
       formatter: (cell, row) => {
-        return cell ? this.humanFileSize(cell, true) : ''
+        return cell ? this.utils.humanFileSize(cell, true) : ''
       },
       editable: false
     }, {

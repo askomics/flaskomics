@@ -6,10 +6,12 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class Admin extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = { isLoading: true,
       error: false,
       errorMessage: '',
@@ -118,20 +120,6 @@ export default class Admin extends Component {
     }
   }
 
-  humanFileSize (bytes, si) {
-    let thresh = si ? 1000 : 1024
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B'
-    }
-    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-    let u = -1
-    do {
-      bytes /= thresh
-      ++u
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
-    return bytes.toFixed(1) + ' ' + units[u]
-  }
-
   updateQuota(oldValue, newValue, row) {
 
     if (newValue === oldValue) {return}
@@ -230,7 +218,7 @@ export default class Admin extends Component {
       dataField: 'quota',
       text: 'Quota',
       formatter: (cell, row) => {
-        return cell === 0 ? "Unlimited" : this.humanFileSize(cell, true)
+        return cell === 0 ? "Unlimited" : this.utils.humanFileSize(cell, true)
       },
       sort: true
     }]

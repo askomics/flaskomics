@@ -6,10 +6,12 @@ import ErrorDiv from '../error/error'
 import UploadModal from './uploadmodal'
 import FilesTable from './filestable'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class Upload extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       error: false,
       errorMessage: null,
@@ -92,20 +94,6 @@ export default class Upload extends Component {
     return this.state.selected.length == 0
   }
 
-  humanFileSize (bytes, si) {
-    let thresh = si ? 1000 : 1024
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B'
-    }
-    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-    let u = -1
-    do {
-      bytes /= thresh
-      ++u
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
-    return bytes.toFixed(1) + ' ' + units[u]
-  }
-
   render () {
     let redirectLogin
     if (this.state.status == 401) {
@@ -129,8 +117,8 @@ export default class Upload extends Component {
       warningDiskSpace = (
         <div>
           <Alert color="warning">
-              Your files (uploaded files and results) take {this.humanFileSize(this.state.diskSpace, true)} of space 
-              (you have {this.humanFileSize(this.props.config.user.quota, true)} allowed). 
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
+              (you have {this.utils.humanFileSize(this.props.config.user.quota, true)} allowed). 
               Please delete some before uploading or contact an admin to increase your quota
           </Alert>
         </div>

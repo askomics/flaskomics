@@ -5,6 +5,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
 import { Badge, FormGroup, CustomInput } from 'reactstrap'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class DatasetsTable extends Component {
   constructor (props) {
@@ -12,25 +13,6 @@ export default class DatasetsTable extends Component {
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.togglePublicDataset = this.togglePublicDataset.bind(this)
-  }
-
-  humanFileSize (bytes, si) {
-    let thresh = si ? 1000 : 1024
-    if (Math.abs(bytes) < thresh) {
-      return bytes + ' B'
-    }
-    let units = si ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-    let u = -1
-    do {
-      bytes /= thresh
-      ++u
-    } while (Math.abs(bytes) >= thresh && u < units.length - 1)
-    return bytes.toFixed(1) + ' ' + units[u]
-  }
-
-  humanDate (date) {
-    let event = new Date(date * 1000)
-    return event.toUTCString()
   }
 
   handleSelection (row, isSelect) {
@@ -91,7 +73,7 @@ export default class DatasetsTable extends Component {
       dataField: 'start',
       text: 'Creation date',
       sort: true,
-      formatter: (cell, row) => { return this.humanDate(cell) }
+      formatter: (cell, row) => { return this.utils.humanDate(cell) }
     }, {
 
       dataField: 'public',
