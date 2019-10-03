@@ -1,5 +1,3 @@
-import json
-
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Result import Result
