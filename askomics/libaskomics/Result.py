@@ -56,6 +56,7 @@ class Result(Params):
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
+            self.sparql_query = result_info["sparql_query"] if "sparql_query" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
             self.file_path = "{}/{}".format(self.result_path, self.file_name)
@@ -182,6 +183,16 @@ class Result(Params):
             return self.format_graph_state(self.graph_state)
         return self.graph_state
 
+    def get_sparql_query(self):
+        """Get the sparql query if exists
+
+        Returns
+        -------
+        string
+            The sparql query
+        """
+        return self.sparql_query
+
     def update_celery(self, celery_id):
         """Update celery id of result in database
 
@@ -216,7 +227,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
@@ -225,7 +236,7 @@ class Result(Params):
 
         else:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
             FROM results
             WHERE public = ? AND id = ?
             '''
@@ -239,6 +250,7 @@ class Result(Params):
         self.start = rows[0][3]
         self.end = rows[0][4]
         self.nrows = rows[0][5]
+        self.sparql_query = rows[0][6]
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -321,7 +333,8 @@ class Result(Params):
             NULL,
             ?,
             ?,
-            NULL
+            NULL,
+            ?
         )
         '''
 
@@ -331,7 +344,8 @@ class Result(Params):
             self.start,
             json.dumps(self.graph_state),
             False,
-            "Query"  # FIXME: use id here
+            "Query",
+            self.sparql_query
         ), get_id=True)
 
         return self.id

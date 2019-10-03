@@ -233,8 +233,10 @@ def get_sparql_query():
         result = Result(current_app, session, result_info)
         query_builder = SparqlQueryBuilder(current_app, session)
 
-        graph_state = result.get_graph_state()
-        query = query_builder.build_query_from_json(graph_state, for_editor=True)
+        query = result.get_sparql_query()
+        if query is None:
+            graph_state = result.get_graph_state()
+            query = query_builder.build_query_from_json(graph_state, for_editor=True)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

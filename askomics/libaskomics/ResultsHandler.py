@@ -1,3 +1,5 @@
+import json
+
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Result import Result
@@ -49,7 +51,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size, sparql_query
         FROM results
         WHERE user_id = ?
         '''
@@ -70,7 +72,8 @@ class ResultsHandler(Params):
                 'errorMessage': row[7],
                 'public': row[8],
                 'description': row[9],
-                'size': row[10]
+                'size': row[10],
+                'sparqlQuery': row[11]
             })
 
         return files
