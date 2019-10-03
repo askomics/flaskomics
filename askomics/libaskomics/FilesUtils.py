@@ -42,4 +42,4 @@ class FilesUtils(Params):
 
         result = database.execute_sql_query(query, (self.session["user"]["id"], self.session["user"]["id"]))
 
-        return result[0][0]
+        return 0 if result[0][0] is None else result[0][0]
