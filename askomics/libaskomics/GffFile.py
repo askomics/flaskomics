@@ -16,7 +16,7 @@ class GffFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -30,7 +30,7 @@ class GffFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
         self.entities = []
         self.entities_to_integrate = []
@@ -155,13 +155,13 @@ class GffFile(File):
                         else:
                             indexes[feature.type] = 1
                             index = 1
-                        entity = self.askomics_prefix[self.format_uri("{}_{}".format(str(feature.type), str(index)))]
+                        entity = self.entity_prefix[self.format_uri("{}_{}".format(str(feature.type), str(index)))]
                         entity_label = "{}_{}".format(str(feature.type), str(index))
                     else:
-                        entity = self.askomics_prefix[self.format_uri(feature.qualifiers["ID"][0])]
+                        entity = self.entity_prefix[self.format_uri(feature.qualifiers["ID"][0])]
                         entity_label = feature.qualifiers["ID"][0]
                 else:
-                    entity = self.askomics_prefix[self.format_uri(feature.id)]
+                    entity = self.entity_prefix[self.format_uri(feature.id)]
                     entity_label = feature.id
 
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))

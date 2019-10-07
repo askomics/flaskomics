@@ -26,7 +26,7 @@ class CsvFile(File):
         Public
     """
 
-    def __init__(self, app, session, file_info, host_url=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -40,7 +40,7 @@ class CsvFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
         self.preview_limit = 30
         try:
             self.preview_limit = self.settings.getint("askomics", "npreview")
@@ -414,7 +414,7 @@ class CsvFile(File):
                     continue
 
                 # Entity
-                entity = self.askomics_prefix[self.format_uri(row[0])]
+                entity = self.entity_prefix[self.format_uri(row[0])]
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
 

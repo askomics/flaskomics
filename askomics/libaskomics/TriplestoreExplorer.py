@@ -116,7 +116,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label
+        SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label
         WHERE {{
             ?graph :public ?public .
             ?graph dc:creator ?creator .
@@ -131,6 +131,7 @@ class TriplestoreExplorer(Params):
                 }}
                 # Label
                 OPTIONAL {{ ?entity_uri rdfs:label ?entity_label . }}
+                OPTIONAL {{ ?entity_uri :instancesHaveNoLabels ?have_no_label . }}
             }}
             FILTER (
                 ?public = <true>{}
@@ -154,6 +155,7 @@ class TriplestoreExplorer(Params):
                     "uri": result["entity_uri"],
                     "type": entity_type,
                     "label": label,
+                    "instancesHaveLabels": True if "have_no_label" not in result else False if result["have_no_label"] == "1" else True,
                     "faldo": True if "entity_faldo" in result else False,
                     "endpoints": [result["endpoint"]],
                     "graphs": [result["graph"]],

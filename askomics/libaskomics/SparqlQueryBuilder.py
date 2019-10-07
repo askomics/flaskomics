@@ -33,6 +33,13 @@ class SparqlQueryBuilder(Params):
         self.graphs = []
         self.selects = []
 
+        self.external_endpoint = None
+
+        try:
+            self.external_endpoint = self.settings.get('triplestore', 'external_endpoint')
+        except Exception:
+            pass
+
         self.set_graphs()
 
     def get_froms(self):
@@ -568,7 +575,7 @@ class SparqlQueryBuilder(Params):
 
         from_string = self.get_froms_from_graphs(self.graphs)
 
-        if for_editor:
+        if for_editor or self.external_endpoint is not None:
             query = """
 SELECT DISTINCT {}
 WHERE {{

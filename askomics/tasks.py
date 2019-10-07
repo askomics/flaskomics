@@ -43,7 +43,7 @@ def integrate(self, session, data, host_url):
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    files_handler = FilesHandler(app, session, host_url=host_url)
+    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
     files_handler.handle_files([data["fileId"], ])
 
     public = data["public"] if session["user"]["admin"] else False

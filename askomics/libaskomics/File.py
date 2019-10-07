@@ -65,7 +65,7 @@ class File(Params):
         User graph
     """
 
-    def __init__(self, app, session, file_info, host_url=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -91,6 +91,7 @@ class File(Params):
         self.public = False
         self.ntriples = 0
         self.timestamp = int(time.time())
+        self.external_endpoint = external_endpoint
 
         self.default_graph = "{}".format(self.settings.get('triplestore', 'default_graph'))
         self.user_graph = "{}:{}_{}".format(
@@ -116,6 +117,7 @@ class File(Params):
 
         self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
         self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
+        self.entity_prefix = Namespace(custom_uri) if custom_uri else self.askomics_prefix
 
         self.faldo = Namespace('http://biohackathon.org/resource/faldo/')
         self.prov = Namespace('http://www.w3.org/ns/prov#')
@@ -158,9 +160,9 @@ class File(Params):
             graph containing metadata of the file
         """
         rdf_graph = RdfGraph(self.app, self.session)
-        local_endpoint = rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
+        location_endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
 
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.atLocation, local_endpoint))
+        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.atLocation, location_endpoint))
         rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
         rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
         rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
