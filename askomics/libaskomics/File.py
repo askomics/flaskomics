@@ -151,6 +151,27 @@ class File(Params):
             return quote(string.replace(' ', ''))
         return quote(string)
 
+    def rdfize(self, string):
+        """Rdfize a string
+
+        Return the literal is string is an url, else,
+        prefix it with askomics prefix
+
+        Parameters
+        ----------
+        string : string
+            Term to rdfize
+
+        Returns
+        -------
+        rdflib.???
+            Rdfized term
+        """
+        if Utils.is_valid_url(string):
+            return rdflib.URIRef(string)
+        else:
+            return self.askomics_prefix[self.format_uri(string)]
+
     def get_metadata(self):
         """Get a rdflib graph of the metadata
 

@@ -1,10 +1,36 @@
 import random
+import re
 
 
 class Utils():
 
     """Contain utils fonction and classes
     """
+
+    @staticmethod
+    def is_valid_url(url):
+        """Test if a string an url
+
+        Parameters
+        ----------
+        url : string
+            The url to test
+
+        Returns
+        -------
+        bool
+            True is url is valid
+        """
+        regex = re.compile(
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE)
+
+        return re.match(regex, url) is not None
 
     @staticmethod
     def get_random_string(number):
