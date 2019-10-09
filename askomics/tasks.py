@@ -153,11 +153,15 @@ def query(self, session, info):
 
         # launch query
         query_builder = SparqlQueryBuilder(app, session)
-        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
+
         query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
+        endpoints = query_builder.endpoints
+        federated = query_builder.is_federated()
+
         headers = query_builder.selects
         results = []
         if query_builder.graphs:
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=endpoints)
             headers, results = query_launcher.process_query(query)
 
         # write result to a file

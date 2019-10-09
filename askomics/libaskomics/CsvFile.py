@@ -293,7 +293,7 @@ class CsvFile(File):
                 s = self.askomics_prefix["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.askomics_namespace["category"]
                 for value in self.category_values[self.header[index]]:
-                    o = self.askomics_prefix[self.format_uri(value)]
+                    o = self.rdfize(value)
                     self.graph_abstraction_dk.add((s, p, o))
                     self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
@@ -306,13 +306,13 @@ class CsvFile(File):
         # Check subclass syntax (<)
         if self.header[0].find('<') > 0:
             splitted = self.header[0].split('<')
-            entity = self.askomics_prefix[self.format_uri(splitted[0], remove_space=True)]
+            entity = self.rdfize(splitted[0])
             entity_label = rdflib.Literal(splitted[0])
-            mother_class = self.askomics_prefix[self.format_uri(splitted[1], remove_space=True)]
+            mother_class = self.rdfize(splitted[1])
             # subClassOf
             self.graph_abstraction_dk.add((entity, rdflib.RDFS.subClassOf, mother_class))
         else:
-            entity = self.askomics_prefix[self.format_uri(self.header[0], remove_space=True)]
+            entity = self.rdfize(self.header[0])
             entity_label = rdflib.Literal(self.header[0])
 
         self.graph_abstraction_dk.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
@@ -337,15 +337,15 @@ class CsvFile(File):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
                 splitted = attribute_name.split('@')
 
-                attribute = self.askomics_prefix[quote(splitted[0])]
+                attribute = self.rdfize(splitted[0])
                 label = rdflib.Literal(splitted[0])
-                rdf_range = self.askomics_prefix[quote(splitted[1])]
+                rdf_range = self.rdfize(splitted[1])
                 rdf_type = rdflib.OWL.ObjectProperty
                 self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
 
             # Category
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
-                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
@@ -353,7 +353,7 @@ class CsvFile(File):
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
-                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.decimal
                 rdf_type = rdflib.OWL.DatatypeProperty
@@ -362,7 +362,7 @@ class CsvFile(File):
 
             # Text (default)
             else:
-                attribute = self.askomics_prefix[self.format_uri(attribute_name, remove_space=True)]
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
