@@ -81,7 +81,6 @@ def start():
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
             "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
-            "localEndpoint": current_app.iniconfig.get('triplestore', 'endpoint'),
             "proxyPath": proxy_path,
             "user": {},
             "logged": False

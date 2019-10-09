@@ -635,7 +635,17 @@ WHERE {{
     {}
 }}
             """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
-        # Query is not federated and endpoint is local
+        # Query is not federated and endpoint is local, and query is for editor (don't add froms)
+        elif not self.is_federated() and self.endpoints == [self.settings.get("triplestore", "endpoint")] and for_editor:
+            query = """
+SELECT DISTINCT {}
+WHERE {{
+    {}
+    {}
+}}
+            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
+
+        # Query is not federated and endpoint is local, and query is not for editor (add froms)
         else:
             query = """
 SELECT DISTINCT {}

@@ -13,5 +13,4 @@ WHERE {
     ?Gene1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#Gene> .
     ?Gene1_uri rdfs:label ?Gene1_Label .
 
-
 }

@@ -2,12 +2,11 @@ import csv
 import re
 import rdflib
 
-from urllib.parse import quote
 from rdflib import BNode
 
 from askomics.libaskomics.File import File
 from askomics.libaskomics.Utils import cached_property
-from askomics.libaskomics.Utils import Utils
+
 
 class CsvFile(File):
     """CSV file

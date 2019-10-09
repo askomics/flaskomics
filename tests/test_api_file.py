@@ -327,17 +327,23 @@ class TestApiFile(AskomicsTestCase):
         """Test /api/files/integrate route"""
         tsv_data = {
             "fileId": 1,
-            "public": False
+            "public": False,
+            "customUri": None,
+            "externalEndpoint": None
         }
 
         gff_data = {
             "fileId": 2,
-            "public": True
+            "public": True,
+            "customUri": None,
+            "externalEndpoint": None
         }
 
         wrong_data = {
             "fileId": 42,
-            "public": False
+            "public": False,
+            "customUri": None,
+            "externalEndpoint": None
         }
 
         response = client_logged_as_jdoe_with_data.post('/api/files/integrate', json=wrong_data)
