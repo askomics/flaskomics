@@ -332,7 +332,7 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
             {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != "null" ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
