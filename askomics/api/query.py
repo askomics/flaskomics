@@ -100,7 +100,7 @@ def get_preview():
 
         query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
         endpoints = query_builder.endpoints
-        federated = query_builder.is_federated()
+        federated = query_builder.federated
 
         header = query_builder.selects
         preview = []

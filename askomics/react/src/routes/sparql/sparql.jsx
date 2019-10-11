@@ -83,7 +83,8 @@ export default class Sparql extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          previewIcon: "times text-error"
+          previewIcon: "times text-error",
+          disablePreview: false
         })
       })
   }

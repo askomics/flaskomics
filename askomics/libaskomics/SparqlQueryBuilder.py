@@ -33,6 +33,14 @@ class SparqlQueryBuilder(Params):
         self.graphs = []
         self.endpoints = []
         self.selects = []
+        self.federated = False
+
+        # local endpoint (for federated query engine)
+        self.local_endpoint_f = self.settings.get('triplestore', 'endpoint')
+        try:
+            self.local_endpoint_f = self.settings.get('federation', 'local_endpoint')
+        except Exception:
+            pass
 
         self.set_graphs_and_endpoints()
 
@@ -49,6 +57,20 @@ class SparqlQueryBuilder(Params):
             from_string += '\nFROM <{}>'.format(graph)
 
         return from_string
+
+    def get_federated_line(self):
+        """Get federtated line
+
+        Returns
+        -------
+        string
+            @federate <endpoint1> <endpoint1> ...
+        """
+        federated_string = '@federate '
+        for endpoint in self.endpoints:
+            federated_string += '<{}> '.format(endpoint)
+
+        return federated_string
 
     def get_default_query(self):
         """Get the default query
@@ -130,7 +152,7 @@ class SparqlQueryBuilder(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False):
         """Format the Sparql query
 
         - remove all FROM
@@ -152,13 +174,19 @@ class SparqlQueryBuilder(Params):
         froms = ''
         if replace_froms:
             froms = self.get_froms()
+
+        if federated:
+            federated_line = self.get_federated_line()
+
         query_lines = query.split('\n')
 
         new_query = ''
 
         for line in query_lines:
-            # Remove all FROM and LIMIT
-            if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT'):
+            # Remove all FROM and LIMIT and @federated
+            if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT') and not line.upper().lstrip().startswith('@FEDERATE'):
+                if line.upper().lstrip().startswith('SELECT') and federated:
+                    new_query += "\n{}\n".format(federated_line)
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
@@ -226,23 +254,6 @@ class SparqlQueryBuilder(Params):
 
         return endpoints_string
 
-    def is_federated(self):
-        """Know if the query have to be launched on local ts or more
-
-        Returns
-        -------
-        bool
-            True if query is federatd
-        """
-        # If local triplestore url is not accessible by federetad query engine
-        local_triplestore_url = self.settings.get('triplestore', 'endpoint')
-        try:
-            local_triplestore_url = self.settings.get('federation', 'local_endpoint')
-        except Exception:
-            pass
-
-        return not self.endpoints == [local_triplestore_url] and len(self.endpoints) > 1
-
     def set_graphs_and_endpoints(self, entities=None):
         """Get all public and private graphs containing the given entities
 
@@ -284,16 +295,12 @@ class SparqlQueryBuilder(Params):
             self.graphs.append(res["graph"])
 
             # If local triplestore url is not accessible by federetad query engine
-            diff_local_url = None
-            try:
-                diff_local_url = self.settings.get('federation', 'local_endpoint')
-            except Exception:
-                pass
-            if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and diff_local_url is not None:
-                self.endpoints.append(diff_local_url)
+            if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
+                self.endpoints.append(self.local_endpoint_f)
             else:
                 self.endpoints.append(res["endpoint"])
         self.endpoints = Utils.unique(self.endpoints)
+        self.federated = len(self.endpoints) > 1
 
     def format_sparql_variable(self, name):
         """Format a name into a sparql variable by remove spacial char and add a ?
@@ -615,8 +622,22 @@ class SparqlQueryBuilder(Params):
         from_string = self.get_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
 
-        # Query for the federated query engine
-        if self.is_federated():
+        self.log.debug(for_editor)
+        self.log.debug(self.federated)
+        self.log.debug(self.endpoints)
+
+        # query is for editor (no froms, no federated)
+        if for_editor:
+            query = """
+SELECT DISTINCT {}
+WHERE {{
+    {}
+    {}
+}}
+            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
+
+        # Query is federated, add federated line
+        elif self.federated:
             query = """
 {}
 
@@ -626,27 +647,9 @@ WHERE {{
     {}
 }}
             """.format(endpoints_string, ' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
-        # Query is not federated, but the endpoint is external
-        elif not self.is_federated() and self.endpoints != [self.settings.get('triplestore', 'endpoint')]:
-            query = """
-SELECT DISTINCT {}
-WHERE {{
-    {}
-    {}
-}}
-            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
-        # Query is not federated and endpoint is local, and query is for editor (don't add froms)
-        elif not self.is_federated() and self.endpoints == [self.settings.get("triplestore", "endpoint")] and for_editor:
-            query = """
-SELECT DISTINCT {}
-WHERE {{
-    {}
-    {}
-}}
-            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
 
-        # Query is not federated and endpoint is local, and query is not for editor (add froms)
-        else:
+        # Query on the local endpoint (add froms)
+        elif self.endpoints == [self.local_endpoint_f]:
             query = """
 SELECT DISTINCT {}
 {}
@@ -655,6 +658,16 @@ WHERE {{
     {}
 }}
             """.format(' '.join(self.selects), from_string, '\n    '.join(triples), '\n    '.join(filters))
+
+        # Query an external endpoint (no froms)
+        else:
+            query = """
+SELECT DISTINCT {}
+WHERE {{
+    {}
+    {}
+}}
+            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))

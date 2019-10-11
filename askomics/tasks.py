@@ -156,7 +156,7 @@ def query(self, session, info):
 
         query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
         endpoints = query_builder.endpoints
-        federated = query_builder.is_federated()
+        federated = query_builder.federated
 
         headers = query_builder.selects
         results = []
@@ -210,14 +210,14 @@ def sparql_query(self, session, info):
         result.update_db_status("started", update_celery=True)
 
         # launch query
-        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
         query_builder = SparqlQueryBuilder(app, session)
 
-        query = query_builder.format_query(info["sparql_query"], replace_froms=True, limit=None)
+        query = query_builder.format_query(info["sparql_query"], replace_froms=False, federated=True, limit=None)
         # header, data = query_launcher.process_query(query)
         header = query_builder.selects
         data = []
         if query_builder.graphs:
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=True)
             header, data = query_launcher.process_query(query)
 
         # Write results in file
