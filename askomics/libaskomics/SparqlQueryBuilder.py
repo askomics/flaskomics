@@ -622,10 +622,6 @@ class SparqlQueryBuilder(Params):
         from_string = self.get_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
 
-        self.log.debug(for_editor)
-        self.log.debug(self.federated)
-        self.log.debug(self.endpoints)
-
         # query is for editor (no froms, no federated)
         if for_editor:
             query = """
