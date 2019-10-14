@@ -1,7 +1,24 @@
 export default class Utils {
 
-  constructor () {
+  isUrl(s) {
+     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+     return regexp.test(s);
+  }
 
+  truncate(string, n) {
+    if (string.length > n) {
+      return string.substring(0 ,n) + "..."
+    } else {
+      return string
+    }
+  }
+
+  splitUrl(url) {
+    let splitList = url.split('/')
+    // take last elem
+    let last = splitList[splitList.length - 1]
+    let splitList2 = last.split('#')
+    return splitList2[splitList2.length - 1]
   }
 
   humanFileSize (bytes, si) {

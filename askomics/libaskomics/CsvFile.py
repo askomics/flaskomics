@@ -98,10 +98,7 @@ class CsvFile(File):
             for row in reader:
                 res_row = {}
                 for i, cell in enumerate(row):
-                    if len(cell) >= 25:
-                        res_row[self.header[i]] = "{}...".format(cell[:25])
-                    else:
-                        res_row[self.header[i]] = cell
+                    res_row[self.header[i]] = cell
                 preview.append(res_row)
 
                 # Stop after x lines

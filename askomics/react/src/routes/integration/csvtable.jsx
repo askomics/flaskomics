@@ -5,10 +5,12 @@ import { Collapse, CustomInput, Input, FormGroup, ButtonGroup, Button } from 're
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AdvancedOptions from './advancedoptions'
+import Utils from '../../classes/utils'
 
 export default class CsvTable extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       name: props.file.name,
       id: props.file.id,
@@ -131,7 +133,16 @@ export default class CsvTable extends Component {
         sort: false,
         headerFormatter: this.headerFormatter,
         index: index,
-        selectedType: this.state.columns_type[index]
+        selectedType: this.state.columns_type[index],
+        formatter: (cell, row) => {
+          let text = row[this.state.header[index]]
+          console.log(text)
+          if (this.utils.isUrl(text)) {
+            return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
+          } else {
+            return this.utils.truncate(text, 25)
+          }
+        },
       })
     })
 
