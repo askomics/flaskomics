@@ -136,7 +136,6 @@ export default class CsvTable extends Component {
         selectedType: this.state.columns_type[index],
         formatter: (cell, row) => {
           let text = row[this.state.header[index]]
-          console.log(text)
           if (this.utils.isUrl(text)) {
             return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
           } else {
