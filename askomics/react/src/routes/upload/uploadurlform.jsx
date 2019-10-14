@@ -3,10 +3,12 @@ import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress 
 import axios from 'axios'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class UploadUrlForm extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
 
     this.state = {
       url: '',
@@ -22,16 +24,10 @@ export default class UploadUrlForm extends Component {
     this.cancelRequest
   }
 
-
-  isUrl(s) {
-     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-     return regexp.test(s);
-  }
-
   handleChange (event) {
     this.setState({
       url: event.target.value,
-      disabled: !this.isUrl(event.target.value)
+      disabled: !this.utils.isUrl(event.target.value)
     })
   }
 
