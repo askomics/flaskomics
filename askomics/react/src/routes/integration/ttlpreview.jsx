@@ -5,6 +5,7 @@ import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import brace from 'brace'
 import AceEditor from 'react-ace'
+import ErrorDiv from '../error/error'
 
 import 'brace/mode/turtle'
 import 'brace/theme/tomorrow'
@@ -18,7 +19,10 @@ export default class TtlPreview extends Component {
       id: props.file.id,
       integrated: false,
       publicTick: false,
-      privateTick: false
+      privateTick: false,
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -101,6 +105,8 @@ export default class TtlPreview extends Component {
             {publicButton}
           </ButtonGroup>
         </div>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

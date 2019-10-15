@@ -17,11 +17,17 @@ export default class ErrorDiv extends Component {
       return null
     }
 
+
+    let errorMessage = this.props.errorMessage
+    if (this.props.status == 404) {
+      errorMessage = "404 not found"
+    }
+
     let error
-    if (Array.isArray(this.props.errorMessage)) {
+    if (Array.isArray(errorMessage)) {
       error = (
         <Alert color="danger">
-          {this.props.errorMessage.map((item, index) => (
+          {errorMessage.map((item, index) => (
             <div key={index}><i className="fas fa-exclamation-circle"></i> {item}</div>
           ))}
         </Alert>
@@ -29,7 +35,7 @@ export default class ErrorDiv extends Component {
     } else {
       error = (
         <Alert color="danger">
-          <div><i className="fas fa-exclamation-circle"></i> {this.props.errorMessage}</div>
+          <div><i className="fas fa-exclamation-circle"></i> {errorMessage}</div>
         </Alert>
       )
     }

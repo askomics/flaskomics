@@ -178,6 +178,7 @@ export default class Sparql extends Component {
         {resultsTable}
 
         <WaitingDiv waiting={this.state.waiting} center />
+        <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

@@ -3,6 +3,7 @@ import axios from 'axios'
 import DatasetsTable from './datasetstable'
 import { Button } from 'reactstrap'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class Datasets extends Component {
   constructor (props) {
@@ -87,6 +88,7 @@ export default class Datasets extends Component {
           <br />
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

@@ -4,7 +4,6 @@ import axios from 'axios'
 
 import Ask from './routes/ask/ask'
 import About from './routes/about/about'
-import Jobs from './routes/jobs/jobs'
 import Upload from './routes/upload/upload'
 import Integration from './routes/integration/integration'
 import Datasets from './routes/datasets/datasets'

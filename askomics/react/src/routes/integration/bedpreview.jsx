@@ -3,6 +3,7 @@ import axios from 'axios'
 import { CustomInput, Input, FormGroup, Label, ButtonGroup, Button, Col } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class BedPreview extends Component {
   constructor (props) {
@@ -14,7 +15,10 @@ export default class BedPreview extends Component {
       id: props.file.id,
       integrated: false,
       publicTick: false,
-      privateTick: false
+      privateTick: false,
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -87,6 +91,8 @@ export default class BedPreview extends Component {
           <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
           {publicButton}
         </ButtonGroup>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

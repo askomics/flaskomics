@@ -3,6 +3,7 @@ import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress 
 import axios from 'axios'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class UploadForm extends Component {
   constructor (props) {
@@ -11,7 +12,10 @@ export default class UploadForm extends Component {
     this.state = {
       files: [],
       new_files: [],
-      label: 'Browse files'
+      label: 'Browse files',
+      error: false,
+      errorMessage: null,
+      status: null
     }
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -24,8 +28,6 @@ export default class UploadForm extends Component {
     if (nselected > 1) {
       label = nselected + ' files selected'
     }
-
-    console.log('files', event.target.files)
 
     this.setState({
       // new_files: event.target.files,
@@ -40,8 +42,6 @@ export default class UploadForm extends Component {
       })),
       label: label
     })
-
-    console.log('state', this.state)
   }
 
   handleSubmit (event) {
@@ -66,7 +66,6 @@ export default class UploadForm extends Component {
       }
 
       reader.readAsBinaryString(blob)
-      console.log(this.state.new_files[i])
       reader.onload = (event) => {
         let data = {
           chunk: reader.result,
@@ -113,10 +112,20 @@ export default class UploadForm extends Component {
                 .catch(error => {
                   console.log(error, error.response.data.errorMessage)
                   this.setState({
-                    new_files: update(this.state.new_files, { [i]: { error: { $set: true } } }, { [i]: { errorMessage: { $set: error.response.data.errorMessage } } })
+                    new_files: update(this.state.new_files, { [i]: { error: { $set: true } } }, { [i]: { errorMessage: { $set: error.response.data.errorMessage } } }),
+                    error: true,
+                    errorMessage: error.response.data.errorMessage,
+                    status: error.response.status
                   })
                 })
             }
+          }).catch(error => {
+            console.log(error, error.response.data.errorMessage)
+            this.setState({
+              error: true,
+              errorMessage: error.response.data.errorMessage,
+              status: error.response.status
+            })
           })
       }
     }
@@ -150,6 +159,8 @@ export default class UploadForm extends Component {
           </FormGroup>
           <Button color="secondary">Upload</Button>
         </Form>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }
