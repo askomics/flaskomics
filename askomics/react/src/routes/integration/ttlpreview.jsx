@@ -3,12 +3,11 @@ import axios from 'axios'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
-import brace from 'brace'
 import AceEditor from 'react-ace'
 import ErrorDiv from '../error/error'
 
-import 'brace/mode/turtle'
-import 'brace/theme/tomorrow'
+import "ace-builds/src-noconflict/mode-turtle";
+import "ace-builds/src-noconflict/theme-tomorrow";
 
 export default class TtlPreview extends Component {
   constructor (props) {

@@ -7,11 +7,10 @@ import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 
-import brace from 'brace'
 import AceEditor from 'react-ace'
 
-import 'brace/mode/sparql'
-import 'brace/theme/tomorrow'
+import "ace-builds/src-noconflict/mode-sparql";
+import "ace-builds/src-noconflict/theme-tomorrow";
 
 import dedent from 'dedent'
 
@@ -172,6 +171,7 @@ export default class Sparql extends Component {
             editorProps={{ $blockScrolling: true }}
             height={400}
             width={'auto'}
+            // resize={'both'}
           />
         </div>
 
