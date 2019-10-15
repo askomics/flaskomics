@@ -157,7 +157,7 @@ export default class Sparql extends Component {
         <hr />
         <br />
         {warningDiskSpace}
-        <div>
+        <div className="resizable">
           <AceEditor
             mode="sparql"
             theme="tomorrow"
@@ -169,9 +169,8 @@ export default class Sparql extends Component {
             highlightActiveLine={true}
             value={this.state.sparqlInput}
             editorProps={{ $blockScrolling: true }}
-            height={400}
-            width={'auto'}
-            // resize={'both'}
+            height={'100%'}
+            width={'100%'}
           />
         </div>
 
