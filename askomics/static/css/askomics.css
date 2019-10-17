@@ -67,7 +67,7 @@ i.inactive {
 
 .resizable {
     overflow: auto;
-    resize: vertical;
+    resize: both;
     height: 400px;
     width: auto;
     background-position: 0% 0%;
