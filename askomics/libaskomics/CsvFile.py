@@ -487,7 +487,7 @@ class CsvFile(File):
                         relation = self.rdfize(current_header)
                         attribute = rdflib.Literal(self.convert_type(cell))
 
-                    if entity and relation and attribute:
+                    if entity and relation is not None and attribute is not None:
                         self.graph_chunk.add((entity, relation, attribute))
                         if symetric_relation:
                             self.graph_chunk.add((attribute, relation, entity))

@@ -4,6 +4,7 @@ import { CustomInput, Input, FormGroup, Label, ButtonGroup, Button, Col } from '
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AdvancedOptions from './advancedoptions'
+import ErrorDiv from '../error/error'
 
 export default class BedPreview extends Component {
   constructor (props) {
@@ -17,7 +18,10 @@ export default class BedPreview extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: ""
+      externalEndpoint: "",
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -116,6 +120,8 @@ export default class BedPreview extends Component {
             <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
             {publicButton}
           </ButtonGroup>
+          <br />
+          <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
         </div>
       </div>
     )

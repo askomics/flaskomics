@@ -4,6 +4,7 @@ import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AdvancedOptions from './advancedoptions'
+import ErrorDiv from '../error/error'
 
 export default class GffPreview extends Component {
   constructor (props) {
@@ -128,6 +129,8 @@ export default class GffPreview extends Component {
               <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
               {publicButton}
             </ButtonGroup>
+            <br />
+            <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
           </div>
       </div>
     )

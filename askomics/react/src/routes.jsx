@@ -4,7 +4,6 @@ import axios from 'axios'
 
 import Ask from './routes/ask/ask'
 import About from './routes/about/about'
-import Jobs from './routes/jobs/jobs'
 import Upload from './routes/upload/upload'
 import Integration from './routes/integration/integration'
 import Datasets from './routes/datasets/datasets'
@@ -72,6 +71,12 @@ export default class Routes extends Component {
 
   render () {
 
+    let redirectRoot
+
+    if (document.getElementById('redirect').getAttribute('redirect') == "/") {
+      redirectRoot = <Redirect to="/" />
+    }
+
     let admin = false
     if (this.state.config.user) {
       admin = this.state.config.user.admin
@@ -92,6 +97,7 @@ export default class Routes extends Component {
     return (
       <Router basename={this.state.config.proxyPath}>
         <div>
+          {redirectRoot}
           <AskoNavbar waitForStart={this.state.waiting} config={this.state.config} />
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} config={this.state.config} />)} />

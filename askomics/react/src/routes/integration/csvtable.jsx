@@ -6,6 +6,7 @@ import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AdvancedOptions from './advancedoptions'
 import Utils from '../../classes/utils'
+import ErrorDiv from '../error/error'
 
 export default class CsvTable extends Component {
   constructor (props) {
@@ -20,7 +21,10 @@ export default class CsvTable extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: ""
+      externalEndpoint: "",
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -186,6 +190,8 @@ export default class CsvTable extends Component {
             {publicButton}
           </ButtonGroup>
         </div>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

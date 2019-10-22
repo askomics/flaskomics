@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, Row, Col, ButtonGroup, Input } from 'reactstrap'
+import { Alert, Button, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -1209,7 +1209,11 @@ export default class Query extends Component {
       )
 
       // buttons
-      previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
+      let previewIcon = <i className={"fas fa-" + this.state.previewIcon}></i>
+      if (this.state.previewIcon == "spinner") {
+        previewIcon = <Spinner size="sm" color="light" />
+      }
+      previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
       if (this.state.config.logged) {
         launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
@@ -1280,7 +1284,7 @@ export default class Query extends Component {
         <div>
           {resultsTable}
         </div>
-        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results"}} />
       </div>
     )
   }

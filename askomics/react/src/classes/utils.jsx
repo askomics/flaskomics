@@ -39,4 +39,10 @@ export default class Utils {
     let event = new Date(date * 1000)
     return event.toUTCString()
   }
+
+  objectHaveKeys(obj, level, ...rest) {
+    if (obj === undefined) return false
+    if (rest.length == 0 && obj.hasOwnProperty(level)) return true
+    return this.objectHaveKeys(obj[level], ...rest)
+  }
 }

@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
+import ErrorDiv from '../error/error'
 
 export default class UploadGalaxyForm extends Component {
   constructor (props) {
@@ -15,7 +16,11 @@ export default class UploadGalaxyForm extends Component {
       selected: [],
       disabled: false,
       waiting: true,
-      uploading: false
+      uploading: false,
+      datasets: [],
+      histories: [],
+      error: false,
+      errorMessage: null
     }
 
     this.handleChange = this.handleChange.bind(this)
@@ -42,7 +47,10 @@ export default class UploadGalaxyForm extends Component {
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
+          waiting: false,
           error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
           waiting: false
         })
       })
@@ -261,6 +269,7 @@ export default class UploadGalaxyForm extends Component {
           </Button>
           <WaitingDiv className="float-right" waiting={this.state.uploading} size='xm' />
         </div>
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

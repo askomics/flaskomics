@@ -115,7 +115,14 @@ def login_api_key(key):
         except Exception:
             pass
 
-        return render_template('index.html', project="AskOmics", proxy_path=proxy_path, redirect="/")
+        title = "AskOmics"
+        try:
+            subtitle = current_app.iniconfig.get('askomics', 'subtitle')
+            title = "AskOmics | {}".format(subtitle)
+        except Exception:
+            pass
+
+        return render_template('index.html', title=title, proxy_path=proxy_path, redirect="/")
 
     else:
 

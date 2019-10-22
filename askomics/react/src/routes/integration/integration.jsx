@@ -89,6 +89,7 @@ export default class Integration extends Component {
         }
 
         <WaitingDiv waiting={this.state.waiting} center="center" />
+        <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
