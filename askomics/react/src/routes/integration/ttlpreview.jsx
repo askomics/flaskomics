@@ -134,6 +134,7 @@ export default class TtlPreview extends Component {
             {publicButton}
           </ButtonGroup>
         </div>
+        </div>
         <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
