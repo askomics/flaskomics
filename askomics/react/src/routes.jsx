@@ -71,6 +71,12 @@ export default class Routes extends Component {
 
   render () {
 
+    let redirectRoot
+
+    if (document.getElementById('redirect').getAttribute('redirect') == "/") {
+      redirectRoot = <Redirect to="/" />
+    }
+
     let admin = false
     if (this.state.config.user) {
       admin = this.state.config.user.admin
@@ -91,6 +97,7 @@ export default class Routes extends Component {
     return (
       <Router basename={this.state.config.proxyPath}>
         <div>
+          {redirectRoot}
           <AskoNavbar waitForStart={this.state.waiting} config={this.state.config} />
           <Switch>
             <Route path="/" exact component={() => (<Ask waitForStart={this.state.waiting} config={this.state.config} />)} />
