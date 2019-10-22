@@ -44,6 +44,20 @@ class SparqlQueryBuilder(Params):
 
         self.set_graphs_and_endpoints()
 
+    def get_federated_froms(self):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = "@from <{}>".format(self.local_endpoint_f)
+        for graph in self.graphs:
+            from_string += " <{}>".format(graph)
+
+        return from_string
+
     def get_froms(self):
         """Get FROM string
 
@@ -237,6 +251,20 @@ class SparqlQueryBuilder(Params):
 
         for graph in graphs:
             from_string += '\nFROM <{}>'.format(graph)
+
+        return from_string
+
+    def get_federated_froms_from_graphs(self, graphs):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = "@from <{}>".format(self.local_endpoint_f)
+        for graph in graphs:
+            from_string += " <{}>".format(graph)
 
         return from_string
 
@@ -620,6 +648,7 @@ class SparqlQueryBuilder(Params):
                     filters.append(filter_string)
 
         from_string = self.get_froms_from_graphs(self.graphs)
+        federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
 
         # query is for editor (no froms, no federated)
@@ -632,9 +661,10 @@ WHERE {{
 }}
             """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
 
-        # Query is federated, add federated line
+        # Query is federated, add federated lines @federate & @from)
         elif self.federated:
             query = """
+{}
 {}
 
 SELECT DISTINCT {}
@@ -642,7 +672,7 @@ WHERE {{
     {}
     {}
 }}
-            """.format(endpoints_string, ' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
+            """.format(endpoints_string, federated_from_string, ' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
 
         # Query on the local endpoint (add froms)
         elif self.endpoints == [self.local_endpoint_f]:
