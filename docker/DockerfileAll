@@ -6,6 +6,7 @@ COPY . /askomics
 WORKDIR /askomics
 
 ENV DEPMODE="prod" \
+    MAX_CELERY_QUEUE="1" \
     SPARQL_UPDATE=true \
     ASKO_triplestore_load_url="http://localhost:5000"
 
@@ -28,4 +29,4 @@ RUN apk update && apk del openssl openssl-dev && \
     rm -rf /root/.npm/*
 
 EXPOSE 5000
-ENTRYPOINT /askomics/start_all.sh
+CMD ["/askomics/start_all.sh"]

@@ -2,7 +2,7 @@
 
 #####################################################
 #                                                   #
-#       Add a user into the AskOmics database       #
+#         Insert uploaded files in database         #
 #                                                   #
 #####################################################
 
@@ -28,9 +28,9 @@ if [[ ! -f ${database_path} ]]; then
     hash_password=$(python3 -c "import hashlib; print(hashlib.sha512('${salted_password}'.encode('utf8')).hexdigest())")
 
     # Create database and user table
-    sqlite3 ${database_path} "CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, ldap boolean, fname text, lname text, username text, email text, password text, salt text, apikey text, admin boolean, blocked boolean)"
+    sqlite3 ${database_path} "CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, ldap boolean, fname text, lname text, username text, email text, password text, salt text, apikey text, admin boolean, blocked boolean, quota INTEGER)"
     # Insert the user
-    sqlite3 ${database_path} "INSERT INTO users VALUES(NULL, 'false', '${first_name}', '${last_name}', '${username}', '${email}', '${hash_password}', '${user_salt}', '${api_key}', 1, 0)"
+    sqlite3 ${database_path} "INSERT INTO users VALUES(NULL, 'false', '${first_name}', '${last_name}', '${username}', '${email}', '${hash_password}', '${user_salt}', '${api_key}', 1, 0, 0)"
     # get user id
     user_id=$(sqlite3 ${database_path} "select user_id from users where username='${username}';")
 
