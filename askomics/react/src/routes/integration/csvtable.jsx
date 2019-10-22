@@ -4,6 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class CsvTable extends Component {
   constructor (props) {
@@ -15,7 +16,10 @@ export default class CsvTable extends Component {
       columns_type: props.file.data.columns_type,
       integrated: false,
       publicTick: false,
-      privateTick: false
+      privateTick: false,
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -148,6 +152,8 @@ export default class CsvTable extends Component {
             {publicButton}
           </ButtonGroup>
         </div>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

@@ -3,6 +3,7 @@ import { Form, FormGroup, FormText, Label, Input, Button, CustomInput, Progress 
 import axios from 'axios'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class UploadUrlForm extends Component {
   constructor (props) {
@@ -14,7 +15,10 @@ export default class UploadUrlForm extends Component {
       progressAnimated: true,
       progressValue: 0,
       progressDisplay: "",
-      progressColor: "success"
+      progressColor: "success",
+      error: false,
+      errorMessage: null,
+      status: null
     }
 
     this.handleChange = this.handleChange.bind(this)
@@ -81,7 +85,10 @@ export default class UploadUrlForm extends Component {
           progressAnimated: false,
           progressValue: 100,
           progressDisplay: "ERROR",
-          progressColor: "error"
+          progressColor: "error",
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
         })
       })
 
@@ -94,6 +101,8 @@ export default class UploadUrlForm extends Component {
         <Progress animated={this.state.progressAnimated} color={this.state.progressColor} value={this.state.progressValue}>{this.state.progressDisplay}</Progress>
         <br />
         <Button disabled={this.state.disabled} onClick={this.handleSubmit} color="secondary">Upload</Button>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )
   }

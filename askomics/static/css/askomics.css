@@ -65,6 +65,14 @@ i.inactive {
   text-align: center;
 }
 
+.resizable {
+    overflow: auto;
+    resize: both;
+    height: 400px;
+    width: auto;
+    background-position: 0% 0%;
+}
+
 div.startpoints-div {
     height: 200px;
     /*width: 30%;*/

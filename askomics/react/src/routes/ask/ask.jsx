@@ -268,6 +268,7 @@ export default class Ask extends Component {
               {exempleQueries}
             </Col>
           </Row>
+          <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

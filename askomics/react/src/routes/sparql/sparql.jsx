@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, ButtonGroup } from 'reactstrap'
+import { Alert, Button, ButtonGroup, Spinner } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 
-import brace from 'brace'
 import AceEditor from 'react-ace'
 
-import 'brace/mode/sparql'
-import 'brace/theme/tomorrow'
+import "ace-builds/src-noconflict/mode-sparql";
+import "ace-builds/src-noconflict/theme-tomorrow";
 
 import dedent from 'dedent'
 
@@ -83,7 +82,8 @@ export default class Sparql extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          previewIcon: "times text-error"
+          previewIcon: "times text-error",
+          disablePreview: false,
         })
       })
   }
@@ -117,7 +117,8 @@ export default class Sparql extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          saveIcon: "times text-error"
+          saveIcon: "times text-error",
+          disableSave: false,
         })
       })
   }
@@ -144,13 +145,19 @@ export default class Sparql extends Component {
       )
     }
 
+    // icons
+    let previewIcon = <i className={"fas fa-" + this.state.previewIcon}></i>
+    if (this.state.previewIcon == "spinner") {
+      previewIcon = <Spinner size="sm" color="light" />
+    }
+
     return (
       <div className="container">
         <h2>SPARQL query</h2>
         <hr />
         <br />
         {warningDiskSpace}
-        <div>
+        <div className="resizable">
           <AceEditor
             mode="sparql"
             theme="tomorrow"
@@ -162,14 +169,14 @@ export default class Sparql extends Component {
             highlightActiveLine={true}
             value={this.state.sparqlInput}
             editorProps={{ $blockScrolling: true }}
-            height={400}
-            width={'auto'}
+            height={'100%'}
+            width={'100%'}
           />
         </div>
 
         <br />
         <ButtonGroup>
-          <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}><i className={"fas fa-" + this.state.previewIcon}></i> Run & preview</Button>
+          <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
           <Button onClick={this.launchQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
         </ButtonGroup>
         <br />
@@ -178,7 +185,8 @@ export default class Sparql extends Component {
         {resultsTable}
 
         <WaitingDiv waiting={this.state.waiting} center />
-        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results"}} />
       </div>
     )
   }

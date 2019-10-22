@@ -9,6 +9,7 @@ import Utils from '../../classes/utils'
 import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
+import ErrorDiv from '../error/error'
 
 export default class ResultsFilesTable extends Component {
   constructor (props) {
@@ -18,7 +19,10 @@ export default class ResultsFilesTable extends Component {
       graphState: [],
       modal: false,
       idToPublish: null,
-      description: ''
+      description: '',
+      error: false,
+      errorMessage: null,
+      status: null
     }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
@@ -334,7 +338,7 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
-            {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != "null" ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
+            {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != null ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
       },
@@ -384,6 +388,8 @@ export default class ResultsFilesTable extends Component {
             })}
           />
         </div>
+        <br />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
 
     )
