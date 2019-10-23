@@ -26,16 +26,12 @@ export default class ErrorDiv extends Component {
       "500": this.utils.objectHaveKeys(this.props, "customMessages", "500") ? this.props.customMessages["500"] : this.props.errorMessage ? this.props.errorMessage : "500 Internal Server Error",
     }
 
-    let errorMessage = this.props.errorMessage
-    if (this.utils.objectHaveKeys(this.props, "status")) {
-      errorMessage = messages[this.props.status.toString()]
-    }
-
     let error
-    if (Array.isArray(errorMessage)) {
+
+    if (Array.isArray(this.props.errorMessage)) {
       error = (
         <Alert color="danger">
-          {errorMessage.map((item, index) => (
+          {this.props.errorMessage.map((item, index) => (
             <div key={index}><i className="fas fa-exclamation-circle"></i> {item}</div>
           ))}
         </Alert>
@@ -43,7 +39,7 @@ export default class ErrorDiv extends Component {
     } else {
       error = (
         <Alert color="danger">
-          <div><i className="fas fa-exclamation-circle"></i> {errorMessage}</div>
+          <div><i className="fas fa-exclamation-circle"></i> {messages[this.props.status.toString()]}</div>
         </Alert>
       )
     }

@@ -83,6 +83,7 @@ export default class Signup extends Component {
           isLoading: false,
           error: response.data.error,
           errorMessage: response.data.errorMessage,
+          status: response.status
         })
         if (!this.state.error) {
           this.props.setStateNavbar({
