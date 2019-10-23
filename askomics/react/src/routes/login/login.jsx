@@ -45,6 +45,7 @@ export default class Login extends Component {
           isLoading: false,
           error: response.data.error,
           errorMessage: response.data.errorMessage,
+          status: response.status,
           user: response.data.user,
           logged: !response.data.error
         })

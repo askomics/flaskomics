@@ -8,6 +8,7 @@ import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 
 import AceEditor from 'react-ace'
+import ReactResizeDetector from 'react-resize-detector';
 
 import "ace-builds/src-noconflict/mode-sparql";
 import "ace-builds/src-noconflict/theme-tomorrow";
@@ -36,11 +37,15 @@ export default class Sparql extends Component {
 
       // Preview icons
       disablePreview: false,
-      previewIcon: "table"
+      previewIcon: "table",
+
+      editorHeight: 500,
+      editorWidth: "auto"
     }
     this.handleCodeChange = this.handleCodeChange.bind(this)
     this.previewQuery = this.previewQuery.bind(this)
     this.launchQuery = this.launchQuery.bind(this)
+    this.onResize = this.onResize.bind(this)
   }
 
   handleCodeChange (code) {
@@ -123,6 +128,13 @@ export default class Sparql extends Component {
       })
   }
 
+  onResize (w, h) {
+    this.setState({
+      editorHeight: h,
+      editorWidth: w
+    })
+  }
+
   render () {
     let resultsTable
     if (this.state.results_header.length > 0) {
@@ -158,6 +170,7 @@ export default class Sparql extends Component {
         <br />
         {warningDiskSpace}
         <div className="resizable">
+          <ReactResizeDetector handleWidth handleHeight onResize={this.onResize} />
           <AceEditor
             mode="sparql"
             theme="tomorrow"
@@ -169,8 +182,8 @@ export default class Sparql extends Component {
             highlightActiveLine={true}
             value={this.state.sparqlInput}
             editorProps={{ $blockScrolling: true }}
-            height={'100%'}
-            width={'100%'}
+            height={this.state.editorHeight}
+            width={this.state.editorWidth}
           />
         </div>
 
