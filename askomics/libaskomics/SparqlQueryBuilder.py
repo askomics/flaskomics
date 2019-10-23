@@ -190,7 +190,7 @@ class SparqlQueryBuilder(Params):
             froms = self.get_froms()
 
         if federated:
-            federated_line = self.get_federated_line()
+            federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
 
         query_lines = query.split('\n')
 
