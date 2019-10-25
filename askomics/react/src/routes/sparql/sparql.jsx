@@ -199,7 +199,7 @@ export default class Sparql extends Component {
 
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
-        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results"}} />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results", "502": "Query time is too long, use Run & Save to get your results"}} />
       </div>
     )
   }
