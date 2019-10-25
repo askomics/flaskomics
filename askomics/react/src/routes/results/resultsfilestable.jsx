@@ -137,6 +137,8 @@ export default class ResultsFilesTable extends Component {
       this.setState({
         redirectSparqlEditor: true,
         sparqlQuery: response.data.query,
+        graphs: response.data.graphs,
+        endpoints: response.data.endpoints,
         diskSpace: response.data.diskSpace
       })
     })
@@ -235,6 +237,8 @@ export default class ResultsFilesTable extends Component {
         state: {
           diskSpace: this.state.diskSpace,
           sparqlQuery: this.state.sparqlQuery,
+          graphs: this.state.graphs,
+          endpoints: this.state.endpoints,
           config: this.props.config
         }
       }} />

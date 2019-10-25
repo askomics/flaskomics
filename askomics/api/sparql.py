@@ -49,16 +49,24 @@ def query():
         query results
     """
     q = request.get_json()['query']
+    graphs = request.get_json()['graphs']
+    endpoints = request.get_json()['endpoints']
 
     try:
         query_builder = SparqlQueryBuilder(current_app, session)
 
-        query = query_builder.format_query(q, replace_froms=False, federated=True)
+        query_builder.set_graphs(graphs)
+        query_builder.set_endpoints(endpoints)
+
+        federated = query_builder.is_federated()
+        replace_froms = query_builder.replace_froms()
+
+        query = query_builder.format_query(q, replace_froms=replace_froms, federated=federated)
         # header, data = query_launcher.process_query(query)
         header = query_builder.selects
         data = []
         if query_builder.graphs:
-            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=True)
+            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated)
             header, data = query_launcher.process_query(query)
 
     except Exception as e:

@@ -44,6 +44,52 @@ class SparqlQueryBuilder(Params):
 
         self.set_graphs_and_endpoints()
 
+    def set_graphs(self, graphs):
+        """Set graphs
+
+        Parameters
+        ----------
+        graphs : list
+            graphs
+        """
+        self.graphs = graphs
+
+    def set_endpoints(self, endpoints):
+        """Set endpoints
+
+        Parameters
+        ----------
+        endpoints : list
+            Endpoints
+        """
+        self.endpoints = endpoints
+
+    def is_federated(self):
+        """Return True if there is more than 1 endpoint
+
+        Returns
+        -------
+        bool
+            True or False
+        """
+        if len(self.endpoints) > 1:
+            return True
+        return False
+
+    def replace_froms(self):
+        """True if not federated and endpoint is local
+
+        Returns
+        -------
+        bool
+            True or False
+        """
+        if not self.is_federated():
+            if self.endpoints == [self.local_endpoint_f]:
+                return True
+
+        return False
+
     def get_federated_froms(self):
         """Get @from string fir the federated query engine
 
@@ -85,6 +131,69 @@ class SparqlQueryBuilder(Params):
             federated_string += '<{}> '.format(endpoint)
 
         return federated_string
+
+    def format_graph_name(self, graph):
+        """Format graph name by removing base graph and timestamp
+
+        Parameters
+        ----------
+        graph : string
+            The graph name
+
+        Returns
+        -------
+        string
+            Formated graph name
+        """
+        to_remove = "{}:{}_{}:".format(
+            self.settings.get("triplestore", "default_graph"),
+            self.session["user"]["id"],
+            self.session["user"]["username"]
+        )
+
+        return "_".join(graph.replace(to_remove, "").split("_")[:-1])
+
+    def format_endpoint_name(self, endpoint):
+        """Replace local url by "local triplestore"
+
+        Parameters
+        ----------
+        endpoint : string
+            The endpoint name
+
+        Returns
+        -------
+        string
+            Formated endpoint name
+        """
+        if endpoint in (self.settings.get("triplestore", "endpoint"), self.local_endpoint_f):
+            return "local triplestore"
+        return endpoint
+
+    def get_graphs_and_enpoints(self):
+        """get graphs and endpoints (uri and names)
+
+        Returns
+        -------
+        list
+            List of dict uri name
+        """
+        graphs = {}
+        endpoints = {}
+        for graph in self.graphs:
+            graphs[graph] = {
+                "uri": graph,
+                "name": self.format_graph_name(graph),
+                "selected": True
+            }
+        for endpoint in self.endpoints:
+            endpoints[endpoint] = {
+                "uri": endpoint,
+                "name": self.format_endpoint_name(endpoint),
+                "selected": True
+            }
+
+        return (graphs, endpoints)
 
     def get_default_query(self):
         """Get the default query

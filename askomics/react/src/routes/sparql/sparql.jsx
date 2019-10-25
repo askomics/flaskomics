@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Alert, Button, ButtonGroup, Spinner } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import update from 'immutability-helper'
 
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -16,6 +17,7 @@ import "ace-builds/src-noconflict/theme-tomorrow";
 import dedent from 'dedent'
 
 import ResultsTable from './resultstable'
+import AdvancedSparql from './advancedsparql'
 import Utils from '../../classes/utils'
 
 export default class Sparql extends Component {
@@ -29,6 +31,8 @@ export default class Sparql extends Component {
       error: false,
       errorMessage: null,
       sparqlInput: this.props.location.state.sparqlQuery,
+      graphs: this.props.location.state.graphs,
+      endpoints: this.props.location.state.endpoints,
       exceededQuota: this.props.location.state.config.user.quota > 0 && this.props.location.state.diskSpace >= this.props.location.state.config.user.quota,
       diskSpace: this.props.location.state.diskSpace,
       // save query icons
@@ -46,6 +50,8 @@ export default class Sparql extends Component {
     this.previewQuery = this.previewQuery.bind(this)
     this.launchQuery = this.launchQuery.bind(this)
     this.onResize = this.onResize.bind(this)
+    this.handleChangeGraphs = this.handleChangeGraphs.bind(this)
+    this.handleChangeEndpoints = this.handleChangeEndpoints.bind(this)
   }
 
   handleCodeChange (code) {
@@ -58,10 +64,32 @@ export default class Sparql extends Component {
     })
   }
 
+  get_selected_graphs () {
+    let graphs = []
+    Object.keys(this.state.graphs).map((key, index) => {
+      if (this.state.graphs[key]["selected"]) {
+        graphs.push(key)
+      }
+    })
+    return graphs
+  }
+
+  get_selected_endpoints () {
+    let endpoints = []
+    Object.keys(this.state.endpoints).map((key, index) => {
+      if (this.state.endpoints[key]["selected"]) {
+        endpoints.push(key)
+      }
+    })
+    return endpoints
+  }
+
   previewQuery () {
     let requestUrl = '/api/sparql/previewquery'
     let data = {
-      query: this.state.sparqlInput
+      query: this.state.sparqlInput,
+      graphs: this.get_selected_graphs(),
+      endpoints: this.get_selected_endpoints()
     }
     this.setState({
       disablePreview: true,
@@ -96,7 +124,9 @@ export default class Sparql extends Component {
   launchQuery () {
     let requestUrl = '/api/sparql/savequery'
     let data = {
-      query: this.state.sparqlInput
+      query: this.state.sparqlInput,
+      graphs: this.get_selected_graphs(),
+      endpoints: this.get_selected_endpoints()
     }
     this.setState({
       disableSave: true,
@@ -126,6 +156,27 @@ export default class Sparql extends Component {
           disableSave: false,
         })
       })
+  }
+
+  handleChangeGraphs (event) {
+    this.setState({
+      graphs: update(this.state.graphs, {[event.target.value]: {selected: {$set: event.target.checked}}}),
+      disableSave: false,
+      saveIcon: "play",
+      disablePreview: false,
+      previewIcon: "table",
+    })
+  }
+
+
+  handleChangeEndpoints (event) {
+    this.setState({
+      endpoints: update(this.state.endpoints, {[event.target.value]: {selected: {$set: event.target.checked}}}),
+      disableSave: false,
+      saveIcon: "play",
+      disablePreview: false,
+      previewIcon: "table",
+    })
   }
 
   onResize (w, h) {
@@ -163,6 +214,8 @@ export default class Sparql extends Component {
       previewIcon = <Spinner size="sm" color="light" />
     }
 
+    console.log(this.state)
+
     return (
       <div className="container">
         <h2>SPARQL query</h2>
@@ -186,7 +239,14 @@ export default class Sparql extends Component {
             width={this.state.editorWidth}
           />
         </div>
-
+        <br />
+        <AdvancedSparql
+          config={this.state.config}
+          graphs={this.state.graphs}
+          endpoints={this.state.endpoints}
+          handleChangeGraphs={this.handleChangeGraphs}
+          handleChangeEndpoints={this.handleChangeEndpoints}
+        />
         <br />
         <ButtonGroup>
           <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
