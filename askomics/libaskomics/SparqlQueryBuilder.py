@@ -391,7 +391,7 @@ class SparqlQueryBuilder(Params):
 
         return endpoints_string
 
-    def set_graphs_and_endpoints(self, entities=None):
+    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None):
         """Get all public and private graphs containing the given entities
 
         Parameters
@@ -429,13 +429,18 @@ class SparqlQueryBuilder(Params):
         self.graphs = []
         self.endpoints = []
         for res in results:
-            self.graphs.append(res["graph"])
+            if not graphs or res["graph"] in graphs:
+                self.graphs.append(res["graph"])
 
             # If local triplestore url is not accessible by federetad query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
-                self.endpoints.append(self.local_endpoint_f)
+                endpoint = self.local_endpoint_f
             else:
-                self.endpoints.append(res["endpoint"])
+                endpoint = res["endpoint"]
+
+            if not endpoints or endpoint in endpoints:
+                self.endpoints.append(endpoint)
+
         self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1
 
