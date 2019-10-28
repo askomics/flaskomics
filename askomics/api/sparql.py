@@ -118,6 +118,30 @@ def save_query():
         query results
     """
     query = request.get_json()['query']
+    graphs = request.get_json()['graphs']
+    endpoints = request.get_json()['endpoints']
+
+    local_endpoint_f = current_app.iniconfig.get('triplestore', 'endpoint')
+    try:
+        local_endpoint_f = current_app.iniconfig.get('federation', 'local_endpoint')
+    except Exception:
+        pass
+
+    # No graph selected in local TS
+    if not graphs and local_endpoint_f in endpoints:
+        return jsonify({
+            'error': True,
+            'errorMessage': "No graph selected in local triplestore",
+            'task_id': None
+        }), 500
+
+    # No endpoint selected
+    if not endpoints:
+        return jsonify({
+            'error': True,
+            'errorMessage': "No endpoint selected",
+            'task_id': None
+        }), 500
 
     try:
         files_utils = FilesUtils(current_app, session)
@@ -132,6 +156,8 @@ def save_query():
 
         info = {
             "sparql_query": query,
+            "graphs": graphs,
+            "endpoints": endpoints,
             "celery_id": None
         }
 
