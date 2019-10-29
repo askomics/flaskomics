@@ -641,6 +641,10 @@ class SparqlQueryBuilder(Params):
                 filters[i] = filtr.replace(var_1, common_var)
                 filters[i] = filters[i].replace(var_2, common_var)
 
+        # uniq lists
+        triples_relations = Utils.unique_list_of_dict(triples_relations)
+        triples_attributes = Utils.unique_list_of_dict(triples_attributes)
+
         # Write the query
         if for_editor:
             query = """
