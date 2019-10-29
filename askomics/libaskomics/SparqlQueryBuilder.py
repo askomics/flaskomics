@@ -628,11 +628,11 @@ class SparqlQueryBuilder(Params):
             common_var = "{}_{}".format(var_1, var_2.replace("?", ""))
             for i, triple_dict in enumerate(triples_relations):
                 for key, value in triple_dict.items():
-                    if key is not "optional":
+                    if key != "optional":
                         triples_relations[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
             for i, triple_dict in enumerate(triples_attributes):
                 for key, value in triple_dict.items():
-                    if key is not "optional":
+                    if key != "optional":
                         triples_attributes[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
             for i, select in enumerate(self.selects):
                 self.selects[i] = select.replace(var_1, common_var)
@@ -650,9 +650,13 @@ WHERE {{
     {}
     {}
     {}
-
 }}
-            """.format(' '.join(self.selects), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]), '\n    '.join(filters), '\n    '.join(values))
+            """.format(
+                ' '.join(self.selects),
+                '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
+                '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
+                '\n    '.join(filters),
+                '\n    '.join(values))
         else:
 
             query = """
@@ -664,7 +668,12 @@ WHERE {{
     {}
     {}
 }}
-            """.format(' '.join(self.selects), from_string, '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]), '\n    '.join(filters), '\n    '.join(values))
+            """.format(
+                ' '.join(self.selects), from_string,
+                '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
+                '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
+                '\n    '.join(filters),
+                '\n    '.join(values))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))

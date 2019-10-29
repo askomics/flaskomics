@@ -10,6 +10,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT ?Gene1_Label
 WHERE {
+
     ?Gene1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#Gene> .
     ?Gene1_uri rdfs:label ?Gene1_Label .
 
