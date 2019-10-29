@@ -31,7 +31,7 @@ class Utils():
     @staticmethod
     def unique_list_of_dict(l):
         """return the list of dict with duplicate elements removed"""
-        return [dict(s) for s in set(frozenset(d.items()) for d in l)]
+        return [i for n, i in enumerate(l) if i not in l[n + 1:]]
 
     @staticmethod
     def intersect(a, b):
