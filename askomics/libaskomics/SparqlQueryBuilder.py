@@ -284,6 +284,25 @@ class SparqlQueryBuilder(Params):
                 return True
         return False
 
+    def triple_dict_to_string(self, triple_dict):
+        """Convert a triple dict into a triple string
+
+        Parameters
+        ----------
+        triple_dict : dict
+            The triple dict
+
+        Returns
+        -------
+        string
+            The triple string
+        """
+        triple = "{} {} {} .".format(triple_dict["subject"], triple_dict["predicate"], triple_dict["object"])
+        if triple_dict["optional"]:
+            triple = "OPTIONAL {{{}}}".format(triple)
+
+        return triple
+
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -302,10 +321,14 @@ class SparqlQueryBuilder(Params):
         linked_attributes = []
 
         self.selects = []
-        triples = []
+        triples_relations = []
+        triples_attributes = []
+        values = []
         filters = []
         start_end = []
         strands = []
+
+        var_to_replace = []
 
         # Browse node to get graphs
         for node in json_query["nodes"]:
@@ -349,22 +372,23 @@ class SparqlQueryBuilder(Params):
                             if attr["faldo"].endswith("faldoStrand"):
                                 strand_2 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
                                 strands.append(attr["id"])
-                    triples.append("{} {} {} .".format(
-                        source,
-                        "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
-                        common_block
-                    ))
-                    triples.append("{} {} {} .".format(
-                        target,
-                        "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
-                        common_block
-                    ))
+
+                    triples_relations.append({
+                        "subject": source,
+                        "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
+                        "object": common_block,
+                        "optional": False
+                    })
+
+                    triples_relations.append({
+                        "subject": target,
+                        "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
+                        "object": common_block,
+                        "optional": False
+                    })
 
                     if link["sameStrand"]:
-                        filters.append("FILTER ({strand1} = {strand2}) .".format(
-                            strand1=strand_1,
-                            strand2=strand_2
-                        ))
+                        var_to_replace.append((strand_1, strand_2))
                     else:
                         strands = []
 
@@ -390,7 +414,12 @@ class SparqlQueryBuilder(Params):
                 # Classic relation
                 else:
                     relation = "<{}>".format(link["uri"])
-                    triples.append("{} {} {} .".format(source, relation, target))
+                    triples_relations.append({
+                        "subject": source,
+                        "predicate": relation,
+                        "object": target,
+                        "optional": False
+                    })
 
         # Store linked attributes
         for attribute in json_query["attr"]:
@@ -408,9 +437,14 @@ class SparqlQueryBuilder(Params):
             if attribute["type"] == "uri":
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
-                obj = attribute["entityUri"]
+                obj = "<{}>".format(attribute["entityUri"])
                 if not self.is_bnode(attribute["entityUri"], json_query["nodes"]):
-                    triples.append("{} {} <{}> .".format(subject, predicate, obj))
+                    triples_attributes.append({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": False
+                    })
                 if attribute["visible"]:
                     self.selects.append(subject)
                 # filters
@@ -425,14 +459,11 @@ class SparqlQueryBuilder(Params):
                         filter_string = "FILTER{} (str({}) = '{}') .".format(not_exist, subject, attribute["filterValue"])
                         filters.append(filter_string)
                 if attribute["linked"]:
-                    filter_string = "FILTER ({} = {})".format(
-                        subject,
-                        self.format_sparql_variable("{}{}_uri".format(
-                            attributes[attribute["linkedWith"]]["entity_label"],
-                            attributes[attribute["linkedWith"]]["entity_id"]
-                        ))
-                    )
-                    filters.append(filter_string)
+                    var_2 = self.format_sparql_variable("{}{}_uri".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"]
+                    ))
+                    var_to_replace.append((subject, var_2))
 
             # Text
             if attribute["type"] == "text":
@@ -444,10 +475,13 @@ class SparqlQueryBuilder(Params):
                         predicate = "<{}>".format(attribute["uri"])
 
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    triple_string = "{} {} {} .".format(subject, predicate, obj)
-                    if attribute["optional"]:
-                        triple_string = "OPTIONAL {{{}}}".format(triple_string)
-                    triples.append(triple_string)
+
+                    triples_attributes.append({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    })
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
@@ -462,15 +496,12 @@ class SparqlQueryBuilder(Params):
                         filter_string = "FILTER (str({}) {}= '{}') .".format(obj, negative, attribute["filterValue"])
                         filters.append(filter_string)
                 if attribute["linked"]:
-                    filter_string = "FILTER ({} = {})".format(
-                        obj,
-                        self.format_sparql_variable("{}{}_{}".format(
-                            attributes[attribute["linkedWith"]]["entity_label"],
-                            attributes[attribute["linkedWith"]]["entity_id"],
-                            attributes[attribute["linkedWith"]]["label"]
-                        ))
-                    )
-                    filters.append(filter_string)
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
 
             # Numeric
             if attribute["type"] == "decimal":
@@ -481,10 +512,12 @@ class SparqlQueryBuilder(Params):
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    triple_string = "{} {} {} .".format(subject, predicate, obj)
-                    if attribute["optional"]:
-                        triple_string = "OPTIONAL {{{}}}".format(triple_string)
-                    triples.append(triple_string)
+                    triples_attributes.append({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    })
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
@@ -492,22 +525,15 @@ class SparqlQueryBuilder(Params):
                     filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
                     filters.append(filter_string)
                 if attribute["linked"]:
-                    filter_string = "FILTER ({} = {})".format(
-                        obj,
-                        self.format_sparql_variable("{}{}_{}".format(
-                            attributes[attribute["linkedWith"]]["entity_label"],
-                            attributes[attribute["linkedWith"]]["entity_id"],
-                            attributes[attribute["linkedWith"]]["label"]
-                        ))
-                    )
-                    filters.append(filter_string)
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
 
             # Category
             if attribute["type"] == "category":
-                triple_string_1 = ""
-                triple_string_2 = ""
-                triple_string_3 = ""
-                triple_string_4 = ""
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
@@ -516,28 +542,53 @@ class SparqlQueryBuilder(Params):
                     label = "rdfs:label"
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
                         category_name = 'faldo:location/faldo:begin/faldo:reference'
-                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
-                        triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
+                        triples_attributes.append({
+                            "subject": node_uri,
+                            "predicate": category_name,
+                            "object": category_value_uri,
+                            "optional": True if attribute["optional"] else False
+                        })
+                        triples_attributes.append({
+                            "subject": category_value_uri,
+                            "predicate": label,
+                            "object": category_label,
+                            "optional": True if attribute["optional"] else False
+                        })
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
-                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
-                        triple_string_2 = "{} a {} .".format(faldo_strand, category_value_uri)
-                        triple_string_3 = "{} rdfs:label {} .".format(faldo_strand, category_label)
-                        triple_string_4 = "VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri)
+                        triples_attributes.append({
+                            "subject": node_uri,
+                            "predicate": category_name,
+                            "object": category_value_uri,
+                            "optional": True if attribute["optional"] else False
+                        })
+                        triples_attributes.append({
+                            "subject": faldo_strand,
+                            "predicate": "a",
+                            "object": category_value_uri,
+                            "optional": True if attribute["optional"] else False
+                        })
+                        triples_attributes.append({
+                            "subject": faldo_strand,
+                            "predicate": "rdfs:label",
+                            "object": category_label,
+                            "optional": False
+                        })
+                        values.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri))
                     else:
                         category_name = "<{}>".format(attribute["uri"])
-                        triple_string_1 = "{} {} {} .".format(node_uri, category_name, category_value_uri)
-                        triple_string_2 = "{} {} {} .".format(category_value_uri, label, category_label)
-
-                    if attribute["optional"]:
-                        triple_string_1 = "OPTIONAL {{{} {}}}".format(triple_string_1, triple_string_2)
-                        triple_string_2 = ""
-                    triples.append(triple_string_1)
-                    triples.append(triple_string_2)
-                    if triple_string_3:
-                        triples.append(triple_string_3)
-                    if triple_string_4:
-                        triples.append(triple_string_4)
+                        triples_attributes.append({
+                            "subject": node_uri,
+                            "predicate": category_name,
+                            "object": category_value_uri,
+                            "optional": True if attribute["optional"] else False
+                        })
+                        triples_attributes.append({
+                            "subject": category_value_uri,
+                            "predicate": label,
+                            "object": category_label,
+                            "optional": True if attribute["optional"] else False
+                        })
 
                     if attribute["visible"]:
                         self.selects.append(category_label)
@@ -548,35 +599,60 @@ class SparqlQueryBuilder(Params):
                         if attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                             faldo_strand_filter = self.format_sparql_variable("{}{}_{}_faldoStrand_filter".format(attribute["entityLabel"], attribute["nodeId"], Utils.get_random_string(5)))
                             filter_substrings_list.append("({} = {})".format(category_value_uri, faldo_strand_filter))
-                            triples.append("<{}> a {}".format(value, faldo_strand_filter))
-                            triples.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} ".format(faldo_strand_filter))
+                            triples_attributes.append({
+                                "subject": "<{}>".append(value),
+                                "predicate": "a",
+                                "object": faldo_strand_filter,
+                                "optional": True if attribute["optional"] else False
+                            })
+                            values.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} ".format(faldo_strand_filter))
                         else:
                             filter_substrings_list.append("({} = <{}>)".format(category_value_uri, value))
                     filter_substring = ' || '.join(filter_substrings_list)
                     filter_string = "FILTER ({})".format(filter_substring)
                     filters.append(filter_string)
                 if attribute["linked"]:
-                    filter_string = "FILTER ({} = {})".format(
-                        category_value_uri,
-                        self.format_sparql_variable("{}{}_{}Category".format(
-                            attributes[attribute["linkedWith"]]["entity_label"],
-                            attributes[attribute["linkedWith"]]["entity_id"],
-                            attributes[attribute["linkedWith"]]["label"]
-                        ))
-                    )
-                    filters.append(filter_string)
+                    var_2 = self.format_sparql_variable("{}{}_{}Category".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((category_value_uri, var_2))
 
         from_string = self.get_froms_from_graphs(self.graphs)
 
+        # Replace variables (linked attributes)
+        for tpl_var in var_to_replace:
+            var_1 = tpl_var[0]
+            var_2 = tpl_var[1]
+            common_var = "{}_{}".format(var_1, var_2.replace("?", ""))
+            for i, triple_dict in enumerate(triples_relations):
+                for key, value in triple_dict.items():
+                    if key is not "optional":
+                        triples_relations[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
+            for i, triple_dict in enumerate(triples_attributes):
+                for key, value in triple_dict.items():
+                    if key is not "optional":
+                        triples_attributes[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
+            for i, select in enumerate(self.selects):
+                self.selects[i] = select.replace(var_1, common_var)
+                self.selects[i] = self.selects[i].replace(var_2, common_var)
+            for i, filtr in enumerate(filters):
+                filters[i] = filtr.replace(var_1, common_var)
+                filters[i] = filters[i].replace(var_2, common_var)
+
+        # Write the query
         if for_editor:
             query = """
 SELECT DISTINCT {}
 WHERE {{
     {}
     {}
+    {}
+    {}
 
 }}
-            """.format(' '.join(self.selects), '\n    '.join(triples), '\n    '.join(filters))
+            """.format(' '.join(self.selects), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]), '\n    '.join(filters), '\n    '.join(values))
         else:
 
             query = """
@@ -585,8 +661,10 @@ SELECT DISTINCT {}
 WHERE {{
     {}
     {}
+    {}
+    {}
 }}
-            """.format(' '.join(self.selects), from_string, '\n    '.join(triples), '\n    '.join(filters))
+            """.format(' '.join(self.selects), from_string, '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]), '\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]), '\n    '.join(filters), '\n    '.join(values))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))
