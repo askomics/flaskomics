@@ -35,6 +35,7 @@ class SparqlQueryBuilder(Params):
         self.selects = []
         self.federated = False
 
+        self.local_endpoint = self.settings.get('federation', 'endpoint')
         # local endpoint (for federated query engine)
         self.local_endpoint_f = self.settings.get('triplestore', 'endpoint')
         try:
@@ -170,7 +171,7 @@ class SparqlQueryBuilder(Params):
             return "local triplestore"
         return endpoint
 
-    def get_graphs_and_enpoints(self):
+    def get_graphs_and_endpoints(self, selected_graphs=None, selected_endpoints=None):
         """get graphs and endpoints (uri and names)
 
         Returns
@@ -184,13 +185,13 @@ class SparqlQueryBuilder(Params):
             graphs[graph] = {
                 "uri": graph,
                 "name": self.format_graph_name(graph),
-                "selected": True
+                "selected": True if graph in selected_graphs else False
             }
         for endpoint in self.endpoints:
             endpoints[endpoint] = {
                 "uri": endpoint,
                 "name": self.format_endpoint_name(endpoint),
-                "selected": True
+                "selected": True if endpoint in selected_endpoints else False
             }
 
         return (graphs, endpoints)

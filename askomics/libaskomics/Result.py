@@ -56,6 +56,8 @@ class Result(Params):
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
+            self.graphs = result_info["graphs"] if "graphs" in result_info else None
+            self.endpoints = result_info["endpoints"] if "endpoints" in result_info else None
             self.sparql_query = result_info["sparql_query"] if "sparql_query" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)
@@ -227,7 +229,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
@@ -236,7 +238,7 @@ class Result(Params):
 
         else:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints
             FROM results
             WHERE public = ? AND id = ?
             '''
@@ -251,6 +253,10 @@ class Result(Params):
         self.end = rows[0][4]
         self.nrows = rows[0][5]
         self.sparql_query = rows[0][6]
+
+        gne = json.loads(rows[0][7])
+        self.graphs = gne["graphs"]
+        self.endpoints = gne["endpoints"]
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -334,6 +340,7 @@ class Result(Params):
             ?,
             ?,
             NULL,
+            ?,
             ?
         )
         '''
@@ -345,7 +352,8 @@ class Result(Params):
             json.dumps(self.graph_state),
             False,
             "Query",
-            self.sparql_query
+            self.sparql_query,
+            json.dumps({"graphs": self.graphs, "endpoints": self.endpoints})
         ), get_id=True)
 
         return self.id

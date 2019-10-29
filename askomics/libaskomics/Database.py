@@ -182,6 +182,7 @@ class Database(Params):
             description text,
             size int,
             sparql_query text,
+            graphs_and_endpoints text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
@@ -204,6 +205,17 @@ class Database(Params):
         query = '''
         ALTER TABLE results
         ADD sparql_query text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE results
+        ADD graphs_and_endpoints text NULL
         DEFAULT(null)
         '''
 

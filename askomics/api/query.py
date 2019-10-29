@@ -147,10 +147,18 @@ def save_result():
                 'task_id': None
             }), 500
 
+        # Get query and endpoints and graphs of the query
         graph_state = request.get_json()["graphState"]
+        query_builder = SparqlQueryBuilder(current_app, session)
+        query = query_builder.build_query_from_json(graph_state, preview=False, for_editor=False)
+        endpoints = query_builder.endpoints
+        graphs = query_builder.graphs
 
         info = {
             "graph_state": graph_state,
+            "query": query,
+            "graphs": graphs,
+            "endpoints": endpoints,
             "celery_id": None
         }
 

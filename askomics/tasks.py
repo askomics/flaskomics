@@ -209,23 +209,8 @@ def sparql_query(self, session, info):
         result.set_celery_id(self.request.id)
         result.update_db_status("started", update_celery=True)
 
-        # launch query
-        query_builder = SparqlQueryBuilder(app, session)
-
-        # Set graphs and endpoints
-        query_builder.set_graphs_and_endpoints(graphs=info["graphs"], endpoints=info["endpoints"])
-
-        # Check if query is federated and if from have to be replaced
-        federated = query_builder.is_federated()
-        replace_froms = query_builder.replace_froms()
-
-        query = query_builder.format_query(info["sparql_query"], replace_froms=replace_froms, federated=federated, limit=None)
-        # header, data = query_launcher.process_query(query)
-        header = query_builder.selects
-        data = []
-        if query_builder.graphs or query_builder.endpoints:
-            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=info["endpoints"])
-            header, data = query_launcher.process_query(query)
+        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
+        header, data = query_launcher.process_query(info["sparql_query"])
 
         # Write results in file
         file_size = result.save_result_in_file(header, data)

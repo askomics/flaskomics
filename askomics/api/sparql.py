@@ -154,10 +154,16 @@ def save_query():
                 'task_id': None
             }), 500
 
+        # Is query federated?
+        query_builder = SparqlQueryBuilder(current_app, session)
+        query_builder.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
+        federated = query_builder.is_federated()
+
         info = {
             "sparql_query": query,
             "graphs": graphs,
             "endpoints": endpoints,
+            "federated": federated,
             "celery_id": None
         }
 
