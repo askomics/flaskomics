@@ -547,7 +547,6 @@ class SparqlQueryBuilder(Params):
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     faldo_strand = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    label = "rdfs:label"
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
                         category_name = 'faldo:location/faldo:begin/faldo:reference'
                         triples_attributes.append({
@@ -556,12 +555,13 @@ class SparqlQueryBuilder(Params):
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
                         })
-                        triples_attributes.append({
-                            "subject": category_value_uri,
-                            "predicate": label,
-                            "object": category_label,
-                            "optional": True if attribute["optional"] else False
-                        })
+                        if attribute["visible"]:
+                            triples_attributes.append({
+                                "subject": category_value_uri,
+                                "predicate": "rdfs:label",
+                                "object": category_label,
+                                "optional": True if attribute["optional"] else False
+                            })
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
                         triples_attributes.append({
@@ -576,12 +576,13 @@ class SparqlQueryBuilder(Params):
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
                         })
-                        triples_attributes.append({
-                            "subject": faldo_strand,
-                            "predicate": "rdfs:label",
-                            "object": category_label,
-                            "optional": False
-                        })
+                        if attribute["visible"]:
+                            triples_attributes.append({
+                                "subject": faldo_strand,
+                                "predicate": "rdfs:label",
+                                "object": category_label,
+                                "optional": False
+                            })
                         values.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri))
                     else:
                         category_name = "<{}>".format(attribute["uri"])
@@ -591,12 +592,13 @@ class SparqlQueryBuilder(Params):
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
                         })
-                        triples_attributes.append({
-                            "subject": category_value_uri,
-                            "predicate": label,
-                            "object": category_label,
-                            "optional": True if attribute["optional"] else False
-                        })
+                        if attribute["visible"]:
+                            triples_attributes.append({
+                                "subject": category_value_uri,
+                                "predicate": "rdfs:label",
+                                "object": category_label,
+                                "optional": True if attribute["optional"] else False
+                            })
 
                     if attribute["visible"]:
                         self.selects.append(category_label)
