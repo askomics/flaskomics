@@ -25,13 +25,8 @@ class Utils():
         return ''.join(random.choice(alpabet) for i in range(number))
 
     @staticmethod
-    def unique(a):
-        """return the list with duplicate elements removed"""
-        return list(set(a))
-
-    @staticmethod
-    def unique_list_of_dict(l):
-        """return the list of dict with duplicate elements removed"""
+    def unique(l):
+        """return the list with duplicate elements removed and keep order"""
         return [i for n, i in enumerate(l) if i not in l[n + 1:]]
 
     @staticmethod
