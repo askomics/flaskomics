@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size, sparql_query
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size, sparql_query, traceback
         FROM results
         WHERE user_id = ?
         '''
@@ -71,7 +71,8 @@ class ResultsHandler(Params):
                 'public': row[8],
                 'description': row[9],
                 'size': row[10],
-                'sparqlQuery': row[11]
+                'sparqlQuery': row[11],
+                'traceback': row[12]
             })
 
         return files

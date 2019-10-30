@@ -3,17 +3,24 @@ import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
-import { Badge, FormGroup, CustomInput } from 'reactstrap'
+import { Badge, FormGroup, CustomInput, Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 export default class DatasetsTable extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      traceback: null
+    }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.togglePublicDataset = this.togglePublicDataset.bind(this)
+    this.handleClickError = this.handleClickError.bind(this)
+    this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
 
   handleSelection (row, isSelect) {
@@ -39,6 +46,26 @@ export default class DatasetsTable extends Component {
         selected: []
       })
     }
+  }
+
+  handleClickError(event) {
+    console.log(event.target.id)
+
+    this.props.datasets.forEach(dataset => {
+      if (dataset.id == event.target.id) {
+        this.setState({
+          modalTracebackTitle: dataset.error_message,
+          modalTracebackContent: dataset.traceback,
+          modalTraceback: true
+        })
+      }
+    })
+  }
+
+  toggleModalTraceback () {
+    this.setState({
+      modalTraceback: !this.state.modalTraceback
+    })
   }
 
   togglePublicDataset (event) {
@@ -91,7 +118,7 @@ export default class DatasetsTable extends Component {
       }
     }, {
       dataField: 'ntriples',
-      text: 'Triple\'s number',
+      text: 'Triples',
       sort: true,
       formatter: (cell, row) => {
         return new Intl.NumberFormat('fr-FR').format(cell)
@@ -112,12 +139,9 @@ export default class DatasetsTable extends Component {
         if (cell == 'deleting') {
           return <Badge color="warning">Deleting</Badge>
         }
-        return <Badge color="danger">Failure</Badge>
+        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
       },
       sort: true
-    }, {
-      dataField: 'error_message',
-      text: 'Error message'
     }]
 
     let defaultSorted = [{
@@ -138,20 +162,35 @@ export default class DatasetsTable extends Component {
     }
 
     return (
-      <div className="asko-table-height-div">
-        <BootstrapTable
-          classes="asko-table"
-          wrapperClasses="asko-table-wrapper"
-          tabIndexCell
-          bootstrap4
-          keyField='id'
-          data={this.props.datasets}
-          columns={columns}
-          defaultSorted={defaultSorted}
-          pagination={paginationFactory()}
-          noDataIndication={noDataIndication}
-          selectRow={ selectRow }
-        />
+      <div>
+        <div className="asko-table-height-div">
+          <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
+            tabIndexCell
+            bootstrap4
+            keyField='id'
+            data={this.props.datasets}
+            columns={columns}
+            defaultSorted={defaultSorted}
+            pagination={paginationFactory()}
+            noDataIndication={noDataIndication}
+            selectRow={ selectRow }
+          />
+        </div>
+        <Modal size="lg" isOpen={this.state.modalTraceback} toggle={this.toggleModalTraceback}>
+          <ModalHeader toggle={this.toggleModalTraceback}>{this.state.modalTracebackTitle}</ModalHeader>
+          <ModalBody>
+            <div>
+              <SyntaxHighlighter language="python" style={monokai}>
+                {this.state.modalTracebackContent}
+              </SyntaxHighlighter>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalTraceback  }>Close</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     )
   }

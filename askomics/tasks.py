@@ -74,9 +74,11 @@ def integrate(self, session, data, host_url):
                 file.integrate(data["entity_name"], public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
+            raise ValueError("Error during integration")
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
-            dataset.update_in_db("failure", error=True, error_message=str(e))
+            trace = traceback.format_exc()
+            dataset.update_in_db("failure", error=True, error_message=str(e), traceback=trace)
             # Rollback
             file.rollback()
             return {
@@ -168,7 +170,8 @@ def query(self, session, info):
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
-        result.update_db_status("error", error=True, error_message=str(e))
+        trace = traceback.format_exc()
+        result.update_db_status("error", error=True, error_message=str(e), traceback=trace)
         result.rollback()
         return {
             'error': True,
@@ -224,8 +227,8 @@ def sparql_query(self, session, info):
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
-        result.update_db_status("error", error=True, error_message=str(e))
-        result.rollback()
+        trace = traceback.format_exc()
+        result.update_db_status("error", error=True, error_message=str(e), traceback=trace)
         return {
             'error': True,
             'errorMessage': str(e)
