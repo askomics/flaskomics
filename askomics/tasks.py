@@ -74,7 +74,6 @@ def integrate(self, session, data, host_url):
                 file.integrate(data["entity_name"], public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
-            raise ValueError("Error during integration")
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             trace = traceback.format_exc()
