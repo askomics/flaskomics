@@ -644,6 +644,7 @@ class SparqlQueryBuilder(Params):
         # uniq lists
         triples_relations = Utils.unique_list_of_dict(triples_relations)
         triples_attributes = Utils.unique_list_of_dict(triples_attributes)
+        self.selects = Utils.unique(self.selects)
 
         # Write the query
         if for_editor:
