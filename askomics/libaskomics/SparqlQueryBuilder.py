@@ -621,25 +621,22 @@ class SparqlQueryBuilder(Params):
 
         from_string = self.get_froms_from_graphs(self.graphs)
 
-        # Replace variables (linked attributes)
+        # Linked attributes: replace SPARQL variable target by source
         for tpl_var in var_to_replace:
-            var_1 = tpl_var[0]
-            var_2 = tpl_var[1]
-            common_var = "{}_{}".format(var_1, var_2.replace("?", ""))
+            var_source = tpl_var[0]
+            var_target = tpl_var[1]
             for i, triple_dict in enumerate(triples_relations):
                 for key, value in triple_dict.items():
                     if key != "optional":
-                        triples_relations[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
+                        triples_relations[i][key] = value.replace(var_source, var_target)
             for i, triple_dict in enumerate(triples_attributes):
                 for key, value in triple_dict.items():
                     if key != "optional":
-                        triples_attributes[i][key] = value.replace(var_1, common_var).replace(var_2, common_var)
+                        triples_attributes[i][key] = value.replace(var_source, var_target)
             for i, select in enumerate(self.selects):
-                self.selects[i] = select.replace(var_1, common_var)
-                self.selects[i] = self.selects[i].replace(var_2, common_var)
+                self.selects[i] = select.replace(var_source, var_target)
             for i, filtr in enumerate(filters):
-                filters[i] = filtr.replace(var_1, common_var)
-                filters[i] = filters[i].replace(var_2, common_var)
+                filters[i] = filtr.replace(var_source, var_target)
 
         # uniq lists
         triples_relations = Utils.unique_list_of_dict(triples_relations)
