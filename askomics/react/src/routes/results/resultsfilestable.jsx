@@ -413,7 +413,7 @@ export default class ResultsFilesTable extends Component {
         </div>
 
         <Modal size="lg" isOpen={this.state.modalTraceback} toggle={this.toggleModalTraceback}>
-          <ModalHeader toggle={this.toggleModalTraceback}>{this.state.modalTracebackTitle}</ModalHeader>
+          <ModalHeader toggle={this.toggleModalTraceback}>{this.state.modalTracebackTitle.substring(0, 100)}</ModalHeader>
           <ModalBody>
             <div>
               <SyntaxHighlighter language="python" style={monokai}>
