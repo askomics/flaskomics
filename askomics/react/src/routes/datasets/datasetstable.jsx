@@ -13,7 +13,9 @@ export default class DatasetsTable extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      traceback: null
+      modalTracebackTitle: "",
+      modalTracebackContent: "",
+      modalTraceback: false
     }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
@@ -49,13 +51,11 @@ export default class DatasetsTable extends Component {
   }
 
   handleClickError(event) {
-    console.log(event.target.id)
-
     this.props.datasets.forEach(dataset => {
       if (dataset.id == event.target.id) {
         this.setState({
-          modalTracebackTitle: dataset.error_message,
-          modalTracebackContent: dataset.traceback,
+          modalTracebackTitle: dataset.error_message ? dataset.error_message : "Internal server error",
+          modalTracebackContent: dataset.traceback ? dataset.traceback : "Internal server error",
           modalTraceback: true
         })
       }

@@ -25,7 +25,9 @@ export default class ResultsFilesTable extends Component {
       error: false,
       errorMessage: null,
       status: null,
-      traceback: null
+      modalTracebackTitle: "",
+      modalTracebackContent: "",
+      modalTraceback: false
     }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
@@ -238,13 +240,12 @@ export default class ResultsFilesTable extends Component {
     this.props.results.forEach(result => {
       if (result.id == event.target.id) {
         this.setState({
-          modalTracebackTitle: result.errorMessage,
-          modalTracebackContent: result.traceback,
+          modalTracebackTitle: result.errorMessage ? result.errorMessage : "Internal server error",
+          modalTracebackContent: result.traceback ? result.traceback : "Internal server error",
           modalTraceback: true
         })
       }
     })
-
   }
 
   toggleModalTraceback () {
