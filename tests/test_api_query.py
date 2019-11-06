@@ -1,5 +1,4 @@
 import json
-from deepdiff import DeepDiff
 
 from . import AskomicsTestCase
 
@@ -78,7 +77,6 @@ class TestApiStartpoints(AskomicsTestCase):
         expected = json.loads(raw_abstraction)
 
         response = client.client.get('/api/query/abstraction')
-        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
         assert response.status_code == 200
         assert len(response.json) == 4
@@ -89,7 +87,7 @@ class TestApiStartpoints(AskomicsTestCase):
         assert len(response.json["abstraction"]) == 3
         assert len(response.json["abstraction"]["attributes"]) == 21
 
-        assert ddiff == {}
+        assert self.equal_objects(response.json, expected)
 
     def test_get_preview(self, client):
         """Test /api/query/preview route"""
@@ -107,10 +105,9 @@ class TestApiStartpoints(AskomicsTestCase):
 
         response = client.client.post('/api/query/preview', json=data)
         expected = {"error": False, "errorMessage": "", "headerPreview": ["transcript1_Label"], "resultsPreview": [{"transcript1_Label": "AT5G41905"}, {"transcript1_Label": "AT1G57800"}, {"transcript1_Label": "AT3G13660"}, {"transcript1_Label": "AT3G51470"}, {"transcript1_Label": "AT1G33615"}, {"transcript1_Label": "AT3G10490"}, {"transcript1_Label": "AT1G49500"}, {"transcript1_Label": "AT3G22640"}, {"transcript1_Label": "AT3G10460"}, {"transcript1_Label": "AT5G35334"}]}
-        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
         assert response.status_code == 200
-        assert ddiff == {}
+        assert self.equal_objects(response.json, expected)
 
     def test_save_result(self, client):
         """Test /api/query/save_result route"""

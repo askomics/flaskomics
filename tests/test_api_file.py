@@ -163,6 +163,25 @@ class TestApiFile(AskomicsTestCase):
         assert response.json["errorMessage"] == ''
         assert len(response.json["path"]) == 10
 
+    def test_upload_url(self, client):
+        """Test /api/files/upload_url route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        data = {"url": "https://raw.githubusercontent.com/askomics/demo-data/master/Example/gene.tsv"}  # FIXME: use a local url
+
+        response = client.client.post("/api/files/upload_url", json=data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            "error": False,
+            "errorMessage": ""
+        }
+
+        response = client.client.get("/api/files")
+        assert response.status_code == 200
+        assert len(response.json["files"]) == 1
+
     def test_get_preview(self, client):
         """Test /api/files/preview route"""
         client.create_two_users()

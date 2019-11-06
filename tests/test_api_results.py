@@ -1,5 +1,4 @@
 import json
-from deepdiff import DeepDiff
 
 from . import AskomicsTestCase
 
@@ -28,8 +27,51 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_set_public(self, client):
+        """test /api/results/setpublic route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"fileId": result_info["id"], "public": True}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+        expected = json.loads(raw_results)
+
+        response = client.client.post("/api/results/setpublic", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+        data = {"fileId": result_info["id"], "public": False}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
+        expected = json.loads(raw_results)
+
+        response = client.client.post("/api/results/setpublic", json=data)
 
         assert response.status_code == 200
         assert response.json == expected
@@ -50,10 +92,9 @@ class TestApiResults(AskomicsTestCase):
         expected = json.loads(file_content)
 
         response = client.client.post('/api/results/preview', json=data)
-        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
         assert response.status_code == 200
-        assert ddiff == {}
+        assert self.equal_objects(response.json, expected)
 
     def test_get_graph_state(self, client):
         """test /api/results/graphstate"""
@@ -131,4 +172,92 @@ class TestApiResults(AskomicsTestCase):
             'diskSpace': client.get_size_occupied_by_user(),
             'errorMessage': '',
             'query': content
+        }
+
+    def test_set_description(self, client):
+        """test /api/results/description route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"id": result_info["id"], "newDesc": "new description"}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###DESC###", "new description")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        response = client.client.post("/api/results/description", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_publish(self, client):
+        """test /api/results/publish route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"id": result_info["id"], "public": True}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        response = client.client.post("/api/results/publish", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+        data = {"id": result_info["id"], "public": False}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        response = client.client.post("/api/results/publish", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_send2galaxy(self, client):
+        """test /api/results/send2galaxy route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"fileId": result_info["id"], "fileToSend": "result"}
+
+        response = client.client.post("/api/results/send2galaxy", json=data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': ''
         }

@@ -71,7 +71,7 @@ class TestApi(AskomicsTestCase):
             'blocked': False,
             "quota": 0,
             'apikey': "0000000001",
-            'galaxy': None
+            'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
         }
         response = client.client.get('/api/start')
 

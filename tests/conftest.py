@@ -3,6 +3,9 @@ import os
 import shutil
 import tempfile
 import json
+import random
+
+from bioblend.galaxy import GalaxyInstance
 
 from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
@@ -80,6 +83,11 @@ class Client(object):
         self.client = self.app.test_client()
         self.session = {}
 
+        # Galaxy
+        self.gurl = "http://localhost:8081"
+        self.gkey = "admin"
+        self.galaxy_history = None
+
         self.init_database()
 
     def get_config(self, section, entry, boolean=False):
@@ -121,6 +129,10 @@ class Client(object):
         username : TYPE
             Description
         """
+        galaxy = None
+        if username == "jdoe":
+            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+
         with self.client.session_transaction() as sess:
             sess["user"] = {
                 'id': 1 if username == "jdoe" else 2,
@@ -133,7 +145,7 @@ class Client(object):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "000000000{}".format("1" if username == "jdoe" else "2"),
-                "galaxy": None
+                "galaxy": galaxy
             }
 
         self.session = sess
@@ -156,6 +168,10 @@ class Client(object):
         TYPE
             Description
         """
+        galaxy = None
+        if username == "jdoe":
+            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+
         uinfo = {
             "fname": "John" if username == "jdoe" else "Jane",
             "lname": "Doe" if username == "jdoe" else "Smith",
@@ -164,12 +180,16 @@ class Client(object):
             "salt": "0000000000",
             "email": "jdoe@askomics.org" if username == "jdoe" else "jsmith@askomics.org",
             "apikey": "0000000001" if username == "jdoe" else "0000000002",
-            "galaxy": None if username == "jdoe" else None,
+            "galaxy": None,
             "quota": 0 if username == "jdoe" else 0,
         }
 
         auth = LocalAuth(self.app, self.session)
         user = auth.persist_user(uinfo)
+        if galaxy:
+            self.session["user"] = user
+            user = auth.add_galaxy_account(user, galaxy["url"], galaxy["apikey"])["user"]
+            self.session = {}
         auth.create_user_directories(user["id"], user["username"])
 
         return user
@@ -403,6 +423,8 @@ class Client(object):
         """Clean"""
         self.delete_data_dir()
         self.clean_triplestore()
+        if self.galaxy_history:
+            self.delete_galaxy_history()
 
     def get_size_occupied_by_user(self):
         """Get size of logged user
@@ -414,3 +436,52 @@ class Client(object):
         """
         files_utils = FilesUtils(self.app, self.session)
         return files_utils.get_size_occupied_by_user() if "user" in self.session else None
+
+    def init_galaxy(self):
+        """Create a new galaxy history"""
+        history_name = "askotest_{}".format(self.get_random_string(5))
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        self.galaxy_history = galaxy.histories.create_history(history_name)
+
+    def upload_dataset_into_galaxy(self):
+        """Upload a dataset into galaxy"""
+        if not self.galaxy_history:
+            self.init_galaxy()
+        file_path = "test-data/transcripts.tsv"
+        filename = "transcripts.tsv"
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        return galaxy.tools.upload_file(file_path, self.galaxy_history['id'], file_name=filename, file_type='tabular')
+
+    def upload_query_into_galaxy(self):
+        """Upload a json query into galaxy"""
+        if not self.galaxy_history:
+            self.init_galaxy()
+        file_path = "tests/data/graphState_simple_query.json"
+        filename = "graphstate.json"
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        return galaxy.tools.upload_file(file_path, self.galaxy_history['id'], file_name=filename, file_type='json')
+
+    def delete_galaxy_history(self):
+        """Delete the galaxy history"""
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        galaxy.histories.delete_history(self.galaxy_history["id"], purge=True)
+
+    @staticmethod
+    def get_random_string(number):
+        """return a random string of n character
+
+        Parameters
+        ----------
+        number : int
+            number of character of the random string
+
+        Returns
+        -------
+        str
+            a random string of n chars
+        """
+        alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        return ''.join(random.choice(alpabet) for i in range(number))

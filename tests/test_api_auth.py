@@ -240,7 +240,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -261,7 +261,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -279,7 +279,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
 
     def test_login_apikey(self, client):
@@ -354,7 +354,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
         # Assert database is untouched
@@ -374,7 +374,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
 
         response = client.client.post("/api/auth/profile", json=update_lname_data)
@@ -393,7 +393,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
         # Assert database is updated
@@ -413,7 +413,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
 
         response = client.client.post("/api/auth/profile", json=update_email_data)
@@ -432,7 +432,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
         # Assert database is updated
@@ -452,7 +452,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
 
         response = client.client.post("/api/auth/profile", json=update_all_data)
@@ -471,7 +471,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
         # Assert database is updated
@@ -491,7 +491,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
 
     def test_update_password(self, client):
@@ -539,7 +539,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -559,7 +559,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -579,7 +579,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -599,7 +599,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': False,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
             }
         }
 
@@ -625,7 +625,7 @@ class TestApiAuth(AskomicsTestCase):
         assert not response.json["user"]["blocked"]
         assert response.json["user"]["quota"] == 0
         assert not response.json["user"]["apikey"] == "0000000001"
-        assert response.json["user"]["galaxy"] is None
+        assert response.json["user"]["galaxy"] == {"url": "http://localhost:8081", "apikey": "admin"}
 
     def test_logout(self, client):
         """test /api/auth/logout route"""

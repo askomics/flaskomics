@@ -67,3 +67,60 @@ class TestApiDatasets(AskomicsTestCase):
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
         assert response.json["datasets"][0]["status"] == "queued"
+
+    def test_toggle_public(self, client):
+        """Test the /api/datsets/delete route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload_and_integrate()
+
+        data = {"id": 1, "newStatus": True}
+
+        expected = {
+            'datasets': [{
+                'end': info["transcripts"]["end"],
+                'error_message': '',
+                'id': 1,
+                'name': 'transcripts.tsv',
+                'ntriples': 0,
+                'public': True,
+                'start': info["transcripts"]["start"],
+                'status': 'success',
+                'traceback': None
+            }, {
+                'end': info["de"]["end"],
+                'error_message': '',
+                'id': 2,
+                'name': 'de.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["de"]["start"],
+                'status': 'success',
+                'traceback': None
+            }, {
+                'end': info["qtl"]["end"],
+                'error_message': '',
+                'id': 3,
+                'name': 'qtl.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["qtl"]["start"],
+                'status': 'success',
+                'traceback': None
+            }],
+            'error': False,
+            'errorMessage': ''
+        }
+
+        response = client.client.post("/api/datasets/public", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+        expected["datasets"][0]["public"] = False
+        data["newStatus"] = False
+
+        response = client.client.post("/api/datasets/public", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
