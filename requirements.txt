@@ -19,3 +19,4 @@ biopython
 bcbio-gff
 bioblend
 pybedtools
+deepdiff
