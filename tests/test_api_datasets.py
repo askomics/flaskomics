@@ -4,30 +4,65 @@ from . import AskomicsTestCase
 class TestApiDatasets(AskomicsTestCase):
     """Test AskOmics API /api/datasets/<someting>"""
 
-    def test_get_datasets(self, client_logged_as_jdoe_with_data):
+    def test_get_datasets(self, client):
         """test the /api/datasets route"""
-        response = client_logged_as_jdoe_with_data.get('/api/datasets')
-        assert response.status_code == 200
-        assert len(response.json) == 3
-        assert not response.json["error"]
-        assert response.json["errorMessage"] == ''
-        assert len(response.json["datasets"]) == 1
-        assert len(response.json["datasets"][0]) == 8
-        assert response.json["datasets"][0]["id"] == 1
-        assert response.json["datasets"][0]["name"] == "gene.tsv"
-        assert not response.json["datasets"][0]["public"]
-        assert response.json["datasets"][0]["status"] == 'success'
-        assert type(response.json["datasets"][0]["start"]) == int
-        assert type(response.json["datasets"][0]["end"]) == int
-        assert response.json["datasets"][0]["error_message"] == ''
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload_and_integrate()
 
-    def test_delete_datasets(self, client_logged_as_jdoe_with_data):
+        response = client.client.get('/api/datasets')
+
+        expected = {
+            'datasets': [{
+                'end': info["transcripts"]["end"],
+                'error_message': '',
+                'id': 1,
+                'name': 'transcripts.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["transcripts"]["start"],
+                'status': 'success',
+                'traceback': None
+            }, {
+                'end': info["de"]["end"],
+                'error_message': '',
+                'id': 2,
+                'name': 'de.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["de"]["start"],
+                'status': 'success',
+                'traceback': None
+            }, {
+                'end': info["qtl"]["end"],
+                'error_message': '',
+                'id': 3,
+                'name': 'qtl.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["qtl"]["start"],
+                'status': 'success',
+                'traceback': None
+            }],
+            'error': False,
+            'errorMessage': ''
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_datasets(self, client):
         """Test the /api/datsets/delete route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+
         data = {
             "datasetsIdToDelete": [1, ]
         }
 
-        response = client_logged_as_jdoe_with_data.post('/api/datasets/delete', json=data)
+        response = client.client.post('/api/datasets/delete', json=data)
+
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''

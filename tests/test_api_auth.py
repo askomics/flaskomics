@@ -4,7 +4,7 @@ from . import AskomicsTestCase
 class TestApiAuth(AskomicsTestCase):
     """Test AskOmics API /api/auth/<someting>"""
 
-    def test_signup(self, client_empty_db, client_filled_db):
+    def test_signup(self, client):
         """Test /api/auth/signup route"""
         ok_data = {
             "fname": "John",
@@ -13,7 +13,7 @@ class TestApiAuth(AskomicsTestCase):
             "password": "dontkillmydog",
             "passwordconf": "dontkillmydog",
             "email": "jwick@askomics.org",
-            'apikey': "0000000000",
+            'apikey': "0000000001",
             "galaxy": None
         }
 
@@ -68,7 +68,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # fname empty
-        response = client_empty_db.post('/api/auth/signup', json=empty_fname_data)
+        response = client.client.post('/api/auth/signup', json=empty_fname_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -77,7 +77,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # lname empty
-        response = client_empty_db.post('/api/auth/signup', json=empty_lname_data)
+        response = client.client.post('/api/auth/signup', json=empty_lname_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -86,7 +86,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # username empty
-        response = client_empty_db.post('/api/auth/signup', json=empty_username_data)
+        response = client.client.post('/api/auth/signup', json=empty_username_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -95,7 +95,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # non valid email
-        response = client_empty_db.post('/api/auth/signup', json=unvalid_email_data)
+        response = client.client.post('/api/auth/signup', json=unvalid_email_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -104,7 +104,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # non valid email
-        response = client_empty_db.post('/api/auth/signup', json=diff_password_data)
+        response = client.client.post('/api/auth/signup', json=diff_password_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -113,7 +113,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # ok inputs
-        response = client_empty_db.post('/api/auth/signup', json=ok_data)
+        response = client.client.post('/api/auth/signup', json=ok_data)
         assert response.status_code == 200
         assert response.json == {
             'error': False,
@@ -128,13 +128,13 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
         # Test logged
-        with client_empty_db.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -146,12 +146,12 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
         # Re-insert same user
-        response = client_empty_db.post('/api/auth/signup', json=ok_data)
+        response = client.client.post('/api/auth/signup', json=ok_data)
         assert response.status_code == 200
         assert response.json == {
             'error': True,
@@ -159,7 +159,7 @@ class TestApiAuth(AskomicsTestCase):
             'user': {}
         }
 
-    def test_wrong_login(self, client_filled_db):
+    def test_wrong_login(self, client):
         """Test /api/auth/login route with wrong credentials"""
         inputs_wrong_username = {
             "login": "xx",
@@ -176,7 +176,9 @@ class TestApiAuth(AskomicsTestCase):
             "password": "xx"
         }
 
-        response = client_filled_db.post('/api/auth/login', json=inputs_wrong_username)
+        client.create_two_users()
+
+        response = client.client.post('/api/auth/login', json=inputs_wrong_username)
 
         assert response.status_code == 200
         assert response.json == {
@@ -185,7 +187,7 @@ class TestApiAuth(AskomicsTestCase):
             'user': {}
         }
 
-        response = client_filled_db.post('/api/auth/login', json=inputs_wrong_email)
+        response = client.client.post('/api/auth/login', json=inputs_wrong_email)
 
         assert response.status_code == 200
         assert response.json == {
@@ -194,7 +196,7 @@ class TestApiAuth(AskomicsTestCase):
             'user': {}
         }
 
-        response = client_filled_db.post('/api/auth/login', json=inputs_wrong_password)
+        response = client.client.post('/api/auth/login', json=inputs_wrong_password)
 
         assert response.status_code == 200
         assert response.json == {
@@ -204,10 +206,10 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # Test logged
-        with client_filled_db.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' not in sess
 
-    def test_ok_login(self, client_filled_db):
+    def test_ok_login(self, client):
         """Test /api/auth/login route with good credentials"""
         ok_inputs_email = {
             "login": "jdoe@askomics.org",
@@ -219,7 +221,9 @@ class TestApiAuth(AskomicsTestCase):
             "password": "iamjohndoe"
         }
 
-        response = client_filled_db.post('/api/auth/login', json=ok_inputs_username)
+        client.create_two_users()
+
+        response = client.client.post('/api/auth/login', json=ok_inputs_username)
 
         assert response.status_code == 200
         assert response.json == {
@@ -235,12 +239,12 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
-        response = client_filled_db.post('/api/auth/login', json=ok_inputs_email)
+        response = client.client.post('/api/auth/login', json=ok_inputs_email)
 
         assert response.status_code == 200
         assert response.json == {
@@ -256,13 +260,13 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
         # Test logged
-        with client_filled_db.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -274,11 +278,38 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
-    def test_update_profile(self, client_logged_as_jdoe):
+    def test_login_apikey(self, client):
+        """Test /loginapikey route"""
+        route_jdoe_apikey = "/loginapikey/0000000001"
+        route_jsmith_apikey = "/loginapikey/0000000002"
+        route_wrong_apikey = "/loginapikey/0000000000"
+
+        client.create_two_users()
+
+        response = client.client.get(route_jdoe_apikey)
+
+        assert response.status_code == 200
+        assert not response.json
+
+        response = client.client.get(route_jsmith_apikey)
+
+        assert response.status_code == 200
+        assert not response.json
+
+        response = client.client.get(route_wrong_apikey)
+
+        assert response.status_code == 200
+        assert response.json == {
+            "error": True,
+            "errorMessage": ["No user with this API key"],
+            "user": {}
+        }
+
+    def test_update_profile(self, client):
         """Test /api/auth/profile route"""
         update_all_data = {
             "newFname": "Johnny",
@@ -304,7 +335,10 @@ class TestApiAuth(AskomicsTestCase):
             "newEmail": ""
         }
 
-        response = client_logged_as_jdoe.post("/api/auth/profile", json=update_empty_data)
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.post("/api/auth/profile", json=update_empty_data)
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -319,7 +353,7 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
@@ -327,7 +361,7 @@ class TestApiAuth(AskomicsTestCase):
         # TODO:
 
         # Assert session is untouched
-        with client_logged_as_jdoe.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -339,11 +373,11 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
-        response = client_logged_as_jdoe.post("/api/auth/profile", json=update_lname_data)
+        response = client.client.post("/api/auth/profile", json=update_lname_data)
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -358,7 +392,7 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
@@ -366,7 +400,7 @@ class TestApiAuth(AskomicsTestCase):
         # TODO:
 
         # Assert session is updated
-        with client_logged_as_jdoe.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -378,11 +412,11 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
-        response = client_logged_as_jdoe.post("/api/auth/profile", json=update_email_data)
+        response = client.client.post("/api/auth/profile", json=update_email_data)
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -397,7 +431,7 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
@@ -405,7 +439,7 @@ class TestApiAuth(AskomicsTestCase):
         # TODO:
 
         # Assert session is updated
-        with client_logged_as_jdoe.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -417,11 +451,11 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
-        response = client_logged_as_jdoe.post("/api/auth/profile", json=update_all_data)
+        response = client.client.post("/api/auth/profile", json=update_all_data)
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -436,7 +470,7 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
@@ -444,7 +478,7 @@ class TestApiAuth(AskomicsTestCase):
         # TODO:
 
         # Assert session is updated
-        with client_logged_as_jdoe.session_transaction() as sess:
+        with client.client.session_transaction() as sess:
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
@@ -456,11 +490,11 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
 
-    def test_update_password(self, client_logged_as_jdoe):
+    def test_update_password(self, client):
         """test /api/auth/password"""
         empty_data = {
             "newPassword": "",
@@ -486,7 +520,10 @@ class TestApiAuth(AskomicsTestCase):
             "oldPassword": "iamjohndoe"
         }
 
-        response = client_logged_as_jdoe.post('/api/auth/password', json=empty_data)
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.post('/api/auth/password', json=empty_data)
         assert response.status_code == 200
         assert response.json == {
             "error": True,
@@ -501,12 +538,12 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
-        response = client_logged_as_jdoe.post('/api/auth/password', json=unidentical_passwords_data)
+        response = client.client.post('/api/auth/password', json=unidentical_passwords_data)
         assert response.status_code == 200
         assert response.json == {
             "error": True,
@@ -521,12 +558,12 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
-        response = client_logged_as_jdoe.post('/api/auth/password', json=wrong_old_passwords_data)
+        response = client.client.post('/api/auth/password', json=wrong_old_passwords_data)
         assert response.status_code == 200
         assert response.json == {
             "error": True,
@@ -541,12 +578,12 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
-        response = client_logged_as_jdoe.post('/api/auth/password', json=ok_data)
+        response = client.client.post('/api/auth/password', json=ok_data)
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -561,14 +598,17 @@ class TestApiAuth(AskomicsTestCase):
                 'admin': True,
                 'blocked': False,
                 'quota': 0,
-                'apikey': "0000000000",
+                'apikey': "0000000001",
                 'galaxy': None
             }
         }
 
-    def test_update_apikey(self, client_logged_as_jdoe):
+    def test_update_apikey(self, client):
         """test /api/auth/logout route"""
-        response = client_logged_as_jdoe.get('/api/auth/apikey')
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.get('/api/auth/apikey')
 
         assert response.status_code == 200
         assert len(response.json) == 3
@@ -584,12 +624,15 @@ class TestApiAuth(AskomicsTestCase):
         assert response.json["user"]["admin"]
         assert not response.json["user"]["blocked"]
         assert response.json["user"]["quota"] == 0
-        assert not response.json["user"]["apikey"] == "0000000000"
+        assert not response.json["user"]["apikey"] == "0000000001"
         assert response.json["user"]["galaxy"] is None
 
-    def test_logout(self, client_logged_as_jdoe):
+    def test_logout(self, client):
         """test /api/auth/logout route"""
-        response = client_logged_as_jdoe.get('/api/auth/logout')
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.get('/api/auth/logout')
 
         assert response.status_code == 200
         assert response.json == {

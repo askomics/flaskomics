@@ -1,5 +1,5 @@
-import unittest
 import json
+from deepdiff import DeepDiff
 
 from . import AskomicsTestCase
 
@@ -7,183 +7,127 @@ from . import AskomicsTestCase
 class TestApiStartpoints(AskomicsTestCase):
     """Test AskOmics API /api/startpoints/<someting>"""
 
-    def test_startpoints(self, client_logged_as_jdoe_with_data):
+    def test_startpoints(self, client):
         """Test /api/startpoints route"""
-        case = unittest.TestCase()
-        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
-        response = client_logged_as_jdoe_with_data.get('/api/query/startpoints')
-        assert response.status_code == 200
-        expected = {
-            'error': False,
-            'errorMessage': '',
-            'startpoints': [{
-                'entity':
-                'http://www.semanticweb.org/user/ontologies/2018/1#Gene',
-                'entity_label':
-                'Gene',
-                'graphs': [{
-                    'creator': 'jdoe',
-                    'public': 'false',
-                    'uri': 'urn:sparql:askomics_test:1_jdoe:gene_{}'.format(gene_timestamp)
-                }],
-                'private': True,
-                'public': False
-            }],
-            'publicQueries': []
-        }
-        case.assertCountEqual(response.json, expected)
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload_and_integrate()
 
-    def test_get_abstraction(self, client_logged_as_jdoe_with_data):
+        response = client.client.get('/api/query/startpoints')
+
+        sp1 = {
+            'entity': 'http://www.semanticweb.org/user/ontologies/2018/1#transcript',
+            'entity_label': 'transcript',
+            'graphs': [{
+                'creator': 'jdoe',
+                'public': 'false',
+                'uri': 'urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}'.format(info["transcripts"]["timestamp"])
+            }],
+            'private': True,
+            'public': False
+        }
+
+        sp2 = {
+            'entity': 'http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression',
+            'entity_label': 'DifferentialExpression',
+            'graphs': [{
+                'creator': 'jdoe',
+                'public': 'false',
+                'uri': 'urn:sparql:askomics_test:1_jdoe:de.tsv_{}'.format(info["de"]["timestamp"])
+            }],
+            'private': True,
+            'public': False
+        }
+
+        sp3 = {
+            'entity': 'http://www.semanticweb.org/user/ontologies/2018/1#QTL',
+            'entity_label': 'QTL',
+            'graphs': [{
+                'creator': 'jdoe',
+                'public': 'false',
+                'uri': 'urn:sparql:askomics_test:1_jdoe:qtl.tsv_{}'.format(info["qtl"]["timestamp"])
+            }],
+            'private': True,
+            'public': False
+        }
+
+        assert response.status_code == 200
+        assert len(response.json) == 4
+
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["publicQueries"] == []
+        assert len(response.json["startpoints"]) == 3
+
+        assert sp1 in response.json["startpoints"]
+        assert sp2 in response.json["startpoints"]
+        assert sp3 in response.json["startpoints"]
+
+    def test_get_abstraction(self, client):
         """Test /api/startpoints/abstraction route"""
-        case = unittest.TestCase()
-        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
-        response = client_logged_as_jdoe_with_data.get('/api/query/abstraction')
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload_and_integrate()
 
-        print(response.json)
+        with open("tests/results/abstraction.json") as file:
+            file_content = file.read()
+        raw_abstraction = file_content.replace("###TRANSCRIPTS_TIMESTAMP###", str(info["transcripts"]["timestamp"]))
+        raw_abstraction = raw_abstraction.replace("###QTL_TIMESTAMP###", str(info["qtl"]["timestamp"]))
+        raw_abstraction = raw_abstraction.replace("###DE_TIMESTAMP###", str(info["de"]["timestamp"]))
+        raw_abstraction = raw_abstraction.replace("###SIZE###", str(client.get_size_occupied_by_user()))
+        expected = json.loads(raw_abstraction)
+
+        response = client.client.get('/api/query/abstraction')
+        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
         assert response.status_code == 200
-        expected = {
-            'abstraction': [{
-                'attributes':
-                [{
-                    'label': 'end',
-                    'type': 'http://www.w3.org/2001/XMLSchema#decimal',
-                    'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#end'
-                }, {
-                    'label': 'start',
-                    'type': 'http://www.w3.org/2001/XMLSchema#decimal',
-                    'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#start'
-                }, {
-                    'label': 'chromosome',
-                    'type': 'http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory',
-                    'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#chromosome',
-                    'values':
-                    [{
-                        'label': 'AT1',
-                        'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#AT1'
-                    }, {
-                        'label': 'AT2',
-                        'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#AT2'
-                    }, {
-                        'label': 'AT3',
-                        'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#AT3'
-                    }, {
-                        'label': 'BN1',
-                        'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#BN1'
-                    }, {
-                        'label': 'BN2',
-                        'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#BN2'
-                    }]
-                }, {
-                    'label': 'organism',
-                    'type': 'http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory',
-                    'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#organism',
-                    'values':
-                        [{
-                            'label': 'Arabidopsis thaliana',
-                            'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis%20thaliana'
-                        }, {
-                            'label': 'Brassica napus',
-                            'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#Brassica%20napus'
-                        }]
-                }, {
-                    'label': 'strand',
-                    'type': 'http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory',
-                    'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#strand',
-                    'values':
-                        [{
-                            'label': 'plus',
-                            'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#plus'
-                        }, {
-                            'label': 'minus',
-                            'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#minus'
-                        }]
-                }],
-                'graphs': ['urn:sparql:askomics_test:1_jdoe:gene_{}'.format(gene_timestamp)],
-                'label': 'Gene',
-                'relations': [],
-                'uri': 'http://www.semanticweb.org/user/ontologies/2018/1#Gene'
-            }],
-            'diskSpace': 2661,
-            'error': False,
-            'errorMessage': ''
-        }
-        case.assertCountEqual(response.json, expected)
+        assert len(response.json) == 4
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ""
+        assert type(response.json["diskSpace"]) == int
 
-    def test_get_preview(self, client_logged_as_jdoe_with_data):
+        assert len(response.json["abstraction"]) == 3
+        assert len(response.json["abstraction"]["attributes"]) == 21
+
+        assert ddiff == {}
+
+    def test_get_preview(self, client):
         """Test /api/query/preview route"""
-        case = unittest.TestCase()
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
 
-        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
-
-        with open("tests/data/query.json", "r") as file:
+        with open("tests/data/graphState_simple_query.json") as file:
             file_content = file.read()
 
-        raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
-        json_query = json.loads(raw_query)
-
+        json_query = json.loads(file_content)
         data = {
             "graphState": json_query,
         }
 
-        expected = {
-            'error': False,
-            'errorMessage': '',
-            'headerPreview': ['Gene1_Label'],
-            'resultsPreview': [{
-                'Gene1_Label': 'AT001'
-            }, {
-                'Gene1_Label': 'AT001'
-            }, {
-                'Gene1_Label': 'AT002'
-            }, {
-                'Gene1_Label': 'AT002'
-            }, {
-                'Gene1_Label': 'AT003'
-            }, {
-                'Gene1_Label': 'AT003'
-            }, {
-                'Gene1_Label': 'AT004'
-            }, {
-                'Gene1_Label': 'AT004'
-            }, {
-                'Gene1_Label': 'AT005'
-            }, {
-                'Gene1_Label': 'AT005'
-            }, {
-                'Gene1_Label': 'BN001'
-            }, {
-                'Gene1_Label': 'BN001'
-            }, {
-                'Gene1_Label': 'BN002'
-            }, {
-                'Gene1_Label': 'BN002'
-            }, {
-                'Gene1_Label': 'BN003'
-            }, {
-                'Gene1_Label': 'BN003'
-            }]
-        }
+        response = client.client.post('/api/query/preview', json=data)
+        expected = {"error": False, "errorMessage": "", "headerPreview": ["transcript1_Label"], "resultsPreview": [{"transcript1_Label": "AT5G41905"}, {"transcript1_Label": "AT1G57800"}, {"transcript1_Label": "AT3G13660"}, {"transcript1_Label": "AT3G51470"}, {"transcript1_Label": "AT1G33615"}, {"transcript1_Label": "AT3G10490"}, {"transcript1_Label": "AT1G49500"}, {"transcript1_Label": "AT3G22640"}, {"transcript1_Label": "AT3G10460"}, {"transcript1_Label": "AT5G35334"}]}
+        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
-        response = client_logged_as_jdoe_with_data.post('/api/query/preview', json=data)
         assert response.status_code == 200
-        case.assertCountEqual(response.json, expected)
+        assert ddiff == {}
 
-    def test_save_result(self, client_logged_as_jdoe_with_data):
+    def test_save_result(self, client):
         """Test /api/query/save_result route"""
-        gene_timestamp = client_logged_as_jdoe_with_data.gene_timestamp
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
 
-        with open("tests/data/query.json", "r") as file:
+        with open("tests/data/graphState_simple_query.json", "r") as file:
             file_content = file.read()
 
-        raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
-        json_query = json.loads(raw_query)
+        json_query = json.loads(file_content)
 
         data = {
             "graphState": json_query,
         }
 
-        response = client_logged_as_jdoe_with_data.post('/api/query/save_result', json=data)
+        response = client.client.post('/api/query/save_result', json=data)
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''

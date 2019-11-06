@@ -1,0 +1,4 @@
+transcript	taxon	featureName	chromosomeName	start	end	featureType	strand	biotype	description
+AT3G10490	Arabidopsis_thaliana	ANAC052	At3	3267835	3270883	gene	plus	protein_coding	NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]
+AT3G13660	Arabidopsis_thaliana	DIR22	At3	4464908	4465586	gene	plus	protein_coding	Dirigent_protein_22_[Source:UniProtKB/Swiss-Prot%3BAcc:Q66GI2]
+AT3G51470	Arabidopsis_thaliana	na	At3	19097787	19099275	gene	minus	protein_coding	Probable_protein_phosphatase_2C_47_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9SD02]

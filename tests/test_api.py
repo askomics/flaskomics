@@ -6,9 +6,9 @@ from . import AskomicsTestCase
 class TestApi(AskomicsTestCase):
     """Test AskOmics API"""
 
-    def test_hello(self, client_no_db, client_logged_as_jdoe):
+    def test_hello(self, client):
         """Test /api/hello route"""
-        response = client_no_db.get('/api/hello')
+        response = client.client.get('/api/hello')
 
         assert response.status_code == 200
         assert response.json == {
@@ -17,7 +17,10 @@ class TestApi(AskomicsTestCase):
             "message": "Welcome to AskOmics"
         }
 
-        response = client_logged_as_jdoe.get('/api/hello')
+        # Log user
+        client.log_user("jdoe")
+
+        response = client.client.get('/api/hello')
 
         assert response.status_code == 200
         assert response.json == {
@@ -26,22 +29,22 @@ class TestApi(AskomicsTestCase):
             "message": "Hello John Doe, Welcome to AskOmics!"
         }
 
-    def test_start(self, app, client_no_db, client_logged_as_jdoe, client_logged_as_jsmith):
+    def test_start(self, client):
         """Test /api/start route"""
         # Non logged
         expected_config_nouser = {
-            'footerMessage': app.iniconfig.get('askomics', 'footer_message'),
+            'footerMessage': client.get_config('askomics', 'footer_message'),
             "version": get_distribution('askomics').version,
             "commit": None,
             "gitUrl": "https://github.com/askomics/flaskomics",
-            "disableIntegration": app.iniconfig.getboolean('askomics', 'disable_integration'),
-            "prefix": app.iniconfig.get('triplestore', 'prefix'),
-            "namespace": app.iniconfig.get('triplestore', 'namespace'),
+            "disableIntegration": client.get_config('askomics', 'disable_integration', boolean=True),
+            "prefix": client.get_config('triplestore', 'prefix'),
+            "namespace": client.get_config('triplestore', 'namespace'),
             "proxyPath": "/",
             "user": {},
             "logged": False
         }
-        response = client_no_db.get('/api/start')
+        response = client.client.get('/api/start')
         assert response.status_code == 200
         assert response.json == {
             "error": False,
@@ -49,7 +52,12 @@ class TestApi(AskomicsTestCase):
             "config": expected_config_nouser
         }
 
+        # Create database and user
+        client.create_two_users()
+
         # Jdoe (admin) logged
+        client.log_user("jdoe")
+
         expected_config_jdoe = expected_config_nouser
         expected_config_jdoe["logged"] = True
         expected_config_jdoe["user"] = {
@@ -62,10 +70,10 @@ class TestApi(AskomicsTestCase):
             'admin': True,
             'blocked': False,
             "quota": 0,
-            'apikey': "0000000000",
+            'apikey': "0000000001",
             'galaxy': None
         }
-        response = client_logged_as_jdoe.get('/api/start')
+        response = client.client.get('/api/start')
 
         assert response.status_code == 200
         assert response.json == {
@@ -75,6 +83,8 @@ class TestApi(AskomicsTestCase):
         }
 
         # jsmith (non admin) logged
+        client.log_user("jsmith")
+
         expected_config_jsmith = expected_config_nouser
         expected_config_jsmith["logged"] = True
         expected_config_jsmith["user"] = {
@@ -87,10 +97,10 @@ class TestApi(AskomicsTestCase):
             'admin': False,
             'blocked': False,
             "quota": 0,
-            'apikey': "0000000000",
+            'apikey': "0000000002",
             'galaxy': None
         }
-        response = client_logged_as_jsmith.get('/api/start')
+        response = client.client.get('/api/start')
 
         assert response.status_code == 200
         assert response.json == {

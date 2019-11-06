@@ -42,13 +42,15 @@ class Dataset(Params):
         self.name = dataset_info["name"] if "name" in dataset_info else None
         self.graph_name = dataset_info["graph_name"] if "graph_name" in dataset_info else None
         self.public = dataset_info["public"] if "public" in dataset_info else False
+        self.start = dataset_info["start"] if "start" in dataset_info else None
+        self.end = dataset_info["end"] if "end" in dataset_info else None
 
     def set_info_from_db(self):
         """Set the info in from the database"""
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public
+        SELECT celery_id, file_id, name, graph_name, public, start, end
         FROM datasets
         WHERE user_id = ?
         AND id = ?
@@ -61,6 +63,8 @@ class Dataset(Params):
         self.name = rows[0][2]
         self.graph_name = rows[0][3]
         self.public = rows[0][4]
+        self.start = rows[0][5]
+        self.end = rows[0][6]
 
     def save_in_db(self):
         """Save the dataset into the database"""
