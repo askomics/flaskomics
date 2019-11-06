@@ -20,3 +20,5 @@ bcbio-gff
 bioblend
 pybedtools
 deepdiff
+sentry-sdk[flask]==0.10.2
+configparser
