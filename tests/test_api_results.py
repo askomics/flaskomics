@@ -1,4 +1,5 @@
 import json
+from deepdiff import DeepDiff
 
 from . import AskomicsTestCase
 
@@ -49,9 +50,10 @@ class TestApiResults(AskomicsTestCase):
         expected = json.loads(file_content)
 
         response = client.client.post('/api/results/preview', json=data)
+        ddiff = DeepDiff(response.json, expected, ignore_order=True)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert ddiff == {}
 
     def test_get_graph_state(self, client):
         """test /api/results/graphstate"""
