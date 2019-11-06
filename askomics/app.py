@@ -69,7 +69,7 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
 
     sentry_dsn = None
     try:
-        sentry_dsn = conf['sentry']['dsn']
+        sentry_dsn = conf['sentry']['server_dsn']
     except Exception:
         pass
 
