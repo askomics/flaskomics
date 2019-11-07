@@ -127,47 +127,6 @@ def upload_url():
     })
 
 
-@file_bp.route('/api/files/upload', methods=['POST'])
-@login_required
-def upload():
-    """Upload files
-
-    Returns
-    -------
-    json
-        uploadedFiles: list of all files of current user
-        error: True if error, else False
-        errorMessage: the error message of error, else an empty string
-    """
-    files_utils = FilesUtils(current_app, session)
-    disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
-
-    if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
-        return jsonify({
-            'errorMessage': "Exceeded quota",
-            "uploadedFiles": [],
-            "error": True
-        }), 500
-    inputs = request.files
-
-    try:
-        files = FilesHandler(current_app, session)
-        uploaded_files = files.persist_files(inputs)
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
-        return jsonify({
-            'uploadedFiles': [],
-            'error': True,
-            'errorMessage': str(e)
-        }), 500
-
-    return jsonify({
-        'uploadedFiles': uploaded_files,
-        'error': False,
-        'errorMessage': ''
-    })
-
-
 @file_bp.route('/api/files/preview', methods=['POST'])
 @login_required
 def get_preview():

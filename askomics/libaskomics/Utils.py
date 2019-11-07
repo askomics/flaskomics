@@ -50,9 +50,9 @@ class Utils():
         return ''.join(random.choice(alpabet) for i in range(number))
 
     @staticmethod
-    def unique(a):
-        """return the list with duplicate elements removed"""
-        return list(set(a))
+    def unique(l):
+        """return the list with duplicate elements removed and keep order"""
+        return [i for n, i in enumerate(l) if i not in l[n + 1:]]
 
     @staticmethod
     def intersect(a, b):
@@ -109,6 +109,30 @@ class Utils():
         if number == 0:
             return 0
         return int(number * units[unit])
+
+    @staticmethod
+    def is_url(url):
+        """Check is string is an url
+
+        Parameters
+        ----------
+        url : string
+            string to test
+
+        Returns
+        -------
+        bool
+            True if string is url
+        """
+        regex = re.compile(
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+            r'localhost|'  # localhost...
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$',
+            re.IGNORECASE)
+        return re.match(regex, url) is not None
 
 
 class cached_property(object):

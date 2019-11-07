@@ -93,6 +93,7 @@ def start():
         }
 
         if 'user' in session:
+            current_app.logger.debug(session["user"]["username"])
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             session['user'] = user

@@ -341,7 +341,7 @@ class Result(Params):
             ?,
             NULL,
             ?,
-            ?
+            NULL
         )
         '''
 
@@ -380,7 +380,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None):
+    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None, traceback=None):
         """Update status of results in db
 
         Parameters
@@ -411,7 +411,8 @@ class Result(Params):
         end=?,
         path=?,
         nrows=?,
-        error=?
+        error=?,
+        traceback=?
         WHERE user_id=? AND id=?
         '''.format(celery=update_celery_substr, size=size_string)
 
@@ -421,6 +422,7 @@ class Result(Params):
             self.file_path,
             self.nrows,
             message,
+            traceback,
             self.session["user"]["id"],
             self.id
         ]

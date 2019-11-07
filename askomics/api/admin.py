@@ -39,8 +39,6 @@ def get_users():
         'errorMessage': ''
     })
 
-    return jsonify({'users': all_users})
-
 
 @admin_bp.route('/api/admin/setadmin', methods=['POST'])
 @admin_required

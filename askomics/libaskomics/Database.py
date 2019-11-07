@@ -147,6 +147,20 @@ class Database(Params):
         )
         '''
         self.execute_sql_query(query)
+        self.update_datasets_table()
+
+    def update_datasets_table(self):
+        """Add cols on the datasets table"""
+        query = '''
+        ALTER TABLE datasets
+        ADD traceback text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
 
     def create_integration_table(self):
         """Create the integration table"""
@@ -215,7 +229,7 @@ class Database(Params):
 
         query = '''
         ALTER TABLE results
-        ADD graphs_and_endpoints text NULL
+        ADD traceback text NULL
         DEFAULT(null)
         '''
 

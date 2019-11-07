@@ -21,6 +21,13 @@ def home(path):
     except Exception:
         pass
 
+    # get sentry frontend dsn
+    sentry_dsn = ""
+    try:
+        sentry_dsn = current_app.iniconfig.get("sentry", "frontend_dsn")
+    except Exception:
+        pass
+
     title = "AskOmics"
     try:
         subtitle = current_app.iniconfig.get('askomics', 'subtitle')
@@ -28,4 +35,4 @@ def home(path):
     except Exception:
         pass
 
-    return render_template('index.html', title=title, proxy_path=proxy_path)
+    return render_template('index.html', title=title, proxy_path=proxy_path, sentry=sentry_dsn)

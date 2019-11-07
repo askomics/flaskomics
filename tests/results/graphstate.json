@@ -1,0 +1,254 @@
+{
+  "error": false,
+  "errorMessage": "",
+  "graphState": {
+    "attr": [
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": false,
+        "filterType": "exact",
+        "filterValue": "",
+        "id": 2,
+        "label": "Uri",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "uri",
+        "uri": "rdf:type",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": false,
+        "filterType": "exact",
+        "filterValue": "",
+        "id": 3,
+        "label": "Label",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "rdfs:label",
+        "visible": true
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoReference",
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "At3",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At3"
+          },
+          {
+            "label": "At1",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At1"
+          },
+          {
+            "label": "At5",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At5"
+          }
+        ],
+        "id": 4,
+        "label": "chromosomeName",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeName",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStrand",
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "minus",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#minus"
+          },
+          {
+            "label": "plus",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#plus"
+          }
+        ],
+        "id": 5,
+        "label": "strand",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "Arabidopsis_thaliana",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis_thaliana"
+          }
+        ],
+        "id": 6,
+        "label": "taxon",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#taxon",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "gene",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#gene"
+          },
+          {
+            "label": "miRNA_gene",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#miRNA_gene"
+          },
+          {
+            "label": "ncRNA_gene",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#ncRNA_gene"
+          }
+        ],
+        "id": 7,
+        "label": "featureType",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#featureType",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
+        "filterSign": "=",
+        "filterValue": "",
+        "id": 8,
+        "label": "end",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
+        "filterSign": "=",
+        "filterValue": "",
+        "id": 9,
+        "label": "start",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "id": 10,
+        "label": "biotype",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#biotype",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "id": 11,
+        "label": "description",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#description",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "id": 12,
+        "label": "featureName",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#featureName",
+        "visible": false
+      }
+    ],
+    "links": [],
+    "nodes": [
+      {
+        "faldo": true,
+        "filterLink": "",
+        "filterNode": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
+        ],
+        "humanId": 1,
+        "id": 1,
+        "label": "transcript",
+        "selected": true,
+        "suggested": false,
+        "type": "node",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript"
+      }
+    ]
+  },
+  "id": 1
+}

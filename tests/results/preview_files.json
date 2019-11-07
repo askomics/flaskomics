@@ -1,0 +1,159 @@
+{
+  "error": false,
+  "errorMessage": "",
+  "previewFiles": [
+    {
+      "data": {
+        "columns_type": [
+          "start_entity",
+          "category",
+          "text",
+          "reference",
+          "start",
+          "end",
+          "category",
+          "strand",
+          "text",
+          "text"
+        ],
+        "content_preview": [
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At3",
+            "description": "NAC_domain_containing_pro...",
+            "end": "3270883",
+            "featureName": "ANAC052",
+            "featureType": "gene",
+            "start": "3267835",
+            "strand": "plus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT3G10490"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At3",
+            "description": "Dirigent_protein_22_[Sour...",
+            "end": "4465586",
+            "featureName": "DIR22",
+            "featureType": "gene",
+            "start": "4464908",
+            "strand": "plus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT3G13660"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At3",
+            "description": "Probable_protein_phosphat...",
+            "end": "19099275",
+            "featureName": "na",
+            "featureType": "gene",
+            "start": "19097787",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT3G51470"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At3",
+            "description": "Plant_self-incompatibilit...",
+            "end": "3256439",
+            "featureName": "na",
+            "featureType": "gene",
+            "start": "3255800",
+            "strand": "plus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT3G10460"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At3",
+            "description": "cupin_family_protein_[Sou...",
+            "end": "8013902",
+            "featureName": "PAP85",
+            "featureType": "gene",
+            "start": "8011724",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT3G22640"
+          },
+          {
+            "biotype": "ncRNA",
+            "chromosomeName": "At1",
+            "description": "other_RNA_[Source:TAIR%3B...",
+            "end": "12194374",
+            "featureName": "na",
+            "featureType": "ncRNA_gene",
+            "start": "12193325",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT1G33615"
+          },
+          {
+            "biotype": "miRNA",
+            "chromosomeName": "At5",
+            "description": "MIR166/MIR166E%3B_miRNA_[...",
+            "end": "16775658",
+            "featureName": "MIR166E",
+            "featureType": "miRNA_gene",
+            "start": "16775524",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT5G41905"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At1",
+            "description": "E3_ubiquitin-protein_liga...",
+            "end": "21412283",
+            "featureName": "ORTH3",
+            "featureType": "gene",
+            "start": "21408623",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT1G57800"
+          },
+          {
+            "biotype": "protein_coding",
+            "chromosomeName": "At1",
+            "description": "unknown_protein%3B_FUNCTI...",
+            "end": "18322284",
+            "featureName": "na",
+            "featureType": "gene",
+            "start": "18321295",
+            "strand": "minus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT1G49500"
+          },
+          {
+            "biotype": "transposable_element",
+            "chromosomeName": "At5",
+            "description": "transposable_element_gene...",
+            "end": "13538984",
+            "featureName": "na",
+            "featureType": "gene",
+            "start": "13537917",
+            "strand": "plus",
+            "taxon": "Arabidopsis_thaliana",
+            "transcript": "AT5G35334"
+          }
+        ],
+        "header": [
+          "transcript",
+          "taxon",
+          "featureName",
+          "chromosomeName",
+          "start",
+          "end",
+          "featureType",
+          "strand",
+          "biotype",
+          "description"
+        ]
+      },
+      "id": 1,
+      "name": "transcripts.tsv",
+      "type": "csv/tsv"
+    }
+  ]
+}
