@@ -1,134 +1,37 @@
 {
   "data": [
     {
-      "o": "http://www.w3.org/2002/07/owl#Class",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#transcript"
+      "transcript1_Label": "AT3G13660"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#Class",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression"
+      "transcript1_Label": "AT3G10460"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#Class",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#QTL"
+      "transcript1_Label": "AT3G51470"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#taxon"
+      "transcript1_Label": "AT5G35334"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#featureType"
+      "transcript1_Label": "AT3G10490"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeName"
+      "transcript1_Label": "AT3G22640"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+      "transcript1_Label": "AT1G57800"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#description"
+      "transcript1_Label": "AT1G49500"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#biotype"
+      "transcript1_Label": "AT1G33615"
     },
     {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#featureName"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#start"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#end"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#PValue"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#logFC"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#FDR"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#Expression"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#FC"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#concern%40transcript"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#Leaves/Leaves"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#Significance"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#Roots/Roots"
-    },
-    {
-      "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#ref"
-    },
-    {
-      "o": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT3G13660"
-    },
-    {
-      "o": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT3G10460"
-    },
-    {
-      "o": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-      "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT3G51470"
+      "transcript1_Label": "AT5G41905"
     }
   ],
   "header": [
-    "s",
-    "p",
-    "o"
+    "transcript1_Label"
   ]
 }
