@@ -22,7 +22,7 @@ def home(path):
         pass
 
     # get sentry frontend dsn
-    sentry_dsn = None
+    sentry_dsn = ""
     try:
         sentry_dsn = current_app.iniconfig.get("sentry", "frontend_dsn")
     except Exception:

@@ -14,7 +14,7 @@ class App extends React.Component {
 }
 
 let sentry = document.getElementById('sentry').getAttribute('sentry')
-if (sentry != "None") {
+if (sentry != "") {
   Sentry.init({dsn: sentry});
 }
 
