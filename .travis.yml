@@ -16,7 +16,7 @@ matrix:
       - docker pull askomics/virtuoso:7.2.5.1
       - docker pull bgruening/galaxy-stable:19.01
       - sudo docker run -d --name virtuoso -p 8890:8890 -e DBA_PASSWORD=dba -e SPARQL_UPDATE=true -e DEFAULT_GRAPH=http://localhost:8890/DAV -t askomics/virtuoso:7.2.5.1
-      - sudo docker run -d --name redis -p 9379:6379 -t redis:4.0
+      - sudo docker run -d --name redis -p 6379:6379 -t redis:4.0
       - sudo docker run -d --name galaxy -p 8081:80 -t bgruening/galaxy-stable:19.01
       - sleep 1m
       script:
