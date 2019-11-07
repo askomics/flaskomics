@@ -250,6 +250,7 @@ class TestApiResults(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jdoe")
         client.upload_and_integrate()
+        client.init_galaxy()
         result_info = client.create_result()
 
         data = {"fileId": result_info["id"], "fileToSend": "result"}
