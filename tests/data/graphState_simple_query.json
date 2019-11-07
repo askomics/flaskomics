@@ -38,9 +38,7 @@
       "entityLabel": "transcript",
       "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
       "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoReference",
-      "filterSelectedValues": [
-        "http://www.semanticweb.org/user/ontologies/2018/1#At1"
-      ],
+      "filterSelectedValues": [],
       "filterValues": [
         {
           "label": "At3",
@@ -64,7 +62,7 @@
       "optional": false,
       "type": "category",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeName",
-      "visible": true
+      "visible": false
     },
     {
       "entityLabel": "transcript",
@@ -90,7 +88,7 @@
       "optional": false,
       "type": "category",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
-      "visible": true
+      "visible": false
     },
     {
       "entityLabel": "transcript",
@@ -193,7 +191,7 @@
       "optional": false,
       "type": "text",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#biotype",
-      "visible": true
+      "visible": false
     },
     {
       "entityLabel": "transcript",
@@ -228,262 +226,92 @@
       "type": "text",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#featureName",
       "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": false,
-      "filterType": "exact",
-      "filterValue": "",
-      "id": 20,
-      "label": "Uri",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "uri",
-      "uri": "rdf:type",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": false,
-      "filterType": "exact",
-      "filterValue": "",
-      "id": 21,
-      "label": "Label",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "text",
-      "uri": "rdfs:label",
-      "visible": true
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterType": "exact",
-      "filterValue": "",
-      "id": 22,
-      "label": "Expression",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "text",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Expression",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 23,
-      "label": "FC",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FC",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 24,
-      "label": "FDR",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FDR",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 25,
-      "label": "Leaves/Leaves",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Leaves/Leaves",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "<=",
-      "filterValue": "0.05",
-      "id": 26,
-      "label": "PValue",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#PValue",
-      "visible": true
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 27,
-      "label": "Roots/Roots",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Roots/Roots",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 28,
-      "label": "Significance",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Significance",
-      "visible": false
-    },
-    {
-      "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-      "faldo": null,
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 29,
-      "label": "logFC",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 13,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#logFC",
-      "visible": true
     }
   ],
   "links": [
     {
-      "id": 30,
-      "label": "concern",
-      "sameRef": false,
+      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern",
+      "type": "link",
       "sameStrand": false,
-      "selected": false,
+      "sameRef": false,
+      "id": 15,
+      "label": "concern",
       "source": {
-        "faldo": false,
-        "filterLink": "",
-        "filterNode": "",
-        "graphs": [
-          "urn:sparql:askomics:1_xgarnier:de.tsv_1572453097"
-        ],
-        "humanId": 1,
-        "id": 13,
-        "label": "DifferentialExpression",
-        "selected": true,
-        "suggested": false,
-        "type": "node",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_1572453097"
+        ],
+        "id": 13,
+        "humanId": null,
+        "label": "DifferentialExpression",
+        "faldo": false,
+        "selected": false,
+        "suggested": true,
         "__indexColor": "#d80002",
         "index": 1,
-        "x": -7.753825381665853,
-        "y": 8.014399241405984,
-        "vx": -3.858299195263574e-10,
-        "vy": 4.0412582091094435e-10
+        "x": -29.684405983363952,
+        "y": 15.226650949977444,
+        "vx": -1.7590532694720358e-10,
+        "vy": -3.762027904105187e-11
       },
-      "strict": true,
-      "suggested": false,
       "target": {
         "faldo": true,
         "filterLink": "",
         "filterNode": "",
         "graphs": [
-          "urn:sparql:askomics:1_xgarnier:transcripts.tsv_1572453098"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
         ],
         "humanId": 1,
         "id": 1,
         "label": "transcript",
-        "selected": false,
+        "selected": true,
         "suggested": false,
         "type": "node",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
         "__indexColor": "#ec0001",
         "index": 0,
-        "x": 23.688204491958494,
-        "y": 15.154574241485303,
-        "vx": -4.673361373691324e-10,
-        "vy": 7.427487735045244e-10
+        "x": -1.077046710613891,
+        "y": -0.015787811459209433,
+        "vx": -1.3207033169214517e-10,
+        "vy": 2.3148471548331512e-11
       },
-      "type": "link",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern",
-      "__indexColor": "#b00004",
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#9c0005",
       "__controlPoints": null,
       "index": 0
     },
     {
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern",
+      "uri": "included_in",
       "type": "link",
-      "sameStrand": false,
-      "sameRef": false,
-      "id": 32,
-      "label": "concern",
+      "id": 17,
+      "sameStrand": true,
+      "sameRef": true,
+      "strict": true,
+      "label": "Included in",
       "source": {
-        "faldo": false,
+        "faldo": true,
         "filterLink": "",
         "filterNode": "",
         "graphs": [
-          "urn:sparql:askomics:1_xgarnier:de.tsv_1572453097"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
         ],
         "humanId": 1,
-        "id": 13,
-        "label": "DifferentialExpression",
+        "id": 1,
+        "label": "transcript",
         "selected": true,
         "suggested": false,
         "type": "node",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "__indexColor": "#d80002",
-        "index": 1,
-        "x": -7.753825381665853,
-        "y": 8.014399241405984,
-        "vx": -3.858299195263574e-10,
-        "vy": 4.0412582091094435e-10
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": -1.077046710613891,
+        "y": -0.015787811459209433,
+        "vx": -1.3207033169214517e-10,
+        "vy": 2.3148471548331512e-11
       },
       "target": {
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
@@ -491,9 +319,9 @@
         "filterNode": "",
         "filterLink": "",
         "graphs": [
-          "urn:sparql:askomics:1_xgarnier:transcripts.tsv_1572453098"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
         ],
-        "id": 31,
+        "id": 16,
         "humanId": null,
         "label": "transcript",
         "faldo": true,
@@ -501,16 +329,72 @@
         "suggested": true,
         "__indexColor": "#c40003",
         "index": 2,
-        "x": -15.934379111874769,
-        "y": -23.168973481260483,
-        "vx": -7.289643320557257e-10,
-        "vy": 4.839311111043774e-10
+        "x": 4.095828927720537,
+        "y": -31.999999999906972,
+        "vx": -2.4948166710565723e-11,
+        "vy": -4.885618974960262e-11
       },
       "selected": false,
       "suggested": true,
-      "__indexColor": "#9c0005",
+      "__indexColor": "#880006",
       "__controlPoints": null,
       "index": 1
+    },
+    {
+      "uri": "included_in",
+      "type": "link",
+      "id": 19,
+      "sameStrand": false,
+      "sameRef": true,
+      "strict": true,
+      "label": "Included in",
+      "source": {
+        "faldo": true,
+        "filterLink": "",
+        "filterNode": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
+        ],
+        "humanId": 1,
+        "id": 1,
+        "label": "transcript",
+        "selected": true,
+        "suggested": false,
+        "type": "node",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": -1.077046710613891,
+        "y": -0.015787811459209433,
+        "vx": -1.3207033169214517e-10,
+        "vy": 2.3148471548331512e-11
+      },
+      "target": {
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1572453096"
+        ],
+        "id": 18,
+        "humanId": null,
+        "label": "QTL",
+        "faldo": true,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#b00004",
+        "index": 3,
+        "x": 26.66562376596576,
+        "y": 16.78913686121677,
+        "vx": 4.1373315817942216e-11,
+        "vy": -1.0863569913571731e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#740007",
+      "__controlPoints": null,
+      "index": 2
     }
   ],
   "nodes": [
@@ -519,42 +403,42 @@
       "filterLink": "",
       "filterNode": "",
       "graphs": [
-        "urn:sparql:askomics:1_xgarnier:transcripts.tsv_1572453098"
+        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
       ],
       "humanId": 1,
       "id": 1,
       "label": "transcript",
-      "selected": false,
+      "selected": true,
       "suggested": false,
       "type": "node",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
       "__indexColor": "#ec0001",
       "index": 0,
-      "x": 23.688204491958494,
-      "y": 15.154574241485303,
-      "vx": -4.673361373691324e-10,
-      "vy": 7.427487735045244e-10
+      "x": -1.077046710613891,
+      "y": -0.015787811459209433,
+      "vx": -1.3207033169214517e-10,
+      "vy": 2.3148471548331512e-11
     },
     {
-      "faldo": false,
-      "filterLink": "",
-      "filterNode": "",
-      "graphs": [
-        "urn:sparql:askomics:1_xgarnier:de.tsv_1572453097"
-      ],
-      "humanId": 1,
-      "id": 13,
-      "label": "DifferentialExpression",
-      "selected": true,
-      "suggested": false,
-      "type": "node",
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        "urn:sparql:askomics_test:1_jdoe:de.tsv_1572453097"
+      ],
+      "id": 13,
+      "humanId": null,
+      "label": "DifferentialExpression",
+      "faldo": false,
+      "selected": false,
+      "suggested": true,
       "__indexColor": "#d80002",
       "index": 1,
-      "x": -7.753825381665853,
-      "y": 8.014399241405984,
-      "vx": -3.858299195263574e-10,
-      "vy": 4.0412582091094435e-10
+      "x": -29.684405983363952,
+      "y": 15.226650949977444,
+      "vx": -1.7590532694720358e-10,
+      "vy": -3.762027904105187e-11
     },
     {
       "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
@@ -562,9 +446,9 @@
       "filterNode": "",
       "filterLink": "",
       "graphs": [
-        "urn:sparql:askomics:1_xgarnier:transcripts.tsv_1572453098"
+        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
       ],
-      "id": 31,
+      "id": 16,
       "humanId": null,
       "label": "transcript",
       "faldo": true,
@@ -572,10 +456,31 @@
       "suggested": true,
       "__indexColor": "#c40003",
       "index": 2,
-      "x": -15.934379111874769,
-      "y": -23.168973481260483,
-      "vx": -7.289643320557257e-10,
-      "vy": 4.839311111043774e-10
+      "x": 4.095828927720537,
+      "y": -31.999999999906972,
+      "vx": -2.4948166710565723e-11,
+      "vy": -4.885618974960262e-11
+    },
+    {
+      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1572453096"
+      ],
+      "id": 18,
+      "humanId": null,
+      "label": "QTL",
+      "faldo": true,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#b00004",
+      "index": 3,
+      "x": 26.66562376596576,
+      "y": 16.78913686121677,
+      "vx": 4.1373315817942216e-11,
+      "vy": -1.0863569913571731e-10
     }
   ]
 }

@@ -1,0 +1,46 @@
+{
+    "error": false,
+    "errorMessage": "",
+    "publicQueries": [],
+    "startpoints": [
+        {
+            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+            "entity_label": "transcript",
+            "graphs": [
+                {
+                    "creator": "jdoe",
+                    "public": "false",
+                    "uri": "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572454136"
+                }
+            ],
+            "private": true,
+            "public": false
+        },
+        {
+            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+            "entity_label": "QTL",
+            "graphs": [
+                {
+                    "creator": "jdoe",
+                    "public": "false",
+                    "uri": "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1572454136"
+                }
+            ],
+            "private": true,
+            "public": false
+        },
+        {
+            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+            "entity_label": "DifferentialExpression",
+            "graphs": [
+                {
+                    "creator": "jdoe",
+                    "public": "false",
+                    "uri": "urn:sparql:askomics_test:1_jdoe:de.tsv_1572454136"
+                }
+            ],
+            "private": true,
+            "public": false
+        }
+    ]
+}

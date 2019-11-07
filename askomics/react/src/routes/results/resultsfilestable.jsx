@@ -10,6 +10,8 @@ import { Badge, Button, ButtonGroup, FormGroup, CustomInput, Input, Modal, Modal
 import FileDownload from 'js-file-download'
 import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 export default class ResultsFilesTable extends Component {
   constructor (props) {
@@ -22,7 +24,10 @@ export default class ResultsFilesTable extends Component {
       description: '',
       error: false,
       errorMessage: null,
-      status: null
+      status: null,
+      modalTracebackTitle: "",
+      modalTracebackContent: "",
+      modalTraceback: false
     }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
@@ -33,6 +38,8 @@ export default class ResultsFilesTable extends Component {
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
+    this.handleClickError = this.handleClickError.bind(this)
+    this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
 
   handleSelection (row, isSelect) {
@@ -227,6 +234,26 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
+  handleClickError(event) {
+    console.log(event.target.id)
+
+    this.props.results.forEach(result => {
+      if (result.id == event.target.id) {
+        this.setState({
+          modalTracebackTitle: result.errorMessage ? result.errorMessage : "Internal server error",
+          modalTracebackContent: result.traceback ? result.traceback : "Internal server error",
+          modalTraceback: true
+        })
+      }
+    })
+  }
+
+  toggleModalTraceback () {
+    this.setState({
+      modalTraceback: !this.state.modalTraceback
+    })
+  }
+
   render () {
     let redirectSparqlEditor
     if (this.state.redirectSparqlEditor) {
@@ -299,13 +326,13 @@ export default class ResultsFilesTable extends Component {
         if (cell == 'deleting') {
           return <Badge color="warning">Deleting...</Badge>
         }
-        return <Badge color="danger">Failure</Badge>
+        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
       },
       sort: true,
       editable: false
     }, {
       dataField: "nrows",
-      text: "Row's number",
+      text: "Rows",
       sort: true,
       formatter: (cell, row) => {
         let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
@@ -336,16 +363,12 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
+            <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
             {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != null ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
           </ButtonGroup>
         )
       },
-      editable: false
-    }, {
-      dataField: 'error_message',
-      text: 'Error message',
       editable: false
     }]
 
@@ -388,6 +411,20 @@ export default class ResultsFilesTable extends Component {
             })}
           />
         </div>
+
+        <Modal size="lg" isOpen={this.state.modalTraceback} toggle={this.toggleModalTraceback}>
+          <ModalHeader toggle={this.toggleModalTraceback}>{this.state.modalTracebackTitle.substring(0, 100)}</ModalHeader>
+          <ModalBody>
+            <div>
+              <SyntaxHighlighter language="python" style={monokai}>
+                {this.state.modalTracebackContent}
+              </SyntaxHighlighter>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalTraceback  }>Close</Button>
+          </ModalFooter>
+        </Modal>
         <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>

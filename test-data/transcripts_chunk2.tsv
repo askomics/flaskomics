@@ -1,0 +1,4 @@
+AT3G10460	Arabidopsis_thaliana	na	At3	3255800	3256439	gene	plus	protein_coding	Plant_self-incompatibility_protein_S1_family_[Source:TAIR%3BAcc:AT3G10460]
+AT3G22640	Arabidopsis_thaliana	PAP85	At3	8011724	8013902	gene	minus	protein_coding	cupin_family_protein_[Source:TAIR%3BAcc:AT3G22640]
+AT1G33615	Arabidopsis_thaliana	na	At1	12193325	12194374	ncRNA_gene	minus	ncRNA	other_RNA_[Source:TAIR%3BAcc:AT1G33615]
+AT5G41905	Arabidopsis_thaliana	MIR166E	At5	16775524	16775658	miRNA_gene	minus	miRNA	MIR166/MIR166E%3B_miRNA_[Source:TAIR%3BAcc:AT5G41905]

@@ -82,3 +82,8 @@ namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#
 preview_limit = 25
 # Triplestore max rows limit
 # result_set_max_rows = 10000
+
+[sentry]
+# Sentry dsn to report python and js errors in a sentry instance
+# server_dsn = https://00000000000000000000000000000000@exemple.org/1
+# frontend_dsn = https://00000000000000000000000000000000@exemple.org/2

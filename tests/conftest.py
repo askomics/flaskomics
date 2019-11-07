@@ -3,10 +3,14 @@ import os
 import shutil
 import tempfile
 import json
+import random
+
+from bioblend.galaxy import GalaxyInstance
 
 from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
@@ -16,514 +20,468 @@ from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 import pytest
 
 
-def init_database(dir_path):
-    """Initalize the AskOmics db in a tmp directory
-
-    Parameters
-    ----------
-    dir_path : string
-        AskOmics data directory path
-    """
-    current_app = create_app(config='config/askomics.test.ini')
-
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    # Create data dir and init database
-    starter = Start(current_app, {})
-    starter.start()
-
-
-def create_users(dir_path):
-    """Initialize the AskOmics database and create users inside
-
-    Parameters
-    ----------
-    dir_path : string
-        AskOmics data directory path
-    """
-    current_app = create_app(config='config/askomics.test.ini')
-
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    # Create data dir and init database
-    starter = Start(current_app, {})
-    starter.start()
-
-    # Fill the DB with users
-    uinfo_1 = {
-        "fname": "John",
-        "lname": "Doe",
-        "username": "jdoe",
-        "password": "iamjohndoe",
-        "salt": "0000000000",
-        "email": "jdoe@askomics.org",
-        "apikey": "0000000000",
-        "galaxy": None,
-        "quota": 0
-    }
-    uinfo_2 = {
-        "fname": "Jane",
-        "lname": "Smith",
-        "username": "jsmith",
-        "password": "iamjanesmith",
-        "salt": "0000000000",
-        "email": "jsmith@askomics.org",
-        "apikey": "0000000000",
-        "galaxy": None,
-        "quota": 0
-    }
-
-    auth = LocalAuth(current_app, {})
-    user_1 = auth.persist_user(uinfo_1)
-    auth.create_user_directories(user_1["id"], user_1["username"])
-    user_2 = auth.persist_user(uinfo_2)
-    auth.create_user_directories(user_2["id"], user_2["username"])
-
-
-def load_file(dir_path, file_path, file_name, file_type, user_session):
-    """Load a file into AskOmics
-
-    Parameters
-    ----------
-    dir_path : string
-        AskOmics data directory
-    file_path : string
-        Path of file to upload
-    user_session : dict
-        user session
+@pytest.fixture
+def client():
+    """Summary
 
     Returns
     -------
-    string
-        Path of uploaded file
+    TYPE
+        Description
     """
-    current_app = create_app(config='config/askomics.test.ini')
+    client = Client()
 
-    db_path = "{}/database.db".format(dir_path)
+    yield client
 
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    with open(file_path, 'r') as content_file:
-        content = content_file.read()
-
-    file_data = {
-        "first": True,
-        "last": True,
-        "chunk": content,
-        "name": file_name,
-        "type": file_type,
-        "size": os.path.getsize(file_path)
-    }
-
-    files = FilesHandler(current_app, user_session)
-    filepath = files.persist_chunk(file_data)
-    filedate = files.date
-
-    return {
-        "filepath": filepath,
-        "filedate": filedate
-    }
+    # teardown
+    client.clean()
 
 
-def integrate_dataset(dir_path, file_info, user_session, public):
-    """integrate some files"""
-    current_app = create_app(config='config/askomics.test.ini')
+class Client(object):
+    """Fixtrue class
 
-    db_path = "{}/database.db".format(dir_path)
+    Attributes
+    ----------
+    app : TYPE
+        Description
+    client : TYPE
+        Description
+    config : TYPE
+        Description
+    ctx : TYPE
+        Description
+    db_path : TYPE
+        Description
+    dir_path : TYPE
+        Description
+    """
 
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
+    def __init__(self, config="config/askomics.test.ini"):
+        """Summary
 
-    files_handler = FilesHandler(current_app, user_session)
-    files_handler.handle_files([file_info["id"], ])
+        Parameters
+        ----------
+        config : str, optional
+            Description
+        """
+        # Config
+        self.config = config
+        self.dir_path = tempfile.mkdtemp(prefix="askotest_")
+        self.db_path = "{}/database.db".format(self.dir_path)
 
-    for file in files_handler.files:
+        # create app
+        self.app = create_app(config=self.config)
+        create_celery(self.app)
+        self.app.iniconfig.set('askomics', 'data_directory', self.dir_path)
+        self.app.iniconfig.set('askomics', 'database_path', self.db_path)
 
-        dataset_info = {
-            "celery_id": "000000000",
-            "file_id": file.id,
-            "name": file.name,
-            "graph_name": file.file_graph,
-            "public": public
+        # context
+        self.ctx = self.app.app_context()
+        self.ctx.push()
+
+        # Client
+        self.client = self.app.test_client()
+        self.session = {}
+
+        # Galaxy
+        self.gurl = "http://localhost:8081"
+        self.gkey = "admin"
+        self.galaxy_history = None
+
+        self.init_database()
+
+    def get_config(self, section, entry, boolean=False):
+        """Summary
+
+        Parameters
+        ----------
+        section : TYPE
+            Description
+        entry : TYPE
+            Description
+        boolean : bool, optional
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        if boolean:
+            return self.app.iniconfig.getboolean(section, entry)
+        return self.app.iniconfig.get(section, entry)
+
+    def get_client(self):
+        """Summary
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        return self.client
+
+    def log_user(self, username):
+        """Summary
+
+        Parameters
+        ----------
+        username : TYPE
+            Description
+        """
+        galaxy = None
+        if username == "jdoe":
+            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+
+        with self.client.session_transaction() as sess:
+            sess["user"] = {
+                'id': 1 if username == "jdoe" else 2,
+                'ldap': False,
+                'fname': "John" if username == "jdoe" else "Jane",
+                'lname': "Doe" if username == "jdoe" else "Smith",
+                'username': username,
+                'email': "{}@askomics.org".format(username),
+                'admin': True if username == "jdoe" else False,
+                'blocked': False,
+                'quota': 0,
+                'apikey': "000000000{}".format("1" if username == "jdoe" else "2"),
+                "galaxy": galaxy
+            }
+
+        self.session = sess
+
+    def init_database(self):
+        """Init database"""
+        starter = Start(self.app, self.session)
+        starter.start()
+
+    def create_user(self, username):
+        """Summary
+
+        Parameters
+        ----------
+        username : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        galaxy = None
+        if username == "jdoe":
+            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+
+        uinfo = {
+            "fname": "John" if username == "jdoe" else "Jane",
+            "lname": "Doe" if username == "jdoe" else "Smith",
+            "username": "jdoe" if username == "jdoe" else "jsmith",
+            "password": "iamjohndoe" if username == "jdoe" else "iamjanesmith",
+            "salt": "0000000000",
+            "email": "jdoe@askomics.org" if username == "jdoe" else "jsmith@askomics.org",
+            "apikey": "0000000001" if username == "jdoe" else "0000000002",
+            "galaxy": None,
+            "quota": 0 if username == "jdoe" else 0,
         }
 
-        dataset = Dataset(current_app, user_session, dataset_info)
-        dataset.save_in_db()
+        auth = LocalAuth(self.app, self.session)
+        user = auth.persist_user(uinfo)
+        if galaxy:
+            self.session["user"] = user
+            user = auth.add_galaxy_account(user, galaxy["url"], galaxy["apikey"])["user"]
+            self.session = {}
+        auth.create_user_directories(user["id"], user["username"])
 
-        file.integrate(file_info["columns_type"], public=public)
-        file_timestamp = file.timestamp
+        return user
 
-        # done
-        dataset.update_in_db("success")
+    def create_two_users(self):
+        """Create jdoe and jsmith"""
+        self.create_user("jdoe")
+        self.create_user("jsmith")
 
-        return file_timestamp
+    def upload_file(self, file_path):
+        """Summary
 
+        Parameters
+        ----------
+        file_path : TYPE
+            Description
 
-def save_query(dir_path, user_session, gene_timestamp):
-    """create a query and save results in database and filesystem"""
-    current_app = create_app(config='config/askomics.test.ini')
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        file_name = file_path.split("/")[-1]
+        file_extension = os.path.splitext(file_path)[1]
 
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    with open("tests/data/query.json", "r") as file:
-        file_content = file.read()
-
-    raw_query = file_content.replace("##TIMESTAMP###", str(gene_timestamp))
-    json_query = json.loads(raw_query)
-
-    info = {
-        "graph_state": json_query,
-        "celery_id": '00000000-0000-0000-0000-000000000000'
-    }
-
-    result = Result(current_app, user_session, info)
-
-    # Save job in database database
-    result.save_in_db()
-
-    # launch query
-    query_builder = SparqlQueryBuilder(current_app, user_session)
-    query_launcher = SparqlQueryLauncher(current_app, user_session)
-    query = query_builder.build_query_from_json(json_query)
-    headers, results = query_launcher.process_query(query)
-
-    # write result to a file
-    result.save_result_in_file(headers, results)
-
-    # Update database status
-    result.update_db_status("success")
-
-    return {
-        "id": result.id,
-        "path": result.file_path,
-        "start": result.start,
-        "end": result.end
-    }
-
-
-@pytest.fixture
-def app():
-    """app"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    return current_app
-
-
-@pytest.fixture
-def client_no_db():
-    """client, with no db"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    yield client
-
-    shutil.rmtree(dir_path)
-
-
-@pytest.fixture
-def client_empty_db():
-    """client, with an empty db"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    init_database(dir_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    yield client
-
-    shutil.rmtree(dir_path)
-
-
-@pytest.fixture
-def client_filled_db():
-    """Client, db with users inside"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    create_users(dir_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    yield client
-
-    shutil.rmtree(dir_path)
-
-
-@pytest.fixture
-def client_logged_as_jdoe():
-    """Logged client (jdoe, admin), db with users inside"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    create_users(dir_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    # log as jdoe
-    with client.session_transaction() as sess:
-        sess["user"] = {
-            'id': 1,
-            'ldap': False,
-            'fname': "John",
-            'lname': "Doe",
-            'username': "jdoe",
-            'email': "jdoe@askomics.org",
-            'admin': True,
-            'blocked': False,
-            'quota': 0,
-            'apikey': "0000000000",
-            "galaxy": None
+        file_type = {
+            ".tsv": "text/tab-separated-values",
+            ".csv": "text/tab-separated-values"
         }
 
-    yield client
+        with open(file_path, 'r') as file_content:
+            content = file_content.read()
 
-    shutil.rmtree(dir_path)
-
-
-@pytest.fixture
-def client_logged_as_jsmith():
-    """Logged client (jsmith, non admin), db with users inside"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    create_users(dir_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    # log as jsmith
-    with client.session_transaction() as sess:
-        sess["user"] = {
-            'id': 1,
-            'ldap': False,
-            'fname': "Jane",
-            'lname': "Smith",
-            'username': "jsmith",
-            'email': "jsmith@askomics.org",
-            'admin': False,
-            'blocked': False,
-            'quota': 0,
-            'apikey': "0000000000",
-            "galaxy": None
+        file_data = {
+            "first": True,
+            "last": True,
+            "chunk": content,
+            "name": file_name,
+            "type": file_type[file_extension],
+            "size": os.path.getsize(file_path)
         }
 
-    yield client
+        files = FilesHandler(self.app, self.session)
+        filepath = files.persist_chunk(file_data)
+        filedate = files.date
 
-    shutil.rmtree(dir_path)
-
-
-@pytest.fixture
-def client_logged_as_jdoe_with_data():
-    """Logged client (jdoe, admin), db with users inside, and data loaded and integrated"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
-
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
-
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
-
-    create_users(dir_path)
-
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    # store dirpath
-    client.dir_path = dir_path
-
-    # log as jsmith
-    # log as jdoe
-    with client.session_transaction() as sess:
-        sess["user"] = {
-            'id': 1,
-            'ldap': False,
-            'fname': "John",
-            'lname': "Doe",
-            'username': "jdoe",
-            'email': "jdoe@askomics.org",
-            'admin': True,
-            'blocked': False,
-            'quota': 0,
-            'apikey': "0000000000",
-            "galaxy": None
+        return {
+            "file_path": filepath,
+            "file_date": filedate
         }
-        user_session = sess
 
-    # Upload people.tsv
-    file = load_file(dir_path, 'test-data/gene.tsv', 'gene.tsv', 'text/tab-separated-values', user_session)
-    client.gene_file_path = file["filepath"]
-    client.gene_file_date = file["filedate"]
+    def integrate_file(self, info, public=False):
+        """Summary
 
-    # upload gene.gff
-    gff_file = load_file(dir_path, 'test-data/gene.gff3', 'gene.gff3', '', user_session)
-    client.gff_file_path = gff_file["filepath"]
-    client.gff_file_date = gff_file["filedate"]
+        Parameters
+        ----------
+        info : TYPE
+            Description
 
-    # Integrate
-    file_info = {
-        "id": 1,
-        "columns_type": ["start_entity", "category", "reference", "strand", "start", "end"]
-    }
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        files_handler = FilesHandler(self.app, self.session)
+        files_handler.handle_files([info["id"], ])
 
-    gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)
-    client.gene_timestamp = gene_timestamp
+        for file in files_handler.files:
 
-    yield client
+            dataset_info = {
+                "celery_id": "000000000",
+                "file_id": file.id,
+                "name": file.name,
+                "graph_name": file.file_graph,
+                "public": public
+            }
 
-    shutil.rmtree(dir_path)
-    # clean triplestore
-    query_launcher = SparqlQueryLauncher(current_app, user_session)
-    query_launcher.drop_dataset('urn:sparql:askomics_test:1_jdoe:gene_{}'.format(gene_timestamp))
+            dataset = Dataset(self.app, self.session, dataset_info)
+            dataset.save_in_db()
 
+            file.integrate(info["columns_type"], public=public)
 
-@pytest.fixture
-def client_logged_as_jdoe_with_data_and_result():
-    """Logged client (jdoe, admin), db with users inside, and data loaded and integrated + a result"""
-    current_app = create_app(config='config/askomics.test.ini')
-    create_celery(current_app)
+            # done
+            dataset.update_in_db("success")
+            dataset.set_info_from_db()
 
-    # dirpath in config
-    dir_path = tempfile.mkdtemp(prefix="askotest_")
-    db_path = "{}/database.db".format(dir_path)
+            return {
+                "timestamp": file.timestamp,
+                "start": dataset.start,
+                "end": dataset.end
+            }
 
-    current_app.iniconfig.set('askomics', 'data_directory', dir_path)
-    current_app.iniconfig.set('askomics', 'database_path', db_path)
+    def upload(self):
+        """Upload files
 
-    create_users(dir_path)
+        Returns
+        -------
+        dict
+            Files info
+        """
+        up_transcripts = self.upload_file("test-data/transcripts.tsv")
+        up_de = self.upload_file("test-data/de.tsv")
+        up_qtl = self.upload_file("test-data/qtl.tsv")
 
-    # Establish an application context before running the tests.
-    ctx = current_app.app_context()
-    ctx.push()
-
-    client = current_app.test_client()
-
-    # store dirpath
-    client.dir_path = dir_path
-
-    # log as jsmith
-    # log as jdoe
-    with client.session_transaction() as sess:
-        sess["user"] = {
-            'id': 1,
-            'ldap': False,
-            'fname': "John",
-            'lname': "Doe",
-            'username': "jdoe",
-            'email': "jdoe@askomics.org",
-            'admin': True,
-            'blocked': False,
-            'quota': 0,
-            'apikey': "0000000000",
-            "galaxy": None
+        return {
+            "transcripts": {
+                "upload": up_transcripts,
+            },
+            "de": {
+                "upload": up_de,
+            },
+            "qtl": {
+                "upload": up_qtl,
+            }
         }
-        user_session = sess
 
-    # Upload people.tsv
-    file = load_file(dir_path, 'test-data/gene.tsv', "gene.tsv", "text/tab-separated-values", user_session)
-    client.gene_file_path = file["filepath"]
-    client.gene_file_date = file["filedate"]
+    def upload_and_integrate(self):
+        """Summary
 
-    # Integrate
-    file_info = {
-        "id": 1,
-        "columns_type": ["start_entity", "category", "reference", "strand", "start", "end"]
-    }
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        # upload
+        up_transcripts = self.upload_file("test-data/transcripts.tsv")
+        up_de = self.upload_file("test-data/de.tsv")
+        up_qtl = self.upload_file("test-data/qtl.tsv")
 
-    gene_timestamp = integrate_dataset(dir_path, file_info, user_session, False)
-    integrate_dataset(dir_path, file_info, user_session, True)
-    client.gene_timestamp = gene_timestamp
+        # integrate
+        int_transcripts = self.integrate_file({
+            "id": 1,
+            "columns_type": ["start_entity", "category", "text", "reference", "start", "end", "category", "strand", "text", "text"]
+        })
 
-    # save a result
-    result_info = save_query(dir_path, user_session, gene_timestamp)
-    client.result_info = result_info
+        int_de = self.integrate_file({
+            "id": 2,
+            "columns_type": ["start_entity", "directed", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"]
+        })
 
-    yield client
+        int_qtl = self.integrate_file({
+            "id": 3,
+            "columns_type": ["start_entity", "ref", "start", "end"]
+        })
 
-    shutil.rmtree(dir_path)
-    # clean triplestore
-    query_launcher = SparqlQueryLauncher(current_app, user_session)
-    query_launcher.drop_dataset('urn:sparql:askomics_test:1_jdoe:gene_{}'.format(gene_timestamp))
+        return {
+            "transcripts": {
+                "upload": up_transcripts,
+                "timestamp": int_transcripts["timestamp"],
+                "start": int_transcripts["start"],
+                "end": int_transcripts["end"]
+            },
+            "de": {
+                "upload": up_de,
+                "timestamp": int_de["timestamp"],
+                "start": int_de["start"],
+                "end": int_de["end"]
+            },
+            "qtl": {
+                "upload": up_qtl,
+                "timestamp": int_qtl["timestamp"],
+                "start": int_qtl["start"],
+                "end": int_qtl["end"]
+            }
+        }
+
+    def create_result(self):
+        """Create a result entry in db
+
+        Returns
+        -------
+        dict
+            Result info
+        """
+        with open("tests/data/graphState_simple_query.json", "r") as file:
+            file_content = file.read()
+
+        json_query = json.loads(file_content)
+
+        info = {
+            "graph_state": json_query,
+            "celery_id": '00000000-0000-0000-0000-000000000000'
+        }
+
+        result = Result(self.app, self.session, info)
+
+        # Save job in database database
+        result.save_in_db()
+
+        # launch query
+        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query = query_builder.build_query_from_json(json_query)
+        headers, results = query_launcher.process_query(query)
+
+        # write result to a file
+        result.save_result_in_file(headers, results)
+
+        # Update database status
+        result.update_db_status("success")
+
+        return {
+            "id": result.id,
+            "path": result.file_path,
+            "start": result.start,
+            "end": result.end
+        }
+
+    def delete_data_dir(self):
+        """remove data directory"""
+        shutil.rmtree(self.dir_path)
+
+    def clean_triplestore(self):
+        """remove all test graph in the triplestore"""
+        query = '''
+        SELECT ?graph
+        WHERE {{
+            GRAPH ?graph {{ ?s ?p ?o . }}
+            FILTER (strStarts(str(?graph), "{}"))
+
+        }}
+        '''.format(self.get_config("triplestore", "default_graph"))
+
+        query_launcher = SparqlQueryLauncher(self.app, {})
+
+        header, data = query_launcher.process_query(query)
+        for result in data:
+            query_launcher.drop_dataset(result["graph"])
+
+    def clean(self):
+        """Clean"""
+        self.delete_data_dir()
+        self.clean_triplestore()
+        if self.galaxy_history:
+            self.delete_galaxy_history()
+
+    def get_size_occupied_by_user(self):
+        """Get size of logged user
+
+        Returns
+        -------
+        int
+            Size
+        """
+        files_utils = FilesUtils(self.app, self.session)
+        return files_utils.get_size_occupied_by_user() if "user" in self.session else None
+
+    def init_galaxy(self):
+        """Create a new galaxy history"""
+        history_name = "askotest_{}".format(self.get_random_string(5))
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        self.galaxy_history = galaxy.histories.create_history(history_name)
+
+    def upload_dataset_into_galaxy(self):
+        """Upload a dataset into galaxy"""
+        if not self.galaxy_history:
+            self.init_galaxy()
+        file_path = "test-data/transcripts.tsv"
+        filename = "transcripts.tsv"
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        return galaxy.tools.upload_file(file_path, self.galaxy_history['id'], file_name=filename, file_type='tabular')
+
+    def upload_query_into_galaxy(self):
+        """Upload a json query into galaxy"""
+        if not self.galaxy_history:
+            self.init_galaxy()
+        file_path = "tests/data/graphState_simple_query.json"
+        filename = "graphstate.json"
+
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        return galaxy.tools.upload_file(file_path, self.galaxy_history['id'], file_name=filename, file_type='json')
+
+    def delete_galaxy_history(self):
+        """Delete the galaxy history"""
+        galaxy = GalaxyInstance(self.gurl, self.gkey)
+        galaxy.histories.delete_history(self.galaxy_history["id"], purge=True)
+
+    @staticmethod
+    def get_random_string(number):
+        """return a random string of n character
+
+        Parameters
+        ----------
+        number : int
+            number of character of the random string
+
+        Returns
+        -------
+        str
+            a random string of n chars
+        """
+        alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        return ''.join(random.choice(alpabet) for i in range(number))

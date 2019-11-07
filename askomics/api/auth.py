@@ -79,13 +79,15 @@ def login():
     local_auth = LocalAuth(current_app, session)
     authentication = local_auth.authenticate_user(data)
 
+    user = {}
     if not authentication['error']:
         session['user'] = authentication['user']
+        user = authentication['user']
 
     return jsonify({
         'error': authentication['error'],
         'errorMessage': authentication['error_messages'],
-        'user': authentication['user']
+        'user': user
     })
 
 

@@ -6,6 +6,8 @@ BLUEPRINTS : Tuple
     Flask blueprints
 """
 
+import configparser
+
 from askomics.api.admin import admin_bp
 from askomics.api.auth import auth_bp
 from askomics.api.datasets import datasets_bp
@@ -26,6 +28,8 @@ from flask_ini import FlaskIni
 
 from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
 
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 __all__ = ('create_app', 'create_celery')
 
@@ -60,6 +64,21 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
     Flask
         AskOmics Flask application
     """
+    conf = configparser.ConfigParser()
+    conf.read(config)
+
+    sentry_dsn = None
+    try:
+        sentry_dsn = conf['sentry']['server_dsn']
+    except Exception:
+        pass
+
+    if sentry_dsn:
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            integrations=[FlaskIntegration()]
+        )
+
     app = Flask(app_name, static_folder='static', template_folder='templates')
 
     app.iniconfig = FlaskIni()

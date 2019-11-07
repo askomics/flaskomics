@@ -108,7 +108,13 @@ class Galaxy(Params):
                 # Don't show deleted datasets
                 if dataset['deleted']:
                     continue
-            dataset_list.append(dataset)
+            dataset_dict = {
+                "create_time": dataset["create_time"],
+                "name": dataset["name"],
+                "extension": dataset["extension"],
+                "id": dataset["id"]
+            }
+            dataset_list.append(dataset_dict)
 
         results['datasets'] = dataset_list
         results['histories'] = histories_list

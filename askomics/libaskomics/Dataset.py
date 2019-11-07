@@ -42,13 +42,15 @@ class Dataset(Params):
         self.name = dataset_info["name"] if "name" in dataset_info else None
         self.graph_name = dataset_info["graph_name"] if "graph_name" in dataset_info else None
         self.public = dataset_info["public"] if "public" in dataset_info else False
+        self.start = dataset_info["start"] if "start" in dataset_info else None
+        self.end = dataset_info["end"] if "end" in dataset_info else None
 
     def set_info_from_db(self):
         """Set the info in from the database"""
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public
+        SELECT celery_id, file_id, name, graph_name, public, start, end
         FROM datasets
         WHERE user_id = ?
         AND id = ?
@@ -61,6 +63,8 @@ class Dataset(Params):
         self.name = rows[0][2]
         self.graph_name = rows[0][3]
         self.public = rows[0][4]
+        self.start = rows[0][5]
+        self.end = rows[0][6]
 
     def save_in_db(self):
         """Save the dataset into the database"""
@@ -79,6 +83,7 @@ class Dataset(Params):
             strftime('%s', 'now'),
             NULL,
             ?,
+            NULL,
             NULL
         )
         '''
@@ -133,7 +138,7 @@ class Dataset(Params):
 
         database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
 
-    def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0):
+    def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
 
         Parameters
@@ -156,14 +161,15 @@ class Dataset(Params):
         status=?,
         end=strftime('%s', 'now'),
         ntriples=?,
-        error_message=?
+        error_message=?,
+        traceback=?
         WHERE user_id = ? AND id=?
         '''.format(update_celery_id_substr)
 
         if update_celery:
-            database.execute_sql_query(query, (self.celery_id, status, ntriples, message, self.session['user']['id'], self.id))
+            database.execute_sql_query(query, (self.celery_id, status, ntriples, message, traceback, self.session['user']['id'], self.id))
         else:
-            database.execute_sql_query(query, (status, ntriples, message, self.session['user']['id'], self.id))
+            database.execute_sql_query(query, (status, ntriples, message, traceback, self.session['user']['id'], self.id))
 
     def delete_from_db(self):
         """Delete a dataset from the database"""
