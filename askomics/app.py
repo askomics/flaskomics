@@ -28,8 +28,11 @@ from flask_ini import FlaskIni
 
 from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
 
+from pkg_resources import get_distribution
+
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
 
 __all__ = ('create_app', 'create_celery')
 
@@ -74,9 +77,12 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
         pass
 
     if sentry_dsn:
+        version = get_distribution('askomics').version
+        name = get_distribution('askomics').project_name
         sentry_sdk.init(
             dsn=sentry_dsn,
-            integrations=[FlaskIntegration()]
+            release="{}@{}".format(name, version),
+            integrations=[FlaskIntegration(), CeleryIntegration()]
         )
 
     app = Flask(app_name, static_folder='static', template_folder='templates')
