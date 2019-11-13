@@ -80,6 +80,7 @@ def integrate(self, session, data, host_url):
             dataset.update_in_db("failure", error=True, error_message=str(e), traceback=trace)
             # Rollback
             file.rollback()
+            raise e
             return {
                 'error': True,
                 'errorMessage': str(e)
@@ -116,6 +117,7 @@ def delete_datasets(self, session, datasets_info):
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
+        raise e
         return {
             'error': True,
             'errorMessage': str(e)
@@ -176,6 +178,7 @@ def query(self, session, info):
         trace = traceback.format_exc()
         result.update_db_status("error", error=True, error_message=str(e), traceback=trace)
         result.rollback()
+        raise e
         return {
             'error': True,
             'errorMessage': str(e)
@@ -224,6 +227,7 @@ def sparql_query(self, session, info):
         traceback.print_exc(file=sys.stdout)
         trace = traceback.format_exc()
         result.update_db_status("error", error=True, error_message=str(e), traceback=trace)
+        raise e
         return {
             'error': True,
             'errorMessage': str(e)
