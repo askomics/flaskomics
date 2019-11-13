@@ -254,7 +254,7 @@ class Result(Params):
         self.nrows = rows[0][5]
         self.sparql_query = rows[0][6]
 
-        gne = json.loads(rows[0][7])
+        gne = json.loads(rows[0][7]) if rows[0][7] else {"graphs": [], "endpoints": []}
         self.graphs = gne["graphs"]
         self.endpoints = gne["endpoints"]
 
@@ -341,7 +341,8 @@ class Result(Params):
             ?,
             NULL,
             ?,
-            NULL
+            NULL,
+            ?
         )
         '''
 
