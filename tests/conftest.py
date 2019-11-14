@@ -369,33 +369,39 @@ class Client(object):
 
         json_query = json.loads(file_content)
 
-        info = {
-            "graph_state": json_query,
-            "celery_id": '00000000-0000-0000-0000-000000000000'
-        }
-
-        result = Result(self.app, self.session, info)
-
-        # Save job in database database
-        result.save_in_db()
-
-        # launch query
+        # Get query and endpoints and graphs of the query
         query_builder = SparqlQueryBuilder(self.app, self.session)
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query = query_builder.build_query_from_json(json_query)
-        headers, results = query_launcher.process_query(query)
+        query = query_builder.build_query_from_json(json_query, preview=False, for_editor=False)
+        endpoints = query_builder.endpoints
+        graphs = query_builder.graphs
 
-        # write result to a file
-        result.save_result_in_file(headers, results)
+        info = {
+            "graph_state": json_query,
+            "query": query,
+            "celery_id": '00000000-0000-0000-0000-000000000000',
+            "graphs": graphs,
+            "endpoints": endpoints
+        }
+
+        # Save job in database database
+        result = Result(self.app, self.session, info)
+
+        result.save_in_db()
+
+        # Execute query and write result to file
+        headers, results = query_launcher.process_query(query)
+        file_size = result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status("success")
+        result.update_db_status("success", size=file_size)
 
         return {
             "id": result.id,
             "path": result.file_path,
             "start": result.start,
-            "end": result.end
+            "end": result.end,
+            "size": file_size
         }
 
     def delete_data_dir(self):

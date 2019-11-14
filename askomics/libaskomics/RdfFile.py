@@ -15,7 +15,7 @@ class RdfFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -29,7 +29,7 @@ class RdfFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
     def set_preview(self):
         """Summary"""

@@ -11,7 +11,7 @@
             "nrows": 10,
             "path": "###PATH###",
             "public": ###PUBLIC###,
-            "size": null,
+            "size": ###SIZE###,
             "sparqlQuery": null,
             "start": ###START###,
             "status": "success",

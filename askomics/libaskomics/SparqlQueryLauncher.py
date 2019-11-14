@@ -20,7 +20,7 @@ class SparqlQueryLauncher(Params):
         triplesotre (virtuoso, fuseki ...)
     """
 
-    def __init__(self, app, session, get_result_query=False):
+    def __init__(self, app, session, get_result_query=False, federated=False, endpoints=None):
         """init
 
         Parameters
@@ -34,19 +34,28 @@ class SparqlQueryLauncher(Params):
 
         self.query_time = None
 
-        self.external_endpoint = None
-
+        # local endpoint (for federated query engine)
+        self.local_endpoint_f = self.settings.get('triplestore', 'endpoint')
         try:
-            self.external_endpoint = self.settings.get('triplestore', 'external_endpoint')
+            self.local_endpoint_f = self.settings.get('federation', 'local_endpoint')
         except Exception:
             pass
 
-        if get_result_query and self.external_endpoint is not None:
-            url_endpoint = self.external_endpoint
-            url_updatepoint = self.external_endpoint
+        # Use the federated query engine
+        if federated:
+            self.url_endpoint = self.settings.get('federation', 'endpoint')
+            self.url_updatepoint = self.settings.get('federation', 'endpoint')
+            self.triplestore = self.settings.get('federation', 'query_engine')
+        # use the external endpoint
+        elif endpoints is not None and endpoints != [self.local_endpoint_f]:
+            self.triplestore = "unknown"
+            self.url_endpoint = endpoints[0]
+            self.url_updatepoint = endpoints[0]
+        # use the local endpoint
         else:
-            url_endpoint = self.settings.get('triplestore', 'endpoint')
-            url_updatepoint = self.settings.get('triplestore', 'updatepoint')
+            self.triplestore = self.settings.get('triplestore', 'triplestore')
+            self.url_endpoint = self.settings.get('triplestore', 'endpoint')
+            self.url_updatepoint = self.settings.get('triplestore', 'updatepoint')
             try:
                 self.endpoint.setCredentials(
                     self.settings.get('triplestore', 'username'),
@@ -55,9 +64,7 @@ class SparqlQueryLauncher(Params):
             except Exception:
                 pass
 
-        self.endpoint = SPARQLWrapper(url_endpoint, url_updatepoint)
-
-        self.triplestore = self.settings.get('triplestore', 'triplestore')
+        self.endpoint = SPARQLWrapper(self.url_endpoint, self.url_updatepoint)
 
     def load_data(self, file_name, graph, host_url):
         """Load data in function of the triplestore
@@ -273,6 +280,7 @@ class SparqlQueryLauncher(Params):
 
         # Debug
         if self.settings.getboolean('askomics', 'debug'):
+            self.log.debug("Launch query on {} ({})".format(self.triplestore, self.url_endpoint))
             self.log.debug(query)
 
         # Update
@@ -289,7 +297,7 @@ class SparqlQueryLauncher(Params):
             self.endpoint.setReturnFormat(JSON)
             results = self.endpoint.query().convert()
             self.query_time = time.time() - start_time
-
+        # self.log.debug(results)
         return results
 
     def parse_results_old(self, json_results):

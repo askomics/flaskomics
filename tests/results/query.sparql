@@ -14,5 +14,4 @@ WHERE {
     ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .
     ?transcript1_uri rdfs:label ?transcript1_Label .
 
-
 }

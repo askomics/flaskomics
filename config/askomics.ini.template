@@ -50,8 +50,6 @@ triplestore = virtuoso
 endpoint = http://localhost:8890/sparql
 # Sparql updatepoint
 updatepoint = http://localhost:8890/sparql
-# Use an external endpoint to get results (local triplestore used only for abstraction)
-# external_endpoint = 
 # If triplestore is fuseki, set the upload url
 # fuseki_upload_url = http://localhost:3030/database/upload
 # Triplestore credentials
@@ -82,6 +80,14 @@ namespace = http://www.semanticweb.org/askomics/ontologies/2018/1#
 preview_limit = 25
 # Triplestore max rows limit
 # result_set_max_rows = 10000
+
+[federation]
+# Query engine can be corese or fedx
+#query_engine = corese
+# Endpoint of the federated query engine
+#endpoint = http://localhost:8028/dqp/sparql
+# local triplestore url, accessible by the federated query engine
+#local_endpoint=http://other-network:8890/sparql
 
 [sentry]
 # Sentry dsn to report python and js errors in a sentry instance

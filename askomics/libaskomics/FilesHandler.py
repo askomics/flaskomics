@@ -24,7 +24,7 @@ class FilesHandler(FilesUtils):
         Upload path
     """
 
-    def __init__(self, app, session, host_url=None):
+    def __init__(self, app, session, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -45,6 +45,8 @@ class FilesHandler(FilesUtils):
             self.session['user']['username']
         )
         self.date = None
+        self.external_endpoint = external_endpoint
+        self.custom_uri = custom_uri
 
     def handle_files(self, files_id):
         """Handle file
@@ -58,13 +60,13 @@ class FilesHandler(FilesUtils):
 
         for file in files_infos:
             if file['type'] == 'csv/tsv':
-                self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url))
+                self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
             elif file['type'] == 'gff/gff3':
-                self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url))
+                self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
             elif file['type'] == 'turtle':
-                self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url))
+                self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
             elif file['type'] == 'bed':
-                self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url))
+                self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
 
     def get_files_infos(self, files_id=None, return_path=False):
         """Get files info

@@ -27,6 +27,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
@@ -50,6 +51,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
         expected = json.loads(raw_results)
@@ -67,6 +69,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
         expected = json.loads(raw_results)
@@ -154,7 +157,7 @@ class TestApiResults(AskomicsTestCase):
         """test /api/results/sparqlquery route"""
         client.create_two_users()
         client.log_user("jdoe")
-        client.upload_and_integrate()
+        info = client.upload_and_integrate()
         result_info = client.create_result()
 
         data = {
@@ -163,16 +166,18 @@ class TestApiResults(AskomicsTestCase):
 
         response = client.client.post("/api/results/sparqlquery", json=data)
 
-        with open('tests/results/query.sparql') as file:
+        with open('tests/results/sparql_query.json') as file:
             content = file.read()
+        content = content.replace("###TRANSCRIPTS_TIMESTAMP###", str(info["transcripts"]["timestamp"]))
+        content = content.replace("###QTL_TIMESTAMP###", str(info["qtl"]["timestamp"]))
+        content = content.replace("###DE_TIMESTAMP###", str(info["de"]["timestamp"]))
+        content = content.replace("###LOCAL_ENDPOINT###", str(client.get_config("federation", "local_endpoint")))
+        content = content.replace("###SIZE###", str(client.get_size_occupied_by_user()))
+
+        expected = json.loads(content)
 
         assert response.status_code == 200
-        assert response.json == {
-            'error': False,
-            'diskSpace': client.get_size_occupied_by_user(),
-            'errorMessage': '',
-            'query': content
-        }
+        assert self.equal_objects(response.json, expected)
 
     def test_set_description(self, client):
         """test /api/results/description route"""
@@ -189,6 +194,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "new description")
 
@@ -215,6 +221,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
 
@@ -234,6 +241,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 

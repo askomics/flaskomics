@@ -97,12 +97,15 @@ def get_preview():
         data = request.get_json()
 
         query_builder = SparqlQueryBuilder(current_app, session)
-        query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True)
 
         query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
+        endpoints = query_builder.endpoints
+        federated = query_builder.federated
+
         header = query_builder.selects
         preview = []
         if query_builder.graphs:
+            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
             header, preview = query_launcher.process_query(query)
 
     except Exception as e:
@@ -144,10 +147,18 @@ def save_result():
                 'task_id': None
             }), 500
 
+        # Get query and endpoints and graphs of the query
         graph_state = request.get_json()["graphState"]
+        query_builder = SparqlQueryBuilder(current_app, session)
+        query = query_builder.build_query_from_json(graph_state, preview=False, for_editor=False)
+        endpoints = query_builder.endpoints
+        graphs = query_builder.graphs
 
         info = {
             "graph_state": graph_state,
+            "query": query,
+            "graphs": graphs,
+            "endpoints": endpoints,
             "celery_id": None
         }
 

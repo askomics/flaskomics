@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
-import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
+import { Collapse, CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import AdvancedOptions from './advancedoptions'
+import Utils from '../../classes/utils'
 import ErrorDiv from '../error/error'
 
 export default class CsvTable extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {
       name: props.file.name,
       id: props.file.id,
@@ -17,6 +20,8 @@ export default class CsvTable extends Component {
       integrated: false,
       publicTick: false,
       privateTick: false,
+      customUri: "",
+      externalEndpoint: "",
       error: false,
       errorMessage: null,
       status: null
@@ -86,7 +91,9 @@ export default class CsvTable extends Component {
       fileId: this.state.id,
       columns_type: this.state.columns_type,
       public: event.target.value == 'public',
-      type: 'csv'
+      type: 'csv',
+      customUri: this.state.customUri,
+      externalEndpoint: this.state.externalEndpoint
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -106,6 +113,22 @@ export default class CsvTable extends Component {
       })
   }
 
+  handleChangeUri (event) {
+    this.setState({
+      customUri: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeEndpoint (event) {
+    this.setState({
+      externalEndpoint: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   render () {
     let columns = this.state.header.map((colName, index) => {
       return ({
@@ -114,7 +137,15 @@ export default class CsvTable extends Component {
         sort: false,
         headerFormatter: this.headerFormatter,
         index: index,
-        selectedType: this.state.columns_type[index]
+        selectedType: this.state.columns_type[index],
+        formatter: (cell, row) => {
+          let text = row[this.state.header[index]]
+          if (this.utils.isUrl(text)) {
+            return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
+          } else {
+            return this.utils.truncate(text, 25)
+          }
+        },
       })
     })
 
@@ -145,7 +176,14 @@ export default class CsvTable extends Component {
             columns={columns}
           />
         </div>
-        <br /><br />
+        <br />
+        <AdvancedOptions
+          config={this.props.config}
+          handleChangeUri={p => this.handleChangeUri(p)}
+          handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+          customUri={this.state.customUri}
+        />
+        <br />
         <div className="center-div">
           <ButtonGroup>
             <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>

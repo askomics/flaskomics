@@ -43,7 +43,7 @@ def integrate(self, session, data, host_url):
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    files_handler = FilesHandler(app, session, host_url=host_url)
+    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
     files_handler.handle_files([data["fileId"], ])
 
     public = data["public"] if session["user"]["admin"] else False
@@ -156,11 +156,15 @@ def query(self, session, info):
 
         # launch query
         query_builder = SparqlQueryBuilder(app, session)
-        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
+
         query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
+        endpoints = query_builder.endpoints
+        federated = query_builder.federated
+
         headers = query_builder.selects
         results = []
         if query_builder.graphs:
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=endpoints)
             headers, results = query_launcher.process_query(query)
 
         # write result to a file
@@ -210,16 +214,8 @@ def sparql_query(self, session, info):
         result.set_celery_id(self.request.id)
         result.update_db_status("started", update_celery=True)
 
-        # launch query
-        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True)
-        query_builder = SparqlQueryBuilder(app, session)
-
-        query = query_builder.format_query(info["sparql_query"], replace_froms=True, limit=None)
-        # header, data = query_launcher.process_query(query)
-        header = query_builder.selects
-        data = []
-        if query_builder.graphs:
-            header, data = query_launcher.process_query(query)
+        query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
+        header, data = query_launcher.process_query(info["sparql_query"])
 
         # Write results in file
         file_size = result.save_result_in_file(header, data)

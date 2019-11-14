@@ -238,6 +238,14 @@ def get_sparql_query():
         query_builder = SparqlQueryBuilder(current_app, session)
 
         query = result.get_sparql_query()
+
+        # get graphs and endpoints used in the query
+        graphs = result.graphs
+        endpoints = result.endpoints
+        # Get all graphs and endpoint, and mark as selected the used one
+        graphs, endpoints = query_builder.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
+
+        # Build query from json if needed
         if query is None:
             graph_state = result.get_graph_state()
             query = query_builder.build_query_from_json(graph_state, for_editor=True)
@@ -246,6 +254,8 @@ def get_sparql_query():
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'query': {},
+            'graphs': [],
+            'endpoints': [],
             'diskSpace': 0,
             'error': True,
             'errorMessage': str(e)
@@ -253,6 +263,8 @@ def get_sparql_query():
 
     return jsonify({
         'query': query,
+        'graphs': graphs,
+        'endpoints': endpoints,
         'diskSpace': disk_space,
         'error': False,
         'errorMessage': ''

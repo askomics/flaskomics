@@ -4,10 +4,12 @@ import { Col, Row, Button, Form, FormGroup, Label, Input, FormText } from 'react
 import ErrorDiv from '../error/error'
 import PropTypes from 'prop-types'
 import update from 'immutability-helper'
+import Utils from '../../classes/utils'
 
 export default class UpdateGalaxyAccount extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.state = {
@@ -23,14 +25,9 @@ export default class UpdateGalaxyAccount extends Component {
     })
   }
 
-  isUrl(s) {
-     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-     return regexp.test(s);
-  }
-
   validateForm () {
     return (
-      (this.isUrl(this.state.gurl) && this.state.gkey.length > 0)
+      (this.utils.isUrl(this.state.gurl) && this.state.gkey.length > 0)
     )
   }
 

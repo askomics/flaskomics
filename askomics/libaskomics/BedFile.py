@@ -16,7 +16,7 @@ class BedFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
         """init
 
         Parameters
@@ -30,7 +30,7 @@ class BedFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
         self.entity_name = ''
         self.category_values = {}
@@ -128,7 +128,7 @@ class BedFile(File):
             else:
                 entity_label = "{}_{}".format(self.entity_name, str(count))
             count += 1
-            entity = self.askomics_prefix[self.format_uri(entity_label)]
+            entity = self.entity_prefix[self.format_uri(entity_label)]
 
             self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
             self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))

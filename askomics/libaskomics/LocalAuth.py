@@ -646,8 +646,6 @@ class LocalAuth(Params):
         '''
 
         rows = database.execute_sql_query(query, (username, ))
-        self.log.debug("rows")
-        self.log.debug(rows)
 
         user = {}
         user['id'] = rows[0][0]

@@ -31,9 +31,79 @@ class SparqlQueryBuilder(Params):
         Params.__init__(self, app, session)
 
         self.graphs = []
+        self.endpoints = []
         self.selects = []
+        self.federated = False
 
-        self.set_graphs()
+        self.local_endpoint = self.settings.get('federation', 'endpoint')
+        # local endpoint (for federated query engine)
+        self.local_endpoint_f = self.settings.get('triplestore', 'endpoint')
+        try:
+            self.local_endpoint_f = self.settings.get('federation', 'local_endpoint')
+        except Exception:
+            pass
+
+        self.set_graphs_and_endpoints()
+
+    def set_graphs(self, graphs):
+        """Set graphs
+
+        Parameters
+        ----------
+        graphs : list
+            graphs
+        """
+        self.graphs = graphs
+
+    def set_endpoints(self, endpoints):
+        """Set endpoints
+
+        Parameters
+        ----------
+        endpoints : list
+            Endpoints
+        """
+        self.endpoints = endpoints
+
+    def is_federated(self):
+        """Return True if there is more than 1 endpoint
+
+        Returns
+        -------
+        bool
+            True or False
+        """
+        if len(self.endpoints) > 1:
+            return True
+        return False
+
+    def replace_froms(self):
+        """True if not federated and endpoint is local
+
+        Returns
+        -------
+        bool
+            True or False
+        """
+        if not self.is_federated():
+            if self.endpoints == [self.local_endpoint_f]:
+                return True
+
+        return False
+
+    def get_federated_froms(self):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = "@from <{}>".format(self.local_endpoint_f)
+        for graph in self.graphs:
+            from_string += " <{}>".format(graph)
+
+        return from_string
 
     def get_froms(self):
         """Get FROM string
@@ -48,6 +118,83 @@ class SparqlQueryBuilder(Params):
             from_string += '\nFROM <{}>'.format(graph)
 
         return from_string
+
+    def get_federated_line(self):
+        """Get federtated line
+
+        Returns
+        -------
+        string
+            @federate <endpoint1> <endpoint1> ...
+        """
+        federated_string = '@federate '
+        for endpoint in self.endpoints:
+            federated_string += '<{}> '.format(endpoint)
+
+        return federated_string
+
+    def format_graph_name(self, graph):
+        """Format graph name by removing base graph and timestamp
+
+        Parameters
+        ----------
+        graph : string
+            The graph name
+
+        Returns
+        -------
+        string
+            Formated graph name
+        """
+        to_remove = "{}:{}_{}:".format(
+            self.settings.get("triplestore", "default_graph"),
+            self.session["user"]["id"],
+            self.session["user"]["username"]
+        )
+
+        return "_".join(graph.replace(to_remove, "").split("_")[:-1])
+
+    def format_endpoint_name(self, endpoint):
+        """Replace local url by "local triplestore"
+
+        Parameters
+        ----------
+        endpoint : string
+            The endpoint name
+
+        Returns
+        -------
+        string
+            Formated endpoint name
+        """
+        if endpoint in (self.settings.get("triplestore", "endpoint"), self.local_endpoint_f):
+            return "local triplestore"
+        return endpoint
+
+    def get_graphs_and_endpoints(self, selected_graphs=None, selected_endpoints=None):
+        """get graphs and endpoints (uri and names)
+
+        Returns
+        -------
+        list
+            List of dict uri name
+        """
+        graphs = {}
+        endpoints = {}
+        for graph in self.graphs:
+            graphs[graph] = {
+                "uri": graph,
+                "name": self.format_graph_name(graph),
+                "selected": True if graph in selected_graphs else False
+            }
+        for endpoint in self.endpoints:
+            endpoints[endpoint] = {
+                "uri": endpoint,
+                "name": self.format_endpoint_name(endpoint),
+                "selected": True if endpoint in selected_endpoints else False
+            }
+
+        return (graphs, endpoints)
 
     def get_default_query(self):
         """Get the default query
@@ -129,7 +276,7 @@ class SparqlQueryBuilder(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False):
         """Format the Sparql query
 
         - remove all FROM
@@ -151,13 +298,19 @@ class SparqlQueryBuilder(Params):
         froms = ''
         if replace_froms:
             froms = self.get_froms()
+
+        if federated:
+            federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+
         query_lines = query.split('\n')
 
         new_query = ''
 
         for line in query_lines:
-            # Remove all FROM and LIMIT
-            if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT'):
+            # Remove all FROM and LIMIT and @federated
+            if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT') and not line.upper().lstrip().startswith('@FEDERATE'):
+                if line.upper().lstrip().startswith('SELECT') and federated:
+                    new_query += "\n{}\n".format(federated_line)
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
@@ -211,7 +364,35 @@ class SparqlQueryBuilder(Params):
 
         return from_string
 
-    def set_graphs(self, entities=None):
+    def get_federated_froms_from_graphs(self, graphs):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = "@from <{}>".format(self.local_endpoint_f)
+        for graph in graphs:
+            from_string += " <{}>".format(graph)
+
+        return from_string
+
+    def get_endpoints_string(self):
+        """get endpoint strngs for the federated query engine
+
+        Returns
+        -------
+        string
+            the endpoint string
+        """
+        endpoints_string = '@federate '
+        for endpoint in self.endpoints:
+            endpoints_string += "<{}> ".format(endpoint)
+
+        return endpoints_string
+
+    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None):
         """Get all public and private graphs containing the given entities
 
         Parameters
@@ -231,11 +412,12 @@ class SparqlQueryBuilder(Params):
             filter_public_string = 'FILTER (?public = <true> || ?creator = <{}>)'.format(self.session["user"]["username"])
 
         query = '''
-        SELECT DISTINCT ?graph
+        SELECT DISTINCT ?graph ?endpoint
         WHERE {{
           ?graph :public ?public .
           ?graph dc:creator ?creator .
           GRAPH ?graph {{
+            ?graph prov:atLocation ?endpoint .
             ?entity_uri a :entity .
           }}
           {}
@@ -246,8 +428,22 @@ class SparqlQueryBuilder(Params):
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         header, results = query_launcher.process_query(self.prefix_query(query))
         self.graphs = []
+        self.endpoints = []
         for res in results:
-            self.graphs.append(res["graph"])
+            if not graphs or res["graph"] in graphs:
+                self.graphs.append(res["graph"])
+
+            # If local triplestore url is not accessible by federetad query engine
+            if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
+                endpoint = self.local_endpoint_f
+            else:
+                endpoint = res["endpoint"]
+
+            if not endpoints or endpoint in endpoints:
+                self.endpoints.append(endpoint)
+
+        self.endpoints = Utils.unique(self.endpoints)
+        self.federated = len(self.endpoints) > 1
 
     def format_sparql_variable(self, name):
         """Format a name into a sparql variable by remove spacial char and add a ?
@@ -335,7 +531,7 @@ class SparqlQueryBuilder(Params):
             if not node["suggested"]:
                 entities.append(node["uri"])
 
-        self.set_graphs(entities=entities)
+        self.set_graphs_and_endpoints(entities=entities)
 
         # self.log.debug(json_query)
 
@@ -625,6 +821,8 @@ class SparqlQueryBuilder(Params):
                     var_to_replace.append((category_value_uri, var_2))
 
         from_string = self.get_froms_from_graphs(self.graphs)
+        federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
+        endpoints_string = self.get_endpoints_string()
 
         # Linked attributes: replace SPARQL variable target by source
         for tpl_var in var_to_replace:
@@ -649,6 +847,8 @@ class SparqlQueryBuilder(Params):
         self.selects = Utils.unique(self.selects)
 
         # Write the query
+
+        # query is for editor (no froms, no federated)
         if for_editor:
             query = """
 SELECT DISTINCT {selects}
@@ -664,8 +864,32 @@ WHERE {{
                 attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
                 filters='\n    '.join(filters),
                 values='\n    '.join(values))
-        else:
 
+        # Query is federated, add federated lines @federate & @from)
+        elif self.federated:
+            query = """
+{endpoints}
+{federated}
+
+SELECT DISTINCT {selects}
+WHERE {{
+    {relations}
+    {attributes}
+    {filters}
+    {values}
+}}
+            """.format(
+                endpoints=endpoints_string,
+                federated=federated_from_string,
+                selects=' '.join(self.selects),
+                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
+                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
+                filters='\n    '.join(filters),
+                values='\n    '.join(values)
+            )
+
+        # Query on the local endpoint (add froms)
+        elif self.endpoints == [self.local_endpoint_f]:
             query = """
 SELECT DISTINCT {selects}
 {froms}
@@ -678,6 +902,23 @@ WHERE {{
             """.format(
                 selects=' '.join(self.selects),
                 froms=from_string,
+                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
+                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
+                filters='\n    '.join(filters),
+                values='\n    '.join(values))
+
+        # Query an external endpoint (no froms)
+        else:
+            query = """
+SELECT DISTINCT {selects}
+WHERE {{
+    {relations}
+    {attributes}
+    {filters}
+    {values}
+}}
+            """.format(
+                selects=' '.join(self.selects),
                 relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
                 attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
                 filters='\n    '.join(filters),

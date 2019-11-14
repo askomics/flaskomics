@@ -3,6 +3,7 @@ import axios from 'axios'
 import { CustomInput, Input, FormGroup, Label, ButtonGroup, Button, Col } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
+import AdvancedOptions from './advancedoptions'
 import ErrorDiv from '../error/error'
 
 export default class BedPreview extends Component {
@@ -16,6 +17,8 @@ export default class BedPreview extends Component {
       integrated: false,
       publicTick: false,
       privateTick: false,
+      customUri: "",
+      externalEndpoint: "",
       error: false,
       errorMessage: null,
       status: null
@@ -40,7 +43,9 @@ export default class BedPreview extends Component {
       fileId: this.state.id,
       entity_name: this.state.entityName,
       public: event.target.value == 'public',
-      type: 'bed'
+      type: 'bed',
+      customUri: this.state.customUri,
+      externalEndpoint: this.state.externalEndpoint
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -58,6 +63,22 @@ export default class BedPreview extends Component {
           waiting: false
         })
       })
+  }
+
+  handleChangeUri (event) {
+    this.setState({
+      customUri: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeEndpoint (event) {
+    this.setState({
+      externalEndpoint: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
   }
 
   render () {
@@ -87,12 +108,21 @@ export default class BedPreview extends Component {
         </FormGroup>
 
         <br />
-        <ButtonGroup>
-          <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
-          {publicButton}
-        </ButtonGroup>
+        <AdvancedOptions
+          config={this.props.config}
+          handleChangeUri={p => this.handleChangeUri(p)}
+          handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+          customUri={this.state.customUri}
+        />
         <br />
-        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
+        <div className="center-div">
+          <ButtonGroup>
+            <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+            {publicButton}
+          </ButtonGroup>
+          <br />
+          <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
+        </div>
       </div>
     )
   }

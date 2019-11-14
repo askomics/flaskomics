@@ -196,6 +196,16 @@ export default class Query extends Component {
     return result
   }
 
+  nodeHaveInstancesWithLabel (uri) {
+    let result = false
+    this.state.abstraction.entities.forEach(entity => {
+      if (entity.uri == uri && entity.instancesHaveLabels) {
+        result = true
+      }
+    })
+    return result
+  }
+
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
@@ -203,11 +213,14 @@ export default class Query extends Component {
     // if bnode without uri, first attribute is visible
     let firstAttrVisibleForBnode = isBnode
 
+    // if label don't exist, donc create a label attribute and set uri visible
+    let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
+
     // create uri and label attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: false,
+        visible: !labelExist,
         nodeId: nodeId,
         uri: 'rdf:type',
         label: 'Uri',
@@ -224,7 +237,7 @@ export default class Query extends Component {
       })
     }
 
-    if (!this.attributeExist('rdfs:label', nodeId) && !isBnode) {
+    if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
@@ -1271,7 +1284,7 @@ export default class Query extends Component {
         <div>
           {resultsTable}
         </div>
-        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results"}} />
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} customMessages={{"504": "Query time is too long, use Run & Save to get your results", "502": "Query time is too long, use Run & Save to get your results"}} />
       </div>
     )
   }

@@ -221,6 +221,9 @@ def integrate():
 
         for file in files_handler.files:
 
+            data["externalEndpoint"] = data["externalEndpoint"] if data["externalEndpoint"] else None
+            data["customUri"] = data["customUri"] if data["customUri"] else None
+
             dataset_info = {
                 "celery_id": None,
                 "file_id": file.id,
@@ -238,6 +241,7 @@ def integrate():
             dataset.update_celery(task.id)
 
     except Exception as e:
+        traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': str(e),

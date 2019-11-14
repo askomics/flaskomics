@@ -237,6 +237,17 @@ class Database(Params):
         except Exception:
             pass
 
+        query = '''
+        ALTER TABLE results
+        ADD graphs_and_endpoints text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_endpoints_table(self):
         """Create the endpoints table"""
         query = '''

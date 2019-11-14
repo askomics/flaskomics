@@ -4,6 +4,7 @@ import { CustomInput, Input, FormGroup, ButtonGroup, Button } from 'reactstrap'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import AceEditor from 'react-ace'
+import AdvancedOptions from './advancedoptions'
 import ErrorDiv from '../error/error'
 
 import "ace-builds/src-noconflict/mode-turtle";
@@ -19,6 +20,8 @@ export default class TtlPreview extends Component {
       integrated: false,
       publicTick: false,
       privateTick: false,
+      customUri: "",
+      externalEndpoint: "",
       error: false,
       errorMessage: null,
       status: null
@@ -42,7 +45,9 @@ export default class TtlPreview extends Component {
     let data = {
       fileId: this.state.id,
       public: event.target.value == 'public',
-      type: 'turtle'
+      type: 'turtle',
+      customUri: this.state.customUri,
+      externalEndpoint: this.state.externalEndpoint
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -60,6 +65,22 @@ export default class TtlPreview extends Component {
           waiting: false
         })
       })
+  }
+
+  handleChangeUri (event) {
+    this.setState({
+      customUri: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeEndpoint (event) {
+    this.setState({
+      externalEndpoint: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
   }
 
   render () {
@@ -99,10 +120,20 @@ export default class TtlPreview extends Component {
               />
             </div>
           <br />
+        <AdvancedOptions
+          hideCustomUri={true}
+          config={this.props.config}
+          handleChangeUri={p => this.handleChangeUri(p)}
+          handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+          customUri={this.state.customUri}
+        />
+        <br />
+        <div className="center-div">
           <ButtonGroup>
             <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
             {publicButton}
           </ButtonGroup>
+        </div>
         </div>
         <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
