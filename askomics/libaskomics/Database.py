@@ -196,7 +196,6 @@ class Database(Params):
             description text,
             size int,
             sparql_query text,
-            graphs_and_endpoints text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''

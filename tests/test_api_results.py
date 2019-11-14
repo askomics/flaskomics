@@ -27,6 +27,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
@@ -50,6 +51,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
         expected = json.loads(raw_results)
@@ -67,6 +69,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
         expected = json.loads(raw_results)
@@ -191,6 +194,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "new description")
 
@@ -217,6 +221,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
 
@@ -236,6 +241,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
         raw_results = raw_results.replace("###ID###", str(result_info["id"]))
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 

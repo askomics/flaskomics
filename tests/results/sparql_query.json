@@ -3,7 +3,7 @@
   "endpoints": {
     "###LOCAL_ENDPOINT###": {
       "name": "local triplestore",
-      "selected": false,
+      "selected": true,
       "uri": "###LOCAL_ENDPOINT###"
     }
   },
@@ -22,7 +22,7 @@
     },
     "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###": {
       "name": "transcripts.tsv",
-      "selected": false,
+      "selected": true,
       "uri": "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
     }
   },
