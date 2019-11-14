@@ -56,8 +56,8 @@ class Result(Params):
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
-            self.graphs = result_info["graphs"] if "graphs" in result_info else None
-            self.endpoints = result_info["endpoints"] if "endpoints" in result_info else None
+            self.graphs = result_info["graphs"] if "graphs" in result_info else []
+            self.endpoints = result_info["endpoints"] if "endpoints" in result_info else []
             self.sparql_query = result_info["sparql_query"] if "sparql_query" in result_info else None
             self.celery_id = result_info["celery_id"] if "celery_id" in result_info else None
             self.file_name = result_info["file_name"] if "file_name" in result_info else Utils.get_random_string(10)

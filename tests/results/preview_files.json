@@ -20,7 +20,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At3",
-            "description": "NAC_domain_containing_pro...",
+            "description": "NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]",
             "end": "3270883",
             "featureName": "ANAC052",
             "featureType": "gene",
@@ -32,7 +32,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At3",
-            "description": "Dirigent_protein_22_[Sour...",
+            "description": "Dirigent_protein_22_[Source:UniProtKB/Swiss-Prot%3BAcc:Q66GI2]",
             "end": "4465586",
             "featureName": "DIR22",
             "featureType": "gene",
@@ -44,7 +44,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At3",
-            "description": "Probable_protein_phosphat...",
+            "description": "Probable_protein_phosphatase_2C_47_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9SD02]",
             "end": "19099275",
             "featureName": "na",
             "featureType": "gene",
@@ -56,7 +56,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At3",
-            "description": "Plant_self-incompatibilit...",
+            "description": "Plant_self-incompatibility_protein_S1_family_[Source:TAIR%3BAcc:AT3G10460]",
             "end": "3256439",
             "featureName": "na",
             "featureType": "gene",
@@ -68,7 +68,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At3",
-            "description": "cupin_family_protein_[Sou...",
+            "description": "cupin_family_protein_[Source:TAIR%3BAcc:AT3G22640]",
             "end": "8013902",
             "featureName": "PAP85",
             "featureType": "gene",
@@ -80,7 +80,7 @@
           {
             "biotype": "ncRNA",
             "chromosomeName": "At1",
-            "description": "other_RNA_[Source:TAIR%3B...",
+            "description": "other_RNA_[Source:TAIR%3BAcc:AT1G33615]",
             "end": "12194374",
             "featureName": "na",
             "featureType": "ncRNA_gene",
@@ -92,7 +92,7 @@
           {
             "biotype": "miRNA",
             "chromosomeName": "At5",
-            "description": "MIR166/MIR166E%3B_miRNA_[...",
+            "description": "MIR166/MIR166E%3B_miRNA_[Source:TAIR%3BAcc:AT5G41905]",
             "end": "16775658",
             "featureName": "MIR166E",
             "featureType": "miRNA_gene",
@@ -104,7 +104,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At1",
-            "description": "E3_ubiquitin-protein_liga...",
+            "description": "E3_ubiquitin-protein_ligase_ORTHRUS_3_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9FVS2]",
             "end": "21412283",
             "featureName": "ORTH3",
             "featureType": "gene",
@@ -116,7 +116,7 @@
           {
             "biotype": "protein_coding",
             "chromosomeName": "At1",
-            "description": "unknown_protein%3B_FUNCTI...",
+            "description": "unknown_protein%3B_FUNCTIONS_IN:_molecular_function_unknown%3B_INVOLVED_IN:_biological_process_unknown%3B_LOCATED_IN:_endomembrane_system%3B_EXPRESSED_IN:_19_plant_structures%3B_EXPRESSED_DURING:_10_growth_stages%3B_BEST_Arabidopsis_thaliana_protein_match_is:_u_/.../_protein_(TAIR:AT3G19030.1)%3B_Has_24_Blast_hits_to_24_proteins_in_2_species:_Archae_-_0%3B_Bacteria_-_0%3B_Metazoa_-_0%3B_Fungi_-_0%3B_Plants_-_24%3B_Viruses_-_0%3B_Other_Eukaryotes_-_0_(source:_NCBI_BLink)._[Source:TAIR%3BAcc:AT1G49500]",
             "end": "18322284",
             "featureName": "na",
             "featureType": "gene",
@@ -128,7 +128,7 @@
           {
             "biotype": "transposable_element",
             "chromosomeName": "At5",
-            "description": "transposable_element_gene...",
+            "description": "transposable_element_gene_[Source:TAIR%3BAcc:AT5G35334]",
             "end": "13538984",
             "featureName": "na",
             "featureType": "gene",

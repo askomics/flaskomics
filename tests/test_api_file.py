@@ -209,7 +209,6 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.post('/api/files/preview', json=data)
         assert response.status_code == 200
-        print(json.dumps(response.json))
         assert response.json == expected
 
     def test_delete_files(self, client):

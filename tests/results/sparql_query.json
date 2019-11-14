@@ -1,0 +1,30 @@
+{
+  "diskSpace": ###SIZE###,
+  "endpoints": {
+    "###LOCAL_ENDPOINT###": {
+      "name": "local triplestore",
+      "selected": false,
+      "uri": "###LOCAL_ENDPOINT###"
+    }
+  },
+  "error": false,
+  "errorMessage": "",
+  "graphs": {
+    "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###": {
+      "name": "de.tsv",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###": {
+      "name": "qtl.tsv",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###": {
+      "name": "transcripts.tsv",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+    }
+  },
+  "query": "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n\n\n}\n"
+}

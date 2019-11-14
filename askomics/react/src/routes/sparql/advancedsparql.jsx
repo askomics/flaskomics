@@ -53,3 +53,10 @@ export default class AdvancedSparql extends Component {
     )
   }
 }
+
+AdvancedSparql.propTypes = {
+  graphs: PropTypes.object,
+  endpoints: PropTypes.object,
+  handleChangeGraphs: PropTypes.func,
+  handleChangeEndpoints: PropTypes.func
+}
