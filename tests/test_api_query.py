@@ -78,6 +78,8 @@ class TestApiStartpoints(AskomicsTestCase):
 
         response = client.client.get('/api/query/abstraction')
 
+        print(json.dumps(response.json))
+
         assert response.status_code == 200
         assert len(response.json) == 4
         assert not response.json["error"]

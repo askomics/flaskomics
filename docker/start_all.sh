@@ -16,10 +16,13 @@ email=$(if [ -z ${USER_EMAIL} ]; then echo "admin@example.org"; else echo "${USE
 api_key=$(if [ -z ${USER_APIKEY} ]; then echo "admin"; else echo "${USER_APIKEY}"; fi)
 
 # Start Redis
-nohup /usr/bin/redis-server &> /var/log/redis-server &
+nohup /usr/bin/redis-server &> /var/log/redis-server.log &
 
-# Start virtuoso
-nohup /virtuoso.sh &> /var/log/virtuoso &
+# Start Virtuoso
+nohup /virtuoso/virtuoso.sh &> /var/log/virtuoso.log &
+
+# Start Corese
+nohup sh /corese/start.sh &> /var/log/corese.log &
 
 # Activate python venv
 source /askomics/venv/bin/activate
@@ -34,16 +37,16 @@ while ! wget -O /dev/null http://localhost:8890/conductor/; do
     sleep 1s
 done
 
-# Start Celery
-/askomics/run_celery.sh -d ${DEPMODE} -c ${MAX_CELERY_QUEUE} &
-
 # Start AskOmics
-/askomics/run_askomics.sh -d ${DEPMODE} &
+/askomics/run_askomics.sh -d ${DEPMODE} &> /var/log/askomics.log &
 
 # Wait for config file to be available
 while [[ ! -f /askomics/config/askomics.ini ]]; do
     sleep 1s
 done
+
+# Start Celery
+/askomics/run_celery.sh -d ${DEPMODE} -c ${MAX_CELERY_QUEUE} &> /var/log/celery.log &
 
 # Create user and upload files if CREATE_USER == true
 if [[ ! -z ${CREATE_USER} ]]; then
@@ -65,4 +68,4 @@ if [[ ! -z ${CREATE_USER} ]]; then
     fi
 fi
 
-wait
+tail -f /var/log/askomics.log & tail -f /var/log/celery.log

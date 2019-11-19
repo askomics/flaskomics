@@ -276,7 +276,7 @@
     "entities": [
       {
         "endpoints": [
-          "http://localhost:8890/sparql"
+          "http://localhost:8891/sparql"
         ],
         "faldo": true,
         "graphs": [
@@ -289,7 +289,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8890/sparql"
+          "http://localhost:8891/sparql"
         ],
         "faldo": true,
         "graphs": [
@@ -302,7 +302,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8890/sparql"
+          "http://localhost:8891/sparql"
         ],
         "faldo": false,
         "graphs": [
