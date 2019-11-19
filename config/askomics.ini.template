@@ -87,7 +87,7 @@ preview_limit = 25
 # Endpoint of the federated query engine
 #endpoint = http://localhost:8028/dqp/sparql
 # local triplestore url, accessible by the federated query engine
-#local_endpoint=http://other-network:8890/sparql
+#local_endpoint=http://other-network:8080/sparql
 
 [sentry]
 # Sentry dsn to report python and js errors in a sentry instance
