@@ -1,26 +1,20 @@
-FROM alpine:3.9
-
+FROM askomics/flaskomics-base:3.2.0-alpine3.9 AS builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
 WORKDIR /askomics
 
-ENV DEPMODE="prod"
-
-RUN apk add --no-cache \
-    gcc g++ libstdc++ make \
-    zlib-dev libzip-dev bzip2-dev xz-dev \
-    python3 python3-dev \
-    py3-numpy \
-    nodejs nodejs-npm \
-    git bash && \
-    rm -f config/askomics.ini && \
+RUN rm -f config/askomics.ini && \
     /askomics/install.sh && \
-    /askomics/build.sh && \
-    apk del gcc g++ make zlib-dev libzip-dev bzip2-dev xz-dev && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /root/.cache/* && \
-    rm -rf /root/.npm/*
+    /askomics/build.sh
+
+
+# Final image
+FROM alpine:3.9
+ENV DEPMODE="prod"
+WORKDIR /askomics
+RUN apk add --no-cache python3 bash git libc-dev libstdc++ nodejs nodejs-npm
+COPY --from=builder /askomics .
 
 EXPOSE 5000
-ENTRYPOINT /askomics/run_askomics.sh -d ${DEPMODE}
+CMD bash /askomics/run_askomics.sh -d ${DEPMODE}
