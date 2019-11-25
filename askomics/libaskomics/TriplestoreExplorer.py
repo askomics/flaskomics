@@ -1,3 +1,5 @@
+import tld
+
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -34,11 +36,12 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity ?entity_label ?creator ?public
+        SELECT DISTINCT ?endpoint ?graph ?entity ?entity_label ?creator ?public
         WHERE {{
             ?graph :public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
+                ?graph prov:atLocation ?endpoint .
                 ?entity a :entity .
                 ?entity a :startPoint .
                 ?entity rdfs:label ?entity_label .
@@ -55,6 +58,9 @@ class TriplestoreExplorer(Params):
         entities = []
 
         for result in data:
+
+            endpoint_name = "local" if result["endpoint"] == self.settings.get("triplestore", "endpoint") else tld.get_fld(result["endpoint"]).split('.')[0]
+
             if result["entity"] not in entities:
                 # new entity
                 entities.append(result['entity'])
@@ -66,6 +72,7 @@ class TriplestoreExplorer(Params):
                         "public": result["public"],
                         "creator": result["creator"]
                     }],
+                    "endpoints": [{"url": result["endpoint"], "name": endpoint_name}],
                     "public": self.str_to_bool(result["public"]),
                     "private": not self.str_to_bool(result["public"])
                 }
@@ -79,6 +86,7 @@ class TriplestoreExplorer(Params):
                     "creator": result["creator"]
                 }
                 startpoints[index]["graphs"].append(graph)
+                startpoints[index]["endpoint"].append({"url": result["endpoint"], "name": endpoint_name})
                 if self.str_to_bool(result["public"]):
                     startpoints[index]["public"] = True
                 else:

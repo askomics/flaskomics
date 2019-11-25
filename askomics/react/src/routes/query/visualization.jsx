@@ -7,6 +7,7 @@ import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import { ForceGraph2D } from 'react-force-graph'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class Visualization extends Component {
   constructor (props) {
@@ -15,6 +16,8 @@ export default class Visualization extends Component {
       error: false,
       errorMessage: null
     }
+
+    this.utils = new Utils()
 
     // graph constants
     this.fg
@@ -36,18 +39,6 @@ export default class Visualization extends Component {
     this.handleLinkSelection = this.props.handleLinkSelection.bind(this)
     this.drawNode = this.drawNode.bind(this)
     this.drawLink = this.drawLink.bind(this)
-  }
-
-  stringToHexColor (str) {
-    // first, hash the string into an int
-    let hash = 0
-    for (var i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash)
-    }
-    // Then convert this int into a rgb color code
-    let c = (hash & 0x00FFFFFF).toString(16).toUpperCase()
-    let hex = '#' + '00000'.substring(0, 6 - c.length) + c
-    return hex
   }
 
   IntersectionCoordinate (x1, y1, x2, y2, r) {
@@ -112,7 +103,7 @@ export default class Visualization extends Component {
     // node style
     let unselectedColor = node.faldo ? this.colorGreen : this.colorGrey
     let unselectedColorText = node.faldo ? this.colorGreen : this.colorDarkGrey
-    ctx.fillStyle = node.type == "node" ? this.stringToHexColor(node.uri) : "#ffffff"
+    ctx.fillStyle = node.type == "node" ? this.utils.stringToHexColor(node.uri) : "#ffffff"
     ctx.lineWidth = this.lineWidth
     ctx.strokeStyle = node.selected ? this.colorFirebrick : unselectedColor
     ctx.globalAlpha = node.suggested ? 0.5 : 1
