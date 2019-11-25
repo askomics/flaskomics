@@ -86,7 +86,7 @@ class TriplestoreExplorer(Params):
                     "creator": result["creator"]
                 }
                 startpoints[index]["graphs"].append(graph)
-                startpoints[index]["endpoint"].append({"url": result["endpoint"], "name": endpoint_name})
+                startpoints[index]["endpoints"].append({"url": result["endpoint"], "name": endpoint_name})
                 if self.str_to_bool(result["public"]):
                     startpoints[index]["public"] = True
                 else:
