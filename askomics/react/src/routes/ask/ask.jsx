@@ -280,7 +280,7 @@ export default class Ask extends Component {
                 let tick = <i className={this.state.selectedEndpoint.includes(endpoint) ? "fas fa-check" : "icon-invisible fas fa-check"}></i>
 
                 return (
-                  <DropdownItem value={endpoint} onClick={this.clickOnEndpoint}>
+                  <DropdownItem key={endpoint} value={endpoint} onClick={this.clickOnEndpoint}>
                     {tick} {endpoint}
                   </DropdownItem>
                 )
@@ -312,7 +312,7 @@ export default class Ask extends Component {
                     {startpoint.endpoints.map(endpoint => {
                       let color = this.utils.stringToHexColor(endpoint.url)
                       let textColor = this.utils.isDarkColor(color) ? "white" : "black"
-                      return <h6><Badge style={{"background-color": color, "color": textColor}}>{endpoint.name}</Badge></h6>
+                      return <h6 key={endpoint.url}><Badge style={{"background-color": color, "color": textColor}}>{endpoint.name}</Badge></h6>
                     })}
                   </td>
                   <td className="startpoint-table cell3">
