@@ -411,6 +411,7 @@ export default class ResultsFilesTable extends Component {
             selectRow={ selectRow }
             cellEdit={ cellEditFactory({
               mode: 'click',
+              autoSelectText: true,
               beforeSaveCell: (oldValue, newValue, row) => { this.saveNewDescription(oldValue, newValue, row) },
             })}
           />
