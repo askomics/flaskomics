@@ -95,7 +95,7 @@ class ResultsHandler(Params):
             sql_var = (True, True, self.session["user"]["id"])
 
         query = '''
-        SELECT id, description
+        SELECT id, description, public
         FROM results
         WHERE public = ?{}
         '''.format(where_substring)
@@ -107,7 +107,8 @@ class ResultsHandler(Params):
         for row in rows:
             queries.append({
                 "id": row[0],
-                "description": row[1]
+                "description": row[1],
+                "public": row[2]
             })
 
         return queries

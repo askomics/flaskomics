@@ -221,14 +221,26 @@ export default class Ask extends Component {
     }
 
     let exempleQueries
+    let emptyPrivate
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
       exempleQueries = (
         <div>
-          <p>Or start with an exemple:</p>
+          <p>Or start with an template:</p>
             <ListGroup>
-              {this.state.publicQueries.map(query => (
-                <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
-              ))}
+              {this.state.publicQueries.map(query => {
+                if (query.public == 0) {
+                  emptyPrivate = <br />
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+            {emptyPrivate}
+            <ListGroup>
+              {this.state.publicQueries.map(query => {
+                if (query.public == 1) {
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                }
+              })}
             </ListGroup>
         </div>
       )
