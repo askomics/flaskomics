@@ -345,6 +345,42 @@ def publish_query():
     })
 
 
+@login_required
+@results_bp.route('/api/results/template', methods=['POST'])
+def template_query():
+    """Template a query from a result
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result_info = {"id": json["id"]}
+
+        result = Result(current_app, session, result_info)
+        result.template_query(json["template"])
+
+        results_handler = ResultsHandler(current_app, session)
+        files = results_handler.get_files_info()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @results_bp.route('/api/results/send2galaxy', methods=['POST'])
 @login_required
 def send2galaxy():

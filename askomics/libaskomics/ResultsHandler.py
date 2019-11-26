@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, description, size, sparql_query, traceback
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback
         FROM results
         WHERE user_id = ?
         '''
@@ -69,10 +69,11 @@ class ResultsHandler(Params):
                 'nrows': row[6],
                 'errorMessage': row[7],
                 'public': row[8],
-                'description': row[9],
-                'size': row[10],
-                'sparqlQuery': row[11],
-                'traceback': row[12]
+                'template': row[9],
+                'description': row[10],
+                'size': row[11],
+                'sparqlQuery': row[12],
+                'traceback': row[13]
             })
 
         return files
@@ -87,13 +88,19 @@ class ResultsHandler(Params):
         """
         database = Database(self.app, self.session)
 
+        where_substring = ""
+        sql_var = (True, )
+        if "user" in self.session:
+            where_substring = " or (template = ? and user_id = ?)"
+            sql_var = (True, True, self.session["user"]["id"])
+
         query = '''
         SELECT id, description
         FROM results
-        WHERE public = ?
-        '''
+        WHERE public = ?{}
+        '''.format(where_substring)
 
-        rows = database.execute_sql_query(query, (True, ))
+        rows = database.execute_sql_query(query, sql_var)
 
         queries = []
 
