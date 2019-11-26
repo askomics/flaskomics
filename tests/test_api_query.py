@@ -22,6 +22,7 @@ class TestApiStartpoints(AskomicsTestCase):
                 'public': 'false',
                 'uri': 'urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}'.format(info["transcripts"]["timestamp"])
             }],
+            'endpoints': [{"url": "http://localhost:8891/sparql", "name": "local"}],
             'private': True,
             'public': False
         }
@@ -34,6 +35,7 @@ class TestApiStartpoints(AskomicsTestCase):
                 'public': 'false',
                 'uri': 'urn:sparql:askomics_test:1_jdoe:de.tsv_{}'.format(info["de"]["timestamp"])
             }],
+            'endpoints': [{"url": "http://localhost:8891/sparql", "name": "local"}],
             'private': True,
             'public': False
         }
@@ -46,6 +48,7 @@ class TestApiStartpoints(AskomicsTestCase):
                 'public': 'false',
                 'uri': 'urn:sparql:askomics_test:1_jdoe:qtl.tsv_{}'.format(info["qtl"]["timestamp"])
             }],
+            'endpoints': [{"url": "http://localhost:8891/sparql", "name": "local"}],
             'private': True,
             'public': False
         }
