@@ -1,0 +1,24 @@
+site_name: AskOmics
+repo_url: https://github.com/askomics/flaskomics
+edit_uri: edit/master/docs/docs/
+site_author: Xavier Garnier
+
+theme: 
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - bash
+    - python
+    - javascript
+markdown_extensions:
+  - admonition
+
+nav:
+  - User guide: user-guide.md
+  - Admin guide: 
+    - Deployment: admin-guide.md
+    - Configuration: configuration.md
+  - Developer guide:
+    - Contribute: contribute.md
+    - Run AskOmics: run-dev.md
+  - Bug Tracker: https://github.com/askomics/flaskomics/issues
