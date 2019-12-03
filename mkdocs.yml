@@ -1,6 +1,6 @@
 site_name: AskOmics
 repo_url: https://github.com/askomics/flaskomics
-edit_uri: edit/master/docs/docs/
+edit_uri: edit/master/docs/
 site_author: Xavier Garnier
 
 theme: 
