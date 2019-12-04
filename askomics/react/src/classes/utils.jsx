@@ -46,6 +46,10 @@ export default class Utils {
     return this.objectHaveKeys(obj[level], ...rest)
   }
 
+  isFunction(functionToCheck) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]'
+  }
+
   stringToHexColor (str) {
     // first, hash the string into an int
     let hash = 0
