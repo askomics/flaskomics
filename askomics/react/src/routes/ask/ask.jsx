@@ -353,12 +353,12 @@ export default class Ask extends Component {
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
-            <Col xs="4">
+            <Col xs="5">
               {startpoints}
               {galaxyImport}
               {galaxyForm}
             </Col>
-            <Col xs="8">
+            <Col xs="7">
               {exempleQueries}
             </Col>
           </Row>
