@@ -71,15 +71,15 @@ export default class Query extends Component {
 
   initId () {
     let listId = new Set()
-    this.graphState.nodes.forEach(node => {
+    this.graphState.nodes.map(node => {
       listId.add(node.id)
     })
 
-    this.graphState.links.forEach(link => {
+    this.graphState.links.map(link => {
       listId.add(link.id)
     })
 
-    this.graphState.attr.forEach(attr => {
+    this.graphState.attr.map(attr => {
       listId.add(attr.id)
     })
 
@@ -93,7 +93,7 @@ export default class Query extends Component {
 
   getHumanNodeId (uri) {
     let humanIds = [0, ]
-    this.state.graphState.nodes.map(node => {
+    this.graphState.nodes.map(node => {
       if (node.uri == uri) {
         humanIds.push(node.humanId)
       }
@@ -102,45 +102,37 @@ export default class Query extends Component {
   }
 
   entityExist (uri) {
-    let result = false
-    this.state.abstraction.entities.forEach(entity => {
-      if (entity.uri == uri) {
-        result = true
-      }
+    return this.state.abstraction.entities.some(entity => {
+      return (entity.uri == uri)
     })
-    return result
   }
 
   getLabel (uri) {
-    let label = this.state.abstraction.entities.map(node => {
+    return this.state.abstraction.entities.map(node => {
       if (node.uri == uri) {
         return node.label
       } else {
         return null
       }
     }).filter(label => label != null).reduce(label => label)
-    return label
   }
 
   getType (uri) {
-    let type = this.state.abstraction.entities.map(node => {
+    return this.state.abstraction.entities.map(node => {
       if (node.uri == uri) {
         return node.type
       } else {
         return null
       }
     }).filter(type => type != null).reduce(type => type)
-    return type
   }
 
   getGraphs (uri) {
-    let graphs = []
-    this.state.abstraction.entities.forEach(node => {
+    return this.state.abstraction.entities.flatMap(node => {
       if (node.uri == uri) {
-        graphs = graphs.concat(node.graphs)
+        return node.graphs
       }
     })
-    return graphs
   }
 
   getAttributeType (typeUri) {
@@ -157,53 +149,33 @@ export default class Query extends Component {
   }
 
   attributeExistInAbstraction (attrUri, entityUri) {
-    let result = false
-    this.state.abstraction.attributes.forEach(attr => {
-      if (attr.uri == attrUri && attr.entityUri == entityUri) {
-        result = true
-      }
+    return this.state.abstraction.attributes.some(attr => {
+      return (attr.uri == attrUri && attr.entityUri == entityUri)
     })
-    return result
   }
 
   isBnode (nodeId) {
-    let result = false
-    this.state.graphState.nodes.forEach(node => {
-      if (node.id == nodeId && node.type == "bnode") {
-        result = true
-      }
+    return this.graphState.nodes.some(node => {
+      return (node.id == nodeId && node.type == "bnode")
     })
-    return result
   }
 
   isFaldoEntity (entityUri) {
-    let result = false
-    this.state.abstraction.entities.forEach(entity => {
-      if (entity.uri == entityUri && entity.faldo) {
-        result = true
-      }
+    return this.state.abstraction.entities.some(entity => {
+      return (entity.uri == entityUri && entity.faldo)
     })
-    return result
   }
 
   attributeExist (attrUri, nodeId) {
-    let result = false
-    this.state.graphState.attr.forEach(attr => {
-      if (attr.uri == attrUri && attr.nodeId == nodeId) {
-        result = true
-      }
+    return this.graphState.attr.some(attr => {
+      return (attr.uri == attrUri && attr.nodeId == nodeId)
     })
-    return result
   }
 
   nodeHaveInstancesWithLabel (uri) {
-    let result = false
-    this.state.abstraction.entities.forEach(entity => {
-      if (entity.uri == uri && entity.instancesHaveLabels) {
-        result = true
-      }
+    return this.state.abstraction.entities.some(entity => {
+      return (entity.uri == uri && entity.instancesHaveLabels)
     })
-    return result
   }
 
   setNodeAttributes (nodeUri, nodeId) {
@@ -216,7 +188,7 @@ export default class Query extends Component {
     // if label don't exist, donc create a label attribute and set uri visible
     let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
 
-    // create uri and label attributes
+    // create uri attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
@@ -237,6 +209,7 @@ export default class Query extends Component {
       })
     }
 
+    // create label attributes
     if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
       nodeAttributes.push({
         id: this.getId(),
@@ -258,46 +231,48 @@ export default class Query extends Component {
       firstAttrVisibleForBnode = false
     }
 
-    this.state.abstraction.attributes.forEach(attr => {
-      if (attr.entityUri == nodeUri) {
-        if (!this.attributeExist(attr.uri, nodeId)) {
-          let nodeAttribute = {}
-          let attributeType = this.getAttributeType(attr.type)
-          nodeAttribute.id = this.getId()
-          nodeAttribute.visible = firstAttrVisibleForBnode
-          nodeAttribute.nodeId = nodeId
-          nodeAttribute.uri = attr.uri
-          nodeAttribute.label = attr.label
-          nodeAttribute.entityLabel = this.getLabel(nodeUri)
-          nodeAttribute.entityUri = attr.entityUri
-          nodeAttribute.type = attributeType
-          nodeAttribute.faldo = attr.faldo
-          nodeAttribute.optional = false
-          nodeAttribute.negative = false
-          nodeAttribute.linked = false
-          nodeAttribute.linkedWith = null
-
-          firstAttrVisibleForBnode = false
-
-          if (attributeType == 'decimal') {
-            nodeAttribute.filterSign = '='
-            nodeAttribute.filterValue = ''
-          }
-
-          if (attributeType == 'text') {
-            nodeAttribute.filterType = 'exact'
-            nodeAttribute.filterValue = ''
-          }
-
-          if (attributeType == 'category') {
-            nodeAttribute.filterValues = attr.categories
-            nodeAttribute.filterSelectedValues = []
-          }
-          // return nodeAttribute
-          nodeAttributes.push(nodeAttribute)
+    // create other attributes
+    nodeAttributes = nodeAttributes.concat(this.state.abstraction.attributes.map(attr => {
+      let attributeType = this.getAttributeType(attr.type)
+      if (attr.entityUri == nodeUri && !this.attributeExist(attr.uri, nodeId)) {
+        let nodeAttribute = {
+          id: this.getId(),
+          visible: firstAttrVisibleForBnode,
+          nodeId: nodeId,
+          uri: attr.uri,
+          label: attr.label,
+          entityLabel: this.getLabel(nodeUri),
+          entityUri: attr.entityUri,
+          type: attributeType,
+          faldo: attr.faldo,
+          optional: false,
+          negative: false,
+          linked: false,
+          linkedWith: null
         }
+
+        firstAttrVisibleForBnode = false
+
+        if (attributeType == 'decimal') {
+          nodeAttribute.filterSign = '='
+          nodeAttribute.filterValue = ''
+        }
+
+        if (attributeType == 'text') {
+          nodeAttribute.filterType = 'exact'
+          nodeAttribute.filterValue = ''
+        }
+
+        if (attributeType == 'category') {
+          nodeAttribute.filterValues = attr.categories
+          nodeAttribute.filterSelectedValues = []
+        }
+
+        return nodeAttribute
       }
-    })
+    }).filter(attr => {return attr != null}))
+
+    // add attributes to the graph state
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
@@ -334,37 +309,28 @@ export default class Query extends Component {
     /*
     remove a node in the graphState
     */
-    this.graphState.nodes.forEach((node, index, gstate) => {
-      if (node.id == id) {
-        gstate.splice(index, 1)
-      }
-    })
+    this.graphState.nodes = this.graphState.nodes.filter(node => node.id != id)
   }
 
   removeLink (id) {
     /*
     remove a link in the graphState
     */
-    this.graphState.links.forEach((link, index, gstate) => {
-      if (link.id == id) {
-        gstate.splice(index, 1)
-      }
-    })
+    this.graphState.links = this.graphState.links.filter(link => link.id != id)
   }
 
   removeAttributes(id){
-    this.state.graphState.attr.forEach((attr, index, gstate) => {
-      if (attr.nodeId == id) {
-        gstate.splice(index, 1)
-      }
-    })
+    /*
+    remove node attributes in the graphState
+    */
+    this.graphState.attr = this.graphState.attr.filter(attr => attr.nodeId != id)
   }
 
   getNodesAndLinksIdToDelete (id, nodesAndLinks={nodes: [], links: []}) {
     /*
-    recusriveky get nodes and link to remove from the graphState
+    recursively get nodes and link to remove from the graphState
     */
-    this.graphState.links.forEach(link => {
+    this.graphState.links.map(link => {
 
       if (link.target.id == id) {
         if (link.source.id > id) {
@@ -406,7 +372,7 @@ export default class Query extends Component {
     let reNode = new RegExp(node.filterNode, 'g')
     let reLink = new RegExp(node.filterLink, 'g')
 
-    this.state.abstraction.relations.forEach(relation => {
+    this.state.abstraction.relations.map(relation => {
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -488,7 +454,7 @@ export default class Query extends Component {
 
     // Position
     if (node.faldo) {
-      this.state.abstraction.entities.forEach(entity => {
+      this.state.abstraction.entities.map(entity => {
         if (entity.faldo) {
           let new_id = this.getId()
           // Push suggested target
@@ -525,16 +491,8 @@ export default class Query extends Component {
   }
 
   removeAllSuggestion () {
-    let newNodes = this.graphState.nodes.filter(node => {
-      if (!node.suggested) {
-        return node
-      }
-    })
-    let newLinks = this.graphState.links.filter(link => {
-      if (!link.suggested) {
-        return link
-      }
-    })
+    let newNodes = this.graphState.nodes.filter(node => !node.suggested)
+    let newLinks = this.graphState.links.filter(link => !link.suggested)
     let newAttr = this.graphState.attr
     this.graphState = {
       nodes: newNodes,
@@ -546,7 +504,7 @@ export default class Query extends Component {
   insertLinkIfExists (node1, node2) {
     let newLink = {}
 
-    this.state.graphState.links.forEach(link => {
+    this.graphState.links.map(link => {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
@@ -720,31 +678,36 @@ export default class Query extends Component {
       nodeIdToDelete = this.currentSelected.id
     }
 
+    // Remove current node and attributes
     this.removeNode(nodeIdToDelete)
+    this.removeAttributes(nodeIdToDelete)
 
+    // Get all nodes and link connected after the node to delete
     let nodeAndLinksToDelete = this.getNodesAndLinksIdToDelete(nodeIdToDelete)
 
-    nodeAndLinksToDelete.nodes.forEach(id => {
+    // remove all this nodes and links and their attributes
+    nodeAndLinksToDelete.nodes.map(id => {
       this.removeNode(id)
+      this.removeAttributes(id)
     })
-    nodeAndLinksToDelete.links.forEach(id => {
+    nodeAndLinksToDelete.links.map(id => {
       this.removeLink(id)
     })
-    // remove attributes
-    this.removeAttributes(nodeIdToDelete)
 
     // unselect node
     this.manageCurrentPreviousSelected(null)
+
+    // update graph
     this.updateGraphState()
   }
 
   setCurrentSelected () {
-    this.graphState.nodes.forEach(node => {
+    this.graphState.nodes.map(node => {
       if (node.selected) {
         this.currentSelected = node
       }
     })
-    this.graphState.links.forEach(link => {
+    this.graphState.links.map(link => {
       if (link.selected) {
         this.currentSelected = link
       }
@@ -774,7 +737,7 @@ export default class Query extends Component {
   // Filter nodes --------------------------
   handleFilterNodes (event) {
     // Store the filter
-    this.state.graphState.nodes.map(node => {
+    this.graphState.nodes.map(node => {
       if (this.currentSelected.id == node.id) {
         node.filterNode = event.target.value
       }
@@ -789,7 +752,7 @@ export default class Query extends Component {
   // Filter links --------------------------
   handleFilterLinks (event) {
     // Store the filter
-    this.state.graphState.nodes.map(node => {
+    this.graphState.nodes.map(node => {
       if (this.currentSelected.id == node.id) {
         node.filterLink = event.target.value
       }
@@ -802,7 +765,7 @@ export default class Query extends Component {
 
   // Attributes managment -----------------------
   toggleVisibility (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.visible = !attr.visible
         if (!attr.visible) {
@@ -814,7 +777,7 @@ export default class Query extends Component {
   }
 
   toggleOptional (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.optional = !attr.optional
         if (attr.optional) {
@@ -826,7 +789,7 @@ export default class Query extends Component {
   }
 
   handleNegative (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.negative = event.target.value == '=' ? false : true
       }
@@ -835,7 +798,7 @@ export default class Query extends Component {
   }
 
   handleFilterType (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterType = event.target.value
       }
@@ -844,7 +807,7 @@ export default class Query extends Component {
   }
 
   handleFilterValue (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
       }
@@ -853,7 +816,7 @@ export default class Query extends Component {
   }
 
   handleFilterCategory (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterSelectedValues = [...event.target.selectedOptions].map(o => o.value)
       }
@@ -862,7 +825,7 @@ export default class Query extends Component {
   }
 
   handleFilterNumericSign (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterSign = event.target.value
       }
@@ -873,7 +836,7 @@ export default class Query extends Component {
 
   handleFilterNumericValue (event) {
     if (!isNaN(event.target.value)) {
-      this.state.graphState.attr.map(attr => {
+      this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filterValue = event.target.value
         }
@@ -883,7 +846,7 @@ export default class Query extends Component {
   }
 
   toggleLinkAttribute (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.linked = !attr.linked
         if (!attr.linked) {
@@ -895,7 +858,7 @@ export default class Query extends Component {
   }
 
   handleChangeLink (event) {
-    this.state.graphState.attr.map(attr => {
+    this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.linkedWith = parseInt(event.target.value)
       }
@@ -906,7 +869,7 @@ export default class Query extends Component {
   // Link view methods -----------------------------
 
   handleChangePosition (event) {
-    this.state.graphState.links.map(link => {
+    this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
         link.label = event.target.value == 'included_in' ? "Included in" : "Overlap with"
@@ -916,12 +879,12 @@ export default class Query extends Component {
   }
 
   mapLinks (event) {
-    this.state.graphState.links.map(link => {})
+    this.graphState.links.map(link => {})
     this.updateGraphState()
   }
 
   handleClickReverse (event) {
-    this.state.graphState.links.map(link => {
+    this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         let old_target = link.target
         link.target = link.source
@@ -932,7 +895,7 @@ export default class Query extends Component {
   }
 
   handleChangeSameRef (event) {
-    this.state.graphState.links.map(link => {
+    this.graphState.links.map(link => {
       if ("sameref-" + link.id == event.target.id) {
         link.sameRef = event.target.checked
       }
@@ -941,7 +904,7 @@ export default class Query extends Component {
   }
 
   handleChangeSameStrand (event) {
-    this.state.graphState.links.map(link => {
+    this.graphState.links.map(link => {
       if ("samestrand-" + link.id == event.target.id) {
         link.sameStrand = event.target.checked
       }
@@ -950,7 +913,7 @@ export default class Query extends Component {
   }
 
   handleChangeStrict (event) {
-    this.state.graphState.links.map(link => {
+    this.graphState.links.map(link => {
       if ("strict-" + link.id == event.target.id) {
         link.strict = event.target.checked
       }
@@ -1005,7 +968,7 @@ export default class Query extends Component {
   handlePreview (event) {
     let requestUrl = '/api/query/preview'
     let data = {
-      graphState: this.state.graphState
+      graphState: this.graphState
     }
     this.setState({
       disablePreview: true,
@@ -1037,7 +1000,7 @@ export default class Query extends Component {
   handleQuery (event) {
     let requestUrl = '/api/query/save_result'
     let data = {
-      graphState: this.state.graphState
+      graphState: this.graphState
     }
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
