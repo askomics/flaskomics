@@ -35,7 +35,6 @@ class SparqlQueryBuilder(Params):
         self.selects = []
         self.federated = False
 
-        self.local_endpoint = self.settings.get('federation', 'endpoint')
         # local endpoint (for federated query engine)
         self.local_endpoint_f = self.settings.get('triplestore', 'endpoint')
         try:
