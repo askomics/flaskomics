@@ -118,6 +118,21 @@ class GffFile(File):
                 if value:
                     self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
 
+    def format_gff_entity(self, entity):
+        """Format a gff entity name by removing type (type:entity --> entity)
+
+        Parameters
+        ----------
+        entity : string
+            The GFF entity
+
+        Returns
+        -------
+        string
+            Entity without type
+        """
+        return ''.join(entity.split(":")[1:]) if ":" in entity else entity
+
     def generate_rdf_content(self):
         """Generator of the rdf content
 
@@ -158,11 +173,11 @@ class GffFile(File):
                         entity = self.entity_prefix[self.format_uri("{}_{}".format(str(feature.type), str(index)))]
                         entity_label = "{}_{}".format(str(feature.type), str(index))
                     else:
-                        entity = self.entity_prefix[self.format_uri(feature.qualifiers["ID"][0])]
-                        entity_label = feature.qualifiers["ID"][0]
+                        entity = self.entity_prefix[self.format_uri(self.format_gff_entity(feature.qualifiers["ID"][0]))]
+                        entity_label = self.format_gff_entity(feature.qualifiers["ID"][0])
                 else:
-                    entity = self.entity_prefix[self.format_uri(feature.id)]
-                    entity_label = feature.id
+                    entity = self.entity_prefix[self.format_uri(self.format_gff_entity(feature.id))]
+                    entity_label = self.format_gff_entity(feature.id)
 
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
@@ -259,7 +274,7 @@ class GffFile(File):
 
                         if qualifier_key in ("Parent", "Derives_from"):
                             relation = self.askomics_prefix[self.format_uri(qualifier_key)]
-                            attribute = self.askomics_prefix[self.format_uri(value)]
+                            attribute = self.askomics_prefix[self.format_uri(self.format_gff_entity(value))]
 
                             if (feature.type, qualifier_key) not in attribute_list:
                                 attribute_list.append((feature.type, qualifier_key))
