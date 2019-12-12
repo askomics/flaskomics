@@ -15,7 +15,9 @@ export default class CsvTable extends Component {
     this.state = {
       name: props.file.name,
       id: props.file.id,
-      header: props.file.data.header,
+      header: props.file.data.header.map(elem => {
+        return {name: elem, newName: elem, input: false}
+      }),
       columns_type: props.file.data.columns_type,
       integrated: false,
       publicTick: false,
@@ -30,6 +32,8 @@ export default class CsvTable extends Component {
     this.headerFormatter = this.headerFormatter.bind(this)
     this.handleChangeType = this.handleChangeType.bind(this)
     this.integrate = this.integrate.bind(this)
+    this.toggleHeaderForm = this.toggleHeaderForm.bind(this)
+    this.handleChangeHeader = this.handleChangeHeader.bind(this)
   }
 
   handleChangeType (index, event) {
@@ -43,11 +47,24 @@ export default class CsvTable extends Component {
   headerFormatter (column, colIndex) {
     let boundChangeType = this.handleChangeType.bind(this, colIndex)
 
+    let colInput = <p id={colIndex} onClick={this.toggleHeaderForm}>{this.state.header[colIndex]["newName"]}</p>
+    if (this.state.header[colIndex]["input"]) {
+      colInput = <Input
+        value={this.state.header[colIndex]["newName"]}
+        name="header"
+        id={colIndex}
+        onChange={this.handleChangeHeader}
+        onFocus={event => {event.target.select()}}
+        autoFocus
+        onKeyPress={event => {if (event.key === 'Enter') {this.setState({header: update(this.state.header, { [event.target.id]: { input: { $set: false } } })})}}}
+      />
+    }
+
     if (colIndex == 0) {
       return (
         <div>
           <FormGroup>
-            <p>{this.state.header[colIndex]}</p>
+            {colInput}
             <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
               <option value="start_entity" >Start entity</option>
               <option value="entity" >Entity</option>
@@ -60,7 +77,7 @@ export default class CsvTable extends Component {
     return (
       <div>
         <FormGroup>
-          <p>{this.state.header[colIndex]}</p>
+          {colInput}
           <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
             <optgroup label="Attributes">
               <option value="numeric" >Numeric</option>
@@ -90,6 +107,9 @@ export default class CsvTable extends Component {
     let data = {
       fileId: this.state.id,
       columns_type: this.state.columns_type,
+      header_names: this.state.header.map(header => {
+        return header.newName
+      }),
       public: event.target.value == 'public',
       type: 'csv',
       customUri: this.state.customUri,
@@ -129,17 +149,30 @@ export default class CsvTable extends Component {
     })
   }
 
+  toggleHeaderForm(event) {
+    this.setState({
+      header: update(this.state.header, { [event.target.id]: { input: { $set: true } } })
+    })
+  }
+
+  handleChangeHeader(event) {
+    this.setState({
+      header: update(this.state.header, { [event.target.id]: { newName: { $set: event.target.value } } })
+    })
+
+  }
+
   render () {
     let columns = this.state.header.map((colName, index) => {
       return ({
-        dataField: this.state.header[index],
-        text: this.state.header[index],
+        dataField: this.state.header[index]["name"],
+        text: this.state.header[index]["name"],
         sort: false,
         headerFormatter: this.headerFormatter,
         index: index,
         selectedType: this.state.columns_type[index],
         formatter: (cell, row) => {
-          let text = row[this.state.header[index]]
+          let text = row[this.state.header[index]["name"]]
           if (this.utils.isUrl(text)) {
             return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
           } else {
@@ -171,7 +204,7 @@ export default class CsvTable extends Component {
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"
             bootstrap4
-            keyField={this.state.header[0]}
+            keyField={this.state.header[0]["name"]}
             data={this.props.file.data.content_preview}
             columns={columns}
           />

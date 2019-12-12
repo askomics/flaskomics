@@ -84,6 +84,16 @@ class CsvFile(File):
         """
         self.columns_type = forced_columns_type
 
+    def force_header_names(self, forced_header_names):
+        """Set the columns type without detecting them
+
+        Parameters
+        ----------
+        forced_columns_type : list
+            columns type
+        """
+        self.header = forced_header_names
+
     def set_preview_and_header(self):
         """Set the preview and header by looking in the fists lines of the file"""
         with open(self.path, 'r', encoding='utf-8') as csv_file:
@@ -261,7 +271,7 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-    def integrate(self, forced_columns_type, public=False):
+    def integrate(self, forced_columns_type, forced_header_names=None, public=False):
         """Integrate the file
 
         Parameters
@@ -274,6 +284,8 @@ class CsvFile(File):
         self.public = public
         self.set_preview_and_header()
         self.force_columns_type(forced_columns_type)
+        if forced_header_names:
+            self.force_header_names(forced_header_names)
         File.integrate(self)
 
     def set_rdf_abstraction_domain_knowledge(self):
