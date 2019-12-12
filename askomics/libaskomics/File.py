@@ -1,6 +1,8 @@
 import datetime
 import os
 import time
+import traceback
+import sys
 from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
@@ -272,10 +274,26 @@ class File(Params):
                         self.rdf_extention
                     )
 
-                    self.load_graph(self.graph_chunk, temp_file_name)
+                    # Try to load data. if failure, wait 10 sec and retry
+                    try:
+                        self.load_graph(self.graph_chunk, temp_file_name)
+                    except Exception:
+                        traceback.print_exc(file=sys.stdout)
+                        self.log.debug("Error during integration of {}. Retrying in 10 seconds...".format(temp_file_name))
+                        time.sleep(10)
+                        self.log.debug("Retrying integration of {}".format(temp_file_name))
+                        self.load_graph(self.graph_chunk, temp_file_name)
                 else:
                     # Insert
-                    sparql.insert_data(self.graph_chunk, self.file_graph)
+                    # Try to insert data. if failure, wait 10 sec and retry
+                    try:
+                        sparql.insert_data(self.graph_chunk, self.file_graph)
+                    except Exception:
+                        traceback.print_exc(file=sys.stdout)
+                        self.log.debug("Error during integration of {}. Retrying in 10 seconds...".format(temp_file_name))
+                        time.sleep(10)
+                        self.log.debug("Retrying integration of {}".format(temp_file_name))
+                        sparql.insert_data(self.graph_chunk, self.file_graph)
 
                 chunk_number += 1
                 self.graph_chunk = RdfGraph(self.app, self.session)
