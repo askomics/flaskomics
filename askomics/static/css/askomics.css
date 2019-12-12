@@ -73,6 +73,10 @@ i.inactive {
     background-position: 0% 0%;
 }
 
+.attr-select {
+  resize: vertical;
+}
+
 div.startpoints-div {
     height: 300px;
     /*width: 30%;*/
