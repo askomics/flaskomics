@@ -99,13 +99,16 @@ class File(Params):
             self.session['user']['id'],
             self.session['user']['username']
         )
-        self.file_graph = "{}:{}_{}:{}_{}".format(
-            self.settings.get('triplestore', 'default_graph'),
-            self.session['user']['id'],
-            self.session['user']['username'],
-            self.name,
-            self.timestamp
-        )
+        if "graph_name" not in file_info:
+            self.file_graph = "{}:{}_{}:{}_{}".format(
+                self.settings.get('triplestore', 'default_graph'),
+                self.session['user']['id'],
+                self.session['user']['username'],
+                self.name,
+                self.timestamp
+            )
+        else:
+            self.file_graph = file_info["graph_name"]
 
         self.ttl_dir = '{}/{}_{}/ttl'.format(
             self.settings.get('askomics', 'data_directory'),
