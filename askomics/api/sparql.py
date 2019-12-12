@@ -157,7 +157,11 @@ def save_query():
         # Is query federated?
         query_builder = SparqlQueryBuilder(current_app, session)
         query_builder.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
+
         federated = query_builder.is_federated()
+        replace_froms = query_builder.replace_froms()
+
+        query = query_builder.format_query(query, limit=None, replace_froms=replace_froms, federated=federated)
 
         info = {
             "sparql_query": query,
