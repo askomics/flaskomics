@@ -137,6 +137,7 @@ export default class FilesTable extends Component {
 FilesTable.propTypes = {
   selected: PropTypes.bool,
   files: PropTypes.object,
+  config: PropTypes.object,
   waiting: PropTypes.bool,
   setStateUpload: PropTypes.func,
 }
