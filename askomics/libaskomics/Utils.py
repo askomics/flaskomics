@@ -1,11 +1,44 @@
 import random
 import re
+import time
+import traceback
+import sys
 
 
 class Utils():
+    """Contain utils fonction and classes"""
 
-    """Contain utils fonction and classes
-    """
+    @staticmethod
+    def redo_if_failure(logger, max_redo, sleep_time, call, *args):
+        """Redo a function if it fail, with a sleep time between each try
+
+        Parameters
+        ----------
+        logger : app.logger
+            The flask logger to log error
+        max_redo : int
+            Max number of try
+        sleep_time : int
+            Time between each try.
+        call : function
+            The function to redo if faliure
+        *args
+            Args of the function
+        """
+        i = 0
+        while True:
+            i += 1
+            try:
+                call(*args)
+                break
+            except Exception as e:
+                if i == max_redo:
+                    raise(e)
+                traceback.print_exc(file=sys.stdout)
+                logger.debug("Fail to execute {}. Retrying in {} sec...".format(call.__name__, sleep_time))
+                time.sleep(sleep_time)
+                sleep_time = sleep_time * 2
+                continue  # redo
 
     @staticmethod
     def is_valid_url(url):

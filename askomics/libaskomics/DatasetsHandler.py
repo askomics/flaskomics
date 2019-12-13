@@ -1,11 +1,11 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
 class DatasetsHandler(Params):
-
     """Summary
 
     Attributes
@@ -33,8 +33,7 @@ class DatasetsHandler(Params):
         self.datasets = []
 
     def handle_datasets(self):
-        """Handle datasets
-        """
+        """Handle datasets"""
         for info in self.datasets_info:
             dataset = Dataset(self.app, self.session, dataset_info=info)
             dataset.set_info_from_db()
@@ -123,7 +122,7 @@ class DatasetsHandler(Params):
         """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
         for dataset in self.datasets:
-            # Delete from triplestore
-            sparql.drop_dataset(dataset.graph_name)
+            # Delete from triplestore (3 try, 1-2 sec between them)
+            Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
             # Delete from db
             dataset.delete_from_db()
