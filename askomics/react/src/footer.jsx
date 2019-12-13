@@ -11,7 +11,7 @@ export default class AskoFooter extends Component {
   render () {
       let commitLink
       if (this.props.config.commit) {
-        commitLink = (<>- <a href={this.props.config.gitUrl + "/" + this.props.config.commit}>{this.props.config.commit}</a></>)
+        commitLink = (<>- <a href={this.props.config.gitUrl + "/commit/" + this.props.config.commit}>{this.props.config.commit}</a></>)
       }
     return (
       <footer className="footer footer-content">
