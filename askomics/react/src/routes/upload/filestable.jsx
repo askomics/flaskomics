@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import cellEditFactory from 'react-bootstrap-table2-editor'
 import WaitingDiv from '../../components/waiting'
 import Utils from '../../classes/utils'
 import PropTypes from 'prop-types'
@@ -38,6 +40,32 @@ export default class FilesTable extends Component {
     }
   }
 
+  editFileName (oldValue, newValue, row) {
+
+    if (newValue === oldValue) {return}
+
+    let requestUrl = '/api/files/editname'
+    let data = {
+      id: row.id,
+      newName: newValue
+    }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.props.setStateUpload({
+        files: response.data.files,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
+
   render () {
     let columns = [{
       dataField: 'name',
@@ -47,16 +75,19 @@ export default class FilesTable extends Component {
       dataField: 'date',
       text: 'Date',
       sort: true,
-      formatter: (cell, row) => { return this.utils.humanDate(cell) }
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
+      editable: false
     }, {
       dataField: 'type',
       text: 'Type',
-      sort: true
+      sort: true,
+      editable: false
     }, {
       dataField: 'size',
       text: 'File size',
       formatter: (cell, row) => { return this.utils.humanFileSize(cell, true) },
-      sort: true
+      sort: true,
+      editable: false
     }]
 
     let defaultSorted = [{
@@ -91,6 +122,11 @@ export default class FilesTable extends Component {
               pagination={paginationFactory()}
               noDataIndication={noDataIndication}
               selectRow={ selectRow }
+              cellEdit={ cellEditFactory({
+                mode: 'click',
+                autoSelectText: true,
+                beforeSaveCell: (oldValue, newValue, row) => { this.editFileName(oldValue, newValue, row) },
+              })}
             />
           </div>
       </div>

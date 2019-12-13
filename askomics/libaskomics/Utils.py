@@ -83,6 +83,11 @@ class Utils():
         return ''.join(random.choice(alpabet) for i in range(number))
 
     @staticmethod
+    def camel_case(string):
+        """camelCase a string"""
+        return ''.join(x for x in string.title() if not x.isspace())
+
+    @staticmethod
     def unique(l):
         """return the list with duplicate elements removed and keep order"""
         return [i for n, i in enumerate(l) if i not in l[n + 1:]]

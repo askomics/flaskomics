@@ -4,6 +4,7 @@ import time
 from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
@@ -147,6 +148,23 @@ class File(Params):
 
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
+
+    def edit_name_in_db(self, new_name):
+        """Edit file name
+
+        Parameters
+        ----------
+        new_name : str
+            New name
+        """
+        query = '''
+        UPDATE files SET
+        name=?
+        WHERE id = ? and user_id = ?
+        '''
+
+        database = Database(self.app, self.session)
+        database.execute_sql_query(query, (new_name.replace(" ", "_"), self.id, self.session["user"]["id"]))
 
     def format_uri(self, string, remove_space=False):
         """remove space and quote"""

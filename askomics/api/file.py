@@ -50,6 +50,48 @@ def get_files():
     })
 
 
+@file_bp.route('/api/files/editname', methods=['POST'])
+@login_required
+def edit_file():
+    """Edit file name
+
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    current_app.logger.debug(data)
+    files_id = [data["id"]]
+    new_name = data["newName"]
+
+    try:
+        files_handler = FilesHandler(current_app, session)
+        files_handler.handle_files(files_id)
+
+        for file in files_handler.files:
+            file.edit_name_in_db(new_name)
+        files = files_handler.get_files_infos()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'diskSpace': 0,
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'diskSpace': files_handler.get_size_occupied_by_user(),
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @file_bp.route('/api/files/upload_chunk', methods=['POST'])
 @login_required
 def upload_chunk():
