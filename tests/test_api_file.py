@@ -75,6 +75,41 @@ class TestApiFile(AskomicsTestCase):
             'files': []
         }
 
+    def test_edit_file(self, client):
+        """Test /api/files/editname route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload()
+
+        data = {"id": 1, "newName": "new name.tsv"}
+
+        response = client.client.post("/api/files/editname", json=data)
+        assert response.status_code == 200
+        assert response.json == {
+            'diskSpace': client.get_size_occupied_by_user(),
+            'error': False,
+            'errorMessage': '',
+            'files': [{
+                'date': info["transcripts"]["upload"]["file_date"],
+                'id': 1,
+                'name': 'new_name.tsv',
+                'size': 1986,
+                'type': 'csv/tsv'
+            }, {
+                'date': info["de"]["upload"]["file_date"],
+                'id': 2,
+                'name': 'de.tsv',
+                'size': 819,
+                'type': 'csv/tsv'
+            }, {
+                'date': info["qtl"]["upload"]["file_date"],
+                'id': 3,
+                'name': 'qtl.tsv',
+                'size': 99,
+                'type': 'csv/tsv'
+            }]
+        }
+
     def test_upload_chunk(self, client):
         """Test /api/files/upload_chunk route"""
         client.create_two_users()
