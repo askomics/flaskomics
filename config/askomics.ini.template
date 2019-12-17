@@ -50,6 +50,9 @@ triplestore = virtuoso
 endpoint = http://localhost:8890/sparql
 # Sparql updatepoint
 updatepoint = http://localhost:8890/sparql
+# Isql API
+# If triplestore is virtuoso, set the (optional) isql api for fastest graph deletion
+isqlapi = http://localhost:5050
 # If triplestore is fuseki, set the upload url
 # fuseki_upload_url = http://localhost:3030/database/upload
 # Triplestore credentials
