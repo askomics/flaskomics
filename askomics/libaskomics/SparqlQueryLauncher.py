@@ -1,5 +1,4 @@
 import time
-import urllib
 import traceback
 import sys
 
@@ -304,9 +303,9 @@ class SparqlQueryLauncher(Params):
             # self.log.debug(results)
             return results
 
-        except urllib.error.URLError:
+        except Exception as e:
             traceback.print_exc(file=sys.stdout)
-            raise urllib.error.URLError("Triplestore is not accessible")
+            raise type(e)("Triplestore error: {}".format(str(e))).with_traceback(sys.exc_info()[2])
 
     def parse_results_old(self, json_results):
         """Parse result of sparql query
