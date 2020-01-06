@@ -1,4 +1,7 @@
 import time
+import urllib
+import traceback
+import sys
 
 from SPARQLWrapper import JSON, SPARQLWrapper
 
@@ -275,30 +278,35 @@ class SparqlQueryLauncher(Params):
         TYPE
             result
         """
-        start_time = time.time()
-        self.endpoint.setQuery(query)
+        try:
+            start_time = time.time()
+            self.endpoint.setQuery(query)
 
-        # Debug
-        if self.settings.getboolean('askomics', 'debug'):
-            self.log.debug("Launch query on {} ({})".format(self.triplestore, self.url_endpoint))
-            self.log.debug(query)
+            # Debug
+            if self.settings.getboolean('askomics', 'debug'):
+                self.log.debug("Launch query on {} ({})".format(self.triplestore, self.url_endpoint))
+                self.log.debug(query)
 
-        # Update
-        if self.endpoint.isSparqlUpdateRequest():
-            self.endpoint.setMethod('POST')
-            # Virtuoso hack
-            if self.triplestore == 'virtuoso':
-                self.endpoint.queryType = "SELECT"
+            # Update
+            if self.endpoint.isSparqlUpdateRequest():
+                self.endpoint.setMethod('POST')
+                # Virtuoso hack
+                if self.triplestore == 'virtuoso':
+                    self.endpoint.queryType = "SELECT"
 
-            results = self.endpoint.query()
-            self.query_time = time.time() - start_time
-        # Select
-        else:
-            self.endpoint.setReturnFormat(JSON)
-            results = self.endpoint.query().convert()
-            self.query_time = time.time() - start_time
-        # self.log.debug(results)
-        return results
+                results = self.endpoint.query()
+                self.query_time = time.time() - start_time
+            # Select
+            else:
+                self.endpoint.setReturnFormat(JSON)
+                results = self.endpoint.query().convert()
+                self.query_time = time.time() - start_time
+            # self.log.debug(results)
+            return results
+
+        except urllib.error.URLError:
+            traceback.print_exc(file=sys.stdout)
+            raise urllib.error.URLError("Triplestore is not accessible")
 
     def parse_results_old(self, json_results):
         """Parse result of sparql query

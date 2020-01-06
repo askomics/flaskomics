@@ -18,6 +18,7 @@ export default class Ask extends Component {
       error: false,
       errorMessage: null,
       startpoints: [],
+      endpoints: [],
       selected: null,
       startSession: false,
       publicQueries: [],
