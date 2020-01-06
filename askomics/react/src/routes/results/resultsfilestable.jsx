@@ -21,7 +21,6 @@ export default class ResultsFilesTable extends Component {
       graphState: [],
       modal: false,
       idToPublish: null,
-      description: '',
       error: false,
       errorMessage: null,
       status: null,
@@ -38,6 +37,7 @@ export default class ResultsFilesTable extends Component {
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
+    this.toggleTemplateQuery = this.toggleTemplateQuery.bind(this)
     this.handleClickError = this.handleClickError.bind(this)
     this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
@@ -175,11 +175,20 @@ export default class ResultsFilesTable extends Component {
   togglePublicQuery(event) {
     // Unpublish
     this.setState({
-      idToPublish: event.target.id,
-      newPublishStatus: event.target.value == 1 ? false : true,
-      description: ''
+      idToPublish: parseInt(event.target.id.replace("publish-", "")),
+      newPublishStatus: event.target.value == 1 ? false : true
     }, () => {
       this.publish()
+    })
+  }
+
+  toggleTemplateQuery(event) {
+    // Unpublish
+    this.setState({
+      idToTemplate: parseInt(event.target.id.replace("template-", "")),
+      newTemplateStatus: event.target.value == 1 ? false : true
+    }, () => {
+      this.template()
     })
   }
 
@@ -193,6 +202,32 @@ export default class ResultsFilesTable extends Component {
     .then(response => {
       this.setState({
         modal: false,
+        idToPublish: null
+      })
+      this.props.setStateResults({
+        results: response.data.files,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
+
+  template() {
+    let requestUrl = '/api/results/template'
+    let data = {
+      id: this.state.idToTemplate,
+      template: this.state.newTemplateStatus
+    }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.setState({
         idToPublish: null
       })
       this.props.setStateResults({
@@ -300,6 +335,20 @@ export default class ResultsFilesTable extends Component {
       formatter: (cell, row) => { return this.utils.humanDate(cell) },
       editable: false
     }, {
+      dataField: 'template',
+      text: 'Template',
+      sort: true,
+      formatter: (cell, row) => {
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" template-id={row.id} id={"template-" + row.id} onChange={this.toggleTemplateQuery} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
+      },
+      editable: false
+    }, {
       dataField: 'public',
       text: 'Public',
       sort: true,
@@ -308,7 +357,7 @@ export default class ResultsFilesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={row.status == "success" ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -411,6 +460,7 @@ export default class ResultsFilesTable extends Component {
             selectRow={ selectRow }
             cellEdit={ cellEditFactory({
               mode: 'click',
+              autoSelectText: true,
               beforeSaveCell: (oldValue, newValue, row) => { this.saveNewDescription(oldValue, newValue, row) },
             })}
           />

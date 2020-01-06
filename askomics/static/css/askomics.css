@@ -73,8 +73,12 @@ i.inactive {
     background-position: 0% 0%;
 }
 
+.attr-select {
+  resize: vertical;
+}
+
 div.startpoints-div {
-    height: 200px;
+    height: 300px;
     /*width: 30%;*/
     overflow-y: scroll;
     border:1px solid #ccc;
@@ -98,6 +102,32 @@ label.startpoint-label {
 
 input[type="radio"].startpoint-radio:checked+label{
     background-color: #ccc;
+}
+
+table.startpoint-table {
+  table-layout: fixed;
+  width: 100%;
+  /*border-collapse: collapse;*/
+}
+
+/*.startpoint-table {
+  border: 1px solid hotpink;
+}*/
+
+td.startpoint-table.cell1 {
+  width: 60%;
+}
+
+td.startpoint-table.cell2 {
+  width: 30%;
+}
+
+td.startpoint-table.cell3 {
+  width: 10%;
+}
+
+.icon-invisible {
+    visibility: hidden;
 }
 
 div.attribute-box {

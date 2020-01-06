@@ -134,7 +134,7 @@ export default class Upload extends Component {
         {warningDiskSpace}
         <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} />
         <hr />
-        <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} />
+        <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} config={this.props.config} />
         <br />
         <ButtonGroup>
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>

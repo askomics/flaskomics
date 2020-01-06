@@ -29,52 +29,10 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
-
-        assert response.status_code == 200
-        assert response.json == expected
-
-    def test_set_public(self, client):
-        """test /api/results/setpublic route"""
-        client.create_two_users()
-        client.log_user("jdoe")
-        client.upload_and_integrate()
-        result_info = client.create_result()
-
-        data = {"fileId": result_info["id"], "public": True}
-
-        with open("tests/results/results.json", "r") as file:
-            file_content = file.read()
-        raw_results = file_content.replace("###START###", str(result_info["start"]))
-        raw_results = raw_results.replace("###END###", str(result_info["end"]))
-        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
-        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
-        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
-        raw_results = raw_results.replace("###PUBLIC###", str(1))
-        raw_results = raw_results.replace("###DESC###", "Query")
-        expected = json.loads(raw_results)
-
-        response = client.client.post("/api/results/setpublic", json=data)
-
-        assert response.status_code == 200
-        assert response.json == expected
-
-        data = {"fileId": result_info["id"], "public": False}
-
-        with open("tests/results/results.json", "r") as file:
-            file_content = file.read()
-        raw_results = file_content.replace("###START###", str(result_info["start"]))
-        raw_results = raw_results.replace("###END###", str(result_info["end"]))
-        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
-        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
-        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
-        raw_results = raw_results.replace("###PUBLIC###", str(0))
-        raw_results = raw_results.replace("###DESC###", "Query")
-        expected = json.loads(raw_results)
-
-        response = client.client.post("/api/results/setpublic", json=data)
 
         assert response.status_code == 200
         assert response.json == expected
@@ -196,12 +154,65 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
         raw_results = raw_results.replace("###DESC###", "new description")
 
         expected = json.loads(raw_results)
         del expected["triplestoreMaxRows"]
 
         response = client.client.post("/api/results/description", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_template(self, client):
+        """test /api/results/template route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"id": result_info["id"], "template": True}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        response = client.client.post("/api/results/template", json=data)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+        # untemplate a public result => unpublic it
+        data_public = {"id": result_info["id"], "public": True}
+        data_template = {"id": result_info["id"], "template": False}
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        client.client.post("/api/results/public", json=data_public)
+        response = client.client.post("/api/results/template", json=data_template)
 
         assert response.status_code == 200
         assert response.json == expected
@@ -223,6 +234,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
+        raw_results = raw_results.replace("###TEMPLATE###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
@@ -243,6 +255,7 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(1))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)

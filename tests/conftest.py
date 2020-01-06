@@ -217,7 +217,8 @@ class Client(object):
 
         file_type = {
             ".tsv": "text/tab-separated-values",
-            ".csv": "text/tab-separated-values"
+            ".csv": "text/tab-separated-values",
+            ".gff3": "null"
         }
 
         with open(file_path, 'r') as file_content:
@@ -293,6 +294,7 @@ class Client(object):
         up_transcripts = self.upload_file("test-data/transcripts.tsv")
         up_de = self.upload_file("test-data/de.tsv")
         up_qtl = self.upload_file("test-data/qtl.tsv")
+        up_gene_gff = self.upload_file("test-data/gene.gff3")
 
         return {
             "transcripts": {
@@ -303,6 +305,9 @@ class Client(object):
             },
             "qtl": {
                 "upload": up_qtl,
+            },
+            "gene": {
+                "upload": up_gene_gff,
             }
         }
 

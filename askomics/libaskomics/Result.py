@@ -342,6 +342,7 @@ class Result(Params):
             NULL,
             ?,
             NULL,
+            ?,
             ?
         )
         '''
@@ -354,7 +355,8 @@ class Result(Params):
             False,
             "Query",
             self.sparql_query,
-            json.dumps({"graphs": self.graphs, "endpoints": self.endpoints})
+            json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
+            False
         ), get_id=True)
 
         return self.id
@@ -464,20 +466,44 @@ class Result(Params):
             self.log.debug("Impossible to delete {}".format(self.file_path))
 
     def publish_query(self, public):
-        """Insert query id and desc in the published_query table"""
+        """Set public to True or False, and template to True if public is True"""
         database = Database(self.app, self.session)
+
+        # If query is set to public, template have to be True
+        sql_substr = ''
+        sql_var = (public, self.session["user"]["id"], self.id)
+        if public:
+            sql_substr = 'template=?,'
+            sql_var = (public, public, self.session["user"]["id"], self.id)
 
         query = '''
         UPDATE results SET
+        {}
         public=?
         WHERE user_id=? AND id=?
-        '''
+        '''.format(sql_substr)
 
-        database.execute_sql_query(query, (
-            public,
-            self.session["user"]["id"],
-            self.id
-        ))
+        database.execute_sql_query(query, sql_var)
+
+    def template_query(self, template):
+        """Set template to True or False, and public to False if template is False"""
+        database = Database(self.app, self.session)
+
+        # If query is set to public, template have to be True
+        sql_substr = ''
+        sql_var = (template, self.session["user"]["id"], self.id)
+        if not template:
+            sql_substr = 'public=?,'
+            sql_var = (template, template, self.session["user"]["id"], self.id)
+
+        query = '''
+        UPDATE results SET
+        {}
+        template=?
+        WHERE user_id=? AND id=?
+        '''.format(sql_substr)
+
+        database.execute_sql_query(query, sql_var)
 
     def update_description(self, description):
         """Change the result description"""

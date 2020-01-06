@@ -65,7 +65,7 @@ def integrate(self, session, data, host_url):
             dataset.update_in_db("started")
 
             if file.type == "csv/tsv":
-                file.integrate(data['columns_type'], public=public)
+                file.integrate(data['columns_type'], data['header_names'], public=public)
             elif file.type == "gff/gff3":
                 file.integrate(data["entities"], public=public)
             elif file.type == "turtle":

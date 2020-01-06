@@ -1,0 +1,64 @@
+navbar {
+    background-color: #343a40;
+    color: rgba(255,255,255,.75);
+    padding-right: 5px;
+    padding-left: 5px;
+    border-radius: 5px;
+}
+
+askolink {
+    color: #0056b3
+}
+
+btn {
+    background-color: #5a6268;
+    color: #fff;
+    padding-right: 5px;
+    padding-left: 5px;
+    border-radius: 5px;
+}
+
+badge {
+    padding-right: 5px;
+    padding-left: 5px;
+    border-radius: 5px;
+}
+
+
+
+badge.local {
+    color: black;
+    background: rgb(216, 212, 168);
+}
+
+badge.hands-on {
+    color: white;
+    background: #53ba11b3;
+}
+
+.admonition.hands-on {
+    background: rgba(100,221,23,.1);
+    padding: 12px;
+    line-height: 24px;
+    margin-bottom: 24px;
+}
+
+div.admonition.hands-on > p.admonition-title {
+    background: #53ba11b3
+}
+
+.admonition.quote {
+    background: #e3e3e3;
+    padding: 12px;
+    line-height: 24px;
+    margin-bottom: 24px;
+}
+
+div.admonition.quote > p.admonition-title {
+    background: #9e9e9e
+}
+
+.primary {
+    color: #007bff;
+}
+

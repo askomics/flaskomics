@@ -196,6 +196,9 @@ class Database(Params):
             description text,
             size int,
             sparql_query text,
+            traceback text,
+            graphs_and_endpoints text,
+            template boolean,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
@@ -241,6 +244,17 @@ class Database(Params):
         ALTER TABLE results
         ADD graphs_and_endpoints text NULL
         DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE results
+        ADD template boolean NULL
+        DEFAULT(0)
         '''
 
         try:

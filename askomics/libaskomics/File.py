@@ -4,6 +4,7 @@ import time
 from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
@@ -99,13 +100,16 @@ class File(Params):
             self.session['user']['id'],
             self.session['user']['username']
         )
-        self.file_graph = "{}:{}_{}:{}_{}".format(
-            self.settings.get('triplestore', 'default_graph'),
-            self.session['user']['id'],
-            self.session['user']['username'],
-            self.name,
-            self.timestamp
-        )
+        if "graph_name" not in file_info:
+            self.file_graph = "{}:{}_{}:{}_{}".format(
+                self.settings.get('triplestore', 'default_graph'),
+                self.session['user']['id'],
+                self.session['user']['username'],
+                self.name,
+                self.timestamp
+            )
+        else:
+            self.file_graph = file_info["graph_name"]
 
         self.ttl_dir = '{}/{}_{}/ttl'.format(
             self.settings.get('askomics', 'data_directory'),
@@ -144,6 +148,23 @@ class File(Params):
 
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
+
+    def edit_name_in_db(self, new_name):
+        """Edit file name
+
+        Parameters
+        ----------
+        new_name : str
+            New name
+        """
+        query = '''
+        UPDATE files SET
+        name=?
+        WHERE id = ? and user_id = ?
+        '''
+
+        database = Database(self.app, self.session)
+        database.execute_sql_query(query, (new_name.replace(" ", "_"), self.id, self.session["user"]["id"]))
 
     def format_uri(self, string, remove_space=False):
         """remove space and quote"""
@@ -269,10 +290,12 @@ class File(Params):
                         self.rdf_extention
                     )
 
-                    self.load_graph(self.graph_chunk, temp_file_name)
+                    # Try to load data. if failure, wait 5 sec and retry 5 time
+                    Utils.redo_if_failure(self.log, 5, 5, self.load_graph, self.graph_chunk, temp_file_name)
                 else:
                     # Insert
-                    sparql.insert_data(self.graph_chunk, self.file_graph)
+                    # Try to insert data. if failure, wait 5 sec and retry 5 time
+                    Utils.redo_if_failure(self.log, 5, 5, sparql.insert_data, self.graph_chunk, self.file_graph)
 
                 chunk_number += 1
                 self.graph_chunk = RdfGraph(self.app, self.session)
@@ -286,10 +309,12 @@ class File(Params):
                 self.rdf_extention
             )
 
-            self.load_graph(self.graph_chunk, temp_file_name)
+            # Try to load data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, self.load_graph, self.graph_chunk, temp_file_name)
         else:
             # Insert
-            sparql.insert_data(self.graph_chunk, self.file_graph)
+            # Try to insert data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, sparql.insert_data, self.graph_chunk, self.file_graph)
 
         # Content is inserted, now insert abstraction and domain_knowledge
         self.set_rdf_abstraction_domain_knowledge()

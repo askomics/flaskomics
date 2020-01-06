@@ -1,3 +1,5 @@
+import tld
+
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -34,11 +36,12 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity ?entity_label ?creator ?public
+        SELECT DISTINCT ?endpoint ?graph ?entity ?entity_label ?creator ?public
         WHERE {{
             ?graph :public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
+                ?graph prov:atLocation ?endpoint .
                 ?entity a :entity .
                 ?entity a :startPoint .
                 ?entity rdfs:label ?entity_label .
@@ -55,6 +58,9 @@ class TriplestoreExplorer(Params):
         entities = []
 
         for result in data:
+
+            endpoint_name = "local" if result["endpoint"] == self.settings.get("triplestore", "endpoint") else tld.get_fld(result["endpoint"]).split('.')[0]
+
             if result["entity"] not in entities:
                 # new entity
                 entities.append(result['entity'])
@@ -66,6 +72,7 @@ class TriplestoreExplorer(Params):
                         "public": result["public"],
                         "creator": result["creator"]
                     }],
+                    "endpoints": [{"url": result["endpoint"], "name": endpoint_name}],
                     "public": self.str_to_bool(result["public"]),
                     "private": not self.str_to_bool(result["public"])
                 }
@@ -79,6 +86,7 @@ class TriplestoreExplorer(Params):
                     "creator": result["creator"]
                 }
                 startpoints[index]["graphs"].append(graph)
+                startpoints[index]["endpoints"].append({"url": result["endpoint"], "name": endpoint_name})
                 if self.str_to_bool(result["public"]):
                     startpoints[index]["public"] = True
                 else:
@@ -185,6 +193,8 @@ class TriplestoreExplorer(Params):
         if self.logged_user():
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
+        litterals = ("http://www.w3.org/2001/XMLSchema#string", "http://www.w3.org/2001/XMLSchema#decimal")
+
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
@@ -224,7 +234,7 @@ class TriplestoreExplorer(Params):
 
         for result in data:
             # Attributes
-            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")):
+            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")) and result["attribute_range"] in litterals:
                 attr_tpl = (result["attribute_uri"], result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
@@ -295,7 +305,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQueryBuilder(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_type ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph :public ?public .
@@ -303,10 +313,10 @@ class TriplestoreExplorer(Params):
             GRAPH ?graph {{
                 # Property (relations and categories)
                 ?property_uri a owl:ObjectProperty .
+                ?property_uri a :AskomicsRelation .
                 ?property_uri rdfs:label ?property_label .
                 ?property_uri rdfs:domain ?entity_uri .
                 ?property_uri rdfs:range ?range_uri .
-                ?property_uri a ?property_type .
             }}
             FILTER (
                 ?public = <true>{}
@@ -321,7 +331,7 @@ class TriplestoreExplorer(Params):
 
         for result in data:
             # Relation
-            if "property_uri" in result and result["property_type"] == "{}AskomicsRelation".format(self.settings.get("triplestore", "prefix")):
+            if "property_uri" in result:
                 rel_tpl = (result["property_uri"], result["entity_uri"], result["range_uri"])
                 if rel_tpl not in relations_list:
                     relations_list.append(rel_tpl)

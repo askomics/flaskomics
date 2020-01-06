@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { Alert, Badge, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, InputGroupButtonDropdown } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import UploadGalaxyForm from '../upload/uploadgalaxyform'
+import Utils from '../../classes/utils'
 
 
 export default class Ask extends Component {
@@ -17,18 +18,24 @@ export default class Ask extends Component {
       error: false,
       errorMessage: null,
       startpoints: [],
+      endpoints: [],
       selected: null,
       startSession: false,
       publicQueries: [],
       modalGalaxy: false,
-      showGalaxyButton: false
+      showGalaxyButton: false,
+      dropdownOpen: false,
+      selectedEndpoint: ["local"]
     }
+    this.utils = new Utils()
     this.cancelRequest
     this.handleClick = this.handleClick.bind(this)
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
     this.handleClickPublicQuery = this.handleClickPublicQuery.bind(this)
+    this.toggleDropDown = this.toggleDropDown.bind(this)
     this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
+    this.clickOnEndpoint = this.clickOnEndpoint.bind(this)
   }
 
   componentDidMount () {
@@ -46,10 +53,21 @@ export default class Ask extends Component {
       axios.get(requestUrl, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
           console.log(requestUrl, response.data)
+
+          let endpoints = []
+          response.data.startpoints.forEach(startpoint => {
+            startpoint.endpoints.forEach(endpoint => {
+              endpoints.push(endpoint.name)
+            })
+          })
+          endpoints = [...new Set(endpoints)]
+
           this.setState({
             waiting: false,
+            endpoints: endpoints,
             startpoints: response.data.startpoints.map(startpoint => new Object({
               graphs: startpoint.graphs,
+              endpoints: startpoint.endpoints,
               entity: startpoint.entity,
               entity_label: startpoint.entity_label,
               public: startpoint.public,
@@ -141,6 +159,28 @@ export default class Ask extends Component {
     this.forceUpdate()
   }
 
+  toggleDropDown() {
+    this.setState({
+      dropdownOpen: ! this.state.dropdownOpen
+    })
+  }
+
+  clickOnEndpoint(event) {
+    let value = event.target.value
+    let array = this.state.selectedEndpoint
+    if (array.includes(value)) {
+      let index = array.indexOf(value)
+      array.splice(index, 1)
+    }else {
+      array.push(value)
+    }
+
+    this.setState({
+      selectedEndpoint: array
+    })
+
+  }
+
   render () {
     let redirectLogin
     if (this.state.status == 401) {
@@ -182,14 +222,26 @@ export default class Ask extends Component {
     }
 
     let exempleQueries
+    let emptyPrivate
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
       exempleQueries = (
         <div>
-          <p>Or start with an exemple:</p>
+          <p>Or start with an template:</p>
             <ListGroup>
-              {this.state.publicQueries.map(query => (
-                <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
-              ))}
+              {this.state.publicQueries.map(query => {
+                if (query.public == 0) {
+                  emptyPrivate = <br />
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+            {emptyPrivate}
+            <ListGroup>
+              {this.state.publicQueries.map(query => {
+                if (query.public == 1) {
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                }
+              })}
             </ListGroup>
         </div>
       )
@@ -229,21 +281,64 @@ export default class Ask extends Component {
         <div>
           <p>Select an entity to start a session:</p>
           <div className="startpoints-filter-div">
+
+          <InputGroup>
+            <InputGroupButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropDown}>
+              <DropdownToggle outline caret>
+                Source
+              </DropdownToggle>
+              <DropdownMenu>
+              {this.state.endpoints.map(endpoint => {
+
+                let tick = <i className={this.state.selectedEndpoint.includes(endpoint) ? "fas fa-check" : "icon-invisible fas fa-check"}></i>
+
+                return (
+                  <DropdownItem key={endpoint} value={endpoint} onClick={this.clickOnEndpoint}>
+                    {tick} {endpoint}
+                  </DropdownItem>
+                )
+              })}
+              </DropdownMenu>
+            </InputGroupButtonDropdown>
             <Input placeholder="Filter entities" onChange={this.handleFilter} />
+          </InputGroup>
+
           </div>
           <div className="startpoints-div">
-            {this.state.startpoints.map(startpoint => (
+            {this.state.startpoints.map(startpoint => {
+              let display = false
+              startpoint.endpoints.forEach(endpoint => {
+                if (this.state.selectedEndpoint.includes(endpoint.name)) {
+                  display = true
+                }
+              })
+              return (
               <div key={startpoint.entity} className="input-label" id={startpoint.entity_label}>
-                <input hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
-                <label hidden={startpoint.hidden ? 'hidden' : ''} className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
-                  {startpoint.entity_label}
+              <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
+              <label className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
+              <table hidden={startpoint.hidden ? 'hidden' : display ? '' : 'hidden'} className="startpoint-table">
+                <tr>
+                  <td className="startpoint-table cell1">
+                      {startpoint.entity_label}
+                  </td>
+                  <td className="startpoint-table cell2">
+                    {startpoint.endpoints.map(endpoint => {
+                      let color = this.utils.stringToHexColor(endpoint.url)
+                      let textColor = this.utils.isDarkColor(color) ? "white" : "black"
+                      return <h6 key={endpoint.url}><Badge style={{"background-color": color, "color": textColor}}>{endpoint.name}</Badge></h6>
+                    })}
+                  </td>
+                  <td className="startpoint-table cell3">
                     <nodiv className="visibility-icon right">
                       {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
                       {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
                     </nodiv>
-                </label>
+                  </td>
+                </tr>
+              </table>
+              </label>
               </div>
-            ))}
+            )})}
           </div>
           <br />
           <Button disabled={this.disabledStartButton()} onClick={this.handleStart} color="secondary">Start!</Button>
@@ -259,12 +354,12 @@ export default class Ask extends Component {
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
-            <Col xs="4">
+            <Col xs="5">
               {startpoints}
               {galaxyImport}
               {galaxyForm}
             </Col>
-            <Col xs="8">
+            <Col xs="7">
               {exempleQueries}
             </Col>
           </Row>

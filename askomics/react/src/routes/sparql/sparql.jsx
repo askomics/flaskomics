@@ -60,7 +60,13 @@ export default class Sparql extends Component {
       saveIcon: "play",
       disablePreview: false,
       previewIcon: "table",
-      sparqlInput: code
+      sparqlInput: code,
+      error: false,
+      errorMessage: null
+    }, () => {
+      if (this.utils.isFunction(this.cancelRequest)) {
+        this.cancelRequest()
+      }
     })
   }
 
@@ -213,8 +219,6 @@ export default class Sparql extends Component {
     if (this.state.previewIcon == "spinner") {
       previewIcon = <Spinner size="sm" color="light" />
     }
-
-    console.log(this.state)
 
     return (
       <div className="container">
