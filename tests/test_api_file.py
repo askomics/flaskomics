@@ -39,6 +39,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv'
+            }, {
+                'date': info["gene"]["upload"]["file_date"],
+                'id': 4,
+                'name': 'gene.gff3',
+                'size': 2267,
+                'type': 'gff/gff3'
             }]
         }
 
@@ -107,6 +113,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv'
+            }, {
+                'date': info["gene"]["upload"]["file_date"],
+                'id': 4,
+                'name': 'gene.gff3',
+                'size': 2267,
+                'type': 'gff/gff3'
             }]
         }
 
@@ -223,8 +235,12 @@ class TestApiFile(AskomicsTestCase):
         client.log_user("jdoe")
         client.upload()
 
-        data = {
+        csv_data = {
             "filesId": [1, ]
+        }
+
+        gff_data = {
+            "filesId": [4, ]
         }
 
         fake_data = {
@@ -232,7 +248,7 @@ class TestApiFile(AskomicsTestCase):
         }
 
         with open("tests/results/preview_files.json") as file:
-            expected = json.loads(file.read())
+            csv_expected = json.loads(file.read())
 
         response = client.client.post('/api/files/preview', json=fake_data)
         assert response.status_code == 200
@@ -242,9 +258,27 @@ class TestApiFile(AskomicsTestCase):
             'previewFiles': []
         }
 
-        response = client.client.post('/api/files/preview', json=data)
+        response = client.client.post('/api/files/preview', json=csv_data)
         assert response.status_code == 200
-        assert response.json == expected
+        assert response.json == csv_expected
+
+        response = client.client.post('/api/files/preview', json=gff_data)
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'previewFiles': [{
+                'data': {
+                    'entities': [
+                        'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS',
+                        'three_prime_UTR'
+                    ]
+                },
+                'id': 4,
+                'name': 'gene.gff3',
+                'type': 'gff/gff3'
+            }]
+        }
 
     def test_delete_files(self, client):
         """Test /api/files/delete route"""
@@ -289,6 +323,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv'
+            }, {
+                'date': info["gene"]["upload"]["file_date"],
+                'id': 4,
+                'name': 'gene.gff3',
+                'size': 2267,
+                'type': 'gff/gff3'
             }]
         }
 
@@ -303,6 +343,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv'
+            }, {
+                'date': info["gene"]["upload"]["file_date"],
+                'id': 4,
+                'name': 'gene.gff3',
+                'size': 2267,
+                'type': 'gff/gff3'
             }]
         }
 
