@@ -49,7 +49,7 @@ export default class UpdatePassword extends Component {
           errorMessage: response.data.errorMessage,
           user: response.data.user,
           success: !response.data.error,
-          status: response.data.error ? 500 : 200
+          status: response.data.error ? 500 : 200,
           oldPassword: '',
           newPassword: '',
           confPassword: ''
