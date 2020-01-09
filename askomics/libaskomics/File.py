@@ -84,7 +84,8 @@ class File(Params):
 
         self.host_url = host_url
 
-        self.name = file_info['name']
+        self.human_name = file_info["name"]
+        self.name = self.format_uri(file_info['name'], remove_space=True)
         self.path = file_info['path']
         self.type = file_info['type']
         self.size = file_info['size']

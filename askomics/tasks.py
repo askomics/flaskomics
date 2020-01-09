@@ -56,7 +56,7 @@ def integrate(self, session, data, host_url):
                 "celery_id": self.request.id,
                 "id": data["dataset_id"],
                 "file_id": file.id,
-                "name": file.name,
+                "name": file.human_name,
                 "graph_name": file.file_graph,
                 "public": public
             }
