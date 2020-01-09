@@ -178,10 +178,12 @@ class FilesHandler(FilesUtils):
         '''
 
         # Type
-        if filetype == 'text/tab-separated-values':
+        if filetype in ('text/tab-separated-values', 'tabular'):
             filetype = 'csv/tsv'
-        elif filetype == 'text/turtle':
+        elif filetype in ('text/turtle', 'ttl'):
             filetype = 'turtle'
+        elif filetype in ('gff', ):
+            filetype = 'gff/gff3'
         else:
             filetype = self.get_type(os.path.splitext(name)[1])
 
