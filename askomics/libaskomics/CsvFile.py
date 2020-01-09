@@ -269,7 +269,7 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-    def integrate(self, forced_columns_type, forced_header_names=None, public=False):
+    def integrate(self, dataset_id, forced_columns_type, forced_header_names=None, public=False):
         """Integrate the file
 
         Parameters
@@ -284,7 +284,7 @@ class CsvFile(File):
         self.force_columns_type(forced_columns_type)
         if forced_header_names:
             self.force_header_names(forced_header_names)
-        File.integrate(self)
+        File.integrate(self, dataset_id=dataset_id)
 
     def set_rdf_abstraction_domain_knowledge(self):
         """Set intersection of abstraction and domain knowledge"""
@@ -395,6 +395,8 @@ class CsvFile(File):
         Graph
             Rdf content
         """
+        total_lines = sum(1 for line in open(self.path))
+
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
 
@@ -414,6 +416,9 @@ class CsvFile(File):
 
             # Loop on lines
             for row_number, row in enumerate(reader):
+
+                # Percent
+                self.graph_chunk.percent = row_number * 100 / total_lines
 
                 # skip blank lines
                 if not row:

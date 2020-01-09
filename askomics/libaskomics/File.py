@@ -165,7 +165,26 @@ class File(Params):
         '''
 
         database = Database(self.app, self.session)
-        database.execute_sql_query(query, (new_name.replace(" ", "_"), self.id, self.session["user"]["id"]))
+        database.execute_sql_query(query, (new_name, self.id, self.session["user"]["id"]))
+
+    def update_percent_in_db(self, percent, dataset_id):
+        """Update dataset percent
+
+        Parameters
+        ----------
+        percent : float
+            The new percent
+        dataset_id : int
+            the corresponding dataset id
+        """
+        query = '''
+        UPDATE datasets SET
+        percent = ?
+        WHERE id = ? and user_id = ?
+        '''
+
+        database = Database(self.app, self.session)
+        database.execute_sql_query(query, (percent, dataset_id, self.session["user"]["id"]))
 
     def format_uri(self, string, remove_space=False):
         """remove space and quote"""
@@ -265,7 +284,7 @@ class File(Params):
         result = sparql.process_query(query)
         self.ntriples = result[1][0]["count"]
 
-    def integrate(self):
+    def integrate(self, dataset_id=None):
         """Integrate the file into the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
 
@@ -280,6 +299,9 @@ class File(Params):
         for _ in content_generator:
 
             if self.graph_chunk.ntriple >= self.max_chunk_size:
+
+                if self.graph_chunk.percent and dataset_id:
+                    self.update_percent_in_db(self.graph_chunk.percent, dataset_id)
 
                 if self.method == 'load':
 
@@ -302,6 +324,9 @@ class File(Params):
                 self.graph_chunk = RdfGraph(self.app, self.session)
 
         # Load the last chunk
+        if self.graph_chunk.percent and dataset_id:
+            self.update_percent_in_db(100, dataset_id)
+
         if self.method == 'load':
             temp_file_name = 'tmp_{}_{}_chunk_{}.{}'.format(
                 Utils.get_random_string(5),

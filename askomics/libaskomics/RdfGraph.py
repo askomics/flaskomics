@@ -41,6 +41,7 @@ class RdfGraph(Params):
         self.graph.bind('dc', 'http://purl.org/dc/elements/1.1/')
         self.graph.bind('prov', 'http://www.w3.org/ns/prov#')
         self.ntriple = 0
+        self.percent = None
 
     def add(self, triple):
         """Add a triple into the rdf graph
@@ -80,6 +81,7 @@ class RdfGraph(Params):
         """
         self.graph += other_graph.graph
         self.ntriple += other_graph.ntriple
+        # self.percent = self.maxi(self.percent, other_graph.percent)
 
     def serialize(self, destination=None, format='xml', base=None, encoding=None, **args):
         """Serialize the graph into a file
@@ -97,3 +99,28 @@ class RdfGraph(Params):
 
         if destination is None:
             return result
+
+    @staticmethod
+    def maxi(a, b):
+        """Get the max between two valuesthat can be int or None
+
+        Parameters
+        ----------
+        a : Int or None
+            first value
+        b : Int or None
+            2nd value
+
+        Returns
+        -------
+        Int or None
+            Max of the two values
+        """
+        try:
+            return max(a, b)
+        except Exception:
+            if a is None:
+                return b
+            if b is None:
+                return a
+            return None
