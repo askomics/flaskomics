@@ -173,7 +173,7 @@ class CsvFile(File):
             return "general_relation"
 
         special_types = {
-            'reference': ('chrom', 'ref'),
+            'reference': ('chr', 'ref'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
@@ -210,8 +210,6 @@ class CsvFile(File):
             if all(val == "" for val in values):
                 return "text"
             return "numeric"
-        elif self.is_category(values):
-            return "category"
 
         return "text"  # default
 
