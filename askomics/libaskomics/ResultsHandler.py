@@ -65,6 +65,7 @@ class ResultsHandler(Params):
                 'path': row[2],
                 'start': row[3],
                 'end': row[4],
+                'execTime': row[4] - row[3],
                 'graphState': row[5],
                 'nrows': row[6],
                 'errorMessage': row[7],

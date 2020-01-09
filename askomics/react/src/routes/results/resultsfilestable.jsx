@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import pretty from 'pretty-time'
 
 export default class ResultsFilesTable extends Component {
   constructor (props) {
@@ -333,6 +334,12 @@ export default class ResultsFilesTable extends Component {
       text: 'Creation date',
       sort: true,
       formatter: (cell, row) => { return this.utils.humanDate(cell) },
+      editable: false
+    },  {
+      dataField: 'execTime',
+      text: 'Exec time',
+      sort: true,
+      formatter: (cell, row) => { return cell == 0 ? '<1s' : pretty([cell, 0])},
       editable: false
     }, {
       dataField: 'template',
