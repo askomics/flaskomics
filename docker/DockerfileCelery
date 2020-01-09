@@ -11,7 +11,7 @@ RUN rm -f config/askomics.ini && \
 # Final image
 FROM alpine:3.9
 ENV DEPMODE="prod"
-ENV MAX_CELERY_QUEUE="1"
+ENV MAX_CELERY_QUEUE="5"
 WORKDIR /askomics
 RUN apk add --no-cache python3 bash git libc-dev libstdc++
 COPY --from=builder /askomics .
