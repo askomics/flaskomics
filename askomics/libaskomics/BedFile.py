@@ -57,8 +57,8 @@ class BedFile(File):
             "entity_name": self.entity_name
         }
 
-    def integrate(self, entity_name, public=True):
-        """Integrate BeD file
+    def integrate(self, dataset_id, entity_name, public=True):
+        """Integrate BED file
 
         Parameters
         ----------
@@ -70,7 +70,7 @@ class BedFile(File):
         self.public = public
         self.entity_name = entity_name
 
-        File.integrate(self)
+        File.integrate(self, dataset_id=dataset_id)
 
     def set_rdf_abstraction_domain_knowledge(self):
         """Set the abstraction and domain knowledge"""
@@ -118,9 +118,16 @@ class BedFile(File):
         count = 0
         attribute_list = []
 
+        total_lines = sum(1 for line in open(self.path))
+        row_number = 0
+
         entity_type = self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)]
 
         for feature in bedfile:
+
+            # Percent
+            row_number += 1
+            self.graph_chunk.percent = row_number * 100 / total_lines
 
             # Entity
             if feature.name != '.':

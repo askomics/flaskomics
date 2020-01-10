@@ -71,7 +71,7 @@ def integrate(self, session, data, host_url):
             elif file.type == "turtle":
                 file.integrate(public=public)
             elif file.type == "bed":
-                file.integrate(data["entity_name"], public=public)
+                file.integrate(data["dataset_id"], data["entity_name"], public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
         except Exception as e:
