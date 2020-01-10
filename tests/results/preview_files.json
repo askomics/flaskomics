@@ -6,12 +6,12 @@
       "data": {
         "columns_type": [
           "start_entity",
-          "category",
+          "text",
           "text",
           "reference",
           "start",
           "end",
-          "category",
+          "text",
           "strand",
           "text",
           "text"

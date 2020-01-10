@@ -22,7 +22,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': False,
                 'start': info["transcripts"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -32,7 +33,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': False,
                 'start': info["de"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -42,7 +44,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': False,
                 'start': info["qtl"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }],
             'error': False,
             'errorMessage': ''
@@ -86,7 +89,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': True,
                 'start': info["transcripts"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -96,7 +100,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': False,
                 'start': info["de"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -106,7 +111,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'public': False,
                 'start': info["qtl"]["start"],
                 'status': 'success',
-                'traceback': None
+                'traceback': None,
+                'percent': 100.0
             }],
             'error': False,
             'errorMessage': ''
