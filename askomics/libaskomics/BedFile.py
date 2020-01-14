@@ -40,7 +40,7 @@ class BedFile(File):
 
     def set_preview(self):
         """Set entity name preview"""
-        self.entity_name = os.path.splitext(self.name)[0]
+        self.entity_name = self.human_name
 
     def get_preview(self):
         """Get file preview
@@ -53,7 +53,7 @@ class BedFile(File):
         return {
             'type': self.type,
             'id': self.id,
-            'name': self.name,
+            'name': self.human_name,
             "entity_name": self.entity_name
         }
 

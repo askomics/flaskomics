@@ -339,7 +339,7 @@ export default class ResultsFilesTable extends Component {
       dataField: 'execTime',
       text: 'Exec time',
       sort: true,
-      formatter: (cell, row) => { return cell == 0 ? '<1s' : pretty([cell, 0])},
+      formatter: (cell, row) => { return row.status != "started" ? cell == 0 ? '<1s' : pretty([cell, 0]) : ""},
       editable: false
     }, {
       dataField: 'template',
