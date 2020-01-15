@@ -395,13 +395,17 @@ export default class ResultsFilesTable extends Component {
       text: "Rows",
       sort: true,
       formatter: (cell, row) => {
-        let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
-        if (cell == this.props.maxRows) {
-          return (
-            <>{formattedNrows} <i className="fas fa-exclamation-circle"></i></>
-          )
-        } else {
-          return formattedNrows
+        if (row.status != "success") {
+          return ""
+        }else {
+          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
+          if (cell == this.props.maxRows) {
+            return (
+              <>{formattedNrows} <i className="fas fa-exclamation-circle"></i></>
+            )
+          } else {
+            return formattedNrows
+          }
         }
       },
       editable: false
