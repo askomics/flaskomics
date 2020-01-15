@@ -4,23 +4,12 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import WaitingDiv from '../../components/waiting'
 import { Badge } from 'reactstrap'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class ResultsTable extends Component {
   constructor (props) {
     super(props)
-  }
-
-  isValidURL(string) {
-    let res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)
-    return (res !== null)
-  }
-
-  splitUrl(url) {
-    let splitList = url.split('/')
-    // take last elem
-    let last = splitList[splitList.length - 1]
-    let splitList2 = last.split('#')
-    return splitList2[splitList2.length - 1]
+    this.utils = new Utils()
   }
 
   render () {
@@ -31,8 +20,8 @@ export default class ResultsTable extends Component {
         sort: true,
         index: index,
         formatter: (cell, row) => {
-          if (this.isValidURL(cell)) {
-            return <a href={cell}>{this.splitUrl(cell)}</a>
+          if (this.utils.isUrl(cell)) {
+            return <a href={cell}>{this.utils.splitUrl(cell)}</a>
           }
           return cell
         }
