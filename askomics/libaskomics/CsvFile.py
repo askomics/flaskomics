@@ -190,8 +190,8 @@ class CsvFile(File):
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
                         break
-                    # test if strand is a category with 2 elements
-                    if stype == 'strand' and len(set(list(filter(None, values)))) != 2:
+                    # test if strand is a category with 2 elements max
+                    if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
                         break
                     # Test if date respect a date format
                     if stype == 'datetime' and all(date_regex.match(val) for val in values):
