@@ -44,6 +44,23 @@ export default class CsvTable extends Component {
     })
   }
 
+  confirmUpdateHeader (event) {
+    if (event.key === "Enter") {
+      // Update column type if a relation is entered
+      if (event.target.value.split("@").length == 2) {
+        let newType = "general_relation"
+        this.setState({
+          header: update(this.state.header, { [event.target.id]: {input: { $set: false}}}),
+          columns_type: update(this.state.columns_type, { [event.target.id]: { $set: newType }})
+        })
+      } else {
+        this.setState({
+          header: update(this.state.header, { [event.target.id]: {input: { $set: false}}})
+        })
+      }
+    }
+  }
+
   headerFormatter (column, colIndex) {
     let boundChangeType = this.handleChangeType.bind(this, colIndex)
 
@@ -56,7 +73,7 @@ export default class CsvTable extends Component {
         onChange={this.handleChangeHeader}
         onFocus={event => {event.target.select()}}
         autoFocus
-        onKeyPress={event => {if (event.key === 'Enter') {this.setState({header: update(this.state.header, { [event.target.id]: { input: { $set: false } } })})}}}
+        onKeyPress={event => this.confirmUpdateHeader(event)}
       />
     }
 
