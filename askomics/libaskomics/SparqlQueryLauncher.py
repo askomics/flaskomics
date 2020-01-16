@@ -7,6 +7,7 @@ from SPARQLWrapper import JSON, SPARQLWrapper
 from askomics.libaskomics.Params import Params
 
 import requests
+from urllib3.exceptions import HTTPError
 
 
 class SparqlQueryLauncher(Params):
@@ -45,16 +46,22 @@ class SparqlQueryLauncher(Params):
 
         # Use the federated query engine
         if federated:
+            self.federated = True
+            self.local_query = False
             self.url_endpoint = self.settings.get('federation', 'endpoint')
             self.url_updatepoint = self.settings.get('federation', 'endpoint')
             self.triplestore = self.settings.get('federation', 'query_engine')
         # use the external endpoint
         elif endpoints is not None and endpoints != [self.local_endpoint_f]:
+            self.federated = False
+            self.local_query = False
             self.triplestore = "unknown"
             self.url_endpoint = endpoints[0]
             self.url_updatepoint = endpoints[0]
         # use the local endpoint
         else:
+            self.federated = False
+            self.local_query = True
             self.triplestore = self.settings.get('triplestore', 'triplestore')
             self.url_endpoint = self.settings.get('triplestore', 'endpoint')
             self.url_updatepoint = self.settings.get('triplestore', 'updatepoint')
@@ -223,7 +230,7 @@ class SparqlQueryLauncher(Params):
         }}
         '''.format(graph, triples)
 
-        return self.execute_query(query)
+        return self.execute_query(query, no_isql=True)
 
     def drop_dataset(self, graph):
         """Drop the datasets of the triplestore and its metadata
@@ -233,21 +240,10 @@ class SparqlQueryLauncher(Params):
         graph : string
             graph name to remove
         """
-        # Remove metadata
-        query = '''
-        DELETE WHERE {{
-            GRAPH <{}> {{
-                <{}> ?p ?o
-            }}
-        }}
-        '''.format(graph, graph)
-        self.execute_query(query)
-
-        # Drop graph
         query = '''
         DROP SILENT GRAPH <{}>
         '''.format(graph)
-        self.execute_query(query)
+        self.execute_query(query, disable_log=True)
 
     def process_query(self, query):
         """Execute a query and return parsed results
@@ -264,7 +260,7 @@ class SparqlQueryLauncher(Params):
         """
         return self.parse_results(self.execute_query(query))
 
-    def execute_query(self, query):
+    def execute_query(self, query, disable_log=False, no_isql=False):
         """Execute a sparql query
 
         Parameters
@@ -278,54 +274,53 @@ class SparqlQueryLauncher(Params):
             result
         """
         try:
+
+            # Use ISQL or SPARQL
+            triplestore = self.settings.get("triplestore", "triplestore")
+            isqlapi = None
+            try:
+                isqlapi = self.settings.get("triplestore", "isqlapi")
+            except Exception:
+                pass
+            use_isl = True if triplestore == "virtuoso" and isqlapi and self.local_query and not no_isql else False
+
             start_time = time.time()
             self.endpoint.setQuery(query)
 
             # Debug
             if self.settings.getboolean('askomics', 'debug'):
-                self.log.debug("Launch query on {} ({})".format(self.triplestore, self.url_endpoint))
+                self.log.debug("Launch {} query on {} ({})".format("ISQL" if use_isl else "SPARQL", self.triplestore, self.url_endpoint))
                 self.log.debug(query)
 
-            # Update
-            if self.endpoint.isSparqlUpdateRequest():
-                self.endpoint.setMethod('POST')
-                # Virtuoso hack
-                if self.triplestore == 'virtuoso':
-                    self.endpoint.queryType = "SELECT"
+            if use_isl:
+                formatted_query = "SPARQL {}".format(query)
+                json = {"command": formatted_query, "disable_log": disable_log, "sparql_select": not self.endpoint.isSparqlUpdateRequest()}
+                response = requests.post(url=isqlapi, json=json)
+                results = response.json()
+                if results["status"] == 500:
+                    raise HTTPError("isqlapi: {}".format(results["message"]))
 
-                results = self.endpoint.query()
-                self.query_time = time.time() - start_time
-            # Select
             else:
-                self.endpoint.setReturnFormat(JSON)
-                results = self.endpoint.query().convert()
+                # Update
+                if self.endpoint.isSparqlUpdateRequest():
+                    self.endpoint.setMethod('POST')
+                    # Virtuoso hack
+                    if self.triplestore == 'virtuoso':
+                        self.endpoint.queryType = "SELECT"
+
+                    results = self.endpoint.query()
+                # Select
+                else:
+                    self.endpoint.setReturnFormat(JSON)
+                    results = self.endpoint.query().convert()
+
                 self.query_time = time.time() - start_time
-            # self.log.debug(results)
+
             return results
 
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             raise type(e)("Triplestore error: {}".format(str(e))).with_traceback(sys.exc_info()[2])
-
-    def parse_results_old(self, json_results):
-        """Parse result of sparql query
-
-        Parameters
-        ----------
-        json_results :
-            Result of the query
-
-        Returns
-        -------
-        list
-            parsed results
-        """
-        try:
-            return [{
-                sparql_variable: entry[sparql_variable]["value"] for sparql_variable in entry.keys()
-            } for entry in json_results["results"]["bindings"]]
-        except Exception:
-            return []
 
     def parse_results(self, json_results):
         """Parse result of sparql query
@@ -341,6 +336,10 @@ class SparqlQueryLauncher(Params):
             Header and data
         """
         try:
+            # If isql, results are allready parsed
+            if "isql" in json_results:
+                return json_results["vars"], json_results["rows"]
+
             header = json_results['head']['vars']
             data = []
             for row in json_results["results"]["bindings"]:
@@ -349,8 +348,8 @@ class SparqlQueryLauncher(Params):
                     row_dict[key] = value['value']
                 data.append(row_dict)
 
-        except Exception as e:
-            self.log.error(str(e))
+        except Exception:
+            traceback.print_exc(file=sys.stdout)
             return [], []
 
         return header, data

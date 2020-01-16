@@ -98,7 +98,7 @@ class TestApiFile(AskomicsTestCase):
             'files': [{
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
-                'name': 'new_name.tsv',
+                'name': 'new name.tsv',
                 'size': 1986,
                 'type': 'csv/tsv'
             }, {

@@ -20,7 +20,7 @@ FROM askomics/virtuoso:7.2.5.1 AS virtuoso_builder
 FROM alpine:3.8
 
 ENV DEPMODE="prod" \
-    MAX_CELERY_QUEUE="1" \
+    MAX_CELERY_QUEUE="5" \
     SPARQL_UPDATE=true \
     ASKO_triplestore_load_url="http://localhost:5000" \
     ASKO_federation_query_engine="corese" \

@@ -56,7 +56,7 @@ def integrate(self, session, data, host_url):
                 "celery_id": self.request.id,
                 "id": data["dataset_id"],
                 "file_id": file.id,
-                "name": file.name,
+                "name": file.human_name,
                 "graph_name": file.file_graph,
                 "public": public
             }
@@ -65,13 +65,13 @@ def integrate(self, session, data, host_url):
             dataset.update_in_db("started")
 
             if file.type == "csv/tsv":
-                file.integrate(data['columns_type'], data['header_names'], public=public)
+                file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)
             elif file.type == "gff/gff3":
-                file.integrate(data["entities"], public=public)
+                file.integrate(data["dataset_id"], data["entities"], public=public)
             elif file.type == "turtle":
                 file.integrate(public=public)
             elif file.type == "bed":
-                file.integrate(data["entity_name"], public=public)
+                file.integrate(data["dataset_id"], data["entity_name"], public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
         except Exception as e:

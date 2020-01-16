@@ -66,7 +66,7 @@ class CsvFile(File):
         return {
             'type': self.type,
             'id': self.id,
-            'name': self.name,
+            'name': self.human_name,
             'data': {
                 'header': self.header,
                 'content_preview': self.preview,
@@ -173,7 +173,7 @@ class CsvFile(File):
             return "general_relation"
 
         special_types = {
-            'reference': ('chrom', 'ref'),
+            'reference': ('chr', 'ref'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
@@ -187,14 +187,11 @@ class CsvFile(File):
             for expression in expressions:
                 epression_regexp = ".*{}.*".format(expression.lower())
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if reference is a category
-                    if stype == "reference" and not self.is_category(values):
-                        break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
                         break
-                    # test if strand is a category with 2 elements
-                    if stype == 'strand' and len(set(list(filter(None, values)))) != 2:
+                    # test if strand is a category with 2 elements max
+                    if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
                         break
                     # Test if date respect a date format
                     if stype == 'datetime' and all(date_regex.match(val) for val in values):
@@ -210,8 +207,6 @@ class CsvFile(File):
             if all(val == "" for val in values):
                 return "text"
             return "numeric"
-        elif self.is_category(values):
-            return "category"
 
         return "text"  # default
 
@@ -271,7 +266,7 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-    def integrate(self, forced_columns_type, forced_header_names=None, public=False):
+    def integrate(self, dataset_id, forced_columns_type, forced_header_names=None, public=False):
         """Integrate the file
 
         Parameters
@@ -286,7 +281,7 @@ class CsvFile(File):
         self.force_columns_type(forced_columns_type)
         if forced_header_names:
             self.force_header_names(forced_header_names)
-        File.integrate(self)
+        File.integrate(self, dataset_id=dataset_id)
 
     def set_rdf_abstraction_domain_knowledge(self):
         """Set intersection of abstraction and domain knowledge"""
@@ -397,6 +392,8 @@ class CsvFile(File):
         Graph
             Rdf content
         """
+        total_lines = sum(1 for line in open(self.path))
+
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
 
@@ -416,6 +413,9 @@ class CsvFile(File):
 
             # Loop on lines
             for row_number, row in enumerate(reader):
+
+                # Percent
+                self.graph_chunk.percent = row_number * 100 / total_lines
 
                 # skip blank lines
                 if not row:

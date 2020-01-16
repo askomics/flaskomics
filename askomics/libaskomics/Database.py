@@ -162,6 +162,17 @@ class Database(Params):
         except Exception:
             pass
 
+        query = '''
+        ALTER TABLE datasets
+        ADD percent real NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_integration_table(self):
         """Create the integration table"""
         query = '''

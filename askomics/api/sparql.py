@@ -161,10 +161,10 @@ def save_query():
         federated = query_builder.is_federated()
         replace_froms = query_builder.replace_froms()
 
-        query = query_builder.format_query(query, limit=None, replace_froms=replace_froms, federated=federated)
+        formatted_query = query_builder.format_query(query, limit=None, replace_froms=replace_froms, federated=federated)
 
         info = {
-            "sparql_query": query,
+            "sparql_query": query,  # Store the non formatted query in db
             "graphs": graphs,
             "endpoints": endpoints,
             "federated": federated,
@@ -173,6 +173,9 @@ def save_query():
 
         result = Result(current_app, session, info)
         info["id"] = result.save_in_db()
+
+        # execute the formatted query
+        info["sparql_query"] = formatted_query
 
         session_dict = {"user": session["user"]}
         task = current_app.celery.send_task("sparql_query", (session_dict, info))

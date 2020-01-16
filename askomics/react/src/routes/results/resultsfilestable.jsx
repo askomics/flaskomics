@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 import ErrorDiv from '../error/error'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import pretty from 'pretty-time'
 
 export default class ResultsFilesTable extends Component {
   constructor (props) {
@@ -334,6 +335,12 @@ export default class ResultsFilesTable extends Component {
       sort: true,
       formatter: (cell, row) => { return this.utils.humanDate(cell) },
       editable: false
+    },  {
+      dataField: 'execTime',
+      text: 'Exec time',
+      sort: true,
+      formatter: (cell, row) => { return row.status != "started" ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
+      editable: false
     }, {
       dataField: 'template',
       text: 'Template',
@@ -388,13 +395,17 @@ export default class ResultsFilesTable extends Component {
       text: "Rows",
       sort: true,
       formatter: (cell, row) => {
-        let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
-        if (cell == this.props.maxRows) {
-          return (
-            <>{formattedNrows} <i className="fas fa-exclamation-circle"></i></>
-          )
-        } else {
-          return formattedNrows
+        if (row.status != "success") {
+          return ""
+        }else {
+          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
+          if (cell == this.props.maxRows) {
+            return (
+              <>{formattedNrows} <i className="fas fa-exclamation-circle"></i></>
+            )
+          } else {
+            return formattedNrows
+          }
         }
       },
       editable: false

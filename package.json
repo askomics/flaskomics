@@ -8,7 +8,7 @@
     "ontology"
   ],
   "name": "AskOmics",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Visual SPARQL query builder",
   "author": "Xavier Garnier",
   "license": "AGPL-3.0",
@@ -46,6 +46,7 @@
     "history": "^4.10.1",
     "immutability-helper": "^3.0.1",
     "js-file-download": "^0.4.9",
+    "pretty-time": "^1.1.0",
     "prismjs": "^1.17.1",
     "react": "^16.12.0",
     "react-ace": "^8.0.0",

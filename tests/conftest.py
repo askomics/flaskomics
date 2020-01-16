@@ -271,7 +271,7 @@ class Client(object):
             dataset = Dataset(self.app, self.session, dataset_info)
             dataset.save_in_db()
 
-            file.integrate(info["columns_type"], public=public)
+            file.integrate(dataset.id, info["columns_type"], public=public)
 
             # done
             dataset.update_in_db("success")

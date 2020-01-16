@@ -64,13 +64,13 @@ class GffFile(File):
         return {
             'type': self.type,
             'id': self.id,
-            'name': self.name,
+            'name': self.human_name,
             'data': {
                 'entities': self.entities
             }
         }
 
-    def integrate(self, entities, public=True):
+    def integrate(self, dataset_id, entities, public=True):
         """Integrate GFF file
 
         Parameters
@@ -83,7 +83,7 @@ class GffFile(File):
         self.public = public
         self.entities_to_integrate = entities
 
-        File.integrate(self)
+        File.integrate(self, dataset_id=dataset_id)
 
     def set_rdf_abstraction_domain_knowledge(self):
         """Set the abstraction and domain knowledge"""
@@ -147,7 +147,15 @@ class GffFile(File):
         indexes = {}
         attribute_list = []
 
+        total_lines = sum(1 for line in open(self.path))
+        row_number = 0
+
         for rec in GFF.parse(handle, limit_info=limit, target_lines=1):
+
+            # Percent
+            row_number += 1
+            self.graph_chunk.percent = row_number * 100 / total_lines
+
             # Loop on entities
             for feature in rec.features:
 

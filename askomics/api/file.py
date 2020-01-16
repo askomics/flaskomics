@@ -269,7 +269,7 @@ def integrate():
             dataset_info = {
                 "celery_id": None,
                 "file_id": file.id,
-                "name": file.name,
+                "name": file.human_name,
                 "graph_name": file.file_graph,
                 "public": data["public"] if session["user"]["admin"] else False
             }

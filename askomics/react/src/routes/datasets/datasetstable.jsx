@@ -121,7 +121,7 @@ export default class DatasetsTable extends Component {
       text: 'Triples',
       sort: true,
       formatter: (cell, row) => {
-        return new Intl.NumberFormat('fr-FR').format(cell)
+        return cell == 0 ? '' : new Intl.NumberFormat('fr-FR').format(cell)
       }
     }, {
       dataField: 'status',
@@ -131,7 +131,7 @@ export default class DatasetsTable extends Component {
           return <Badge color="secondary">Queued</Badge>
         }
         if (cell == 'started') {
-          return <Badge color="info">Started</Badge>
+          return <Badge color="info">{row.percent ? "processing (" + Math.round(row.percent) + "%)" : "started"}</Badge>
         }
         if (cell == 'success') {
           return <Badge color="success">Success</Badge>

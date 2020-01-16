@@ -52,7 +52,8 @@ export default class UpdateProfile extends Component {
           error: response.data.error,
           errorMessage: response.data.errorMessage,
           user: response.data.user,
-          success: !response.data.error
+          success: !response.data.error,
+          status: response.data.error ? 500 : 200
         })
         if (!this.state.error) {
           this.props.setStateNavbar({

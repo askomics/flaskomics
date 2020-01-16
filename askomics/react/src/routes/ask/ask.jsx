@@ -67,7 +67,7 @@ export default class Ask extends Component {
             endpoints: endpoints,
             startpoints: response.data.startpoints.map(startpoint => new Object({
               graphs: startpoint.graphs,
-              endpoints: startpoint.endpoints,
+              endpoints: Array.from(new Set(startpoint.endpoints.map(JSON.stringify))).map(JSON.parse),
               entity: startpoint.entity,
               entity_label: startpoint.entity_label,
               public: startpoint.public,

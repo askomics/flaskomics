@@ -1,5 +1,3 @@
-import requests
-
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.Params import Params
@@ -52,7 +50,7 @@ class DatasetsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, public, status, start, end, ntriples, error_message, traceback
+        SELECT id, name, public, status, start, end, ntriples, error_message, traceback, percent
         FROM datasets
         WHERE user_id = ?
         '''
@@ -70,7 +68,8 @@ class DatasetsHandler(Params):
                 'end': row[5],
                 'ntriples': row[6],
                 'error_message': row[7],
-                'traceback': row[8]
+                'traceback': row[8],
+                'percent': row[9]
             }
             datasets.append(dataset)
 
@@ -120,38 +119,11 @@ class DatasetsHandler(Params):
 
         database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(datasets_id))
 
-    def delete_graph_isql(self, graph):
-        """Delete graph using isql api of virtuoso
-
-        Parameters
-        ----------
-        graph : str
-            Graph name to delete
-        """
-        isqlapi = self.settings.get("triplestore", "isqlapi")
-        data = [
-            "log_enable(3,1)",
-            "SPARQL CLEAR GRAPH <{}>".format(graph)
-        ]
-
-        requests.post(url=isqlapi, json=data)
-
     def delete_datasets(self):
         """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
         for dataset in self.datasets:
-
-            # Use isql api if triplestore is virtuoso and api url is set in config file
-            triplestore = self.settings.get("triplestore", "triplestore")
-            isqlapi = None
-            try:
-                isqlapi = self.settings.get("triplestore", "isqlapi")
-            except Exception:
-                pass
-
-            if triplestore == "virtuoso" and isqlapi:
-                Utils.redo_if_failure(self.log, 3, 1, self.delete_graph_isql, dataset.graph_name)
-            else:
-                Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
+            # Delete from triplestore
+            Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
             # Delete from db
             dataset.delete_from_db()
