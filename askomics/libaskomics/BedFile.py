@@ -1,4 +1,3 @@
-import os
 import rdflib
 
 from rdflib import BNode

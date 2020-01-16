@@ -1,5 +1,3 @@
-import requests
-
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.Params import Params
