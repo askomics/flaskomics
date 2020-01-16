@@ -187,9 +187,6 @@ class CsvFile(File):
             for expression in expressions:
                 epression_regexp = ".*{}.*".format(expression.lower())
                 if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if reference is a category
-                    if stype == "reference" and not self.is_category(values):
-                        break
                     # Test if start and end are numerical
                     if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
                         break
