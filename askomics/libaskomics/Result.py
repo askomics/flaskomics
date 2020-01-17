@@ -307,15 +307,11 @@ class Result(Params):
             File size
         """
         with open(self.file_path, 'w') as file:
-            writer = csv.writer(file, delimiter="\t")
-            writer.writerow(headers)
-            if len(results) > 0:
-                for i in results:
-                    row = []
-                    self.nrows += 1
-                    for header, value in i.items():
-                        row.append(value)
-                    writer.writerow(row)
+            writer = csv.DictWriter(file, delimiter="\t", fieldnames=headers)
+            writer.writeheader()
+            for row in results:
+                self.nrows += 1
+                writer.writerow(row)
 
         return os.path.getsize(self.file_path)
 
