@@ -99,7 +99,7 @@ export default class ResultsFilesTable extends Component {
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then((response) => {
         console.log(requestUrl, response.data)
-        FileDownload(response.data, 'result.csv')
+        FileDownload(response.data, 'result.tsv')
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
