@@ -276,7 +276,9 @@ class TestApiFile(AskomicsTestCase):
                 },
                 'id': 4,
                 'name': 'gene.gff3',
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'error': False,
+                'error_message': ''
             }]
         }
 
