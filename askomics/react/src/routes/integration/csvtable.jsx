@@ -213,34 +213,48 @@ export default class CsvTable extends Component {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
+    let body
+
+    if (this.props.file.error) {
+      body = (
+        <ErrorDiv status={500} error={this.props.file.error} errorMessage={this.props.file.error_message} />
+      )
+    } else {
+      body = (
+        <div>
+          <div className="asko-table-div">
+            <BootstrapTable
+              classes="asko-table"
+              wrapperClasses="asko-table-wrapper"
+              bootstrap4
+              keyField={this.state.header[0]["name"]}
+              data={this.props.file.data.content_preview}
+              columns={columns}
+            />
+          </div>
+          <br />
+          <AdvancedOptions
+            config={this.props.config}
+            handleChangeUri={p => this.handleChangeUri(p)}
+            handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            customUri={this.state.customUri}
+          />
+          <br />
+          <div className="center-div">
+            <ButtonGroup>
+              <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+              {publicButton}
+            </ButtonGroup>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div>
         <h4>{this.state.name} (preview)</h4>
-        <div className="asko-table-div">
-          <BootstrapTable
-            classes="asko-table"
-            wrapperClasses="asko-table-wrapper"
-            bootstrap4
-            keyField={this.state.header[0]["name"]}
-            data={this.props.file.data.content_preview}
-            columns={columns}
-          />
-        </div>
-        <br />
-        <AdvancedOptions
-          config={this.props.config}
-          handleChangeUri={p => this.handleChangeUri(p)}
-          handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
-          customUri={this.state.customUri}
-        />
-        <br />
-        <div className="center-div">
-          <ButtonGroup>
-            <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
-            {publicButton}
-          </ButtonGroup>
-        </div>
-        <br />
+        {body}
+        {this.state.error ? <br /> : ''}
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
     )

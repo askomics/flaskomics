@@ -150,6 +150,9 @@ class File(Params):
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
 
+        self.error = False
+        self.error_message = ""
+
     def edit_name_in_db(self, new_name):
         """Edit file name
 

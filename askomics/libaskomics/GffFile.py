@@ -1,4 +1,6 @@
 import rdflib
+import sys
+import traceback
 
 from rdflib import BNode
 from BCBio.GFF import GFFExaminer
@@ -45,13 +47,18 @@ class GffFile(File):
 
     def set_preview(self):
         """Summary"""
-        exam = GFFExaminer()
-        handle = open(self.path, encoding="utf-8", errors="ignore")
-        gff_type = exam.available_limits(handle)['gff_type']
-        for entity in gff_type:
-            self.entities.append(entity[0])
+        try:
+            exam = GFFExaminer()
+            handle = open(self.path, encoding="utf-8", errors="ignore")
+            gff_type = exam.available_limits(handle)['gff_type']
+            for entity in gff_type:
+                self.entities.append(entity[0])
 
-        handle.close()
+            handle.close()
+        except Exception as e:
+            self.error = True
+            self.error_message = "Malformated GFF ({})".format(str(e))
+            traceback.print_exc(file=sys.stdout)
 
     def get_preview(self):
         """Get gff file preview (list of entities)
@@ -65,6 +72,8 @@ class GffFile(File):
             'type': self.type,
             'id': self.id,
             'name': self.human_name,
+            'error': self.error,
+            'error_message': self.error_message,
             'data': {
                 'entities': self.entities
             }

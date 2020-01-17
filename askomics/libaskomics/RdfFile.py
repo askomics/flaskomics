@@ -53,6 +53,8 @@ class RdfFile(File):
             'type': self.type,
             'id': self.id,
             'name': self.human_name,
+            'error': self.error,
+            'error_message': self.error_message,
             'data': {
                 'preview': head
             }

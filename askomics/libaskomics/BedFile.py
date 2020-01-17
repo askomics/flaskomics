@@ -1,4 +1,6 @@
 import rdflib
+import sys
+import traceback
 
 from rdflib import BNode
 from pybedtools import BedTool
@@ -39,7 +41,13 @@ class BedFile(File):
 
     def set_preview(self):
         """Set entity name preview"""
-        self.entity_name = self.human_name
+        try:
+            BedTool(self.path).count()
+            self.entity_name = self.human_name
+        except Exception as e:
+            self.error = True
+            self.error_message = "Malformated BED ({})".format(str(e))
+            traceback.print_exc(file=sys.stdout)
 
     def get_preview(self):
         """Get file preview
@@ -53,6 +61,8 @@ class BedFile(File):
             'type': self.type,
             'id': self.id,
             'name': self.human_name,
+            'error': self.error,
+            'error_message': self.error_message,
             "entity_name": self.entity_name
         }
 
