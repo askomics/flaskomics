@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import pretty from 'pretty-time'
 
 export default class DatasetsTable extends Component {
   constructor (props) {
@@ -102,6 +103,12 @@ export default class DatasetsTable extends Component {
       text: 'Creation date',
       sort: true,
       formatter: (cell, row) => { return this.utils.humanDate(cell) }
+    }, {
+      dataField: 'exec_time',
+      text: 'Exec time',
+      sort: true,
+      formatter: (cell, row) => { return ["started", "queued"].indexOf(row.status) == -1 ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
+      editable: false
     }, {
 
       dataField: 'public',

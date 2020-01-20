@@ -59,6 +59,11 @@ class DatasetsHandler(Params):
 
         datasets = []
         for row in rows:
+
+            exec_time = 0
+            if row[5] is not None and row[4] is not None:
+                exec_time = row[5] - row[4]
+
             dataset = {
                 'id': row[0],
                 'name': row[1],
@@ -66,6 +71,7 @@ class DatasetsHandler(Params):
                 'status': row[3],
                 'start': row[4],
                 'end': row[5],
+                'exec_time': exec_time,
                 'ntriples': row[6],
                 'error_message': row[7],
                 'traceback': row[8],

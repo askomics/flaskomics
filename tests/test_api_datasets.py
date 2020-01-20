@@ -23,7 +23,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["transcripts"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"]
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -34,7 +35,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["de"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["de"]["end"] - info["de"]["start"]
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -45,7 +47,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["qtl"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
             }],
             'error': False,
             'errorMessage': ''
@@ -90,7 +93,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["transcripts"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"]
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -101,7 +105,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["de"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["de"]["end"] - info["de"]["start"]
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -112,7 +117,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'start': info["qtl"]["start"],
                 'status': 'success',
                 'traceback': None,
-                'percent': 100.0
+                'percent': 100.0,
+                'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
             }],
             'error': False,
             'errorMessage': ''

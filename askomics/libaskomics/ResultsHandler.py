@@ -59,13 +59,18 @@ class ResultsHandler(Params):
         files = []
 
         for row in rows:
+
+            exec_time = 0
+            if row[4] is not None and row[3] is not None:
+                exec_time = row[4] - row[3]
+
             files.append({
                 'id': row[0],
                 'status': row[1],
                 'path': row[2],
                 'start': row[3],
                 'end': row[4],
-                'execTime': row[4] - row[3],
+                'execTime': exec_time,
                 'graphState': row[5],
                 'nrows': row[6],
                 'errorMessage': row[7],
