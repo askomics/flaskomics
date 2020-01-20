@@ -49,6 +49,30 @@ class TestApiDatasets(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
+            }, {
+                'end': info["gff"]["end"],
+                'error_message': '',
+                'id': 4,
+                'name': 'gene.gff3',
+                'ntriples': 0,
+                'public': False,
+                'start': info["gff"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["gff"]["end"] - info["gff"]["start"]
+            }, {
+                'end': info["bed"]["end"],
+                'error_message': '',
+                'id': 5,
+                'name': 'gene.bed',
+                'ntriples': 0,
+                'public': False,
+                'start': info["bed"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["bed"]["end"] - info["bed"]["start"]
             }],
             'error': False,
             'errorMessage': ''
@@ -119,6 +143,30 @@ class TestApiDatasets(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
+            }, {
+                'end': info["gff"]["end"],
+                'error_message': '',
+                'id': 4,
+                'name': 'gene.gff3',
+                'ntriples': 0,
+                'public': False,
+                'start': info["gff"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["gff"]["end"] - info["gff"]["start"]
+            }, {
+                'end': info["bed"]["end"],
+                'error_message': '',
+                'id': 5,
+                'name': 'gene.bed',
+                'ntriples': 0,
+                'public': False,
+                'start': info["bed"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["bed"]["end"] - info["bed"]["start"]
             }],
             'error': False,
             'errorMessage': ''

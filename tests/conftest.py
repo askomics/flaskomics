@@ -218,7 +218,8 @@ class Client(object):
         file_type = {
             ".tsv": "text/tab-separated-values",
             ".csv": "text/tab-separated-values",
-            ".gff3": "null"
+            ".gff3": "null",
+            ".bed": "null"
         }
 
         with open(file_path, 'r') as file_content:
@@ -271,7 +272,12 @@ class Client(object):
             dataset = Dataset(self.app, self.session, dataset_info)
             dataset.save_in_db()
 
-            file.integrate(dataset.id, info["columns_type"], public=public)
+            if file.type == "csv/tsv":
+                file.integrate(dataset.id, info["columns_type"], public=public)
+            elif file.type == "gff/gff3":
+                file.integrate(dataset.id, info["entities"], public=public)
+            elif file.type == "bed":
+                file.integrate(dataset.id, info["entity_name"], public=public)
 
             # done
             dataset.update_in_db("success")
@@ -295,6 +301,7 @@ class Client(object):
         up_de = self.upload_file("test-data/de.tsv")
         up_qtl = self.upload_file("test-data/qtl.tsv")
         up_gene_gff = self.upload_file("test-data/gene.gff3")
+        up_bed = self.upload_file("test-data/gene.bed")
 
         return {
             "transcripts": {
@@ -308,6 +315,9 @@ class Client(object):
             },
             "gene": {
                 "upload": up_gene_gff,
+            },
+            "bed": {
+                "upload": up_bed,
             }
         }
 
@@ -323,6 +333,8 @@ class Client(object):
         up_transcripts = self.upload_file("test-data/transcripts.tsv")
         up_de = self.upload_file("test-data/de.tsv")
         up_qtl = self.upload_file("test-data/qtl.tsv")
+        up_gff = self.upload_file("test-data/gene.gff3")
+        up_bed = self.upload_file("test-data/gene.bed")
 
         # integrate
         int_transcripts = self.integrate_file({
@@ -338,6 +350,16 @@ class Client(object):
         int_qtl = self.integrate_file({
             "id": 3,
             "columns_type": ["start_entity", "ref", "start", "end"]
+        })
+
+        int_gff = self.integrate_file({
+            "id": 4,
+            "entities": ["gene", "transcript"]
+        })
+
+        int_bed = self.integrate_file({
+            "id": 5,
+            "entity_name": "gene"
         })
 
         return {
@@ -358,6 +380,18 @@ class Client(object):
                 "timestamp": int_qtl["timestamp"],
                 "start": int_qtl["start"],
                 "end": int_qtl["end"]
+            },
+            "gff": {
+                "upload": up_gff,
+                "timestamp": int_gff["timestamp"],
+                "start": int_gff["start"],
+                "end": int_gff["end"]
+            },
+            "bed": {
+                "upload": up_bed,
+                "timestamp": int_bed["timestamp"],
+                "start": int_bed["start"],
+                "end": int_bed["end"]
             }
         }
 
