@@ -62,7 +62,7 @@ def integrate(self, session, data, host_url):
             }
 
             dataset = Dataset(app, session, dataset_info)
-            dataset.update_in_db("started", update_date=True)
+            dataset.update_in_db("started", update_date=True, update_graph=True)
 
             if file.type == "csv/tsv":
                 file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)

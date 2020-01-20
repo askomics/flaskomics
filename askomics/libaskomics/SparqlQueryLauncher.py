@@ -245,7 +245,7 @@ class SparqlQueryLauncher(Params):
         '''.format(graph)
         self.execute_query(query, disable_log=True)
 
-    def process_query(self, query):
+    def process_query(self, query, no_isql=False):
         """Execute a query and return parsed results
 
         Parameters
@@ -258,7 +258,7 @@ class SparqlQueryLauncher(Params):
         list
             Parsed results
         """
-        return self.parse_results(self.execute_query(query))
+        return self.parse_results(self.execute_query(query, no_isql=False))
 
     def execute_query(self, query, disable_log=False, no_isql=False):
         """Execute a sparql query
