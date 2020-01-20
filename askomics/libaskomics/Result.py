@@ -379,7 +379,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None, traceback=None):
+    def update_db_status(self, status, size=None, update_celery=False, update_date=False, error=False, error_message=None, traceback=None):
         """Update status of results in db
 
         Parameters
@@ -394,6 +394,8 @@ class Result(Params):
         if update_celery:
             update_celery_substr = "celery_id=?,"
 
+        update_date_substr = "start=strftime('%s', 'now')," if update_date else ""
+
         size_string = ""
         if size:
             size_string = "size=?,"
@@ -406,6 +408,7 @@ class Result(Params):
         UPDATE results SET
         {celery}
         {size}
+        {date}
         status=?,
         end=?,
         path=?,
@@ -413,7 +416,7 @@ class Result(Params):
         error=?,
         traceback=?
         WHERE user_id=? AND id=?
-        '''.format(celery=update_celery_substr, size=size_string)
+        '''.format(celery=update_celery_substr, size=size_string, date=update_date_substr)
 
         variables = [
             status,

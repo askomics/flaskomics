@@ -62,7 +62,7 @@ def integrate(self, session, data, host_url):
             }
 
             dataset = Dataset(app, session, dataset_info)
-            dataset.update_in_db("started")
+            dataset.update_in_db("started", update_date=True)
 
             if file.type == "csv/tsv":
                 file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)
@@ -152,7 +152,7 @@ def query(self, session, info):
 
         # Save job in database database
         result.set_celery_id(self.request.id)
-        result.update_db_status("started", update_celery=True)
+        result.update_db_status("started", update_celery=True, update_date=True)
 
         # launch query
         query_builder = SparqlQueryBuilder(app, session)

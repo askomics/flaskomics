@@ -139,7 +139,7 @@ class Dataset(Params):
 
         database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
 
-    def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0, traceback=None):
+    def update_in_db(self, status, update_celery=False, update_date=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
 
         Parameters
@@ -154,10 +154,13 @@ class Dataset(Params):
         message = error_message if error else ""
         update_celery_id_substr = "celery_id=?," if update_celery else ""
 
+        update_date_substr = "start=strftime('%s', 'now')," if update_date else ""
+
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE datasets SET
+        {}
         {}
         status=?,
         end=strftime('%s', 'now'),
@@ -165,7 +168,7 @@ class Dataset(Params):
         error_message=?,
         traceback=?
         WHERE user_id = ? AND id=?
-        '''.format(update_celery_id_substr)
+        '''.format(update_celery_id_substr, update_date_substr)
 
         if update_celery:
             database.execute_sql_query(query, (self.celery_id, status, ntriples, message, traceback, self.session['user']['id'], self.id))
