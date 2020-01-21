@@ -1049,8 +1049,10 @@ export default class Query extends Component {
             this.graphState = this.props.location.state.graphState
             this.initId()
             this.setCurrentSelected()
-            if (this.currentSelected.type != "link") {
-              this.insertSuggestion(this.currentSelected)
+            if (this.currentSelected) {
+              if (this.currentSelected.type != "link") {
+                this.insertSuggestion(this.currentSelected)
+              }
             }
             this.updateGraphState()
           } else {

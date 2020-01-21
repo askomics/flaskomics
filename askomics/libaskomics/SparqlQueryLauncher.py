@@ -245,7 +245,7 @@ class SparqlQueryLauncher(Params):
         '''.format(graph)
         self.execute_query(query, disable_log=True)
 
-    def process_query(self, query):
+    def process_query(self, query, no_isql=False):
         """Execute a query and return parsed results
 
         Parameters
@@ -258,7 +258,7 @@ class SparqlQueryLauncher(Params):
         list
             Parsed results
         """
-        return self.parse_results(self.execute_query(query))
+        return self.parse_results(self.execute_query(query, no_isql=False))
 
     def execute_query(self, query, disable_log=False, no_isql=False):
         """Execute a sparql query
@@ -282,17 +282,17 @@ class SparqlQueryLauncher(Params):
                 isqlapi = self.settings.get("triplestore", "isqlapi")
             except Exception:
                 pass
-            use_isl = True if triplestore == "virtuoso" and isqlapi and self.local_query and not no_isql else False
+            use_isql = True if triplestore == "virtuoso" and isqlapi and self.local_query and not no_isql else False
 
             start_time = time.time()
             self.endpoint.setQuery(query)
 
             # Debug
             if self.settings.getboolean('askomics', 'debug'):
-                self.log.debug("Launch {} query on {} ({})".format("ISQL" if use_isl else "SPARQL", self.triplestore, self.url_endpoint))
+                self.log.debug("Launch {} query on {} ({})".format("ISQL" if use_isql else "SPARQL", self.triplestore, self.url_endpoint))
                 self.log.debug(query)
 
-            if use_isl:
+            if use_isql:
                 formatted_query = "SPARQL {}".format(query)
                 json = {"command": formatted_query, "disable_log": disable_log, "sparql_select": not self.endpoint.isSparqlUpdateRequest()}
                 response = requests.post(url=isqlapi, json=json)

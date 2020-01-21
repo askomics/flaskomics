@@ -45,6 +45,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'gene.gff3',
                 'size': 2267,
                 'type': 'gff/gff3'
+            }, {
+                'date': info["bed"]["upload"]["file_date"],
+                'id': 5,
+                'name': 'gene.bed',
+                'size': 689,
+                'type': 'bed'
             }]
         }
 
@@ -119,6 +125,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'gene.gff3',
                 'size': 2267,
                 'type': 'gff/gff3'
+            }, {
+                'date': info["bed"]["upload"]["file_date"],
+                'id': 5,
+                'name': 'gene.bed',
+                'size': 689,
+                'type': 'bed'
             }]
         }
 
@@ -276,7 +288,9 @@ class TestApiFile(AskomicsTestCase):
                 },
                 'id': 4,
                 'name': 'gene.gff3',
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'error': False,
+                'error_message': ''
             }]
         }
 
@@ -329,6 +343,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'gene.gff3',
                 'size': 2267,
                 'type': 'gff/gff3'
+            }, {
+                'date': info["bed"]["upload"]["file_date"],
+                'id': 5,
+                'name': 'gene.bed',
+                'size': 689,
+                'type': 'bed'
             }]
         }
 
@@ -349,6 +369,12 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'gene.gff3',
                 'size': 2267,
                 'type': 'gff/gff3'
+            }, {
+                'date': info["bed"]["upload"]["file_date"],
+                'id': 5,
+                'name': 'gene.bed',
+                'size': 689,
+                'type': 'bed'
             }]
         }
 
@@ -366,7 +392,14 @@ class TestApiFile(AskomicsTestCase):
         }
 
         gff_data = {
-            "fileId": 2,
+            "fileId": 4,
+            "public": True,
+            "customUri": None,
+            "externalEndpoint": None
+        }
+
+        bed_data = {
+            "fileId": 5,
             "public": True,
             "customUri": None,
             "externalEndpoint": None
@@ -396,6 +429,14 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json["task_id"]) == 36
 
         response = client.client.post('/api/files/integrate', json=gff_data)
+        assert response.status_code == 200
+        print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["task_id"]) == 36
+
+        response = client.client.post('/api/files/integrate', json=bed_data)
         assert response.status_code == 200
         print(response.json)
         assert len(response.json) == 3

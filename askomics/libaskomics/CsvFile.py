@@ -1,6 +1,8 @@
 import csv
 import re
 import rdflib
+import sys
+import traceback
 
 from rdflib import BNode
 
@@ -67,6 +69,8 @@ class CsvFile(File):
             'type': self.type,
             'id': self.id,
             'name': self.human_name,
+            'error': self.error,
+            'error_message': self.error_message,
             'data': {
                 'header': self.header,
                 'content_preview': self.preview,
@@ -96,28 +100,34 @@ class CsvFile(File):
 
     def set_preview_and_header(self):
         """Set the preview and header by looking in the fists lines of the file"""
-        with open(self.path, 'r', encoding='utf-8') as csv_file:
-            reader = csv.reader(csv_file, dialect=self.dialect)
-            count = 0
-            # Store header
-            header = next(reader)
-            self.header = [h.strip() for h in header]
+        try:
+            with open(self.path, 'r', encoding='utf-8') as csv_file:
+                reader = csv.reader(csv_file, dialect=self.dialect)
+                count = 0
+                # Store header
+                header = next(reader)
+                self.header = [h.strip() for h in header]
 
-            # Loop on lines
-            preview = []
-            for row in reader:
-                res_row = {}
-                for i, cell in enumerate(row):
-                    res_row[self.header[i]] = cell
-                preview.append(res_row)
+                # Loop on lines
+                preview = []
+                for row in reader:
+                    res_row = {}
+                    res_row = dict.fromkeys(self.header, "")
+                    for i, cell in enumerate(row):
+                        res_row[self.header[i]] = cell
+                    preview.append(res_row)
 
-                # Stop after x lines
-                if self.preview_limit:
-                    count += 1
-                    if count > self.preview_limit:
-                        break
+                    # Stop after x lines
+                    if self.preview_limit:
+                        count += 1
+                        if count > self.preview_limit:
+                            break
+            self.preview = preview
 
-        self.preview = preview
+        except Exception as e:
+            self.error = True
+            self.error_message = "Malformated CSV/TSV ({})".format(str(e))
+            traceback.print_exc(file=sys.stdout)
 
     def set_columns_type(self):
         """Set the columns type by guessing them"""

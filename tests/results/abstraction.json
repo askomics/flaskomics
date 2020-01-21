@@ -4,16 +4,16 @@
       {
         "categories": [
           {
+            "label": "At3",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At3"
+          },
+          {
             "label": "At5",
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At5"
           },
           {
             "label": "At1",
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At1"
-          },
-          {
-            "label": "At3",
-            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At3"
           }
         ],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
@@ -28,18 +28,85 @@
       {
         "categories": [
           {
+            "label": "1",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#1"
+          },
+          {
+            "label": "7",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#7"
+          }
+        ],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoReference",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+        ],
+        "label": "reference",
+        "type": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#reference"
+      },
+      {
+        "categories": [
+          {
+            "label": "1",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#1"
+          }
+        ],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoReference",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "reference",
+        "type": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#reference"
+      },
+      {
+        "categories": [
+          {
             "label": "plus",
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#plus"
           },
           {
             "label": "minus",
             "uri": "http://www.semanticweb.org/user/ontologies/2018/1#minus"
+          },
+          {
+            "label": "+",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#%2B"
+          },
+          {
+            "label": "-",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#-"
           }
         ],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
         "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStrand",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "strand",
+        "type": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+      },
+      {
+        "categories": [
+          {
+            "label": "+",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#%2B"
+          },
+          {
+            "label": "-",
+            "uri": "http://www.semanticweb.org/user/ontologies/2018/1#-"
+          }
+        ],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStrand",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
         "label": "strand",
         "type": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
@@ -88,53 +155,91 @@
       {
         "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
-        "label": "start",
+        "label": "end",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start"
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end"
       },
       {
         "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
-        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
         ],
-        "label": "start",
+        "label": "end",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start"
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+        ],
+        "label": "end",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end"
       },
       {
         "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
-        "label": "end",
+        "label": "start",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end"
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start"
       },
       {
         "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
-        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
         ],
-        "label": "end",
+        "label": "start",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end"
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+        ],
+        "label": "start",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start"
       },
       {
         "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
         "faldo": null,
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "biotype",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#biotype"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "biotype",
         "type": "http://www.w3.org/2001/XMLSchema#string",
@@ -146,6 +251,17 @@
         "faldo": null,
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+        ],
+        "label": "description",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#description"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "description",
         "type": "http://www.w3.org/2001/XMLSchema#string",
@@ -169,64 +285,9 @@
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
         ],
-        "label": "Expression",
-        "type": "http://www.w3.org/2001/XMLSchema#string",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Expression"
-      },
-      {
-        "categories": [],
-        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "faldo": null,
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
-        ],
-        "label": "FDR",
-        "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FDR"
-      },
-      {
-        "categories": [],
-        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "faldo": null,
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
-        ],
-        "label": "Roots/Roots",
-        "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Roots/Roots"
-      },
-      {
-        "categories": [],
-        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "faldo": null,
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
-        ],
-        "label": "Significance",
-        "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Significance"
-      },
-      {
-        "categories": [],
-        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "faldo": null,
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
-        ],
         "label": "PValue",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#PValue"
-      },
-      {
-        "categories": [],
-        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
-        "faldo": null,
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
-        ],
-        "label": "FC",
-        "type": "http://www.w3.org/2001/XMLSchema#decimal",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FC"
       },
       {
         "categories": [],
@@ -246,9 +307,31 @@
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
         ],
+        "label": "Significance",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Significance"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+        ],
         "label": "concern@transcript",
         "type": "http://www.w3.org/2001/XMLSchema#string",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern%40transcript"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+        ],
+        "label": "FDR",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FDR"
       },
       {
         "categories": [],
@@ -263,6 +346,39 @@
       },
       {
         "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+        ],
+        "label": "Expression",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Expression"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+        ],
+        "label": "Roots/Roots",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Roots/Roots"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+        ],
+        "label": "FC",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FC"
+      },
+      {
+        "categories": [],
         "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
         "faldo": null,
         "graphs": [
@@ -271,6 +387,116 @@
         "label": "ref",
         "type": "http://www.w3.org/2001/XMLSchema#string",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#ref"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "source",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#source"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "source",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#source"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "ID",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#ID"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "ID",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#ID"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "logic_name",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#logic_name"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "Name",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Name"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "Name",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Name"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "gene_id",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#gene_id"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "transcript_id",
+        "type": "http://www.w3.org/2001/XMLSchema#string",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript_id"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+        ],
+        "label": "score",
+        "type": "http://www.w3.org/2001/XMLSchema#decimal",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#score"
       }
     ],
     "entities": [
@@ -280,12 +506,27 @@
         ],
         "faldo": true,
         "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
         ],
         "instancesHaveLabels": true,
         "label": "transcript",
         "type": "node",
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript"
+      },
+      {
+        "endpoints": [
+          "http://localhost:8891/sparql"
+        ],
+        "faldo": true,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "instancesHaveLabels": true,
+        "label": "gene",
+        "type": "node",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#gene"
       },
       {
         "endpoints": [
@@ -314,7 +555,17 @@
         "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression"
       }
     ],
-    "relations": []
+    "relations": [
+      {
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        ],
+        "label": "Parent",
+        "source": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "target": "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Parent"
+      }
+    ]
   },
   "diskSpace": ###SIZE###,
   "error": false,

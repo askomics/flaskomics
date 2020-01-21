@@ -2,4 +2,4 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
 
 - [User documentation](user-guide.md)
 - [Admin documentation](admin-guide.md)
-- [Developer documentation](contribute.md)
+- [Developer documentation](dev.md)

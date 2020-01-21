@@ -105,10 +105,13 @@ export default class GffPreview extends Component {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
-    return (
-      <div>
-        <h4>{this.state.name} (preview)</h4>
-        <br />
+    let body
+    if (this.props.file.error) {
+      body = <ErrorDiv status={500} error={this.props.file.error} errorMessage={this.props.file.error_message} />
+    } else {
+      body = (
+        <div>
+          <br />
             <div>
               <FormGroup check>
                 {this.state.availableEntities.map((entity, index) => {
@@ -132,6 +135,14 @@ export default class GffPreview extends Component {
             <br />
             <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
           </div>
+        </div>
+      )
+    }
+
+    return (
+      <div>
+        <h4>{this.state.name} (preview)</h4>
+        {body}
       </div>
     )
   }

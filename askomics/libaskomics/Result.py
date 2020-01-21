@@ -307,15 +307,11 @@ class Result(Params):
             File size
         """
         with open(self.file_path, 'w') as file:
-            writer = csv.writer(file, delimiter="\t")
-            writer.writerow(headers)
-            if len(results) > 0:
-                for i in results:
-                    row = []
-                    self.nrows += 1
-                    for header, value in i.items():
-                        row.append(value)
-                    writer.writerow(row)
+            writer = csv.DictWriter(file, delimiter="\t", fieldnames=headers)
+            writer.writeheader()
+            for row in results:
+                self.nrows += 1
+                writer.writerow(row)
 
         return os.path.getsize(self.file_path)
 
@@ -383,7 +379,7 @@ class Result(Params):
             self.id
         ))
 
-    def update_db_status(self, status, size=None, update_celery=False, error=False, error_message=None, traceback=None):
+    def update_db_status(self, status, size=None, update_celery=False, update_date=False, error=False, error_message=None, traceback=None):
         """Update status of results in db
 
         Parameters
@@ -398,6 +394,8 @@ class Result(Params):
         if update_celery:
             update_celery_substr = "celery_id=?,"
 
+        update_date_substr = "start=strftime('%s', 'now')," if update_date else ""
+
         size_string = ""
         if size:
             size_string = "size=?,"
@@ -410,6 +408,7 @@ class Result(Params):
         UPDATE results SET
         {celery}
         {size}
+        {date}
         status=?,
         end=?,
         path=?,
@@ -417,7 +416,7 @@ class Result(Params):
         error=?,
         traceback=?
         WHERE user_id=? AND id=?
-        '''.format(celery=update_celery_substr, size=size_string)
+        '''.format(celery=update_celery_substr, size=size_string, date=update_date_substr)
 
         variables = [
             status,

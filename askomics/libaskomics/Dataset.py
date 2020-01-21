@@ -77,7 +77,7 @@ class Dataset(Params):
             ?,
             ?,
             ?,
-            ?,
+            NULL,
             ?,
             "queued",
             strftime('%s', 'now'),
@@ -94,7 +94,6 @@ class Dataset(Params):
             self.celery_id,
             self.file_id,
             self.name,
-            self.graph_name,
             self.public,
             0
         ), get_id=True)
@@ -139,7 +138,7 @@ class Dataset(Params):
 
         database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
 
-    def update_in_db(self, status, update_celery=False, error=False, error_message=None, ntriples=0, traceback=None):
+    def update_in_db(self, status, update_celery=False, update_date=False, update_graph=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
 
         Parameters
@@ -152,12 +151,17 @@ class Dataset(Params):
             Number of triples integrated
         """
         message = error_message if error else ""
+
         update_celery_id_substr = "celery_id=?," if update_celery else ""
+        update_date_substr = "start=strftime('%s', 'now')," if update_date else ""
+        update_graph_substr = "graph_name=?," if update_graph else ""
 
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE datasets SET
+        {}
+        {}
         {}
         status=?,
         end=strftime('%s', 'now'),
@@ -165,12 +169,17 @@ class Dataset(Params):
         error_message=?,
         traceback=?
         WHERE user_id = ? AND id=?
-        '''.format(update_celery_id_substr)
+        '''.format(update_celery_id_substr, update_date_substr, update_graph_substr)
+
+        variables = [status, ntriples, message, traceback, self.session['user']['id'], self.id]
+
+        if update_graph:
+            variables.insert(0, self.graph_name)
 
         if update_celery:
-            database.execute_sql_query(query, (self.celery_id, status, ntriples, message, traceback, self.session['user']['id'], self.id))
-        else:
-            database.execute_sql_query(query, (status, ntriples, message, traceback, self.session['user']['id'], self.id))
+            variables.insert(0, self.celery_id)
+
+        database.execute_sql_query(query, tuple(variables))
 
     def delete_from_db(self):
         """Delete a dataset from the database"""

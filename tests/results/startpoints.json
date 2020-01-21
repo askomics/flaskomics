@@ -1,0 +1,107 @@
+{
+    "error":
+    false,
+    "errorMessage": "",
+    "publicQueries": [],
+    "startpoints":
+    [{
+        "endpoints": [{
+            "name": "local",
+            "url": "http://localhost:8891/sparql"
+        }, {
+            "name": "local",
+            "url": "http://localhost:8891/sparql"
+        }],
+        "entity":
+        "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "entity_label":
+        "transcript",
+        "graphs":
+        [{
+            "creator": "jdoe",
+            "public": "false",
+            "uri": "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+        },
+         {
+             "creator": "jdoe",
+             "public": "false",
+             "uri":
+             "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+         }],
+        "private":
+        true,
+        "public":
+        false
+    },
+     {
+         "endpoints": [{
+             "name": "local",
+             "url": "http://localhost:8891/sparql"
+         }, {
+             "name": "local",
+             "url": "http://localhost:8891/sparql"
+         }],
+         "entity":
+         "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+         "entity_label":
+         "gene",
+         "graphs": [{
+             "creator":
+             "jdoe",
+             "public":
+             "false",
+             "uri":
+             "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+         },
+                    {
+                        "creator":
+                        "jdoe",
+                        "public":
+                        "false",
+                        "uri":
+                        "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+                    }],
+         "private":
+         true,
+         "public":
+         false
+     },
+     {
+         "endpoints": [{
+             "name": "local",
+             "url": "http://localhost:8891/sparql"
+         }],
+         "entity":
+         "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+         "entity_label":
+         "DifferentialExpression",
+         "graphs": [{
+             "creator": "jdoe",
+             "public": "false",
+             "uri": "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+         }],
+         "private":
+         true,
+         "public":
+         false
+     },
+     {
+         "endpoints": [{
+             "name": "local",
+             "url": "http://localhost:8891/sparql"
+         }],
+         "entity":
+         "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+         "entity_label":
+         "QTL",
+         "graphs": [{
+             "creator": "jdoe",
+             "public": "false",
+             "uri": "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
+         }],
+         "private":
+         true,
+         "public":
+         false
+     }]
+}

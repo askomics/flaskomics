@@ -97,32 +97,46 @@ export default class BedPreview extends Component {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
+    let body
+
+    if (this.props.file.error) {
+      body = (
+        <ErrorDiv status={500} error={this.props.file.error} errorMessage={this.props.file.error_message} />
+      )
+    } else {
+      body = (
+        <div>
+          <br />
+
+          <FormGroup md={4}>
+            <Label for="entityName">Entity name</Label>
+            <Input type="text" name="entityName" id="entityName" placeholder="Entity name" value={this.state.entityName} onChange={this.handleChange} />
+          </FormGroup>
+
+          <br />
+          <AdvancedOptions
+            config={this.props.config}
+            handleChangeUri={p => this.handleChangeUri(p)}
+            handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            customUri={this.state.customUri}
+          />
+          <br />
+          <div className="center-div">
+            <ButtonGroup>
+              <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+              {publicButton}
+            </ButtonGroup>
+            <br />
+            <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div>
         <h4>{this.state.name} (preview)</h4>
-        <br />
-
-        <FormGroup md={4}>
-          <Label for="entityName">Entity name</Label>
-          <Input type="text" name="entityName" id="entityName" placeholder="Entity name" value={this.state.entityName} onChange={this.handleChange} />
-        </FormGroup>
-
-        <br />
-        <AdvancedOptions
-          config={this.props.config}
-          handleChangeUri={p => this.handleChangeUri(p)}
-          handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
-          customUri={this.state.customUri}
-        />
-        <br />
-        <div className="center-div">
-          <ButtonGroup>
-            <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
-            {publicButton}
-          </ButtonGroup>
-          <br />
-          <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
-        </div>
+        {body}
       </div>
     )
   }

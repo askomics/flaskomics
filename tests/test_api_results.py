@@ -130,6 +130,8 @@ class TestApiResults(AskomicsTestCase):
         content = content.replace("###TRANSCRIPTS_TIMESTAMP###", str(info["transcripts"]["timestamp"]))
         content = content.replace("###QTL_TIMESTAMP###", str(info["qtl"]["timestamp"]))
         content = content.replace("###DE_TIMESTAMP###", str(info["de"]["timestamp"]))
+        content = content.replace("###GFF_TIMESTAMP###", str(info["gff"]["timestamp"]))
+        content = content.replace("###BED_TIMESTAMP###", str(info["bed"]["timestamp"]))
         content = content.replace("###LOCAL_ENDPOINT###", str(client.get_config("federation", "local_endpoint")))
         content = content.replace("###SIZE###", str(client.get_size_occupied_by_user()))
 
