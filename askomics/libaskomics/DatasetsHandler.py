@@ -130,6 +130,7 @@ class DatasetsHandler(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
         for dataset in self.datasets:
             # Delete from triplestore
-            Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
+            if dataset.graph_name:
+                Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
             # Delete from db
             dataset.delete_from_db()
