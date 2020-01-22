@@ -230,7 +230,7 @@ class SparqlQueryLauncher(Params):
         }}
         '''.format(graph, triples)
 
-        return self.execute_query(query, no_isql=True)
+        return self.execute_query(query)
 
     def drop_dataset(self, graph):
         """Drop the datasets of the triplestore and its metadata
@@ -243,9 +243,9 @@ class SparqlQueryLauncher(Params):
         query = '''
         DROP SILENT GRAPH <{}>
         '''.format(graph)
-        self.execute_query(query, disable_log=True)
+        self.execute_query(query, disable_log=True, isql_api=True)
 
-    def process_query(self, query, no_isql=False):
+    def process_query(self, query, isql_api=False):
         """Execute a query and return parsed results
 
         Parameters
@@ -258,9 +258,9 @@ class SparqlQueryLauncher(Params):
         list
             Parsed results
         """
-        return self.parse_results(self.execute_query(query, no_isql=False))
+        return self.parse_results(self.execute_query(query, isql_api=isql_api))
 
-    def execute_query(self, query, disable_log=False, no_isql=False):
+    def execute_query(self, query, disable_log=False, isql_api=False):
         """Execute a sparql query
 
         Parameters
@@ -274,15 +274,15 @@ class SparqlQueryLauncher(Params):
             result
         """
         try:
+            triplestore = self.settings.get("triplestore", "triplestore")
 
             # Use ISQL or SPARQL
-            triplestore = self.settings.get("triplestore", "triplestore")
-            isqlapi = None
+            isql_api_url = None
             try:
-                isqlapi = self.settings.get("triplestore", "isqlapi")
+                isql_api_url = self.settings.get("triplestore", "isqlapi")
             except Exception:
                 pass
-            use_isql = True if triplestore == "virtuoso" and isqlapi and self.local_query and not no_isql else False
+            use_isql = True if triplestore == "virtuoso" and isql_api_url and self.local_query and isql_api else False
 
             start_time = time.time()
             self.endpoint.setQuery(query)
@@ -295,7 +295,7 @@ class SparqlQueryLauncher(Params):
             if use_isql:
                 formatted_query = "SPARQL {}".format(query)
                 json = {"command": formatted_query, "disable_log": disable_log, "sparql_select": not self.endpoint.isSparqlUpdateRequest()}
-                response = requests.post(url=isqlapi, json=json)
+                response = requests.post(url=isql_api_url, json=json)
                 results = response.json()
                 if results["status"] == 500:
                     raise HTTPError("isqlapi: {}".format(results["message"]))
