@@ -165,7 +165,7 @@ def query(self, session, info):
         results = []
         if query_builder.graphs:
             query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            headers, results = query_launcher.process_query(query)
+            headers, results = query_launcher.process_query(query, isql_api=True)
 
         # write result to a file
         file_size = result.save_result_in_file(headers, results)
@@ -215,7 +215,7 @@ def sparql_query(self, session, info):
         result.update_db_status("started", update_celery=True)
 
         query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
-        header, data = query_launcher.process_query(info["sparql_query"])
+        header, data = query_launcher.process_query(info["sparql_query"], isql_api=True)
 
         # Write results in file
         file_size = result.save_result_in_file(header, data)
