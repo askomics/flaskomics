@@ -94,7 +94,7 @@ If you have an idea for a feature to add or an approach for a bugfix, it is best
 
 All changes to AskOmics should be made through pull requests to [this](https://github.com/askomics/flaskomics) repository.
 
-[Install AskOmics in development mode](run-dev.md), then, create a new branch for your new feature
+[Install AskOmics in development mode](dev.md#install-askomics), then, create a new branch for your new feature
 
 ```bash
 git checkout -b my_new_feature
@@ -102,7 +102,7 @@ git checkout -b my_new_feature
 
 Commit and push your modification to your [fork](https://help.github.com/articles/pushing-to-a-remote/). If your changes modify code, please ensure that is conform to [AskOmics style](#coding-style-guidlines)
 
-Write tests for your changes, and make sure that they [passes](run-dev.md#launch-continuous-integration-locally).
+Write tests for your changes, and make sure that they [passes](dev.md#launch-continuous-integration-locally).
 
 Open a pull request against the master branch of flaskomics. The message of your pull request should describe your modifications (why and how).
 
@@ -139,7 +139,6 @@ To serve docs locally, run
 cd flaskomics
 # source the askomics virtual env
 source venv/bin/activate
-cd docs
 mkdocs serve
 ```
 
