@@ -31,10 +31,10 @@ nav:
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
   - Developer guide:
-    - Deploy AskOmics: dev-deployment.md
+    - Dev deployment: dev-deployment.md
     - Contribute: contribute.md
     - CI: ci.md
-    - Doc: doc.md
+    - Doc: docs.md
   - Bug Tracker: https://github.com/askomics/flaskomics/issues
   - Project monitoring: https://github.com/askomics/flaskomics/projects
 
