@@ -4,7 +4,7 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
     - [Overview tutorial](tutorial.md): How to use AskOmics with example data
     - [Prepare your data](data.md): How to format your own data for AskOmics
     - [Build an RDF abstraction](abstraction.md): Learn how to build an RDF abstraction for RDF data
-    - [Perform federated queries](federation.md): How to query your own data with external ressources
+    - [Perform federated queries](federation.md): How to query your own data with external resources
     - [Use AskOmics with Galaxy](galaxy.md): How to connect AskOmics with your Galaxy history
     - [Contribute as a user](issues.md): How to contribute to the development of AskOmics as a user
 <br /><br />
