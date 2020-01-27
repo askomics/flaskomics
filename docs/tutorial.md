@@ -4,9 +4,9 @@ This guide is intended for users who want to analyze their project-specific data
 
 To do this tutorial, you will need an AskOmics instance. you can use [genouest](https://askomics.genouest.org) instance. You will also need input data. Data are available [here]().
 
-## Account creation and management
+# Account creation and management
 
-### Login or signup into AskOmics
+## Login or signup into AskOmics
 
 AskOmics is a mutli-user plateform. To use it, you will need an account on the instance. Use the <navbar><i class="fa fa-sign-in"></i> Login</navbar> button on the navbar, and log in using your AskOmics credentials. If you don't have already an account, fill the signup form by clicking on <askolink>signup</askolink> below the login form.
 
@@ -16,18 +16,18 @@ AskOmics is a mutli-user plateform. To use it, you will need an account on the i
 
 Once your are logged, you can use all the functionalities of AskOmics.
 
-### Manage your account
+## Manage your account
 
 To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> Your Name &#9662;</navbar> on the navigation bar.
 
 
 Uses the forms to change your personal information.
 
-## Data integration
+# Data integration
 
 AskOmics convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files. It can also integrate RDF data.
 
-### Data upload
+## Data upload
 
 The first step is to upload the input files into AskOmics. Go on the *Files* page by clicking on <navbar><i class="fa fa-file"></i> Files</navbar>.
 
@@ -45,11 +45,11 @@ Uploaded files are displayed into the files table.
 Next step is to convert this files into RDF triples. This step is called *Integration*. Integration will produce a RDF description of your data: the *Abstraction*.
 
 
-### Integration
+## Integration
 
 The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files. Select input files from the *Files* page, and click on the <btn><i class="fa fa-database"></i> Integrate</btn> button.
 
-#### CSV/TSV
+### CSV/TSV
 
 ![tsv](img/tsv.png "tsv")
 
@@ -67,22 +67,22 @@ CSV/TSV files are previewed on the integration page as a table. The first column
 !!! Hands-on
     Integrate `transcriptomics.tsv` and `qtl.tsv`. a QTL is a locatable entity. Set `chromosome`, `start` and `end` as FALDO attributes (*reference*, *start* and *end*). The `transcriptomics` entity contain a relation to a `gene` entity (not integrated yet). Other attributes have repeated values. They can be integrated as *category*
 
-#### GFF
+### GFF
 
 GFF files contain genetic coordinate of entities. Each entities contained in the GFF file are displayed on the preview page. Select the entities you want to integrate.
 
 !!! Hands-on
     Integrate the `TAIR1_GFF3_genes_mRNA.gff` file. The GFF contain the locatable entities `gene` and `mRNA`. Select both and integrate them. The `gene` entities is the entity targeted by `transcriptomics`.
 
-#### BED
+### BED
 
 BED contain also locatable entities. You have to specify an entity name since the BED format don't specify it.
 
-#### RDF
+### RDF
 
 RDF file can be directly integrated into AskOmics. This RDF file have to contain the *abstraction* and the *data* to be correctly used in AskOmics.
 
-#### Manage integrated datasets
+### Manage integrated datasets
 
 All integrated files are stored in a specific named graph in the RDF triplestore. The named graph obtained are called *datasets*. You can manage the integrated *datasets* on the <navbar><i class="fa fa-database"></i> Datasets</navbar> page
 
@@ -90,11 +90,11 @@ All integrated files are stored in a specific named graph in the RDF triplestore
 
 The table show all integrated datasets. The *status* column show if the datasets is fully integrated or in the process of being integrated. You can delete datasets independently.
 
-## Query
+# Query
 
 Once your data are integrated, the time has come to make requests on these data. Go to the *Ask* page by clicking on <navbar><i class="fa fa-play"></i> Ask!</navbar> on the navbar.
 
-### Start point
+## Start point
 
 On the *Ask* page, all entities available are showed on the page. 
 
@@ -108,7 +108,7 @@ To start a query, select a *start point*. You must choose the start point accord
 
 Start points can be filtered with the *Filter entities* box. a badge show where the entity is. Here, we only have local entities.
 
-### Simple query
+## Simple query
 
 To start a query, select a start point and click on <btn>Start!</btn>
 
@@ -131,13 +131,13 @@ A preview of the results are displayed on the bottom of the page.
 
 ![preview](img/preview.png "preview")
 
-### Complex query
+## Complex query
 
 To build a complex query, we need to apply constraints to our node. Two kinf of constraints can be apply. Constraints on relations and constraints on attributes. This constraints are called *filters* From this point, we will construct the following query:
 
 *All genes that are significantly over-expressed on day post-infection one (dpi1) and under-expressed at dpi 3 and 7.*
 
-#### Filters on attributes
+### Filters on attributes
 
 On the *attribute view*, you see all attributes of the gene entity. Each attribute is represented as an *attribute box*. Depending of the *type* of attribute (numeric, text or category), Each box type have common properties and specific properties.
 
@@ -182,7 +182,7 @@ A category is an attribute who have a limited number of values. Each values are 
 
 At this point, we have "all genes whose label start with `AT1G06` located on chr1 and chr2, and with a start value superior or equal to `2000000`".
 
-#### Filter on relations
+### Filter on relations
 
 Filter on relations allow to link an entity to other entities. On the *entity graph*, the selected entity is surrounded by a red circle, and other entities are proposed (transparent and dotted). To instantiate a entity linked to the selected one, click on it.
 

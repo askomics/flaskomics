@@ -15,12 +15,27 @@ markdown_extensions:
   - fontawesome_markdown
   - toc:
       permalink: true
+      toc_depth: 1
+
 
 nav:
   - Home: index.md
-  - User guide: user-guide.md
-  - Admin guide: admin-guide.md
-  - Developer guide: dev.md
+  - AskOmics tutorials:
+    - Overview tutorial: tutorial.md
+    - Prepare data: data.md
+    - Build RDF Abstraction: abstraction.md
+    - Federated queries: federation.md
+    - AskOmics and Galaxy: galaxy.md
+    - Contribute: issues.md
+  - Admin :
+    - Deploy AskOmics: production-deployment.md
+    - Configure: configure.md
+  - Developer guide:
+    - Deploy AskOmics: dev-deployment.md
+    - Contribute: contribute.md
+    - CI: ci.md
+    - Doc: doc.md
   - Bug Tracker: https://github.com/askomics/flaskomics/issues
+  - Project monitoring: https://github.com/askomics/flaskomics/projects
 
 extra_css: [style.css]
