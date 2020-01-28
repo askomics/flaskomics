@@ -74,7 +74,7 @@ GFF files contain genetic coordinate of entities. Each entities contained in the
 !!! Hands-on
     1. Search for `Mus_musculus.GRCm38.98.subset.gff3 (preview)`
     2. Select `gene` and `mRNA`
-    3. **Integrate (private dataset)**
+    3. <btn>Integrate (Private dataset)</btn>
 
     ![De results preview](img/gff_preview.png)
 
@@ -112,7 +112,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - change `SYMBOL` to `linkedTo@GeneLink` and set type to *Directed relation*
         - change `GENENAME` to `name` and set type to *text*
         - Keep the other column names and set their types to *numeric*
-    3. **Integrate (private dataset)**
+    3. <btn>Integrate (Private dataset)</btn>
 
     ![De results preview](img/de_results_preview.png)
 
@@ -121,7 +121,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
     2. Edit attribute names and types:
         - change `symbol` to `GeneLink` and set type to *entity*
         - change `ensembl` to `linkedTo@gene` and set type to *Directed relation*
-    3. **Integrate (private dataset)**
+    3. <btn>Integrate (Private dataset)</btn>
 
     ![Symbol to Ensembl preview](img/symbol_to_ensembl_preview.png)
 
@@ -132,7 +132,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - set `Chr` type to *Reference*
         - set `Start` type to *Start*
         - set `End` type to *End*
-    3. **Integrate (private dataset)**
+    3. <btn>Integrate (Private dataset)</btn>
 
     ![QTL preview](img/qtl_preview.png)
 
@@ -140,10 +140,10 @@ A columns can also be a relation between the *entity* to another. In this case, 
 ### Manage integrated datasets
 
 
-Integration can take some times depending on the file size. The **Datasets** page show the progress.
+Integration can take some times depending on the file size. The <navbar><i class="fa fa-database"></i> Datasets</navbar> page show the progress.
 
 !!! Hands-on
-    1. Go to **Dataset** page
+    1. Go to <navbar><i class="fa fa-database"></i> Datasets</navbar> page
     2. Wait for all datasets to be *success*
 
     ![dataset](img/datasets.png "Datasets table")
@@ -168,9 +168,9 @@ The first step to build a query is to choose a start point for the query.
 
 
 !!! Hands-on
-    1. Go to **Ask!** page
+    1. Go to <navbar><i class="fa fa-play"></i> Ask!</navbar> page
     2. Select the *Differential Expression* entity
-    3. **Start!**
+    3. <btn>Start!</btn>
 
 
 Once the start entity is chosen, the query builder is displayed.
@@ -183,12 +183,12 @@ The query builder is composed of a graph. Nodes represents *entities* and links 
 On the right, attributes of the selected entity are displayed as attribute boxes. Each boxes have an eye icon. Open eye mean the attribute will be displayed on the results.
 
 !!! Hands-on
-    1. Display `logFC` and `adj.P.val` by clicking on the eye icon
-    2. **Run & preview**
+    1. Display `logFC` and `adj.P.val` by clicking on the <i class="fa fa-eye"></i> eye icon
+    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 ![preview results](img/preview_results.png "Results preview")
 
-**Run & preview** launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
+<btn><i class="fa fa-table"></i> Run & Preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
 
 
 ### Filter on attributes
@@ -198,7 +198,7 @@ Next query will search for all over-expressed genes. Genes are considered over-e
 !!! Hands-on
     1. Filter `logFC` with `>` `2`
     2. Filter `adj.P.val` with `≤` `0.05`
-    2. **Run & preview**
+    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 Results show only significantly over-expressed genes.
 
@@ -213,14 +213,14 @@ To constraint on relation, we have to click on suggested nodes, linked to our en
     1. First, hide `Label`, `logFC` and `adj.P.val` of `Differential Expression`
     2. Instantiate `GeneLink`, and hide `Label`
     3. Instantiate `gene`
-    2. **Run & preview**
+    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. for example, we can filter on chromosome and display chromosome and strand to get information about gene location.
 
 !!! Hands-on
     1. Show `reference` and `strand` using the eye icon
     2. Filter `reference` to select `X` and `Y` chromosomes (use `ctrl`+`click` to multiple selection)
-    2. **Run & preview**
+    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 ### Use FALDO ontology to query on the position of elements on the genome.
 
@@ -239,7 +239,7 @@ On the query builder interface, FALDO entities are represented with a green circ
     3. Instantiate `QTL`
     4. Click on the link between `gene` and `QTL` to edit the relation
     5. check that the relation is `gene` `included in` `QTL` `on the same reference` with `strict` ticked
-    7. **Run & preview**
+    7. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 
 To go further, we can filter on `QTL` to refine the results.
@@ -249,13 +249,13 @@ To go further, we can filter on `QTL` to refine the results.
     1. got back to the `QTL` node
     2. Show the `Name` attribute using the eye icon
     3. Filter the name with a `regexp` with `growth`
-    4. **Run & preview**
+    4. <btn><i class="fa fa-table"></i> Run & Preview</btn>
 
 From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. So we can save it.
 
 !!! Hands-on
-    1. **Run & save**
-    2. Got to the **Results** page
+    1. <btn><i class="fa fa-table"></i> Run & save</btn>
+    2. Go to the <navbar><i class="fa fa-tasks"></i> Results</navbar> page
 
 
 ## Results management
@@ -276,7 +276,7 @@ The **Action** column contain button to perform certain action:
 - SPARQL: edit the query with a SPARQL editor for advanced users
 
 !!! Hands-on
-    1. Download the results file on your computer using *Download* button
+    1. Download the results file on your computer using <btn class="white">Download</btn> button
 
 
 # Conclusion
