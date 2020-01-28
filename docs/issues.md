@@ -1,0 +1,1 @@
+If you have an idea for a feature to add, or an approach for a bugfix, the best way to communicate with AskOmics developers is [Github issues](https://github.com/askomics/flaskomics/issues). Browse through existing issues to see if one seems related, or open a new one.

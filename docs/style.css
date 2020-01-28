@@ -18,6 +18,14 @@ btn {
     border-radius: 5px;
 }
 
+btn.white {
+    background-color: white;
+    color: #5a6268;
+    padding-right: 5px;
+    padding-left: 5px;
+    border-radius: 5px; 
+}
+
 badge {
     padding-right: 5px;
     padding-left: 5px;
