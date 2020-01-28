@@ -1,4 +1,6 @@
-In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial :
+AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
+
+In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial:
 
 - [Differentially expressed results file](https://zenodo.org/record/2529117/files/limma-voom_luminalpregnant-luminallactate): genes in rows, and 4 required columns: identifier (ENTREZID), gene symbol (SYMBOL), log fold change (logFC) and adjusted P values (adj.P.Val)
 - [Reference genome annotation file](https://zenodo.org/record/3601076/files/Mus_musculus.GRCm38.98.subset.gff3) in GFF format
@@ -31,7 +33,7 @@ Uses the forms to change your personal information.
 
 # Data integration
 
-AskOmics convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files. It can also integrate RDF data.
+AskOmics convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files.
 
 !!! Hands-on
     Download the files for the tutorial using the following links:<br />
@@ -63,16 +65,18 @@ Next step is to convert this files into RDF triples. This step is called *Integr
 
 ## Integration
 
-The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files.
+The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files. During the step of integration, AskOmics show a preview of each files. We can choose how the file will be integrated at this step.
 
 ### GFF
 
-GFF files contain genetic coordinate of entities. Each entities contained in the GFF file are displayed on the preview page. Select the entities you want to integrate.
+GFF files contain genetic coordinate of entities. Each entities contained in the GFF file are displayed on the preview page. We can Select the entities that will be integrated.
 
 !!! Hands-on
     1. Search for `Mus_musculus.GRCm38.98.subset.gff3 (preview)`
     2. Select `gene` and `mRNA`
     3. **Integrate (private dataset)**
+
+    ![De results preview](img/gff_preview.png)
 
 
 ### CSV/TSV
@@ -86,11 +90,13 @@ The first column of a TSV file will be the *entity* name. Other columns of the f
 Entity and attributes can have special types. The types are defined with the select below the header. An *entity* can be a *start entity* or an *entity*. A *start entity* mean that the entity may be used to start a query.
 
 Attributes can take the following types:
+
 - Numeric: if all the values are numeric
 - Text: if all the values are strings
 - Category: if there is a limited number of repeated values
 
 If the entity describe a locatable element on a genome:
+
 - Reference: chromosome
 - Strand: strand
 - Start: start position
@@ -103,7 +109,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
     1. Search for `limma-voom_luminalpregnant-luminallactate (preview)`
     2. Edit attribute names and types:
         - change `ENTREZ ID` to `Differential Expression` and set type to *start entity*
-        - change `SYMBOL` to `linkedTo@GeneLink` and set type to *Symmetric relation*
+        - change `SYMBOL` to `linkedTo@GeneLink` and set type to *Directed relation*
         - change `GENENAME` to `name` and set type to *text*
         - Keep the other column names and set their types to *numeric*
     3. **Integrate (private dataset)**
@@ -114,7 +120,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
     1. Search for `symbol-ensembl.tsv (preview)`
     2. Edit attribute names and types:
         - change `symbol` to `GeneLink` and set type to *entity*
-        - change `ensembl` to `linkedTo@gene` and set type to *Symmetric relation*
+        - change `ensembl` to `linkedTo@gene` and set type to *Directed relation*
     3. **Integrate (private dataset)**
 
     ![Symbol to Ensembl preview](img/symbol_to_ensembl_preview.png)
@@ -144,7 +150,7 @@ Integration can take some times depending on the file size. The **Datasets** pag
 
 
 
-The table show all integrated datasets. The *status* column show if the datasets is fully integrated or in the process of being integrated. You can delete datasets independently.
+The table show all integrated datasets. The *status* column show if the datasets is fully integrated or in the process of being integrated.
 
 
 
@@ -187,21 +193,19 @@ On the right, attributes of the selected entity are displayed as attribute boxes
 
 ### Filter on attributes
 
-Next query will search for all over-expressed genes. Genes are considered over-expressed if the log fold change is > 2. We are oly interested by  significant results (Adj P value ≤ 0.05)
-
-Back to the query builder,
+Next query will search for all over-expressed genes. Genes are considered over-expressed if the log fold change is > 2. We are only interested by significant results (Adj P value ≤ 0.05)
 
 !!! Hands-on
-    1. Filter `logFC` with `> 2`
-    2. Filter `adj.P.val` with `≤ 0.05`
+    1. Filter `logFC` with `>` `2`
+    2. Filter `adj.P.val` with `≤` `0.05`
     2. **Run & preview**
 
-The preview show only significantly over-expressed genes.
+Results show only significantly over-expressed genes.
 
 
 ### Filter on relations
 
-now that we have our genes if interest, we will link these genes to the reference genome to get information about location.
+Now that we have our genes if interest, we will link these genes to the reference genome to get information about location.
 
 To constraint on relation, we have to click on suggested nodes, linked to our entity of interest.
 
@@ -258,11 +262,11 @@ From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤
 
 The results page store the saved queries. A table show some useful information about the queries. Query name can be edited by clicking on it.
 
-![results table](img/results_table.png)
-
 !!! Hands-on
     1. Click on the name and enter `Over-expressed genes on a growth QTL`
     2. press `enter` key
+
+    ![results table](img/results_table.png)
 
 The **Action** column contain button to perform certain action:
 
@@ -271,4 +275,10 @@ The **Action** column contain button to perform certain action:
 - Edit: Edit the query with the query builder
 - SPARQL: edit the query with a SPARQL editor for advanced users
 
+!!! Hands-on
+    1. Download the results file on your computer using *Download* button
 
+
+# Conclusion
+
+In this tutorial we have seen how to use AskOmics Interactive Tool to Build a complex SPARQL query to interrogate 4 different datasets and answer a biological question.
