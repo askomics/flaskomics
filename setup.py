@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='askomics',
-    version='3.2.4',
+    version='3.2.5',
     description='''
         AskOmics is a visual SPARQL query interface supporting both intuitive
         data integration and querying while shielding the user from most of the
