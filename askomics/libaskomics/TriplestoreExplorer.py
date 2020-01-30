@@ -1,4 +1,5 @@
 import tld
+from urllib.parse import urlparse
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
@@ -59,7 +60,13 @@ class TriplestoreExplorer(Params):
 
         for result in data:
 
-            endpoint_name = "local" if result["endpoint"] == self.settings.get("triplestore", "endpoint") else tld.get_fld(result["endpoint"]).split('.')[0]
+            if result["endpoint"] == self.settings.get("triplestore", "endpoint"):
+                endpoint_name = "local"
+            else:
+                try:
+                    endpoint_name = tld.get_fld(result["endpoint"]).split('.')[0]
+                except Exception:
+                    endpoint_name = urlparse(result["endpoint"]).netloc
 
             if result["entity"] not in entities:
                 # new entity
