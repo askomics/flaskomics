@@ -58,7 +58,8 @@ cd federated
 
 First, edit the `docker-compose.yml` file. You can change the following entries:
 
-- `services` > `askomics` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/flaskomics:3.2.5` 
+- `services` > `askomics` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/flaskomics:3.2.6`
+- `services` > `celery_askomics` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/celery-flaskomics:3.2.6` 
 - `services` > `isqlapi` > `image`: Use the [latest](https://github.com/xgaia/isql-api/releases/latest) image tag. Example: `xgaia/isql-api:2.2.1` 
 - `services` > `virtuoso` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/virtuoso:7.2.5.1` 
 - `services` > `nginx` > `ports`: You can change the default port if `80` is already used on your machine. Example: `"8080:80"`
