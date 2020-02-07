@@ -693,7 +693,7 @@ class SparqlQueryBuilder(Params):
                         if attribute["negative"]:
                             filters.append("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]))
                         else:
-                            values.append("VALUES {} {{ '{}' }} .".format(obj, attribute["filterValue"]))
+                            values.append("VALUES {} {{ '{}'^^xsd:string }} .".format(obj, attribute["filterValue"]))
 
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
