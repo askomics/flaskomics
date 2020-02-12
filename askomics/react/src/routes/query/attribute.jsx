@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Input, FormGroup, CustomInput } from 'reactstrap'
+import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class AttributeBox extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
@@ -60,6 +62,18 @@ export default class AttributeBox extends Component {
       )
   }
 
+  checkUnvalidUri (value) {
+    if (value == "") {
+      return false
+    } else {
+      if (value.includes(":")) {
+        return false
+      } else {
+        return !this.utils.isUrl(value)
+      }
+    }
+  }
+
   renderUri () {
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
     if (this.props.attribute.visible) {
@@ -92,7 +106,8 @@ export default class AttributeBox extends Component {
               </CustomInput>
             </td>
             <td>
-              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              <Input invalid={this.checkUnvalidUri(this.props.attribute.filterValue)} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              <FormFeedback tooltip>Please filter with a valid URI or CURIE</FormFeedback>
             </td>
           </tr>
         </table>

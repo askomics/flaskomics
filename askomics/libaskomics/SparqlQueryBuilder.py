@@ -498,6 +498,47 @@ class SparqlQueryBuilder(Params):
 
         return triple
 
+    def get_uri_filter_value(self, value):
+        """Get full uri from a filter value (curie or uri)
+
+        :xxx                     -->  :xxx
+        uniprot:xxx              -->  <http://purl.uniprot.org/core/xxx>
+        http://example.org/xxx   -->  <http://example.org/xxx>
+
+        xxx                      -->  xxx is not a valid URI or CURIE
+        bla:xxx                  -->  bla: is not a known prefix
+
+        Parameters
+        ----------
+        value : string
+            Input filter
+
+        Returns
+        -------
+        string
+            corresponding uri
+
+        Raises
+        ------
+        ValueError
+            Invalid URI or CURIE return a value error
+        """
+        if Utils().is_url(value):
+            return "<{}>".format(value)
+        elif ":" in value:
+            prefix, val = value.split(":")
+            if prefix:
+                prefix_manager = PrefixManager(self.app, self.session)
+                namespace = prefix_manager.get_namespace(prefix)
+                if namespace:
+                    return "<{}{}>".format(namespace, val)
+                else:
+                    raise ValueError("{}: is not a known prefix".format(prefix))
+            else:
+                return value
+
+        raise ValueError("{} is not a valid URI or CURIE".format(value))
+
     def build_query_from_json(self, json_query, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -644,7 +685,7 @@ class SparqlQueryBuilder(Params):
                     self.selects.append(subject)
                 # filters/values
                 if attribute["filterValue"] != "" and not attribute["linked"]:
-                    filter_value = "<{}>".format(attribute["filterValue"]) if Utils.is_url(attribute["filterValue"]) else "{}".format(attribute["filterValue"])
+                    filter_value = self.get_uri_filter_value(attribute["filterValue"])
                     if attribute["filterType"] == "regexp":
                         negative_sign = ""
                         if attribute["negative"]:

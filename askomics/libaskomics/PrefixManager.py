@@ -1,6 +1,7 @@
 from askomics.libaskomics.Params import Params
 
 import rdflib
+import json
 
 
 class PrefixManager(Params):
@@ -56,3 +57,26 @@ class PrefixManager(Params):
             prefix_string += 'PREFIX {} <{}>\n'.format(prefix, self.prefix[prefix])
 
         return prefix_string
+
+    def get_namespace(self, prefix):
+        """Get a namespace from a prefix
+
+        Parameters
+        ----------
+        prefix : string
+            prefix
+
+        Returns
+        -------
+        string
+            The corresponding namespace
+        """
+        json_prefix_file = "askomics/libaskomics/prefix.cc.json"
+        with open(json_prefix_file) as json_file:
+            content = json_file.read()
+        prefix_cc = json.loads(content)
+
+        try:
+            return prefix_cc[prefix]
+        except Exception:
+            return ""
