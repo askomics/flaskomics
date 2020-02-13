@@ -6,29 +6,6 @@ from . import AskomicsTestCase
 class TestApi(AskomicsTestCase):
     """Test AskOmics API"""
 
-    def test_hello(self, client):
-        """Test /api/hello route"""
-        response = client.client.get('/api/hello')
-
-        assert response.status_code == 200
-        assert response.json == {
-            "error": False,
-            "errorMessage": '',
-            "message": "Welcome to AskOmics"
-        }
-
-        # Log user
-        client.log_user("jdoe")
-
-        response = client.client.get('/api/hello')
-
-        assert response.status_code == 200
-        assert response.json == {
-            "error": False,
-            "errorMessage": '',
-            "message": "Hello John Doe, Welcome to AskOmics!"
-        }
-
     def test_start(self, client):
         """Test /api/start route"""
         # Non logged
