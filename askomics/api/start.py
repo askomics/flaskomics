@@ -48,6 +48,7 @@ def start():
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
+            "disableAccountCreation": current_app.iniconfig.getboolean("askomics", "disable_account_creation"),
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
             "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
