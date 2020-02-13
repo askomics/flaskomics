@@ -61,10 +61,10 @@ git clone https://github.com/USERNAME/flaskomics.git # replace USERNAME with you
 
 # Install AskOmics
 
-Use the `install.sh` script to setup the python virtual environment and to download python and node modules needed.
+Use the `install.sh` script to setup the python virtual environment and to download python and node modules needed. Use the `-d dev` to get the dev dependencies.
 
 ```bash
-./install.sh
+./install.sh -d dev
 ```
 
 # Run

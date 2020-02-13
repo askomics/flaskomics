@@ -25,6 +25,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `display_commit_hash` (`true` or `false`): diplay the commit hash of the current version in the AskOmics footer
     - `data_directory` (path): where AskOmics store the data 
     - `database_path` (path): Path to the sqlite database
+    - `disable_account_creation` (`true` or `false`): disable the possibility to create new accounts
     - `npreview` (int): Number of line displayed during integration 
     - `password_salt` (string): Password salt 
     - `default_locked_account` (`true` or `false`): Lock new account
