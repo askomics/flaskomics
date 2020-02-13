@@ -62,6 +62,10 @@ class AddUser(object):
         }
 
         local_auth = LocalAuth(self.application, self.session)
+        if local_auth.get_number_of_users() > 0:
+            self.application.logger.error("Database is not empty, user {} will not be created".format(self.args.username))
+            return
+        self.application.logger.info("Create user {}".format(self.args.username))
         self.user = local_auth.persist_user(inputs)
         self.session["user"] = self.user
         local_auth.create_user_directories(self.user["id"], self.user["username"])
