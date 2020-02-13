@@ -322,10 +322,7 @@ export default class AttributeBox extends Component {
 
   render () {
     let box = null
-    if (this.props.attribute.type == 'uri') {
-      box = this.renderUri()
-    }
-    if (this.props.attribute.type == 'text') {
+    if (this.props.attribute.type == 'text' || this.props.attribute.type == 'uri') {
       box = this.renderText()
     }
     if (this.props.attribute.type == 'decimal') {
