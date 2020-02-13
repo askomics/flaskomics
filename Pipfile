@@ -1,0 +1,39 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+werkzeug = "==0.16.1"
+flask = "*"
+flask-ini = "*"
+flask-reverse-proxy-fix = "*"
+validate-email = "*"
+gunicorn = "*"
+python-magic = "*"
+rdflib = "*"
+sparqlwrapper = "*"
+requests = "*"
+celery = "*"
+redis = "*"
+watchdog = "*"
+gitpython = "*"
+biopython = "*"
+bcbio-gff = "*"
+bioblend = "*"
+pysam = "==0.15.3"
+pybedtools = "*"
+deepdiff = "*"
+sentry-sdk = "*"
+configparser = "*"
+tld = "*"
+argh = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-cov ="*"
+coveralls = "*"
+flake8 = "*"
+
+[requires]
+python_version = "3.7"

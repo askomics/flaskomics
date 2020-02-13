@@ -47,6 +47,7 @@ if [[ $ignored != "python" ]]; then
     # install python dependancies inside the virtual environment
     echo "Installing Python dependancies inside the virtual environment ..."
     pip3 install -e .
+    pipenv install
 fi
 
 if [[ $ignored != "js" ]]; then
