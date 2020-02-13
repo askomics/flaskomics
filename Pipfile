@@ -34,6 +34,4 @@ pytest = "*"
 pytest-cov ="*"
 coveralls = "*"
 flake8 = "*"
-
-[requires]
-python_version = "3.7"
+mkdocs = "*"
