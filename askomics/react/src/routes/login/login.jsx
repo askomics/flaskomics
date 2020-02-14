@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap'
+import { Button, Form, FormGroup, Label, Input, Alert, FormText } from 'reactstrap'
 import update from 'immutability-helper'
 import { Redirect, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -94,7 +94,7 @@ export default class Login extends Component {
                 <Input type="password" name="password" id="password" placeholder="password" value={this.state.password} onChange={this.handleChange} />
               </FormGroup>
               <Button disabled={!this.validateForm()}>Login</Button>
-              <p>(Or <Link to="/signup"> signup</Link>)</p>
+              {this.props.config.disableAccountCreation ? <FormText>(Account creation is disabled)</FormText> : <p>(Or <Link to="/signup"> signup</Link>)</p>}
             </Form>
             <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
           </div>

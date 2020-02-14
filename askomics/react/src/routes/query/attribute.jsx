@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Input, FormGroup, CustomInput } from 'reactstrap'
+import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
 import Visualization from './visualization'
 import PropTypes from 'prop-types'
+import Utils from '../../classes/utils'
 
 export default class AttributeBox extends Component {
   constructor (props) {
     super(props)
+    this.utils = new Utils()
     this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
@@ -58,6 +60,70 @@ export default class AttributeBox extends Component {
           })}
         </CustomInput>
       )
+  }
+
+  checkUnvalidUri (value) {
+    if (value == "") {
+      return false
+    } else {
+      if (value.includes(":")) {
+        return false
+      } else {
+        return !this.utils.isUrl(value)
+      }
+    }
+  }
+
+  renderUri () {
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    if (this.props.attribute.visible) {
+      eyeIcon = 'attr-icon fas fa-eye'
+    }
+
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
+    }
+
+    let selected_sign = {
+      '=': !this.props.attribute.negative,
+      "≠": this.props.attribute.negative
+    }
+
+    let form
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input invalid={this.checkUnvalidUri(this.props.attribute.filterValue)} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              <FormFeedback tooltip>Please filter with a valid URI or CURIE</FormFeedback>
+            </td>
+          </tr>
+        </table>
+      )
+    }
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        <div className="attr-icons">
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+        </div>
+        {form}
+      </div>
+    )
   }
 
   renderText () {

@@ -13,15 +13,20 @@ dir_node_modules="$dir_askomics/node_modules"
 activate="$dir_venv/bin/activate"
 
 function usage() {
-    echo "Usage: $0 (-i { js | python })"
+    echo "Usage: $0 (-d { dev | prod }) (-i { js | python })"
     echo "    -i     ignore install of python or js"
+    echo "    -d     deployment mode (default: production)"
 }
 
-while getopts "hi:" option; do
+while getopts "hi:d:" option; do
     case $option in
         h)
             usage
             exit 0
+        ;;
+
+        d)
+            depmode=$OPTARG
         ;;
 
         i)
@@ -29,6 +34,19 @@ while getopts "hi:" option; do
         ;;
     esac
 done
+
+case $depmode in
+    prod|production|"")
+        pipenv_opt=""
+    ;;
+    dev|development)
+        pipenv_opt="--dev"
+    ;;
+    *)
+        echo "-d $depmode: wrong deployment mode"
+        usage
+        exit 1
+esac
 
 if [[ $ignored != "python" ]]; then
     python3 --version > /dev/null 2>&1 || { echo "python3 required but not installed. Abording." >&2; exit 1; }
@@ -47,6 +65,7 @@ if [[ $ignored != "python" ]]; then
     # install python dependancies inside the virtual environment
     echo "Installing Python dependancies inside the virtual environment ..."
     pip3 install -e .
+    pipenv install ${pipenv_opt}
 fi
 
 if [[ $ignored != "js" ]]; then

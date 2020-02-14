@@ -20,13 +20,24 @@ export default class Signup extends Component {
       password: '',
       passwordconf: '',
       usernameFirstChar: '',
-      usernameLastChars: ''
+      usernameLastChars: '',
+      RedirectHome: false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.cancelRequest
+  }
+
+  componentDidMount() {
+    if (!this.props.waitForStart) {
+      if (this.props.config.disableAccountCreation) {
+        this.setState({
+          RedirectHome: true
+        })
+      }
+    }
   }
 
   handleChangeFname (event) {
@@ -100,7 +111,7 @@ export default class Signup extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          success: !response.data.error,
+          success: !error.response.data.error,
           fname: '',
           lname: '',
           username: '',
@@ -120,7 +131,7 @@ export default class Signup extends Component {
 
   render () {
     let html = <Redirect to="/" />
-    if (!this.props.config.logged) {
+    if (!this.props.config.logged && !this.state.RedirectHome) {
       html = (
         <div className="container">
           <h2>Signup</h2>
@@ -165,5 +176,6 @@ export default class Signup extends Component {
 
 Signup.propTypes = {
   setStateNavbar: PropTypes.func,
-  config: PropTypes.object
+  config: PropTypes.object,
+  waitForStart: PropTypes.bool
 }

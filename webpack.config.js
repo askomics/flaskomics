@@ -1,7 +1,7 @@
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
-let config = {
+module.exports = (env, argv) => ({
     entry: [
         './askomics/react/src/index.jsx'
     ],
@@ -25,25 +25,10 @@ let config = {
     resolve: {
         extensions: ['.js', '.jsx'],
     },
-    // plugins: [
-    //   new webpack.DefinePlugin({
-    //     'process.env': {
-    //       'NODE_ENV': JSON.stringify('production')
-    //     }
-    //   }),
-    //   new UglifyJsPlugin({
-    //     cache: true,
-    //     parallel: true,
-    //     uglifyOptions: {
-    //       compress: true,
-    //       ecma: 6,
-    //       mangle: true
-    //     },
-    //     sourceMap: true
-    //   })
-    // ]
+    optimization: {
+      minimize: (argv.mode === 'production') ? true : false,
+      minimizer: [new TerserPlugin()],
+    },
+});
 
-
-};
-
-module.exports = config;
+// module.exports = config;

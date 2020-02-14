@@ -64,9 +64,77 @@ class TestApiStartpoints(AskomicsTestCase):
         response = client.client.post('/api/query/preview', json=data)
         expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT1G57800'}, {'transcript1_Label': 'AT5G35334'}, {'transcript1_Label': 'AT3G10460'}, {'transcript1_Label': 'AT1G49500'}, {'transcript1_Label': 'AT3G10490'}, {'transcript1_Label': 'AT3G51470'}, {'transcript1_Label': 'AT5G41905'}, {'transcript1_Label': 'AT1G33615'}, {'transcript1_Label': 'AT3G22640'}, {'transcript1_Label': 'AT3G13660'}, {'transcript1_Label': 'AT1G01010.1'}]}
 
-        print(response.json)
+        # print(response.json)
 
         assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # Use a filtered query
+
+        # CURIE :
+        with open("tests/data/graphState_filtered_query.json") as file:
+            file_content = file.read()
+            file_content = file_content.replace("###FILTER_VALUE###", ":AT3G10490")
+        json_query = json.loads(file_content)
+        data = {
+            "graphState": json_query,
+        }
+        response = client.client.post('/api/query/preview', json=data)
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT3G10490'}]}
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # CURIE uniprot:
+        with open("tests/data/graphState_filtered_query.json") as file:
+            file_content = file.read()
+            file_content = file_content.replace("###FILTER_VALUE###", "uniprot:AT3G10490")
+        json_query = json.loads(file_content)
+        data = {
+            "graphState": json_query,
+        }
+        response = client.client.post('/api/query/preview', json=data)
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': []}
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # URI
+        with open("tests/data/graphState_filtered_query.json") as file:
+            file_content = file.read()
+            file_content = file_content.replace("###FILTER_VALUE###", "{}AT3G10490".format(client.get_config("triplestore", "prefix")))
+        json_query = json.loads(file_content)
+        data = {
+            "graphState": json_query,
+        }
+        response = client.client.post('/api/query/preview', json=data)
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT3G10490'}]}
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # invalid input
+        with open("tests/data/graphState_filtered_query.json") as file:
+            file_content = file.read()
+            file_content = file_content.replace("###FILTER_VALUE###", "coucou")
+        json_query = json.loads(file_content)
+        data = {
+            "graphState": json_query,
+        }
+        response = client.client.post('/api/query/preview', json=data)
+        expected = {'error': True, 'errorMessage': 'coucou is not a valid URI or CURIE', 'headerPreview': [], 'resultsPreview': []}
+        assert response.status_code == 500
+        assert self.equal_objects(response.json, expected)
+
+        # invalid prefix
+        with open("tests/data/graphState_filtered_query.json") as file:
+            file_content = file.read()
+            file_content = file_content.replace("###FILTER_VALUE###", "invalid:coucou")
+        json_query = json.loads(file_content)
+        data = {
+            "graphState": json_query,
+        }
+        response = client.client.post('/api/query/preview', json=data)
+        print(response.json)
+        expected = {'error': True, 'errorMessage': 'invalid: is not a known prefix', 'headerPreview': [], 'resultsPreview': []}
+        assert response.status_code == 500
         assert self.equal_objects(response.json, expected)
 
     def test_save_result(self, client):

@@ -46,6 +46,13 @@ def signup():
     json
         Info about the user
     """
+    if current_app.iniconfig.getboolean("askomics", "disable_account_creation"):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Account creation is disabled",
+            'user': {}
+        }), 500
+
     user = {}
 
     data = request.get_json()

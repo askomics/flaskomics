@@ -27,6 +27,9 @@ npreview = 30
 
 # Authentication
 
+# Disable user creation, true or false
+disable_account_creation = false
+
 # Salt for user password. Use a random string
 password_salt = 4sk0mIcs
 # If true, accout are locked at creation

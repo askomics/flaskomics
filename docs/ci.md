@@ -13,4 +13,7 @@ docker-compose up -d
 
 # Run CI locally
 
+First, [install askomics in dev mode](/dev-deployment/#install-askomics).
+
+
 Use `test.sh` to launch the CI. The script will launch the same commands as Travis-CI.

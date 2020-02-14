@@ -2,10 +2,11 @@ all the documentation (including what you are reading) can be found [here](https
 
 # Serve doc locally
 
-To serve docs locally, run
+First, [install askomics in dev mode](/dev-deployment/#install-askomics).
+
+Then, run
 
 ```bash
-cd flaskomics
 # source the askomics virtual env
 source venv/bin/activate
 mkdocs serve

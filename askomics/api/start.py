@@ -13,36 +13,6 @@ from pkg_resources import get_distribution
 start_bp = Blueprint('start', __name__, url_prefix='/')
 
 
-@start_bp.route('/api/hello', methods=['GET'])
-def hello():
-    """Dummy routes
-
-    Returns
-    -------
-    json
-        error: True if error, else False
-        errorMessage: the error message of error, else an empty string
-        message: a welcome message
-    """
-    try:
-        message = "Welcome to AskOmics" if 'user' not in session else "Hello {} {}, Welcome to AskOmics!".format(
-            session["user"]["fname"], session["user"]["lname"])
-
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
-        return jsonify({
-            'error': True,
-            'errorMessage': str(e),
-            'message': ''
-        }), 500
-
-    return jsonify({
-        'error': False,
-        'errorMessage': '',
-        'message': message
-    })
-
-
 @start_bp.route('/api/start', methods=['GET'])
 def start():
     """Starting route
@@ -78,6 +48,7 @@ def start():
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
+            "disableAccountCreation": current_app.iniconfig.getboolean("askomics", "disable_account_creation"),
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
             "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
             "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
@@ -93,7 +64,6 @@ def start():
         }
 
         if 'user' in session:
-            current_app.logger.debug(session["user"]["username"])
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             session['user'] = user
