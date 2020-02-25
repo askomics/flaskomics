@@ -1,6 +1,3 @@
-import os
-from shutil import copyfile
-
 from askomics.libaskomics.File import File
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
@@ -30,6 +27,12 @@ class RdfFile(File):
             AskOmics url
         """
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
+
+        self.type_dict = {
+            "rdf/ttl": "turtle",
+            "rdf/xml": "xml",
+            "rdf/nt": "nt"
+        }
 
     def set_preview(self):
         """Summary"""
@@ -74,27 +77,26 @@ class RdfFile(File):
 
         method = self.settings.get('triplestore', 'upload_method')
 
+        # Load file into a RDF graph
+        self.graph_chunk.parse(self.path, format=self.type_dict[self.type])
+
         # insert metadata
         sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
 
         if method == "load":
-            # cp file into ttl dir
-            tmp_file_name = 'tmp_{}_{}.ttl'.format(
+            # write rdf into a tmpfile and load it
+            temp_file_name = 'tmp_{}_{}.{}'.format(
                 Utils.get_random_string(5),
                 self.name,
+                self.rdf_extention
             )
-            temp_file_path = '{}/{}'.format(self.ttl_dir, tmp_file_name)
-            copyfile(self.path, temp_file_path)
-            # Load the chunk
-            sparql.load_data(tmp_file_name, self.file_graph, self.host_url)
 
-            # Remove tmp file
-            if not self.settings.getboolean('askomics', 'debug_ttl'):
-                os.remove(temp_file_path)
+            # Try to load data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, self.load_graph, self.graph_chunk, temp_file_name)
+
         else:
-
-            with open(self.path) as ttl_file:
-                ttl_content = ttl_file.read()
-                sparql.insert_ttl_string(ttl_content, self.user_graph)
+            # Insert
+            # Try to insert data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, sparql.insert_data, self.graph_chunk, self.file_graph)
 
         self.set_triples_number()

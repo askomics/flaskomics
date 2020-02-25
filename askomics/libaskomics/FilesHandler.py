@@ -63,7 +63,7 @@ class FilesHandler(FilesUtils):
                 self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
             elif file['type'] == 'gff/gff3':
                 self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
-            elif file['type'] == 'turtle':
+            elif file['type'] in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
                 self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
             elif file['type'] == 'bed':
                 self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
@@ -181,7 +181,11 @@ class FilesHandler(FilesUtils):
         if filetype in ('text/tab-separated-values', 'tabular'):
             filetype = 'csv/tsv'
         elif filetype in ('text/turtle', 'ttl'):
-            filetype = 'turtle'
+            filetype = 'rdf/ttl'
+        elif filetype == "text/xml":
+            filetype = "rdf/xml"
+        elif filetype == "application/n-triples":
+            filetype = "rdf/nt"
         elif filetype in ('gff', ):
             filetype = 'gff/gff3'
         else:
@@ -278,8 +282,11 @@ class FilesHandler(FilesUtils):
         elif file_ext in ('.bed', ):
             return 'bed'
         elif file_ext in ('.ttl', '.turtle'):
-            return 'turtle'
-
+            return 'rdf/ttl'
+        elif file_ext in ('.xml', ):
+            return 'rdf/xml'
+        elif file_ext in ('.nt', ):
+            return 'rdf/nt'
         # Default is csv
         return 'csv/tsv'
 

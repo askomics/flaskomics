@@ -68,7 +68,7 @@ def integrate(self, session, data, host_url):
                 file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)
             elif file.type == "gff/gff3":
                 file.integrate(data["dataset_id"], data["entities"], public=public)
-            elif file.type == "turtle":
+            elif file.type in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
                 file.integrate(public=public)
             elif file.type == "bed":
                 file.integrate(data["dataset_id"], data["entity_name"], public=public)

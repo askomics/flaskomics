@@ -43,6 +43,10 @@ class RdfGraph(Params):
         self.ntriple = 0
         self.percent = None
 
+    def parse(self, source=None, publicID=None, format=None, location=None, file=None, data=None, **args):
+        """Parse a RDF file"""
+        self.graph.parse(source=source, publicID=publicID, format=format, location=location, file=file, data=data, **args)
+
     def add(self, triple):
         """Add a triple into the rdf graph
 
