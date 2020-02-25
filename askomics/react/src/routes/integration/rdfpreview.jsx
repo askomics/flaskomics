@@ -23,7 +23,7 @@ export default class RdfPreview extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: "",
+      externalEndpoint: props.file.data.location ? props.file.data.location : "",
       error: false,
       errorMessage: null,
       status: null
@@ -137,9 +137,9 @@ export default class RdfPreview extends Component {
         <AdvancedOptions
           hideCustomUri={true}
           config={this.props.config}
-          handleChangeUri={p => this.handleChangeUri(p)}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
-          customUri={this.state.customUri}
+          externalEndpoint={this.state.externalEndpoint}
+          handleChangeUri={p => this.handleChangeUri(p)}
         />
         <br />
         <div className="center-div">

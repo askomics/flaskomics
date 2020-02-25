@@ -149,6 +149,7 @@ class File(Params):
 
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
+        self.graph_metadata = RdfGraph(self.app, self.session)
 
         self.error = False
         self.error_message = ""
@@ -216,7 +217,7 @@ class File(Params):
         else:
             return self.askomics_prefix[self.format_uri(string)]
 
-    def get_metadata(self):
+    def set_metadata(self):
         """Get a rdflib graph of the metadata
 
         Returns
@@ -224,22 +225,19 @@ class File(Params):
         Graph
             graph containing metadata of the file
         """
-        rdf_graph = RdfGraph(self.app, self.session)
         location_endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
 
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.atLocation, location_endpoint))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.atLocation, location_endpoint))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
 
         if self.public:
-            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
         else:
-            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(False)))
-
-        return rdf_graph
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(False)))
 
     def load_graph(self, rdf_graph, tmp_file_name):
         """Load a rdflib graph into the triplestore
@@ -292,7 +290,8 @@ class File(Params):
         sparql = SparqlQueryLauncher(self.app, self.session)
 
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
+        self.set_metadata()
+        sparql.insert_data(self.graph_metadata, self.file_graph, metadata=True)
 
         content_generator = self.generate_rdf_content()
 

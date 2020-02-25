@@ -1,4 +1,5 @@
 from askomics.libaskomics.File import File
+from askomics.libaskomics.RdfGraph import RdfGraph
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
@@ -38,6 +39,21 @@ class RdfFile(File):
         """Summary"""
         pass
 
+    def get_location(self):
+        """Get location of data if specified
+
+        Returns
+        -------
+        str
+            Location
+        """
+        graph = RdfGraph(self.app, self.session)
+        graph.parse(self.path, format=self.type_dict[self.type])
+        triple = (None, self.prov.atLocation, None)
+        for s, p, o in graph.graph.triples(triple):
+            return str(o)
+        return None
+
     def get_preview(self):
         """Get a preview of the frist 100 lines of a ttl file
 
@@ -59,9 +75,14 @@ class RdfFile(File):
             'error': self.error,
             'error_message': self.error_message,
             'data': {
-                'preview': head
+                'preview': head,
+                'location': self.get_location()
             }
         }
+
+    def delete_metadata_location(self):
+        """Delete metadata from data"""
+        self.graph_chunk.remove((None, self.prov.atLocation, None))
 
     def integrate(self, public=False):
         """Integrate the file into the triplestore
@@ -80,8 +101,14 @@ class RdfFile(File):
         # Load file into a RDF graph
         self.graph_chunk.parse(self.path, format=self.type_dict[self.type])
 
+        # get metadata
+        self.set_metadata()
+
+        # Remove metadata from data
+        self.delete_metadata_location()
+
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
+        sparql.insert_data(self.graph_metadata, self.file_graph, metadata=True)
 
         if method == "load":
             # write rdf into a tmpfile and load it

@@ -58,6 +58,17 @@ class RdfGraph(Params):
         self.graph.add(triple)
         self.ntriple += 1
 
+    def remove(self, triple):
+        """Remove a triple into the rdf graph
+
+        Parameters
+        ----------
+        triple : tuple
+            triple to remove
+        """
+        self.graph.remove(triple)
+        self.ntriple -= 1
+
     def bind(self, a, b):
         """Bind a namespace
 
