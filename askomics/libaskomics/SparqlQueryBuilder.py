@@ -170,7 +170,7 @@ class SparqlQueryBuilder(Params):
             return "local triplestore"
         return endpoint
 
-    def get_graphs_and_endpoints(self, selected_graphs=None, selected_endpoints=None):
+    def get_graphs_and_endpoints(self, selected_graphs=[], selected_endpoints=[], all_selected=False):
         """get graphs and endpoints (uri and names)
 
         Returns
@@ -184,13 +184,13 @@ class SparqlQueryBuilder(Params):
             graphs[graph] = {
                 "uri": graph,
                 "name": self.format_graph_name(graph),
-                "selected": True if graph in selected_graphs else False
+                "selected": True if all_selected else True if graph in selected_graphs else False
             }
         for endpoint in self.endpoints:
             endpoints[endpoint] = {
                 "uri": endpoint,
                 "name": self.format_endpoint_name(endpoint),
-                "selected": True if endpoint in selected_endpoints else False
+                "selected": True if all_selected else True if endpoint in selected_endpoints else False
             }
 
         return (graphs, endpoints)
@@ -209,7 +209,6 @@ class SparqlQueryBuilder(Params):
             WHERE {
                 ?s ?p ?o
             }
-            LIMIT 25
             '''
         )
 

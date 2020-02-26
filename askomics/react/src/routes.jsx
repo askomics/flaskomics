@@ -109,7 +109,7 @@ export default class Routes extends Component {
             <Route path="/admin" exact component={() => (<Admin config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
-            <Route path="/sparql" exact component={Sparql} />
+            <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
             {integrationRoutes}
           </Switch>
           <br />

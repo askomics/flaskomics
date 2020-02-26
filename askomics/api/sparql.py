@@ -39,6 +39,47 @@ def prefix():
     })
 
 
+@sparql_bp.route("/api/sparql/init", methods=["GET"])
+def init():
+    """Get the default sparql query
+
+    Returns
+    -------
+    json
+    """
+    try:
+        # Disk space
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+        # Get graphs and endpoints
+        query_builder = SparqlQueryBuilder(current_app, session)
+        graphs, endpoints = query_builder.get_graphs_and_endpoints(all_selected=True)
+
+        # Default query
+        default_query = query_builder.prefix_query(query_builder.get_default_query())
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "error": True,
+            "errorMessage": str(e),
+            "defaultQuery": "",
+            "graphs": {},
+            "endpoints": {},
+            "diskSpace": None
+        }), 500
+
+    return jsonify({
+        "error": False,
+        "errorMessage": "",
+        "defaultQuery": default_query,
+        "graphs": graphs,
+        "endpoints": endpoints,
+        "diskSpace": disk_space
+    })
+
+
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
 def query():
     """Perform a sparql query
