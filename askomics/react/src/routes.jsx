@@ -38,8 +38,8 @@ export default class Routes extends Component {
         commit: null,
         gitUrl: null,
         disableIntegration: null,
-        prefix: null,
-        namespace: null
+        namespaceData: null,
+        namespaceInternal: null
       }
     }
     this.cancelRequest

@@ -9,9 +9,9 @@ class PrefixManager(Params):
 
     Attributes
     ----------
-    askomics_namespace : str
+    namespace_internal : str
         askomics namespace, from config file
-    askomics_prefix : str
+    namespace_data : str
         askomics prefix, from config file
     prefix : dict
         dict of all prefixes
@@ -28,12 +28,12 @@ class PrefixManager(Params):
             AskOmics session
         """
         Params.__init__(self, app, session)
-        self.askomics_namespace = self.settings.get('triplestore', 'namespace')
-        self.askomics_prefix = self.settings.get('triplestore', 'prefix')
+        self.namespace_data = self.settings.get('triplestore', 'namespace_data')
+        self.namespace_internal = self.settings.get('triplestore', 'namespace_internal')
 
         self.prefix = {
-            ':': self.settings.get('triplestore', 'prefix'),
-            'askomics:': self.settings.get('triplestore', 'namespace'),
+            ':': self.settings.get('triplestore', 'namespace_data'),
+            'askomics:': self.settings.get('triplestore', 'namespace_internal'),
             'prov:': 'http://www.w3.org/ns/prov#',
             'dc:': 'http://purl.org/dc/elements/1.1/',
             'faldo:': "http://biohackathon.org/resource/faldo/",

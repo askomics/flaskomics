@@ -248,13 +248,13 @@ class SparqlQueryBuilder(Params):
         query = '''
         WITH GRAPH <{graph}>
         DELETE {{
-            <{graph}> :public ?public .
+            <{graph}> askomics:public ?public .
         }}
         INSERT {{
-            <{graph}> :public <{public}> .
+            <{graph}> askomics:public <{public}> .
         }}
         WHERE {{
-            <{graph}> :public ?public .
+            <{graph}> askomics:public ?public .
         }}
         '''.format(graph=graph, public=public)
 
@@ -413,11 +413,11 @@ class SparqlQueryBuilder(Params):
         query = '''
         SELECT DISTINCT ?graph ?endpoint
         WHERE {{
-          ?graph :public ?public .
+          ?graph askomics:public ?public .
           ?graph dc:creator ?creator .
           GRAPH ?graph {{
             ?graph prov:atLocation ?endpoint .
-            ?entity_uri a :entity .
+            ?entity_uri a askomics:entity .
           }}
           {}
           {}

@@ -50,8 +50,8 @@ def start():
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
             "disableAccountCreation": current_app.iniconfig.getboolean("askomics", "disable_account_creation"),
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
-            "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
-            "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
+            "namespaceData": current_app.iniconfig.get('triplestore', 'namespace_data'),
+            "namespaceInternal": current_app.iniconfig.get('triplestore', 'namespace_internal'),
             "proxyPath": proxy_path,
             "user": {},
             "logged": False

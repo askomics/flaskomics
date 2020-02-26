@@ -20,9 +20,9 @@ class File(Params):
 
     Attributes
     ----------
-    askomics_namespace : Namespace
+    namespace_internal : Namespace
         AskOmics namespace askomics:
-    askomics_prefix : Namespace
+    namespace_data : Namespace
         AskOmics prefix :
     dc : Namespace
         dc namespace
@@ -120,9 +120,9 @@ class File(Params):
 
         self.now = datetime.datetime.now().isoformat()
 
-        self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
-        self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
-        self.entity_prefix = Namespace(custom_uri) if custom_uri else self.askomics_prefix
+        self.namespace_internal = Namespace(self.settings.get('triplestore', 'namespace_internal'))
+        self.namespace_data = Namespace(self.settings.get('triplestore', 'namespace_data'))
+        self.namespace_entity = Namespace(custom_uri) if custom_uri else self.namespace_data
 
         self.faldo = Namespace('http://biohackathon.org/resource/faldo/')
         self.prov = Namespace('http://www.w3.org/ns/prov#')
@@ -136,10 +136,10 @@ class File(Params):
             "reference": None
         }
         self.faldo_abstraction_eq = {
-            "start": self.askomics_namespace["faldoStart"],
-            "end": self.askomics_namespace["faldoEnd"],
-            "strand": self.askomics_namespace["faldoStrand"],
-            "reference": self.askomics_namespace["faldoReference"]
+            "start": self.namespace_internal["faldoStart"],
+            "end": self.namespace_internal["faldoEnd"],
+            "strand": self.namespace_internal["faldoStrand"],
+            "reference": self.namespace_internal["faldoReference"]
         }
 
         self.method = self.settings.get('triplestore', 'upload_method')
@@ -215,7 +215,7 @@ class File(Params):
         if Utils.is_valid_url(string):
             return rdflib.URIRef(string)
         else:
-            return self.askomics_prefix[self.format_uri(string)]
+            return self.namespace_data[self.format_uri(string)]
 
     def set_metadata(self):
         """Get a rdflib graph of the metadata
@@ -235,9 +235,9 @@ class File(Params):
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
 
         if self.public:
-            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(True)))
         else:
-            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(False)))
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(False)))
 
     def load_graph(self, rdf_graph, tmp_file_name):
         """Load a rdflib graph into the triplestore

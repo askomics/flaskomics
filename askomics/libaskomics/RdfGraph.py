@@ -9,9 +9,9 @@ class RdfGraph(Params):
 
     Attributes
     ----------
-    askomics_namespace : Namespace
+    namespace_internal : Namespace
         AskOmics napespace
-    askomics_prefix : Namespace
+    namespace_data : Namespace
         AskOmics prefix
     graph : Graph
         rdflib graph
@@ -31,12 +31,12 @@ class RdfGraph(Params):
         """
         Params.__init__(self, app, session)
 
-        self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
-        self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
+        self.namespace_data = Namespace(self.settings.get('triplestore', 'namespace_data'))
+        self.namespace_internal = Namespace(self.settings.get('triplestore', 'namespace_internal'))
 
         self.graph = rdflib.Graph()
-        self.graph.bind('', self.askomics_prefix)
-        self.graph.bind('askomics', self.askomics_namespace)
+        self.graph.bind('', self.namespace_data)
+        self.graph.bind('askomics', self.namespace_internal)
         self.graph.bind('faldo', "http://biohackathon.org/resource/faldo/")
         self.graph.bind('dc', 'http://purl.org/dc/elements/1.1/')
         self.graph.bind('prov', 'http://www.w3.org/ns/prov#')

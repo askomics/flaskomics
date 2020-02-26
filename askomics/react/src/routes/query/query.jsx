@@ -140,7 +140,7 @@ export default class Query extends Component {
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
       return 'decimal'
     }
-    if (typeUri == this.state.config.prefix + 'AskomicsCategory') {
+    if (typeUri == this.state.config.namespaceInternal + 'AskomicsCategory') {
       return 'category'
     }
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {

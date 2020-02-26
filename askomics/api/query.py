@@ -68,7 +68,7 @@ def get_abstraction():
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            'diskSpace': disk_space,
+            'diskSpace': None,
             'abstraction': [],
             'error': True,
             'errorMessage': str(e)

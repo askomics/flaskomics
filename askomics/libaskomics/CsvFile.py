@@ -303,12 +303,12 @@ class CsvFile(File):
         for index, attribute in enumerate(self.header):
 
             if self.columns_type[index] in ('category', 'reference', 'strand'):
-                s = self.askomics_prefix["{}Category".format(self.format_uri(attribute, remove_space=True))]
-                p = self.askomics_namespace["category"]
+                s = self.namespace_data["{}Category".format(self.format_uri(attribute, remove_space=True))]
+                p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
                     o = self.rdfize(value)
                     self.graph_abstraction_dk.add((s, p, o))
-                    self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.askomics_prefix["{}CategoryValue".format(self.format_uri(self.header[index]))]))
+                    self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
                     if self.columns_type[index] == "strand":
                         self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
@@ -329,12 +329,12 @@ class CsvFile(File):
             entity_label = rdflib.Literal(self.header[0])
 
         self.graph_abstraction_dk.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
-        self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix['entity']))
+        self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal['entity']))
         if self.faldo_entity:
-            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix["faldo"]))
+            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal["faldo"]))
         self.graph_abstraction_dk.add((entity, rdflib.RDFS.label, entity_label))
         if self.columns_type[0] == 'start_entity':
-            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.askomics_prefix['startPoint']))
+            self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal['startPoint']))
 
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
@@ -354,15 +354,15 @@ class CsvFile(File):
                 label = rdflib.Literal(splitted[0])
                 rdf_range = self.rdfize(splitted[1])
                 rdf_type = rdflib.OWL.ObjectProperty
-                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsRelation"]))
+                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
 
             # Category
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
                 attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
-                rdf_range = self.askomics_prefix["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
+                rdf_range = self.namespace_data["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
-                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.askomics_prefix["AskomicsCategory"]))
+                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
@@ -432,7 +432,7 @@ class CsvFile(File):
                     continue
 
                 # Entity
-                entity = self.entity_prefix[self.format_uri(row[0])]
+                entity = self.namespace_entity[self.format_uri(row[0])]
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
 
@@ -545,9 +545,9 @@ class CsvFile(File):
                     block_end = int(end) // block_base
 
                     for slice_block in range(block_start, block_end + 1):
-                        self.graph_chunk.add((entity, self.askomics_namespace['includeIn'], rdflib.Literal(int(slice_block))))
+                        self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
                         if reference:
                             block_reference = self.rdfize(self.format_uri("{}_{}".format(reference, slice_block)))
-                            self.graph_chunk.add((entity, self.askomics_namespace["includeInReference"], block_reference))
+                            self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
 
                 yield
