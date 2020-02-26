@@ -1,4 +1,12 @@
 {
+  "diskSpace": ###SIZE###,
+  "endpoints": {
+    "###LOCAL_ENDPOINT###": {
+      "name": "local triplestore",
+      "selected": true,
+      "uri": "###LOCAL_ENDPOINT###"
+    }
+  },
   "error": false,
   "errorMessage": "",
   "graphState": {
@@ -250,5 +258,32 @@
       }
     ]
   },
-  "id": 1
+  "graphs": {
+    "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###": {
+      "name": "de.tsv",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:de.tsv_###DE_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###": {
+      "name": "gene.bed",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###": {
+      "name": "gene.gff3",
+      "selected": true,
+      "uri": "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###": {
+      "name": "qtl.tsv",
+      "selected": false,
+      "uri": "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
+    },
+    "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###": {
+      "name": "transcripts.tsv",
+      "selected": true,
+      "uri": "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+    }
+  },
+  "sparqlQuery": null
 }

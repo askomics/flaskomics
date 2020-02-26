@@ -17,7 +17,7 @@ class TestApiSparql(AskomicsTestCase):
         assert response.json == {
             'error': False,
             'errorMessage': '',
-            'query': 'PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?s ?p ?o\nWHERE {\n    ?s ?p ?o\n}\nLIMIT 25\n'
+            'query': 'PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?s ?p ?o\nWHERE {\n    ?s ?p ?o\n}\nLIMIT 25\n'
         }
 
     def test_preview(self, client):
@@ -27,19 +27,19 @@ class TestApiSparql(AskomicsTestCase):
         info = client.upload_and_integrate()
 
         no_endpoint_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': ["urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}".format(str(info["transcripts"]["timestamp"]))],
             'endpoints': []
         }
 
         no_graph_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': [],
             'endpoints': [client.get_config("federation", "local_endpoint")]
         }
 
         ok_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': ["urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}".format(str(info["transcripts"]["timestamp"]))],
             'endpoints': [client.get_config("federation", "local_endpoint")]
         }
@@ -82,19 +82,19 @@ class TestApiSparql(AskomicsTestCase):
         info = client.upload_and_integrate()
 
         no_endpoint_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': ["urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}".format(str(info["transcripts"]["timestamp"]))],
             'endpoints': []
         }
 
         no_graph_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': [],
             'endpoints': [client.get_config("federation", "local_endpoint")]
         }
 
         ok_data = {
-            'query': "PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>\nPREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
+            'query': "PREFIX : <http://askomics.org/test/data/>\nPREFIX askomics: <http://askomics.org/test/internal/>\nPREFIX dc: <http://purl.org/dc/elements/1.1/>\nPREFIX faldo: <http://biohackathon.org/resource/faldo/>\nPREFIX owl: <http://www.w3.org/2002/07/owl#>\nPREFIX prov: <http://www.w3.org/ns/prov#>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\nSELECT DISTINCT ?transcript1_Label\nWHERE {\n    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .\n    ?transcript1_uri rdfs:label ?transcript1_Label .\n}\n",
             'graphs': ["urn:sparql:askomics_test:1_jdoe:transcripts.tsv_{}".format(str(info["transcripts"]["timestamp"]))],
             'endpoints': [client.get_config("federation", "local_endpoint")]
         }

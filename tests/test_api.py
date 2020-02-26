@@ -16,8 +16,8 @@ class TestApi(AskomicsTestCase):
             "gitUrl": "https://github.com/askomics/flaskomics",
             "disableIntegration": client.get_config('askomics', 'disable_integration', boolean=True),
             "disableAccountCreation": client.get_config('askomics', 'disable_account_creation', boolean=True),
-            "prefix": client.get_config('triplestore', 'prefix'),
-            "namespace": client.get_config('triplestore', 'namespace'),
+            "namespaceData": client.get_config('triplestore', 'namespace_data'),
+            "namespaceInternal": client.get_config('triplestore', 'namespace_internal'),
             "proxyPath": "/",
             "user": {},
             "logged": False

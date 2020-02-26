@@ -23,6 +23,8 @@ class TestApiStartpoints(AskomicsTestCase):
         raw_startpoints = raw_startpoints.replace("###BED_TIMESTAMP###", str(info["bed"]["timestamp"]))
         expected = json.loads(raw_startpoints)
 
+        print(response.json)
+
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
@@ -100,7 +102,7 @@ class TestApiStartpoints(AskomicsTestCase):
         # URI
         with open("tests/data/graphState_filtered_query.json") as file:
             file_content = file.read()
-            file_content = file_content.replace("###FILTER_VALUE###", "{}AT3G10490".format(client.get_config("triplestore", "prefix")))
+            file_content = file_content.replace("###FILTER_VALUE###", "{}AT3G10490".format(client.get_config("triplestore", "namespace_data")))
         json_query = json.loads(file_content)
         data = {
             "graphState": json_query,

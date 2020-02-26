@@ -13,7 +13,7 @@
             "url": "http://localhost:8891/sparql"
         }],
         "entity":
-        "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "http://askomics.org/test/data/transcript",
         "entity_label":
         "transcript",
         "graphs":
@@ -42,7 +42,7 @@
              "url": "http://localhost:8891/sparql"
          }],
          "entity":
-         "http://www.semanticweb.org/user/ontologies/2018/1#gene",
+         "http://askomics.org/test/data/gene",
          "entity_label":
          "gene",
          "graphs": [{
@@ -72,7 +72,7 @@
              "url": "http://localhost:8891/sparql"
          }],
          "entity":
-         "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+         "http://askomics.org/test/data/DifferentialExpression",
          "entity_label":
          "DifferentialExpression",
          "graphs": [{
@@ -91,7 +91,7 @@
              "url": "http://localhost:8891/sparql"
          }],
          "entity":
-         "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+         "http://askomics.org/test/data/QTL",
          "entity_label":
          "QTL",
          "graphs": [{
