@@ -32,7 +32,7 @@ export default class Ask extends Component {
     this.handleClick = this.handleClick.bind(this)
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
-    this.handleClickPublicQuery = this.handleClickPublicQuery.bind(this)
+    this.handleClickTemplateQuery = this.handleClickTemplateQuery.bind(this)
     this.toggleDropDown = this.toggleDropDown.bind(this)
     this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
     this.clickOnEndpoint = this.clickOnEndpoint.bind(this)
@@ -110,18 +110,28 @@ export default class Ask extends Component {
     })
   }
 
-  handleClickPublicQuery (event) {
+  handleClickTemplateQuery (event) {
     // request api to get a preview of file
-    let requestUrl = '/api/results/graphstate'
+    let requestUrl = '/api/results/getquery'
     let data = { fileId: event.target.id }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         // set state of resultsPreview
-        this.setState({
-          startSessionWithExemple: true,
-          graphState: response.data.graphState
-        })
+        if (response.data.sparqlQuery == null) {
+          this.setState({
+            startSessionWithExemple: true,
+            graphState: response.data.graphState
+          })
+        } else {
+          this.setState({
+            startSPARQLWithExemple: true,
+            sparqlQuery: response.data.sparqlQuery,
+            graphs: response.data.graphs,
+            endpoints_sparql: response.data.endpoints,
+            diskSpace: response.data.diskSpace,
+          })
+        }
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -209,6 +219,20 @@ export default class Ask extends Component {
       }} />
     }
 
+    let redirectSparqlEditor
+    if (this.state.startSPARQLWithExemple) {
+      redirectSparqlEditor = <Redirect to={{
+        pathname: '/sparql',
+        state: {
+          sparqlQuery: this.state.sparqlQuery,
+          graphs: this.state.graphs,
+          endpoints: this.state.endpoints_sparql,
+          diskSpace: this.state.diskSpace,
+          config: this.props.config
+        }
+      }} />
+    }
+
 
     let errorDiv
     if (this.state.error) {
@@ -221,17 +245,17 @@ export default class Ask extends Component {
       )
     }
 
-    let exempleQueries
+    let templateQueries
     let emptyPrivate
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
-      exempleQueries = (
+      templateQueries = (
         <div>
           <p>Or start with an template:</p>
             <ListGroup>
               {this.state.publicQueries.map(query => {
                 if (query.public == 0) {
                   emptyPrivate = <br />
-                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateQuery}>{query.description}</ListGroupItem>
                 }
               })}
             </ListGroup>
@@ -239,7 +263,7 @@ export default class Ask extends Component {
             <ListGroup>
               {this.state.publicQueries.map(query => {
                 if (query.public == 1) {
-                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickPublicQuery}>{query.description}</ListGroupItem>
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateQuery}>{query.description}</ListGroupItem>
                 }
               })}
             </ListGroup>
@@ -350,6 +374,7 @@ export default class Ask extends Component {
       <div className="container">
         {redirectQueryBuilder}
         {redirectLogin}
+        {redirectSparqlEditor}
         <h2>Ask!</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
@@ -360,7 +385,7 @@ export default class Ask extends Component {
               {galaxyForm}
             </Col>
             <Col xs="7">
-              {exempleQueries}
+              {templateQueries}
             </Col>
           </Row>
           <br />
