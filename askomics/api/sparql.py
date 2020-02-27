@@ -11,34 +11,6 @@ from flask import (Blueprint, current_app, jsonify, request, session)
 sparql_bp = Blueprint('sparql', __name__, url_prefix='/')
 
 
-@sparql_bp.route('/api/sparql/getquery', methods=['GET'])
-def prefix():
-    """Get the default sparql query
-
-    Returns
-    -------
-    json
-        default query
-    """
-    try:
-        query_builder = SparqlQueryBuilder(current_app, session)
-        query = query_builder.get_default_query_with_prefix()
-
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
-        return jsonify({
-            'error': True,
-            'errorMessage': str(e),
-            'query': ''
-        }), 500
-
-    return jsonify({
-        'error': False,
-        'errorMessage': '',
-        'query': query
-    })
-
-
 @sparql_bp.route("/api/sparql/init", methods=["GET"])
 def init():
     """Get the default sparql query
