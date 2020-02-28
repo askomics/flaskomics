@@ -10,6 +10,7 @@ import Datasets from './routes/datasets/datasets'
 import Signup from './routes/login/signup'
 import Login from './routes/login/login'
 import Logout from './routes/login/logout'
+import PasswordReset from './routes/login/passwordreset'
 import Account from './routes/account/account'
 import Admin from './routes/admin/admin'
 import Sparql from './routes/sparql/sparql'
@@ -105,6 +106,7 @@ export default class Routes extends Component {
             <Route path="/login" exact component={() => (<Login config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/signup" exact component={() => (<Signup config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/logout" exact component={() => (<Logout config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/password_reset" component={(props) => <PasswordReset config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} {...props}/>}/>
             <Route path="/account" exact component={() => (<Account config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />

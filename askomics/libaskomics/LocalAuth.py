@@ -2,9 +2,12 @@
 
 import hashlib
 import os
+import time
+import textwrap
 
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Galaxy import Galaxy
+from askomics.libaskomics.Mailer import Mailer
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 
@@ -164,7 +167,8 @@ class LocalAuth(Params):
             ?,
             ?,
             ?,
-            ?
+            ?,
+            NULL
         )
         '''
 
@@ -450,6 +454,30 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_message': error_message, 'user': user}
 
+    def update_pw_db(self, username, password):
+        """Update a password in database
+
+        Parameters
+        ----------
+        username : str
+            User username
+        password : str
+            New password
+        """
+        database = Database(self.app, self.session)
+
+        salt = Utils.get_random_string(20)
+        salted_pw = self.settings.get('askomics', 'password_salt') + password + salt
+        sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
+
+        query = '''
+        UPDATE users SET
+        password=?, salt=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (sha512_pw, salt, username))
+
     def update_password(self, inputs, user):
         """Update the password of a user
 
@@ -468,8 +496,6 @@ class LocalAuth(Params):
         error = False
         error_message = ''
 
-        database = Database(self.app, self.session)
-
         # check if new passwords are identicals
         password_identical = (inputs['newPassword'] == inputs['confPassword'])
 
@@ -479,18 +505,7 @@ class LocalAuth(Params):
                 credentials = {'login': user['username'], 'password': inputs['oldPassword']}
                 authentication = self.authenticate_user(credentials)
                 if not authentication['error']:
-                    # Update the password
-                    salt = Utils.get_random_string(20)
-                    salted_pw = self.settings.get('askomics', 'password_salt') + inputs['newPassword'] + salt
-                    sha512_pw = hashlib.sha512(salted_pw.encode('utf-8')).hexdigest()
-
-                    query = '''
-                    UPDATE users SET
-                    password=?, salt=?
-                    WHERE username=?
-                    '''
-
-                    database.execute_sql_query(query, (sha512_pw, salt, user['username']))
+                    self.update_pw_db(user['username'], inputs['newPassword'])
                 else:
                     error = True
                     error_message = 'Incorrect old password'
@@ -771,3 +786,233 @@ class LocalAuth(Params):
         '''
 
         database.execute_sql_query(query, (Utils.humansize_to_bytes(quota), username))
+
+    def get_email_with_username(self, username):
+        """Get email from a username
+
+        Parameters
+        ----------
+        username : str
+            Username
+
+        Returns
+        -------
+        str
+            email
+        """
+        database = Database(self.app, self.session)
+
+        query = """
+        SELECT email
+        FROM users
+        WHERE username=?
+        """
+
+        return database.execute_sql_query(query, (username, ))[0][0]
+
+    def get_username_with_email(self, email):
+        """Get username from an email
+
+        Parameters
+        ----------
+        email : str
+            email
+
+        Returns
+        -------
+        str
+            username
+        """
+        database = Database(self.app, self.session)
+
+        query = """
+        SELECT username
+        FROM users
+        WHERE email=?
+        """
+
+        return database.execute_sql_query(query, (email, ))[0][0]
+
+    def create_reset_token(self, login):
+        """Insert a token into the db
+
+        Parameters
+        ----------
+        login : str
+            username or email
+
+        Returns
+        -------
+        str
+            The reset token
+        """
+        token = "{}:{}".format(int(time.time()), Utils.get_random_string(20))
+
+        database_field = 'username'
+        if validate_email(login):
+            database_field = 'email'
+
+        database = Database(self.app, self.session)
+        query = """
+        UPDATE users
+        SET reset_token=?
+        WHERE {}=?
+        """.format(database_field)
+
+        database.execute_sql_query(query, (token, login))
+
+        return token
+
+    def send_reset_link(self, login):
+        """Send a reset link to a user
+
+        Parameters
+        ----------
+        login : str
+            username or email
+        """
+        login_type = 'username'
+        if validate_email(login):
+            login_type = 'email'
+
+        if login_type == 'username':
+            valid_user = self.is_username_in_db(login)
+            username = login
+            email = self.get_email_with_username(login) if valid_user else None
+        else:
+            valid_user = self.is_email_in_db(login)
+            username = self.get_username_with_email(login) if valid_user else None
+            email = login
+
+        if valid_user:
+            token = self.create_reset_token(login)
+
+            mailer = Mailer(self.app, self.session)
+            if mailer.check_mailer():
+                body = textwrap.dedent("""
+                Dear {user},
+
+                We heard that you lost your AskOmics password. Sorry about that!
+
+                But don’t worry! You can use the following link to reset your password:
+
+                {url}/password_reset?token={token}
+
+                If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit {url}/password_reset
+
+
+                Thanks,
+                The AskOmics Team
+
+                """.format(
+                    user=username,
+                    url=self.settings.get('askomics', 'askomics_url'),
+                    token=token
+                ))
+
+                mailer.send_mail(email, "[AskOmics] Password reset", body)
+
+    def check_token(self, token):
+        """Get username corresponding to the token
+
+        Parameters
+        ----------
+        token : str
+            The reset token
+
+        Returns
+        -------
+        dict
+            Username and message
+        """
+        database = Database(self.app, self.session)
+
+        query = """
+        SELECT username, fname, lname
+        FROM users
+        WHERE reset_token=?
+        """
+
+        rows = database.execute_sql_query(query, (token, ))
+
+        username = None
+        fname = None
+        lname = None
+        message = "Invalid token"
+
+        if len(rows) > 0:
+            username = rows[0][0]
+            fname = rows[0][1]
+            lname = rows[0][2]
+
+        if username:
+            # check token validity
+            token_timestamp = token.split(":")[0]
+            time_elapsed = int(time.time()) - int(token_timestamp)
+
+            if time_elapsed >= 10800:  # 3 hours
+                username = None
+                fname = None
+                lname = None
+                message = "{} (too old token)".format(message)
+
+        return {
+            "username": username,
+            "fname": fname,
+            "lname": lname,
+            "message": "" if username else message
+        }
+
+    def remove_token(self, username):
+        """Remove a user token from database
+
+        Parameters
+        ----------
+        username : str
+            User to remove token
+        """
+        database = Database(self.app, self.session)
+        query = """
+        UPDATE users
+        SET reset_token=?
+        WHERE username=?
+        """
+
+        database.execute_sql_query(query, (None, username))
+
+    def reset_password_with_token(self, token, password, password_conf):
+        """Reset password of user with his token
+
+        Parameters
+        ----------
+        token : str
+            User password reset token
+        password : str
+            new password
+        password_conf : str
+            new password confirmation
+
+        Returns
+        -------
+        dict
+            error and message
+        """
+        message = ""
+        error = False
+
+        if password != password_conf:
+            message = "Password are not identical"
+            error = True
+        else:
+            user = self.check_token(token)
+            if user["username"]:
+                self.update_pw_db(user["username"], password)
+                self.remove_token(user["username"])
+            else:
+                error = True
+                message = user["message"]
+
+        return {
+            "error": error,
+            "message": message
+        }

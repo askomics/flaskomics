@@ -639,3 +639,117 @@ class TestApiAuth(AskomicsTestCase):
             "user": {},
             "logged": False
         }
+
+    def test_reset_password(self, client):
+        """test /api/auth/reset_password route"""
+        client.create_two_users()
+
+        # Test send link
+        fake_data = {"login": "jean-michel-fake"}
+        ok_data = {"login": "jdoe"}
+        ok_data_email = {"login": "jdoe@askomics.org"}
+
+        expected = {
+            "error": False,
+            "errorMessage": ""
+        }
+
+        response = client.client.post("/api/auth/reset_password", json=fake_data)
+        assert response.status_code == 200
+        assert response.json == expected
+
+        response = client.client.post("/api/auth/reset_password", json=ok_data)
+        assert response.status_code == 200
+        assert response.json == expected
+
+        response = client.client.post("/api/auth/reset_password", json=ok_data_email)
+        assert response.status_code == 200
+        assert response.json == expected
+
+        # Test check token
+        token = client.create_reset_token("jdoe")
+        fake_data = {
+            "token": "fake_token"
+        }
+        ok_data = {
+            "token": token
+        }
+
+        response = client.client.post("/api/auth/reset_password", json=fake_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "token": "fake_token",
+            "username": None,
+            "fname": None,
+            "lname": None,
+            "error": True,
+            "errorMessage": "Invalid token"
+        }
+
+        response = client.client.post("/api/auth/reset_password", json=ok_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "token": token,
+            "username": "jdoe",
+            "fname": "John",
+            "lname": "Doe",
+            "error": False,
+            "errorMessage": ""
+        }
+
+        # Old token
+        token = client.create_reset_token("jdoe", old_token=True)
+        old_data = {
+            "token": token
+        }
+        response = client.client.post("/api/auth/reset_password", json=old_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "token": token,
+            "username": None,
+            "fname": None,
+            "lname": None,
+            "error": True,
+            "errorMessage": "Invalid token (too old token)"
+        }
+
+        # Test update password
+        token = client.create_reset_token("jdoe")
+        fake_data = {
+            "token": token,
+            "password": "coucou",
+            "passwordConf": "niktarace",
+        }
+
+        response = client.client.post("/api/auth/reset_password", json=fake_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Password are not identical"
+        }
+
+        token = client.create_reset_token("jdoe", old_token=True)
+        old_data = {
+            "token": token,
+            "password": "coucou",
+            "passwordConf": "coucou",
+        }
+        response = client.client.post("/api/auth/reset_password", json=old_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Invalid token (too old token)"
+        }
+
+        token = client.create_reset_token("jdoe")
+        old_data = {
+            "token": token,
+            "password": "coucou",
+            "passwordConf": "coucou",
+        }
+        response = client.client.post("/api/auth/reset_password", json=old_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "error": False,
+            "errorMessage": ""
+        }

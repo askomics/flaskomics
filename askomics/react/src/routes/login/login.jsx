@@ -90,7 +90,7 @@ export default class Login extends Component {
                 <Input type="text" name="login" id="login" placeholder="login" value={this.state.login} onChange={this.handleChange} />
               </FormGroup>
               <FormGroup>
-                <Label for="password">Password</Label>
+                <Label for="password">Password</Label> <Link to="/password_reset"> (Forgot password?)</Link>
                 <Input type="password" name="password" id="password" placeholder="password" value={this.state.password} onChange={this.handleChange} />
               </FormGroup>
               <Button disabled={!this.validateForm()}>Login</Button>

@@ -1,5 +1,8 @@
 """Authentication routes"""
 
+import traceback
+import sys
+
 from functools import wraps
 
 from askomics.libaskomics.LocalAuth import LocalAuth
@@ -250,3 +253,68 @@ def logout():
 
     current_app.logger.debug(session)
     return jsonify({'user': {}, 'logged': False})
+
+
+@auth_bp.route("/api/auth/reset_password", methods=["POST"])
+def reset_password():
+    """Reset password route"""
+    data = request.get_json()
+
+    # Send a reset link
+    if "login" in data:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            local_auth.send_reset_link(data["login"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "error": False,
+            "errorMessage": ""
+        })
+
+    # check if token is valid
+    elif "token" in data and "password" not in data:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            result = local_auth.check_token(data["token"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "token": None,
+                "username": None,
+                "fname": None,
+                "lname": None,
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "token": data["token"],
+            "username": result["username"],
+            "fname": result["fname"],
+            "lname": result["lname"],
+            "error": False if result["username"] else True,
+            "errorMessage": result["message"]
+        })
+
+    # Update password
+    else:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            result = local_auth.reset_password_with_token(data["token"], data["password"], data["passwordConf"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "error": result["error"],
+            "errorMessage": result["message"]
+        })

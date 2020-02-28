@@ -27,10 +27,19 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `database_path` (path): Path to the sqlite database
     - `disable_account_creation` (`true` or `false`): disable the possibility to create new accounts
     - `npreview` (int): Number of line displayed during integration 
-    - `password_salt` (string): Password salt 
+    - `password_salt` (string): Password salt
+    - `disable_account_creation` (`true` or `false`): Disable new account creation
     - `default_locked_account` (`true` or `false`): Lock new account
     - `disable_integration` (`true` or `false`): Disable integration to non admin users
     - `quota` (size): Default quota for new users
+    - `github` (url): Github repository URL
+    - `askomics_url` (url): Instance URL. Used to send link by email when user reset his password
+    - `smtp_host` (url): SMTP host url
+    - `smtp_port` (int): SMTP port 
+    - `smtp_user` (string): SMTP user
+    - `smtp_sender` (email): SMTP sender 
+    - `smtp_password` (string): SMTP password
+    - `smtp_connection` (string): SMTP connectin (starttls or null)
 
 - `virtuoso`
 

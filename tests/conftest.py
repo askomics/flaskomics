@@ -4,10 +4,12 @@ import shutil
 import tempfile
 import json
 import random
+import time
 
 from bioblend.galaxy import GalaxyInstance
 
 from askomics.app import create_app, create_celery
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
@@ -16,6 +18,7 @@ from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.Utils import Utils
 
 import pytest
 
@@ -198,6 +201,23 @@ class Client(object):
         """Create jdoe and jsmith"""
         self.create_user("jdoe")
         self.create_user("jsmith")
+
+    def create_reset_token(self, username, old_token=False):
+        """Create a reset token"""
+        if old_token:
+            old_timestamp = int(time.time()) - 14400
+            token = "{}:{}".format(old_timestamp, Utils.get_random_string(20))
+            database = Database(self.app, self.session)
+            query = """
+            UPDATE users
+            SET reset_token=?
+            WHERE username=?
+            """
+            database.execute_sql_query(query, (token, username))
+            return token
+        else:
+            auth = LocalAuth(self.app, self.session)
+            return auth.create_reset_token(username)
 
     def upload_file(self, file_path):
         """Summary
