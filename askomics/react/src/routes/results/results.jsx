@@ -41,6 +41,7 @@ export default class Results extends Component {
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
+          selected: [],
           results: response.data.remainingFiles,
           resultsPreview: [],
           headerPreview: [],
