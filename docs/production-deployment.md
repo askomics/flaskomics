@@ -80,12 +80,24 @@ Nginx is used to manage web redirection. Nginx configuration is in two files: `n
 
 ### AskOmics
 
-AskOmics configuration is set using enviroment variables. This variables are set in `askomics.env`. All entry if the `askomics.ini` file can be overrided in this file using 
-
-
-All properties defined in `askomics.ini` can be configured via the environment variables in `askomics.env`. The environment variable should be prefixed with `ASKO_` and have a format like `ASKO_$SECTION_$KEY`. $SECTION and $KEY are case sensitive. *E.g.* property `footer_message` in the `askomics` section should be configured as `ASKO_askomics_footer_message=Welcome to my AskOmics!`
+All properties defined in `askomics.ini` can be configured via the environment variables in `askomics.env`. The environment variable should be prefixed with `ASKO_` and have a format like `ASKO_$SECTION_$KEY`. $SECTION and $KEY are case sensitive. *E.g.* property `footer_message` in the `askomics` section should be configured as `ASKO_askomics_footer_message=Welcome to my AskOmics!`.
 
 !!! warning
     Change `ASKO_flask_secret_key` and `ASKO_askomics_password_salt` to random string
 
 For more information about AskOmics configuration, see [configuration](configure.md) section.
+
+#### First user
+
+environment variables can also be used to create a user into AskOmics at first start. For this, use `CREATE_USER=true` User information can be configured with the following environment variables:
+
+- `USER_FIRST_NAME`: User first name (default: Ad)
+- `USER_LAST_NAME`: User last name (default: Min)
+- `USER_USERNAME`: Username (default: admin)
+- `USER_PASSWORD`: Password (default: admin)
+- `USER_EMAIL`: User email (default: admin@example.com)
+- `USER_APIKEY`: User API key (default: admin)
+- `GALAXY_API_KEY`: Galaxy URL linked to the user (optional)
+- `GALAXY_URL`: User Galaxy API Key (optional)
+
+The user will be created only if the users table of the database is empty.

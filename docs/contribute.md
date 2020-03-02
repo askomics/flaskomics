@@ -14,7 +14,7 @@ git checkout -b my_new_feature
 
 Commit and push your modification to your [fork](https://help.github.com/articles/pushing-to-a-remote/). If your changes modify code, please ensure that is conform to [AskOmics style](#coding-style-guidlines)
 
-Write tests for your changes, and make sure that they [passes](dev.md#launch-continuous-integration-locally).
+Write tests for your changes, and make sure that they [passes](dev-deployment.md#launch-continuous-integration-locally).
 
 Open a pull request against the master branch of flaskomics. The message of your pull request should describe your modifications (why and how).
 
