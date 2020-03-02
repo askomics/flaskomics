@@ -19,11 +19,11 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
 
     - `debug` (`true` or `false`): Display debug log in console
     - `debug_ttl` (`true` or `false`): Keep converted rdf file. Set the to true can fill you disk, active only for debug purpose
-    - `reverse_proxy_path` (string): proxy path if AskOmics is accessible under a subpath
+    - `reverse_proxy_path` (string): Proxy path if AskOmics is accessible under a subpath
     - `subtitle` (string): Subtitle, displayed on the browser tab
     - `footer_message` (string): Custom message displayed on the AskOmics footer
     - `display_commit_hash` (`true` or `false`): diplay the commit hash of the current version in the AskOmics footer
-    - `data_directory` (path): where AskOmics store the data 
+    - `data_directory` (path): Where AskOmics store the data 
     - `database_path` (path): Path to the sqlite database
     - `disable_account_creation` (`true` or `false`): disable the possibility to create new accounts
     - `npreview` (int): Number of line displayed during integration 
@@ -40,6 +40,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `smtp_sender` (email): SMTP sender 
     - `smtp_password` (string): SMTP password
     - `smtp_connection` (string): SMTP connectin (starttls or null)
+
 
 - `virtuoso`
 

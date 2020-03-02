@@ -12,7 +12,6 @@ theme:
     - javascript
 markdown_extensions:
   - admonition
-  - fontawesome_markdown
   - toc:
       permalink: true
       toc_depth: 1

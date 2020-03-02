@@ -1,2 +1,1 @@
-mkdocs
-fontawesome_markdown
+mkdocs==1.0.4
