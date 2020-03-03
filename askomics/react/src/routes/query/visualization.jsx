@@ -8,6 +8,7 @@ import update from 'react-addons-update'
 import { ForceGraph2D } from 'react-force-graph'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 
 export default class Visualization extends Component {
   constructor (props) {
@@ -34,11 +35,17 @@ export default class Visualization extends Component {
     this.blankNodeSize = 1
     this.arrowLength = 7
 
+    this.contextTrigger = null
+    this.rightClickedNodeId = null
+
     this.cancelRequest
     this.handleNodeSelection = this.props.handleNodeSelection.bind(this)
     this.handleLinkSelection = this.props.handleLinkSelection.bind(this)
     this.drawNode = this.drawNode.bind(this)
     this.drawLink = this.drawLink.bind(this)
+
+    this.handleRightClick = this.handleRightClick.bind(this)
+    this.handleRightClickMenu = this.handleRightClickMenu.bind(this)
   }
 
   IntersectionCoordinate (x1, y1, x2, y2, r) {
@@ -164,6 +171,19 @@ export default class Visualization extends Component {
     ctx.closePath()
   }
 
+  handleRightClick(clickedNode, event) {
+    if (this.contextTrigger && clickedNode.suggested) {
+      this.setState({
+        rightClickedNodeId: clickedNode.id
+      })
+      this.contextTrigger.handleContextClick(event)
+    }
+  }
+
+  handleRightClickMenu(event, data) {
+    console.log("Convert " + data.nodeId + " to " + data.convertTo + " node")
+  }
+
   componentDidMount () {
     this.fg.zoom(this.zoom, this.zoomTime)
   }
@@ -178,10 +198,26 @@ export default class Visualization extends Component {
           height={this.h}
           backgroundColor="Gainsboro"
           onNodeClick={this.handleNodeSelection}
+          onNodeRightClick={this.handleRightClick}
           onLinkClick={this.handleLinkSelection}
           nodeCanvasObject={this.drawNode}
           linkCanvasObject={this.drawLink}
         />
+
+    <div>
+      <ContextMenuTrigger id="context-menu-1" ref={c => this.contextTrigger = c}>
+      </ContextMenuTrigger>
+
+      <ContextMenu id="context-menu-1">
+        <MenuItem data={{nodeId: this.state.rightClickedNodeId, convertTo: "union"}} onClick={this.handleRightClickMenu}>
+          Convert to UNION node
+        </MenuItem>
+        <MenuItem data={{nodeId: this.state.rightClickedNodeId, convertTo: "not"}} onClick={this.handleRightClickMenu}>
+          Convert to NOT node
+        </MenuItem>
+      </ContextMenu>
+    </div>
+
       </div>
     )
   }

@@ -56,6 +56,7 @@
     "react-bootstrap-table-next": "^3.3.3",
     "react-bootstrap-table2-editor": "^1.4.0",
     "react-bootstrap-table2-paginator": "^2.1.0",
+    "react-contextmenu": "^2.13.0",
     "react-dom": "^16.12.0",
     "react-force-graph": "^1.30.1",
     "react-resize-detector": "^4.2.1",
