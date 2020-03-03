@@ -8,6 +8,7 @@ import UpdatePassword from './update_password'
 import UpdateGalaxyAccount from './update_galaxy'
 import UpdateApiKey from './update_apikey'
 import PropTypes from 'prop-types'
+import WaitingDiv from '../../components/waiting'
 
 export default class Account extends Component {
   constructor (props) {
@@ -19,6 +20,14 @@ export default class Account extends Component {
   }
 
   render () {
+    if (!this.props.waitForStart && !this.props.config.logged) {
+      return <Redirect to="/login" />
+    }
+
+    if (this.props.waitForStart) {
+      return <WaitingDiv waiting={this.props.waitForStart} center />
+    }
+
     return (
       <div className="container">
         <h2>{this.props.config.user.fname} {this.props.config.user.lname}</h2>
