@@ -46,5 +46,6 @@ export default class Account extends Component {
 
 Account.propTypes = {
   config: PropTypes.object,
-  setStateNavbar: PropTypes.func
+  setStateNavbar: PropTypes.func,
+  waitForStart: PropTypes.bool
 }
