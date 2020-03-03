@@ -88,6 +88,60 @@ def get_preview():
     })
 
 
+@login_required
+@results_bp.route('/api/results/getquery', methods=["POST"])
+def get_graph_and_sparql_query():
+    """Get query (graphState or Sparql)
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        file_id = request.get_json()["fileId"]
+        result_info = {"id": file_id}
+        result = Result(current_app, session, result_info)
+
+        # Get graph state and sparql query
+        graph_state = result.get_graph_state(formated=True)
+        sparql_query = result.get_sparql_query()
+
+        # Get disk space
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+        # Get graphs and endpoints
+        graphs = result.graphs
+        endpoints = result.endpoints
+        # Get all graphs and endpoint, and mark as selected the used one
+        query_builder = SparqlQueryBuilder(current_app, session)
+        graphs, endpoints = query_builder.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'graphState': {},
+            'sparqlQuery': "",
+            'graphs': [],
+            'endpoints': [],
+            'diskSpace': 0,
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'graphState': graph_state,
+        'sparqlQuery': sparql_query,
+        'graphs': graphs,
+        'endpoints': endpoints,
+        'diskSpace': disk_space,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @results_bp.route('/api/results/graphstate', methods=['POST'])
 def get_graph_state():
     """Summary

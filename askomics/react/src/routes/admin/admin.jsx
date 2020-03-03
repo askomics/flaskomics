@@ -7,6 +7,8 @@ import cellEditFactory from 'react-bootstrap-table2-editor'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import { Redirect } from 'react-router-dom'
+import WaitingDiv from '../../components/waiting'
 
 export default class Admin extends Component {
   constructor (props) {
@@ -89,7 +91,7 @@ export default class Admin extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          success: !response.data.error
+          success: !error.response.data.error
         })
       })
   }
@@ -114,7 +116,7 @@ export default class Admin extends Component {
             error: true,
             errorMessage: error.response.data.errorMessage,
             status: error.response.status,
-            success: !response.data.error
+            success: !error.response.data.error
           })
         })
     }
@@ -149,7 +151,7 @@ export default class Admin extends Component {
             error: true,
             errorMessage: error.response.data.errorMessage,
             status: error.response.status,
-            success: !response.data.error
+            success: !error.response.data.error
           })
     })
   }
@@ -227,6 +229,17 @@ export default class Admin extends Component {
       dataField: 'fname',
       order: 'asc'
     }]
+
+    if (!this.props.waitForStart && !this.props.config.logged) {
+      return <Redirect to="/login" />
+    }
+    if (!this.props.waitForStart && this.props.config.user.admin != 1) {
+      return <Redirect to="/" />
+    }
+
+    if (this.props.waitForStart) {
+      return <WaitingDiv waiting={this.props.waitForStart} center />
+    }
 
     return (
       <div className="container">

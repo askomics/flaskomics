@@ -130,27 +130,34 @@ class Result(Params):
         """
         new_nodes = []
         new_links = []
+        new_attr = []
 
-        for node in d3_graph_state["nodes"]:
+        try:
 
-            if node["suggested"]:
-                continue
+            for node in d3_graph_state["nodes"]:
 
-            new_node = self.clean_node(node)
-            new_nodes.append(new_node)
+                if node["suggested"]:
+                    continue
 
-        for link in d3_graph_state["links"]:
+                new_node = self.clean_node(node)
+                new_nodes.append(new_node)
 
-            if link["suggested"]:
-                continue
+            for link in d3_graph_state["links"]:
 
-            new_link = self.clean_link(link)
-            new_links.append(new_link)
+                if link["suggested"]:
+                    continue
+
+                new_link = self.clean_link(link)
+                new_links.append(new_link)
+
+            new_attr = d3_graph_state["attr"]
+        except Exception:
+            return {}
 
         return {
             "nodes": new_nodes,
             "links": new_links,
-            "attr": d3_graph_state["attr"]
+            "attr": new_attr
         }
 
     def get_file_name(self):
