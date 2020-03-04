@@ -145,13 +145,11 @@ class SparqlQueryBuilder(Params):
         string
             Formated graph name
         """
-        to_remove = "{}:{}_{}:".format(
+        regexp = r"{}:.*:".format(
             self.settings.get("triplestore", "default_graph"),
-            self.session["user"]["id"],
-            self.session["user"]["username"]
         )
 
-        return "_".join(graph.replace(to_remove, "").split("_")[:-1])
+        return "_".join(re.sub(regexp, "", graph).split("_")[:-1])
 
     def format_endpoint_name(self, endpoint):
         """Replace local url by "local triplestore"
