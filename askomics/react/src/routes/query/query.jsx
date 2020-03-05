@@ -276,7 +276,7 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested) {
+  insertNode (uri, selected, suggested, special=null) {
     /*
     Insert a new node in the graphState
     */
@@ -284,7 +284,7 @@ export default class Query extends Component {
     let humanId = this.getHumanNodeId(uri)
     let node = {
       uri: uri,
-      type: this.getType(uri),
+      type: special ? special : this.getType(uri),
       filterNode: "",
       filterLink: "",
       graphs: this.getGraphs(uri),
@@ -297,12 +297,14 @@ export default class Query extends Component {
     }
     this.graphState.nodes.push(node)
     if (selected) {
+      this.previousSelected = this.currentSelected
       this.currentSelected = node
     }
 
-    if (!suggested) {
+    if (!suggested && !special) {
       this.setNodeAttributes(uri, nodeId)
     }
+    return node
   }
 
   removeNode (id) {
@@ -406,7 +408,8 @@ export default class Query extends Component {
               source: node.id,
               target: targetId,
               selected: false,
-              suggested: true
+              suggested: true,
+              directed: true
             })
           }
         }
@@ -445,7 +448,8 @@ export default class Query extends Component {
               source: sourceId,
               target: node.id,
               selected: false,
-              suggested: true
+              suggested: true,
+              directed: true
             })
           }
         }
@@ -483,7 +487,8 @@ export default class Query extends Component {
             source: node.id,
             target: new_id,
             selected: false,
-            suggested: true
+            suggested: true,
+            directed: true
           })
         }
       })
@@ -517,7 +522,8 @@ export default class Query extends Component {
           source: node1.id,
           target: node2.id,
           selected: false,
-          suggested: false
+          suggested: false,
+          directed: true
         }
       }
 
@@ -533,7 +539,8 @@ export default class Query extends Component {
           source: node2.id,
           target: node1.id,
           selected: false,
-          suggested: false
+          suggested: false,
+          directed: true
         }
       }
     })
@@ -733,6 +740,87 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // Node conversion
+  handleNodeConversion(event, data) {
+    /*
+      Source node
+      Special node
+      Target node
+    */
+    let sourceNode = this.currentSelected
+
+    // Get info about the relation between source and target
+    let relation = this.getInfoAboutRelation(sourceNode.id, data.node.id)
+
+    // remove suggestionand unselect all
+    this.removeAllSuggestion()
+    this.unselectAllObjects()
+
+    // insert a special node and select it
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo)
+
+    // insert target node
+    let targetNode = this.insertNode(data.node.uri, false, false)
+
+    // insert link between source and special node
+    this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
+
+    // insert link between special node and target
+    relation.source = relation.source == "source" ? specialNode.id : targetNode.id
+    relation.target = relation.target == "target" ? targetNode.id : specialNode.id
+    relation.id = this.getId()
+    relation.suggested = false
+    relation.selected = false
+    this.graphState.links.push(relation)
+
+    //insert suggestion
+    this.insertSuggestion(specialNode)
+
+    // Manage selection
+    this.manageCurrentPreviousSelected(specialNode)
+
+    // Update graph
+    this.updateGraphState()
+  }
+
+  getInfoAboutRelation(sourceId, targetId) {
+    let relation
+    this.graphState.links.map(link => {
+      if ((link.source.id == sourceId && link.target.id == targetId) || link.source.id == targetId && link.target.id == sourceId) {
+        relation =  {
+          uri: link.uri,
+          type: link.type,
+          sameStrand: link.sameStrand,
+          sameRef: link.sameRef,
+          id: null,
+          label: link.label,
+          source: link.source.id == sourceId ? "source" : "target",
+          target: link.target.id == targetId ? "target" : "source",
+          selected: link.selected,
+          suggested: link.suggested,
+          directed: link.directed
+        }
+      }
+    })
+    return relation
+  }
+
+  insertSpecialLink(node1, node2, relation) {
+    let link = {
+      uri: relation,
+      type: "link",
+      sameStrand: null,
+      sameRef: null,
+      id: this.getId(),
+      label: relation,
+      source: node1.id,
+      target: node2.id,
+      selected: false,
+      suggested: false,
+      directed: false
+    }
+    this.graphState.links.push(link)
+  }
 
   // Filter nodes --------------------------
   handleFilterNodes (event) {
@@ -1170,6 +1258,7 @@ export default class Query extends Component {
           waiting={this.state.waiting}
           handleNodeSelection={p => this.handleNodeSelection(p)}
           handleLinkSelection={p => this.handleLinkSelection(p)}
+          handleNodeConversion={(p, d) => this.handleNodeConversion(p, d)}
         />
       )
 

@@ -36,7 +36,7 @@ export default class Visualization extends Component {
     this.arrowLength = 7
 
     this.contextTrigger = null
-    this.rightClickedNodeId = null
+    this.rightClickedNode = null
 
     this.cancelRequest
     this.handleNodeSelection = this.props.handleNodeSelection.bind(this)
@@ -45,7 +45,7 @@ export default class Visualization extends Component {
     this.drawLink = this.drawLink.bind(this)
 
     this.handleRightClick = this.handleRightClick.bind(this)
-    this.handleRightClickMenu = this.handleRightClickMenu.bind(this)
+    this.handleNodeConversion = this.props.handleNodeConversion.bind(this)
   }
 
   IntersectionCoordinate (x1, y1, x2, y2, r) {
@@ -107,29 +107,61 @@ export default class Visualization extends Component {
 
 
   drawNode (node, ctx, globalScale) {
-    // node style
-    let unselectedColor = node.faldo ? this.colorGreen : this.colorGrey
-    let unselectedColorText = node.faldo ? this.colorGreen : this.colorDarkGrey
-    ctx.fillStyle = node.type == "node" ? this.utils.stringToHexColor(node.uri) : "#ffffff"
-    ctx.lineWidth = this.lineWidth
-    ctx.strokeStyle = node.selected ? this.colorFirebrick : unselectedColor
-    ctx.globalAlpha = node.suggested ? 0.5 : 1
-    node.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
-    // draw node
-    ctx.beginPath()
-    ctx.arc(node.x, node.y, this.nodeSize, 0, 2 * Math.PI, false)
-    ctx.stroke()
-    ctx.fill()
-    ctx.closePath()
-    // draw text
-    ctx.beginPath()
-    ctx.fillStyle = unselectedColorText
-    ctx.font = this.nodeSize + 'px Sans-Serif'
-    ctx.textAlign = 'middle'
-    ctx.textBaseline = 'middle'
-    let label = node.humanId ? node.label + " " + this.subNums(node.humanId) : node.label
-    ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
-    ctx.closePath()
+    if (node.type == "union" || node.type == "not") {
+      // node style
+      ctx.fillStyle = "#f5d273"
+      ctx.lineWidth = this.lineWidth
+      ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
+      ctx.globalAlpha = 1
+      ctx.setLineDash([])
+
+      // draw node
+      ctx.beginPath()
+      ctx.moveTo(node.x, node.y + 4)  // move to top
+      ctx.lineTo(node.x - 4, node.y)  // draw to left
+      ctx.lineTo(node.x, node.y - 4)  // draw to down
+      ctx.lineTo(node.x + 4, node.y)  // draw to right
+      ctx.lineTo(node.x, node.y + 4)  // draw to top
+      ctx.stroke()
+      ctx.fill()
+      ctx.closePath()
+
+      // draw text
+      ctx.beginPath()
+      ctx.fillStyle = this.colorDarkGrey
+      ctx.font = this.nodeSize + 'px Sans-Serif'
+      ctx.textAlign = 'middle'
+      ctx.textBaseline = 'middle'
+      let label = node.type
+      ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
+      ctx.closePath()
+
+
+    } else {
+      // node style
+      let unselectedColor = node.faldo ? this.colorGreen : this.colorGrey
+      let unselectedColorText = node.faldo ? this.colorGreen : this.colorDarkGrey
+      ctx.fillStyle = node.type == "node" ? this.utils.stringToHexColor(node.uri) : "#ffffff"
+      ctx.lineWidth = this.lineWidth
+      ctx.strokeStyle = node.selected ? this.colorFirebrick : unselectedColor
+      ctx.globalAlpha = node.suggested ? 0.5 : 1
+      node.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
+      // draw node
+      ctx.beginPath()
+      ctx.arc(node.x, node.y, this.nodeSize, 0, 2 * Math.PI, false)
+      ctx.stroke()
+      ctx.fill()
+      ctx.closePath()
+      // draw text
+      ctx.beginPath()
+      ctx.fillStyle = unselectedColorText
+      ctx.font = this.nodeSize + 'px Sans-Serif'
+      ctx.textAlign = 'middle'
+      ctx.textBaseline = 'middle'
+      let label = node.humanId ? node.label + " " + this.subNums(node.humanId) : node.label
+      ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
+      ctx.closePath()
+    }
   }
 
   drawLink (link, ctx, globalScale) {
@@ -153,13 +185,15 @@ export default class Visualization extends Component {
     ctx.stroke()
     ctx.closePath()
     // draw arrow
-    ctx.beginPath()
-    let triangle = this.triangleCoordinate(link.target.x, link.target.y, link.source.x, link.source.y, this.arrowLength)
-    ctx.moveTo(c.x, c.y)
-    ctx.lineTo(triangle.xa, triangle.ya)
-    ctx.lineTo(triangle.xb, triangle.yb)
-    ctx.fill()
-    ctx.closePath()
+    if (link.directed) {
+      ctx.beginPath()
+      let triangle = this.triangleCoordinate(link.target.x, link.target.y, link.source.x, link.source.y, this.arrowLength)
+      ctx.moveTo(c.x, c.y)
+      ctx.lineTo(triangle.xa, triangle.ya)
+      ctx.lineTo(triangle.xb, triangle.yb)
+      ctx.fill()
+      ctx.closePath()
+    }
     // draw text
     ctx.beginPath()
     ctx.fillStyle = unselectedColorText
@@ -174,14 +208,10 @@ export default class Visualization extends Component {
   handleRightClick(clickedNode, event) {
     if (this.contextTrigger && clickedNode.suggested) {
       this.setState({
-        rightClickedNodeId: clickedNode.id
+        rightClickedNode: clickedNode
       })
       this.contextTrigger.handleContextClick(event)
     }
-  }
-
-  handleRightClickMenu(event, data) {
-    console.log("Convert " + data.nodeId + " to " + data.convertTo + " node")
   }
 
   componentDidMount () {
@@ -209,10 +239,10 @@ export default class Visualization extends Component {
       </ContextMenuTrigger>
 
       <ContextMenu id="context-menu-1">
-        <MenuItem data={{nodeId: this.state.rightClickedNodeId, convertTo: "union"}} onClick={this.handleRightClickMenu}>
+        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "union"}} onClick={this.handleNodeConversion}>
           Convert to UNION node
         </MenuItem>
-        <MenuItem data={{nodeId: this.state.rightClickedNodeId, convertTo: "not"}} onClick={this.handleRightClickMenu}>
+        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "not"}} onClick={this.handleNodeConversion}>
           Convert to NOT node
         </MenuItem>
       </ContextMenu>
