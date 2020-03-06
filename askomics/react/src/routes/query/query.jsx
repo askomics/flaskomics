@@ -664,8 +664,6 @@ export default class Query extends Component {
     }
     // update graph state
     this.updateGraphState()
-    // // manage node filter
-    // this.manageFilterNodes(this.currentSelected.filter)
   }
 
   handleRemoveNode () {
