@@ -478,7 +478,7 @@ export default class Query extends Component {
           // push suggested link
           this.graphState.links.push({
             uri: "included_in",
-            type: "link",
+            type: "posLink",
             id: this.getId(),
             sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
             sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
@@ -601,33 +601,36 @@ export default class Query extends Component {
   }
 
   handleLinkSelection (clickedLink) {
-    // case 1: link is selected, so deselect it
-    if (clickedLink.selected) {
-      // Update current and previous
-      this.manageCurrentPreviousSelected(null)
+    // Only position link are clickabl
+    if (clickedLink.type == "posLink") {
+      // case 1: link is selected, so deselect it
+      if (clickedLink.selected) {
+        // Update current and previous
+        this.manageCurrentPreviousSelected(null)
 
-      // Deselect nodes and links
-      this.unselectAllObjects()
+        // Deselect nodes and links
+        this.unselectAllObjects()
 
-      // Remove all suggestion
-      this.removeAllSuggestion()
-    } else {
-      // case 2: link is unselected, so select it
-      let suggested = clickedLink.suggested
-      // Update current and previous
-      this.manageCurrentPreviousSelected(clickedLink)
-      // Deselect nodes and links
-      this.unselectAllObjects()
-      // Select and instanciate the link
-      this.selectAndInstanciateLink(clickedLink)
-      // instanciate node only if node is suggested
-      if (suggested) {
-        this.instanciateNode(clickedLink.target)
+        // Remove all suggestion
+        this.removeAllSuggestion()
+      } else {
+        // case 2: link is unselected, so select it
+        let suggested = clickedLink.suggested
+        // Update current and previous
+        this.manageCurrentPreviousSelected(clickedLink)
+        // Deselect nodes and links
+        this.unselectAllObjects()
+        // Select and instanciate the link
+        this.selectAndInstanciateLink(clickedLink)
+        // instanciate node only if node is suggested
+        if (suggested) {
+          this.instanciateNode(clickedLink.target)
+        }
+        // reload suggestions
+        this.removeAllSuggestion()
       }
-      // reload suggestions
-      this.removeAllSuggestion()
+      this.updateGraphState()
     }
-    this.updateGraphState()
   }
 
   handleNodeSelection (clickedNode) {
@@ -1200,10 +1203,10 @@ export default class Query extends Component {
     let graphFilters
 
     if (!this.state.waiting) {
-      // attribute boxes (right view)
+      // attribute boxes (right view) only for node
       if (this.currentSelected) {
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
-          if (attribute.nodeId == this.currentSelected.id) {
+          if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
               <AttributeBox
                 attribute={attribute}
@@ -1223,7 +1226,7 @@ export default class Query extends Component {
           }
         })
         // Link view (rightview)
-        if (this.currentSelected.type == "link") {
+        if (this.currentSelected.type == "posLink") {
 
           let link = Object.assign(this.currentSelected)
           this.state.graphState.nodes.map(node => {
