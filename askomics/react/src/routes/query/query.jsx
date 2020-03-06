@@ -825,12 +825,12 @@ export default class Query extends Component {
 
   insertSpecialLink(node1, node2, relation) {
     let link = {
-      uri: relation,
-      type: "link",
+      uri: null,
+      type: "specialLink",
       sameStrand: null,
       sameRef: null,
       id: this.getId(),
-      label: relation,
+      label: relation == "unionNode" ? "Union" : "Not",
       source: node1.id,
       target: node2.id,
       selected: false,

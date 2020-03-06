@@ -107,7 +107,7 @@ export default class Visualization extends Component {
 
 
   drawNode (node, ctx, globalScale) {
-    if (node.type == "union" || node.type == "not") {
+    if (node.type == "unionNode" || node.type == "notNode") {
       // node style
       ctx.fillStyle = "#f5d273"
       ctx.lineWidth = this.lineWidth
@@ -132,7 +132,7 @@ export default class Visualization extends Component {
       ctx.font = this.nodeSize + 'px Sans-Serif'
       ctx.textAlign = 'middle'
       ctx.textBaseline = 'middle'
-      let label = node.type
+      let label = node.type == "unionNode" ? "Union" : "Not"
       ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
       ctx.closePath()
 
@@ -239,10 +239,10 @@ export default class Visualization extends Component {
       </ContextMenuTrigger>
 
       <ContextMenu id="context-menu-1">
-        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "union"}} onClick={this.handleNodeConversion}>
+        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "unionNode"}} onClick={this.handleNodeConversion}>
           Convert to UNION node
         </MenuItem>
-        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "not"}} onClick={this.handleNodeConversion}>
+        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "notNode"}} onClick={this.handleNodeConversion}>
           Convert to NOT node
         </MenuItem>
       </ContextMenu>
