@@ -577,8 +577,10 @@ export default class Query extends Component {
         inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
-    // get attributes
-    this.setNodeAttributes(node.uri, node.id)
+    // get attributes (only for nodes)
+    if (node.type =="node") {
+      this.setNodeAttributes(node.uri, node.id)
+    }
   }
 
   instanciateNode (node) {
@@ -587,8 +589,10 @@ export default class Query extends Component {
         inode.suggested = false
       }
     })
-    // get attributes
-    this.setNodeAttributes(node.uri, node.id)
+    // get attributes (only for nodes)
+    if (node.type =="node") {
+      this.setNodeAttributes(node.uri, node.id)
+    }
   }
 
   selectAndInstanciateLink (link) {
