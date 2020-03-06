@@ -668,7 +668,7 @@ class SparqlQueryBuilder(Params):
         for attribute in json_query["attr"]:
             # URI ---
             if attribute["type"] == "uri":
-                subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["humanNodeId"]))
                 predicate = attribute["uri"]
                 obj = "<{}>".format(attribute["entityUri"])
                 if not self.is_bnode(attribute["entityUri"], json_query["nodes"]):
@@ -710,7 +710,7 @@ class SparqlQueryBuilder(Params):
                     else:
                         predicate = "<{}>".format(attribute["uri"])
 
-                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
 
                     triples_attributes.append({
                         "subject": subject,
@@ -749,7 +749,7 @@ class SparqlQueryBuilder(Params):
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
-                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
                     triples_attributes.append({
                         "subject": subject,
                         "predicate": predicate,
@@ -778,7 +778,7 @@ class SparqlQueryBuilder(Params):
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
                     faldo_strand = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
                         category_name = 'faldo:location/faldo:begin/faldo:reference'

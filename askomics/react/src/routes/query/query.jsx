@@ -178,6 +178,16 @@ export default class Query extends Component {
     })
   }
 
+  getHumanIdFromId(nodeId) {
+    return this.graphState.nodes.map(node => {
+      if (node.id == nodeId) {
+        return node.humanId
+      } else {
+        return null
+      }
+    }).filter(humanId => humanId != null).reduce(humanId => humanId)
+  }
+
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
@@ -194,6 +204,7 @@ export default class Query extends Component {
         id: this.getId(),
         visible: !labelExist,
         nodeId: nodeId,
+        humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
         label: 'Uri',
         entityLabel: this.getLabel(nodeUri),
@@ -215,6 +226,7 @@ export default class Query extends Component {
         id: this.getId(),
         visible: true,
         nodeId: nodeId,
+        humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdfs:label',
         label: 'Label',
         entityLabel: this.getLabel(nodeUri),
@@ -239,6 +251,7 @@ export default class Query extends Component {
           id: this.getId(),
           visible: firstAttrVisibleForBnode,
           nodeId: nodeId,
+          humanNodeId: this.getHumanIdFromId(nodeId),
           uri: attr.uri,
           label: attr.label,
           entityLabel: this.getLabel(nodeUri),
