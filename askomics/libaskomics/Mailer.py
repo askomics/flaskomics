@@ -34,16 +34,25 @@ class Mailer(Params):
         try:
             self.host = self.settings.get('askomics', 'smtp_host')
             self.port = self.settings.get('askomics', 'smtp_port')
-            self.user = self.settings.get('askomics', 'smtp_user')
-            self.sender = self.settings.get('askomics', 'smtp_sender')
-            self.password = self.settings.get('askomics', 'smtp_password')
-            self.connection = self.settings.get('askomics', 'smtp_connection')
         except Exception:
             self.host = None
             self.port = None
+
+        try:
+            self.user = self.settings.get('askomics', 'smtp_user')
+            self.password = self.settings.get('askomics', 'smtp_password')
+        except Exception:
             self.user = None
-            self.sender = None
             self.password = None
+
+        try:
+            self.sender = self.settings.get('askomics', 'smtp_sender')
+        except Exception:
+            self.sender = None
+
+        try:
+            self.connection = self.settings.get('askomics', 'smtp_connection')
+        except Exception:
             self.connection = None
 
     def check_mailer(self):
@@ -54,7 +63,7 @@ class Mailer(Params):
         bool
             True if SMTP is set
         """
-        if not self.host or not self.port or not self.user or not self.sender or not self.password:
+        if not self.host or not self.port or not self.sender:
             return False
         return True
 
@@ -83,7 +92,11 @@ class Mailer(Params):
 
         smtp = smtplib.SMTP(host=self.host, port=self.port)
         smtp.connect(self.host, self.port)
+
         if self.connection == "starttls":
             smtp.starttls()
-        smtp.login(self.user, self.password)
+
+        if self.user and self.password:
+            smtp.login(self.user, self.password)
+
         smtp.sendmail(self.sender, receiver, message.as_string())

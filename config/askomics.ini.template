@@ -50,10 +50,13 @@ github = https://github.com/askomics/flaskomics
 askomics_url = http://localhost:5000
 
 # SMTP (for password recovery)
+# If set, host, port and sender are mandatory.
+# user and password are optional
+# connection: starttls or nothing
 #smtp_host = 
 #smtp_port = 
-#smtp_user = 
 #smtp_sender = 
+#smtp_user = 
 #smtp_password = 
 #smtp_connection = 
 
