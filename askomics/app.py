@@ -24,8 +24,6 @@ from kombu import Exchange, Queue
 
 from flask import Flask
 
-from flask_ini import FlaskIni
-
 from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
 
 from pkg_resources import get_distribution
@@ -87,11 +85,11 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
 
     app = Flask(app_name, static_folder='static', template_folder='templates')
 
-    app.iniconfig = FlaskIni()
+    app.iniconfig = conf
+    app.secret_key = app.iniconfig.get("flask", "secret_key")
 
     with app.app_context():
 
-        app.iniconfig.read(config)
         proxy_path = None
         try:
             proxy_path = app.iniconfig.get('askomics', 'reverse_proxy_path')

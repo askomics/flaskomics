@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 werkzeug = "==0.16.1"
 flask = "*"
-flask-ini = "*"
 flask-reverse-proxy-fix = "*"
 validate-email = "*"
 gunicorn = "*"
