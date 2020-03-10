@@ -371,8 +371,12 @@ export default class Ask extends Component {
     }
 
     // message
-    let frontMessage
-    console.log(this.props.config.frontMessage)
+    let frontMessage = (
+      <div>
+        <h2>Ask!</h2>
+        <hr />
+      </div>
+    )
     if (this.props.config.frontMessage) {
       frontMessage = (
       <div>
@@ -392,8 +396,6 @@ export default class Ask extends Component {
         {redirectQueryBuilder}
         {redirectLogin}
         {redirectSparqlEditor}
-        <h2>Ask!</h2>
-        <hr />
         {frontMessage}
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
