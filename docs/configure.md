@@ -33,7 +33,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `disable_integration` (`true` or `false`): Disable integration to non admin users
     - `quota` (size): Default quota for new users
     - `github` (url): Github repository URL
-    - `askomics_url` (url): Instance URL. Used to send link by email when user reset his password
+    - `instance_url` (url): Instance URL. Used to send link by email when user reset his password
     - `smtp_host` (url): SMTP host url
     - `smtp_port` (int): SMTP port 
     - `smtp_user` (string): SMTP user

@@ -906,11 +906,17 @@ class LocalAuth(Params):
 
                 """.format(
                     user=username,
-                    url=self.settings.get('askomics', 'askomics_url'),
+                    url=self.settings.get('askomics', 'instance_url'),
                     token=token
                 ))
 
-                mailer.send_mail(email, "[AskOmics] Password reset", body)
+                asko_subtitle = ""
+                try:
+                    asko_subtitle = " | {}".format(self.settings.get("askomics", "subtitle"))
+                except Exception:
+                    pass
+
+                mailer.send_mail(email, "[AskOmics{}] Password reset".format(asko_subtitle), body)
 
     def check_token(self, token):
         """Get username corresponding to the token
