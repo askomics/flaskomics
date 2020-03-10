@@ -370,6 +370,23 @@ export default class Ask extends Component {
       )
     }
 
+    // message
+    let frontMessage
+    console.log(this.props.config.frontMessage)
+    if (this.props.config.frontMessage) {
+      frontMessage = (
+      <div>
+        <Alert color="secondary">
+          <h4 className="alert-heading">{this.props.config.footerMessage}</h4>
+          <hr />
+          <div className="wrap-line">
+            {this.props.config.frontMessage}
+          </div>
+        </Alert>
+      </div>
+      )
+    }
+
     return (
       <div className="container">
         {redirectQueryBuilder}
@@ -377,6 +394,7 @@ export default class Ask extends Component {
         {redirectSparqlEditor}
         <h2>Ask!</h2>
         <hr />
+        {frontMessage}
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
             <Col xs="5">

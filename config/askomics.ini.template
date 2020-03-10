@@ -16,6 +16,8 @@ debug_ttl = false
 
 # subtitle = 
 footer_message = Welcome to AskOmics!
+#front_message=
+
 display_commit_hash = false
 
 # data directory
@@ -47,7 +49,7 @@ quota = 0
 github = https://github.com/askomics/flaskomics
 
 # Instance URL
-askomics_url = http://localhost:5000
+instance_url = http://localhost:5000
 
 # SMTP (for password recovery)
 # If set, host, port and sender are mandatory.

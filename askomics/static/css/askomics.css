@@ -154,6 +154,10 @@ i.attr-icon {
   cursor: pointer;
 }
 
+div.wrap-line {
+  white-space: pre-wrap;
+} 
+
 
 /*Context menu *********************************************************/
 .react-contextmenu {
