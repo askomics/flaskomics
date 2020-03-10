@@ -1,6 +1,7 @@
 from askomics.libaskomics.File import File
 from askomics.libaskomics.RdfGraph import RdfGraph
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.Utils import Utils
 
 
@@ -93,6 +94,7 @@ class RdfFile(File):
             Integrate in private or public graph
         """
         sparql = SparqlQueryLauncher(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
 
         self.public = public
 
@@ -125,5 +127,8 @@ class RdfFile(File):
             # Insert
             # Try to insert data. if failure, wait 5 sec and retry 5 time
             Utils.redo_if_failure(self.log, 5, 5, sparql.insert_data, self.graph_chunk, self.file_graph)
+
+        # Remove chached abstraction
+        tse.uncache_abstraction(public=self.public)
 
         self.set_triples_number()

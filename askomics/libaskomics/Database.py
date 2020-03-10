@@ -75,6 +75,7 @@ class Database(Params):
         self.create_endpoints_table()
         self.create_files_table()
         self.create_datasets_table()
+        self.create_abstraction_table()
 
     def create_user_table(self):
         """Create the user table"""
@@ -312,4 +313,16 @@ class Database(Params):
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
+        self.execute_sql_query(query)
+
+    def create_abstraction_table(self):
+        """Create abstraction table"""
+        query = """
+        CREATE TABLE IF NOT EXISTS abstraction (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            abstraction text,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+        """
         self.execute_sql_query(query)

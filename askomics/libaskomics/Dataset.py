@@ -1,6 +1,7 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 
 
 class Dataset(Params):
@@ -108,6 +109,8 @@ class Dataset(Params):
         """
         # Update in TS
         query_builder = SparqlQueryBuilder(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
+
         string_status = "true" if new_status else "false"
         query_builder.toggle_public(self.graph_name, string_status)
 
@@ -119,6 +122,9 @@ class Dataset(Params):
         WHERE user_id = ? AND id = ?
         '''
         database.execute_sql_query(query, (new_status, self.session["user"]["id"], self.id))
+
+        # Uncache abstraction
+        tse.uncache_abstraction()
 
     def update_celery(self, celery_id):
         """Update celery id of dataset in database

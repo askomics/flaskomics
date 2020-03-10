@@ -8,6 +8,7 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 
 from pkg_resources import get_distribution
 
@@ -288,6 +289,7 @@ class File(Params):
     def integrate(self, dataset_id=None):
         """Integrate the file into the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
 
         # insert metadata
         self.set_metadata()
@@ -346,6 +348,9 @@ class File(Params):
 
         # Content is inserted, now insert abstraction and domain_knowledge
         self.set_rdf_abstraction_domain_knowledge()
+
+        # Remove chached abstraction
+        tse.uncache_abstraction(public=self.public)
 
         if self.method == 'load':
 

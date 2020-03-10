@@ -1,6 +1,8 @@
 import tld
+import json
 from urllib.parse import urlparse
 
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -109,11 +111,101 @@ class TriplestoreExplorer(Params):
         dict
             AskOmics abstraction
         """
-        return {
-            "entities": self.get_abstraction_entities(),
-            "attributes": self.get_abstraction_attributes(),
-            "relations": self.get_abstraction_relations()
-        }
+        insert, abstraction = self.get_cached_asbtraction()
+
+        # No abstraction entry in database, create it
+        if not abstraction:
+            abstraction = {
+                "entities": self.get_abstraction_entities(),
+                "attributes": self.get_abstraction_attributes(),
+                "relations": self.get_abstraction_relations()
+            }
+
+            # Cache abstraction in DB, only for logged users
+            if "user" in self.session:
+                self.cache_asbtraction(abstraction, insert)
+
+        return abstraction
+
+    def get_cached_asbtraction(self):
+        """Get cached abstraction from database
+
+        Returns
+        -------
+        (bool, dict):
+            bool: True if no row exist, else False if row exist
+            dict: {} if no abstraction, else, return abstraction
+
+        """
+        if "user" not in self.session:
+            return True, {}
+
+        database = Database(self.app, self.session)
+
+        query = """
+        SELECT abstraction
+        FROM abstraction
+        WHERE user_id=?
+        """
+        results = database.execute_sql_query(query, (self.session["user"]["id"], ))
+
+        if results:
+            if results[0][0]:
+                return False, json.loads(results[0][0])
+            else:
+                return False, {}
+        return True, {}
+
+    def cache_asbtraction(self, abstraction, insert):
+        """Summary
+
+        Parameters
+        ----------
+        abstraction : TYPE
+            Description
+        insert : bool, optional
+            Description
+        """
+        database = Database(self.app, self.session)
+
+        if insert:
+            query = """
+            INSERT INTO abstraction VALUES (
+                NULL,
+                ?,
+                ?
+            )
+            """
+            database.execute_sql_query(query, (self.session["user"]["id"], json.dumps(abstraction)))
+        else:
+            query = """
+            UPDATE abstraction SET
+            abstraction=?
+            WHERE user_id=?
+            """
+            database.execute_sql_query(query, (json.dumps(abstraction), self.session["user"]["id"]))
+
+    def uncache_abstraction(self, public=True):
+        """Remove cached abstraction from database
+
+        Parameters
+        ----------
+        public : bool, optional
+            Remove for all users if True, else, for logged user only
+        """
+        if "user" in self.session:
+            database = Database(self.app, self.session)
+
+            sub_query = "WHERE user_id=?" if not public else ""
+            sql_var = (self.session["user"]["id"], ) if not public else ()
+
+            query = """
+            UPDATE abstraction SET
+            abstraction=NULL
+            {}
+            """.format(sub_query)
+
+            database.execute_sql_query(query, sql_var)
 
     def get_abstraction_entities(self):
         """Get abstraction entities
