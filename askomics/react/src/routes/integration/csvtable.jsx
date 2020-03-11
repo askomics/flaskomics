@@ -100,7 +100,7 @@ export default class CsvTable extends Component {
               <option value="numeric" >Numeric</option>
               <option value="text" >Text</option>
               <option value="category" >Category</option>
-              <option value="datetime" >Datetime</option>
+              <option value="boolean" >Boolean</option>
             </optgroup>
             <optgroup label="Faldo attributes">
               <option value="reference" >Reference</option>

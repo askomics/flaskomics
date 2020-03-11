@@ -146,6 +146,9 @@ export default class Query extends Component {
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {
       return 'text'
     }
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
+      return "boolean"
+    }
   }
 
   attributeExistInAbstraction (attrUri, entityUri) {
@@ -278,6 +281,11 @@ export default class Query extends Component {
 
         if (attributeType == 'category') {
           nodeAttribute.filterValues = attr.categories
+          nodeAttribute.filterSelectedValues = []
+        }
+
+        if (attributeType == 'boolean') {
+          nodeAttribute.filterValues = ["true", "false"]
           nodeAttribute.filterSelectedValues = []
         }
 

@@ -192,7 +192,11 @@ class CsvFile(File):
 
         date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}')
 
-        # First, detect special type with header
+        # First, detect boolean values
+        if self.are_boolean(values):
+            return "boolean"
+
+        # Then, detect special type with header
         for stype, expressions in special_types.items():
             for expression in expressions:
                 epression_regexp = ".*{}.*".format(expression.lower())
@@ -212,13 +216,29 @@ class CsvFile(File):
         if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
             return "goterm"
 
-        # Finaly, check numerical/text/category
+        # Finaly, check numerical/text
         if all(self.is_decimal(val) for val in values):
             if all(val == "" for val in values):
                 return "text"
             return "numeric"
 
         return "text"  # default
+
+    @staticmethod
+    def are_boolean(values):
+        """Check if a list of values are boolean strings
+
+        Parameters
+        ----------
+        values : list
+            List of strings
+
+        Returns
+        -------
+        boolean
+            True if values are boolean strings (true false or 0 1)
+        """
+        return set(list(filter(None, [value.lower() for value in values]))) in ({'false', 'true'}, {'0', '1'})
 
     @staticmethod
     def is_decimal(value):
@@ -371,7 +391,12 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.decimal
                 rdf_type = rdflib.OWL.DatatypeProperty
 
-            # TODO: datetime
+            # Boolean
+            elif self.columns_type[index] == "boolean":
+                attribute = self.rdfize(attribute_name)
+                label = rdflib.Literal(attribute_name)
+                rdf_range = rdflib.XSD.boolean
+                rdf_type = rdflib.OWL.DatatypeProperty
 
             # Text (default)
             else:
@@ -502,7 +527,13 @@ class CsvFile(File):
                             relation = potential_relation
                             attribute = rdflib.Literal(self.convert_type(cell))
 
-                    # TODO: datetime
+                    # Boolean
+                    elif current_type == "boolean":
+                        relation = self.rdfize(current_header)
+                        if cell.lower() in ("1", "true"):
+                            attribute = rdflib.Literal("true", datatype=rdflib.XSD.boolean)
+                        else:
+                            attribute = rdflib.Literal("false", datatype=rdflib.XSD.boolean)
 
                     # default is text
                     else:

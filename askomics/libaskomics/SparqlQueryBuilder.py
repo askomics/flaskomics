@@ -701,6 +701,44 @@ class SparqlQueryBuilder(Params):
                     ))
                     var_to_replace.append((subject, var_2))
 
+            if attribute["type"] == "boolean":
+                if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in linked_attributes:
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
+
+                    triples_attributes.append({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    })
+
+                    if attribute["visible"]:
+                        self.selects.append(obj)
+
+                # values
+                if attribute["filterSelectedValues"] != [] and not attribute["optional"] and not attribute["linked"]:
+                    uri_val_list = []
+                    for value in attribute["filterSelectedValues"]:
+                        if value == "true":
+                            bool_value = "'true'^^xsd:boolean"
+                        else:
+                            bool_value = "'false'^^xsd:boolean"
+                        value_var = obj
+                        uri_val_list.append(bool_value)
+
+                    if uri_val_list:
+                        values.append("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)))
+
+                if attribute["linked"]:
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
+
             # Text
             if attribute["type"] == "text":
                 if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in linked_attributes:

@@ -292,7 +292,11 @@ class TriplestoreExplorer(Params):
         if self.logged_user():
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
-        litterals = ("http://www.w3.org/2001/XMLSchema#string", "http://www.w3.org/2001/XMLSchema#decimal")
+        litterals = (
+            "http://www.w3.org/2001/XMLSchema#string",
+            "http://www.w3.org/2001/XMLSchema#decimal",
+            "http://www.w3.org/2001/XMLSchema#boolean"
+        )
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQueryBuilder(self.app, self.session)

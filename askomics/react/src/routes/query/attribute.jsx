@@ -320,6 +320,50 @@ export default class AttributeBox extends Component {
     )
   }
 
+  renderBoolean () {
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    if (this.props.attribute.visible) {
+      eyeIcon = 'attr-icon fas fa-eye'
+    }
+
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    if (this.props.attribute.optional) {
+      optionalIcon = 'attr-icon fas fa-question-circle'
+    }
+
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
+    }
+
+    let form
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
+        <FormGroup>
+          <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
+            <option key="true" attrId={this.props.attribute.uri} value="true" selected={this.props.attribute.filterSelectedValues.includes("true")}>True</option>
+            <option key="false" attrId={this.props.attribute.uri} value="false" selected={this.props.attribute.filterSelectedValues.includes("false")}>False</option>
+          </CustomInput>
+        </FormGroup>
+      )
+    }
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        <div className="attr-icons">
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+        </div>
+        {form}
+      </div>
+    )
+  }
+
   render () {
     let box = null
     if (this.props.attribute.type == 'text' || this.props.attribute.type == 'uri') {
@@ -330,6 +374,9 @@ export default class AttributeBox extends Component {
     }
     if (this.props.attribute.type == 'category') {
       box = this.renderCategory()
+    }
+    if (this.props.attribute.type == 'boolean') {
+      box = this.renderBoolean()
     }
     return box
   }
