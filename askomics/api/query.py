@@ -27,11 +27,16 @@ def query():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        tse = TriplestoreExplorer(current_app, session)
-        results_handler = ResultsHandler(current_app, session)
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            startpoints = []
+            public_queries = []
+        else:
+            tse = TriplestoreExplorer(current_app, session)
+            results_handler = ResultsHandler(current_app, session)
+            startpoints = tse.get_startpoints()
+            public_queries = results_handler.get_public_queries()
 
-        startpoints = tse.get_startpoints()
-        public_queries = results_handler.get_public_queries()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -61,10 +66,15 @@ def get_abstraction():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        tse = TriplestoreExplorer(current_app, session)
-        abstraction = tse.get_abstraction()
-        files_utils = FilesUtils(current_app, session)
-        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            abstraction = []
+            disk_space = None
+        else:
+            tse = TriplestoreExplorer(current_app, session)
+            abstraction = tse.get_abstraction()
+            files_utils = FilesUtils(current_app, session)
+            disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -94,19 +104,24 @@ def get_preview():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        data = request.get_json()
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            preview = []
+            header = []
+        else:
+            data = request.get_json()
 
-        query_builder = SparqlQueryBuilder(current_app, session)
+            query_builder = SparqlQueryBuilder(current_app, session)
 
-        query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
-        endpoints = query_builder.endpoints
-        federated = query_builder.federated
+            query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
+            endpoints = query_builder.endpoints
+            federated = query_builder.federated
 
-        header = query_builder.selects
-        preview = []
-        if query_builder.graphs:
-            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            header, preview = query_launcher.process_query(query)
+            header = query_builder.selects
+            preview = []
+            if query_builder.graphs:
+                query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
+                header, preview = query_launcher.process_query(query)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

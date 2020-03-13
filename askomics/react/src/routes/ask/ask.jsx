@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { Alert, Badge, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, InputGroupButtonDropdown } from 'reactstrap'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
@@ -297,77 +297,85 @@ export default class Ask extends Component {
       )
     }
 
-
-
     let startpoints
     if (!this.state.waiting) {
-      startpoints = (
-        <div>
-          <p>Select an entity to start a session:</p>
-          <div className="startpoints-filter-div">
+      if (this.props.config.protectPublic && !this.props.config.logged) {
+        startpoints = (
+          <div>
+          <Alert color="info">
+            This instance is available only for logged user. <Link to="/login">Login</Link> or <Link to="/signup">signup</Link> to use.
+          </Alert>
+          </div>
+        )
+      } else {
+        startpoints = (
+          <div>
+            <p>Select an entity to start a session:</p>
+            <div className="startpoints-filter-div">
 
-          <InputGroup>
-            <InputGroupButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropDown}>
-              <DropdownToggle outline caret>
-                Source
-              </DropdownToggle>
-              <DropdownMenu>
-              {this.state.endpoints.map(endpoint => {
+            <InputGroup>
+              <InputGroupButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropDown}>
+                <DropdownToggle outline caret>
+                  Source
+                </DropdownToggle>
+                <DropdownMenu>
+                {this.state.endpoints.map(endpoint => {
 
-                let tick = <i className={this.state.selectedEndpoint.includes(endpoint) ? "fas fa-check" : "icon-invisible fas fa-check"}></i>
+                  let tick = <i className={this.state.selectedEndpoint.includes(endpoint) ? "fas fa-check" : "icon-invisible fas fa-check"}></i>
 
+                  return (
+                    <DropdownItem key={endpoint} value={endpoint} onClick={this.clickOnEndpoint}>
+                      {tick} {endpoint}
+                    </DropdownItem>
+                  )
+                })}
+                </DropdownMenu>
+              </InputGroupButtonDropdown>
+              <Input placeholder="Filter entities" onChange={this.handleFilter} />
+            </InputGroup>
+
+            </div>
+            <div className="startpoints-div">
+              {this.state.startpoints.map(startpoint => {
+                let display = false
+                startpoint.endpoints.forEach(endpoint => {
+                  if (this.state.selectedEndpoint.includes(endpoint.name)) {
+                    display = true
+                  }
+                })
                 return (
-                  <DropdownItem key={endpoint} value={endpoint} onClick={this.clickOnEndpoint}>
-                    {tick} {endpoint}
-                  </DropdownItem>
-                )
-              })}
-              </DropdownMenu>
-            </InputGroupButtonDropdown>
-            <Input placeholder="Filter entities" onChange={this.handleFilter} />
-          </InputGroup>
-
+                <div key={startpoint.entity} className="input-label" id={startpoint.entity_label}>
+                <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
+                <label className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
+                <table hidden={startpoint.hidden ? 'hidden' : display ? '' : 'hidden'} className="startpoint-table">
+                  <tr>
+                    <td className="startpoint-table cell1">
+                        {startpoint.entity_label}
+                    </td>
+                    <td className="startpoint-table cell2">
+                      {startpoint.endpoints.map(endpoint => {
+                        let color = this.utils.stringToHexColor(endpoint.url)
+                        let textColor = this.utils.isDarkColor(color) ? "white" : "black"
+                        return <h6 key={endpoint.url}><Badge style={{"background-color": color, "color": textColor}}>{endpoint.name}</Badge></h6>
+                      })}
+                    </td>
+                    <td className="startpoint-table cell3">
+                      <nodiv className="visibility-icon right">
+                        {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
+                        {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
+                      </nodiv>
+                    </td>
+                  </tr>
+                </table>
+                </label>
+                </div>
+              )})}
+            </div>
+            <br />
+            <Button disabled={this.disabledStartButton()} onClick={this.handleStart} color="secondary">Start!</Button>
           </div>
-          <div className="startpoints-div">
-            {this.state.startpoints.map(startpoint => {
-              let display = false
-              startpoint.endpoints.forEach(endpoint => {
-                if (this.state.selectedEndpoint.includes(endpoint.name)) {
-                  display = true
-                }
-              })
-              return (
-              <div key={startpoint.entity} className="input-label" id={startpoint.entity_label}>
-              <input className="startpoint-radio" value={startpoint.entity_label} type="radio" name="startpoints" id={startpoint.entity} onClick={this.handleClick}></input>
-              <label className="startpoint-label" id={startpoint.name} htmlFor={startpoint.entity}>
-              <table hidden={startpoint.hidden ? 'hidden' : display ? '' : 'hidden'} className="startpoint-table">
-                <tr>
-                  <td className="startpoint-table cell1">
-                      {startpoint.entity_label}
-                  </td>
-                  <td className="startpoint-table cell2">
-                    {startpoint.endpoints.map(endpoint => {
-                      let color = this.utils.stringToHexColor(endpoint.url)
-                      let textColor = this.utils.isDarkColor(color) ? "white" : "black"
-                      return <h6 key={endpoint.url}><Badge style={{"background-color": color, "color": textColor}}>{endpoint.name}</Badge></h6>
-                    })}
-                  </td>
-                  <td className="startpoint-table cell3">
-                    <nodiv className="visibility-icon right">
-                      {startpoint.public ? <i className="fa fa-globe-europe text-info"></i> : <nodiv></nodiv> } <nodiv> </nodiv>
-                      {startpoint.private ? <i className="fa fa-lock text-primary"></i> : <nodiv></nodiv> }
-                    </nodiv>
-                  </td>
-                </tr>
-              </table>
-              </label>
-              </div>
-            )})}
-          </div>
-          <br />
-          <Button disabled={this.disabledStartButton()} onClick={this.handleStart} color="secondary">Start!</Button>
-        </div>
-      )
+        )
+      }
     }
 
     // message
