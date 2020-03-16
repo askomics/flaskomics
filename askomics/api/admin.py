@@ -129,3 +129,13 @@ def set_blocked():
         'error': False,
         'errorMessage': ''
     })
+
+@admin_bp.route("/api/admin/adduser", methods=["POST"])
+@admin_required
+def add_user():
+
+    data = request.get_json()
+
+    try:
+        local_auth = LocalAuth(current_app, session)
+        # local_auth

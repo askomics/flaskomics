@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Button, Form, FormGroup, Label, Input, Alert, Col, CustomInput } from 'reactstrap'
+import { Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
@@ -17,11 +17,85 @@ export default class Admin extends Component {
     this.state = { isLoading: true,
       error: false,
       errorMessage: '',
-      users: []
+      users: [],
+      fname: "",
+      lname: "",
+      username: "",
+      email: ""
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
+    this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
+    this.handleChangeFname = this.handleChangeFname.bind(this)
+    this.handleChangeLname = this.handleChangeLname.bind(this)
     this.cancelRequest
+  }
+
+  handleChangeFname (event) {
+    this.setState({
+      username: event.target.value.charAt(0).toLowerCase(),
+      fname: event.target.value
+    })
+  }
+
+  handleChangeLname (event) {
+    this.setState({
+      username: this.state.fname.charAt(0).toLowerCase() + event.target.value.toLowerCase(),
+      lname: event.target.value
+    })
+  }
+
+  handleChangeUserInput (event) {
+    this.setState({
+      [event.target.id]: event.target.value
+    })
+  }
+
+  validateEmail (email) {
+    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(String(email).toLowerCase())
+  }
+
+  validateForm () {
+    return (
+      this.state.fname.length > 0 &&
+      this.state.lname.length > 0 &&
+      this.validateEmail(this.state.email) &&
+      this.state.username.length > 0
+    )
+  }
+
+  handleSubmit(event) {
+
+    let requestUrl = "/api/admin/adduser"
+    let data = {
+      fname: this.state.fname,
+      lname: this.state.lname,
+      username: this.state.username,
+      email: this.state.email
+    }
+
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.loadUsers()
+      this.setState({
+        fname: "",
+        lname: "",
+        username: "",
+        email: ""
+      })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        success: !response.data.error
+      })
+    })
+    event.preventDefault()
   }
 
   handleChangeAdmin (event) {
@@ -98,28 +172,31 @@ export default class Admin extends Component {
 
   componentDidMount () {
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/admin/getusers'
-
-      axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-        .then(response => {
-          console.log(requestUrl, response.data)
-          this.setState({
-            isLoading: false,
-            error: response.data.error,
-            errorMessage: response.data.errorMessage,
-            users: response.data.users
-          })
-        })
-        .catch(error => {
-          console.log(error, error.response.data.errorMessage)
-          this.setState({
-            error: true,
-            errorMessage: error.response.data.errorMessage,
-            status: error.response.status,
-            success: !error.response.data.error
-          })
-        })
+      this.loadUsers()
     }
+  }
+
+  loadUsers() {
+    let requestUrl = '/api/admin/getusers'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          isLoading: false,
+          error: response.data.error,
+          errorMessage: response.data.errorMessage,
+          users: response.data.users
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !error.response.data.error
+        })
+      })
   }
 
   updateQuota(oldValue, newValue, row) {
@@ -245,6 +322,40 @@ export default class Admin extends Component {
       <div className="container">
         <h2>Admin</h2>
         <hr />
+        <h4>Add a user</h4>
+        <Form onSubmit={this.handleSubmit}>
+          <Row form>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="fname">First name</Label>
+                <Input type="text" name="fname" id="fname" placeholder="first name" value={this.state.fname} onChange={this.handleChangeFname} />
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="lname">Last name</Label>
+                <Input type="text" name="lname" id="lname" placeholder="last name" value={this.state.lname} onChange={this.handleChangeLname} />
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="username">Username</Label>
+                <Input type="text" name="username" id="username" placeholder="username" value={this.state.username} onChange={this.handleChangeUserInput} />
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="email">Email</Label>
+                <Input type="email" name="email" id="email" placeholder="email" value={this.state.email} onChange={this.handleChangeUserInput} />
+              </FormGroup>
+            </Col>
+          </Row>
+          <Button disabled={!this.validateForm()}>Create</Button>
+        </Form>
+
+        <hr />
+
+        <h4>Users</h4>
         <div className=".asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
