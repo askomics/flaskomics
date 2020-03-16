@@ -2,8 +2,8 @@
 
 import hashlib
 import os
-import time
 import textwrap
+import time
 
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Galaxy import Galaxy
@@ -29,7 +29,7 @@ class LocalAuth(Params):
         """
         Params.__init__(self, app, session)
 
-    def check_inputs(self, inputs):
+    def check_inputs(self, inputs, admin_add=False):
         """Check user inputs
 
         Check if inputs are not empty, if passwords are identical, and if
@@ -57,13 +57,14 @@ class LocalAuth(Params):
             self.error = True
             self.error_message.append('Not a valid email')
 
-        if not inputs['password']:
-            self.error = True
-            self.error_message.append('Password empty')
+        if not admin_add:
+            if not inputs['password']:
+                self.error = True
+                self.error_message.append('Password empty')
 
-        if inputs['password'] != inputs['passwordconf']:
-            self.error = True
-            self.error_message.append("Passwords doesn't match")
+            if inputs['password'] != inputs['passwordconf']:
+                self.error = True
+                self.error_message.append("Passwords doesn't match")
 
         if self.is_username_in_db(inputs['username']):
             self.error = True
@@ -125,7 +126,23 @@ class LocalAuth(Params):
             return False
         return True
 
-    def persist_user(self, inputs, ldap=False):
+    def persist_user_admin(self, inputs):
+        """Persist a new user (admin action)
+
+        Parameters
+        ----------
+        inputs : User input
+            The new user info
+
+        Returns
+        -------
+        dict
+            The new user
+        """
+        inputs["password"] = Utils.get_random_string(8)
+        return self.persist_user(inputs, return_password=True)
+
+    def persist_user(self, inputs, ldap=False, return_password=False):
         """
         Persist user in the TS
 
@@ -188,8 +205,7 @@ class LocalAuth(Params):
             query, (ldap, inputs['fname'], inputs['lname'], inputs['username'],
                     inputs['email'], sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
 
-        # Return user infos
-        return {
+        user = {
             'id': user_id,
             'ldap': ldap,
             'fname': inputs['fname'],
@@ -202,6 +218,12 @@ class LocalAuth(Params):
             'apikey': api_key,
             'galaxy': None
         }
+
+        if return_password:
+            user["password"] = inputs["password"]
+
+        # Return user infos
+        return user
 
     def create_user_directories(self, user_id, username):
         """Create the User directory
@@ -862,6 +884,46 @@ class LocalAuth(Params):
         database.execute_sql_query(query, (token, login))
 
         return token
+
+    def send_mail_to_new_user(self, user):
+        """Send a reset password link for a newly created user
+
+        Parameters
+        ----------
+        user : dict
+            The new user
+        """
+        token = self.create_reset_token(user["username"])
+        mailer = Mailer(self.app, self.session)
+        if mailer.check_mailer():
+            body = textwrap.dedent("""
+            Welcome {username}!
+
+            We heard that administrators of {url} create an account for you.
+
+            To use it, use the following link to create your password. Then, login with you email adress ({email}) or username ({username}).
+
+            {url}/password_reset?token={token}
+
+            If you don’t use this link within 3 hours, it will expire. To get a new password creation link, visit {url}/password_reset
+
+            Thanks,
+
+            The AskOmics Team
+            """.format(
+                username=user["username"],
+                email=user["email"],
+                url=self.settings.get('askomics', 'instance_url'),
+                token=token
+            ))
+
+            asko_subtitle = ""
+            try:
+                asko_subtitle = " | {}".format(self.settings.get("askomics", "subtitle"))
+            except Exception:
+                pass
+
+            mailer.send_mail(user["email"], "[AskOmics{}] New account".format(asko_subtitle), body)
 
     def send_reset_link(self, login):
         """Send a reset link to a user

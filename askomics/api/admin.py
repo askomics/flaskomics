@@ -4,6 +4,7 @@ import traceback
 
 from askomics.api.auth import admin_required
 from askomics.libaskomics.LocalAuth import LocalAuth
+from askomics.libaskomics.Mailer import Mailer
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
@@ -130,12 +131,57 @@ def set_blocked():
         'errorMessage': ''
     })
 
+
 @admin_bp.route("/api/admin/adduser", methods=["POST"])
 @admin_required
 def add_user():
+    """Change blocked status of a user
 
+    Returns
+    -------
+    json
+        instanceUrl: The instance URL
+        user: the new created user
+        displayPassword: Display password on the interface ?
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
     data = request.get_json()
+
+    user = {}
+    display_password = True
 
     try:
         local_auth = LocalAuth(current_app, session)
-        # local_auth
+        local_auth.check_inputs(data, admin_add=True)
+
+        if not local_auth.get_error():
+            # Create a user
+            user = local_auth.persist_user_admin(data)
+            local_auth.create_user_directories(user['id'], user['username'])
+            # Send a email to this user (if askomics can send emails)
+
+            mailer = Mailer(current_app, session)
+            if mailer.check_mailer():
+                display_password = False
+                local_auth.send_mail_to_new_user(user)
+                # Don't send password user to frontend
+                user.pop("password")
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'instanceUrl': "",
+            'user': user,
+            'displayPassword': False,
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'instanceUrl': current_app.iniconfig.get("askomics", "instance_url"),
+        'user': user,
+        'displayPassword': display_password,
+        'error': local_auth.get_error(),
+        'errorMessage': local_auth.get_error_message()
+    })

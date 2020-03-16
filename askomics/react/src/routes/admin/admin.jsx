@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
 import WaitingDiv from '../../components/waiting'
+import ErrorDiv from '../error/error'
 
 export default class Admin extends Component {
   constructor (props) {
@@ -21,14 +22,27 @@ export default class Admin extends Component {
       fname: "",
       lname: "",
       username: "",
-      email: ""
+      email: "",
+      newUser: {},
+      messageOpen: false,
+      displayPassword: false,
+      instanceUrl: ""
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
+    this.handleAddUser = this.handleAddUser.bind(this)
+    this.dismissMessage = this.dismissMessage.bind(this)
     this.cancelRequest
+  }
+
+  dismissMessage () {
+    this.setState({
+      newUser: {},
+      messageOpen: false
+    })
   }
 
   handleChangeFname (event) {
@@ -65,7 +79,7 @@ export default class Admin extends Component {
     )
   }
 
-  handleSubmit(event) {
+  handleAddUser(event) {
 
     let requestUrl = "/api/admin/adduser"
     let data = {
@@ -78,13 +92,18 @@ export default class Admin extends Component {
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
-      this.loadUsers()
       this.setState({
-        fname: "",
-        lname: "",
-        username: "",
-        email: ""
+        error: response.data.error,
+        errorMessage: response.data.errorMessage,
+        status: response.status,
+        newUser: response.data.user,
+        messageOpen: true,
+        displayPassword: response.data.displayPassword,
+        instanceUrl: response.data.instanceUrl
       })
+      if (!response.data.error) {
+        this.loadUsers()
+      }
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
@@ -182,9 +201,11 @@ export default class Admin extends Component {
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
+          fname: "",
+          lname: "",
+          username: "",
+          email: "",
           isLoading: false,
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
           users: response.data.users
         })
       })
@@ -318,12 +339,39 @@ export default class Admin extends Component {
       return <WaitingDiv waiting={this.props.waitForStart} center />
     }
 
+    let newUserMessage
+    if (this.state.displayPassword) {
+      newUserMessage = (
+        <Alert color="info" isOpen={this.state.messageOpen} toggle={this.dismissMessage}>
+          Send the following message to the new user as AskOmics is not configured to send emails. Once the message is closed, there is no way to recover the password.
+          <hr />
+          Welcome {this.state.newUser.username}! An AskOmics account has been created for on <a href={this.state.instanceUrl}>{this.state.instanceUrl}</a>.<br /><br />
+
+          Username: <b>{this.state.newUser.username}</b><br />
+          Email: <b>{this.state.newUser.email}</b><br />
+          Password: <b>{this.state.newUser.password}</b><br /><br />
+
+          Please change the password as soon as possible.<br /><br />
+
+          Thanks,<br />
+          The AskOmics Team
+        </Alert>
+      )
+    } else {
+      newUserMessage = (
+        <Alert color="info" isOpen={this.state.messageOpen} toggle={this.dismissMessage}>
+          User {this.state.newUser.username} added. Password creation link send to {this.state.newUser.email}
+        </Alert>
+      )
+    }
+
     return (
       <div className="container">
         <h2>Admin</h2>
         <hr />
         <h4>Add a user</h4>
-        <Form onSubmit={this.handleSubmit}>
+        <div>
+        <Form onSubmit={this.handleAddUser}>
           <Row form>
             <Col md={3}>
               <FormGroup>
@@ -352,6 +400,12 @@ export default class Admin extends Component {
           </Row>
           <Button disabled={!this.validateForm()}>Create</Button>
         </Form>
+        <br />
+        </div>
+
+        {newUserMessage}
+
+        <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
 
         <hr />
 
