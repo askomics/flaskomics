@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import shutil
 import textwrap
 import time
 
@@ -9,6 +10,8 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Galaxy import Galaxy
 from askomics.libaskomics.Mailer import Mailer
 from askomics.libaskomics.Params import Params
+from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.Utils import Utils
 
 from validate_email import validate_email
@@ -1084,3 +1087,45 @@ class LocalAuth(Params):
             "error": error,
             "message": message
         }
+
+    def delete_users(self, usernames):
+        """Delete selected users
+
+        Parameters
+        ----------
+        usernames : list
+            user to delete
+        """
+        for username in usernames:
+            self.delete_user(username)
+
+    def delete_user(self, username):
+        """Delete user by username
+
+        Delete in DB, TS and filesystem
+
+        Parameters
+        ----------
+        username : string
+            Username to delete
+        """
+        # Get user info
+        user = self.get_user(username)
+
+        # Delete user from database
+        database = Database(self.app, self.session)
+        query = """
+        DELETE FROM users
+        WHERE username = ?
+        """
+        database.execute_sql_query(query, (username, ))
+
+        # Delete user directory
+        shutil.rmtree("{}/{}_{}".format(self.app.iniconfig.get("askomics", "data_directory"), user["id"], user["username"]))
+
+        # Delete RDF data
+        tse = TriplestoreExplorer(self.app, self.session)
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        graphs = tse.get_graph_of_user(username)
+        for graph in graphs:
+            query_launcher.drop_dataset(graph)

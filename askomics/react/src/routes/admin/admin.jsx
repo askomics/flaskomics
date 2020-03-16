@@ -26,7 +26,8 @@ export default class Admin extends Component {
       newUser: {},
       messageOpen: false,
       displayPassword: false,
-      instanceUrl: ""
+      instanceUrl: "",
+      selected: []
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
@@ -35,7 +36,55 @@ export default class Admin extends Component {
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
+    this.handleSelection = this.handleSelection.bind(this)
+    this.handleSelectionAll = this.handleSelectionAll.bind(this)
+    this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
     this.cancelRequest
+  }
+
+  handleSelection (row, isSelect) {
+    if (isSelect) {
+      this.setState({
+        selected: [...this.state.selected, row.username]
+      })
+    } else {
+      this.setState({
+        selected: this.state.selected.filter(x => x !== row.username)
+      })
+    }
+  }
+
+  handleSelectionAll (isSelect, rows) {
+    const usernames = rows.map(r => r.username)
+    if (isSelect) {
+      this.setState({
+        selected: usernames
+      })
+    } else {
+      this.setState({
+        selected: []
+      })
+    }
+  }
+
+  isDisabled () {
+    return this.state.selected.length == 0
+  }
+
+  deleteSelectedUsers () {
+    let requestUrl = '/api/admin/delete_users'
+    let data = {
+      usersToDelete: this.state.selected
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          users: response.data.users,
+          selected: [],
+          waiting: false
+        })
+      })
   }
 
   dismissMessage () {
@@ -261,8 +310,6 @@ export default class Admin extends Component {
   }
 
   render () {
-    // console.log()
-
     let columns = [{
       editable: false,
       dataField: 'ldap',
@@ -365,6 +412,15 @@ export default class Admin extends Component {
       )
     }
 
+    let selectRow = {
+      mode: 'checkbox',
+      clickToSelect: true,
+      selected: this.state.selected,
+      onSelect: this.handleSelection,
+      onSelectAll: this.handleSelectionAll,
+      nonSelectable: [this.props.config.user.username]
+    }
+
     return (
       <div className="container">
         <h2>Admin</h2>
@@ -415,7 +471,7 @@ export default class Admin extends Component {
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"
             bootstrap4
-            keyField='id'
+            keyField='username'
             data={this.state.users}
             columns={columns}
             defaultSorted={defaultSorted}
@@ -425,7 +481,10 @@ export default class Admin extends Component {
               autoSelectText: true,
               beforeSaveCell: (oldValue, newValue, row) => { this.updateQuota(oldValue, newValue, row) },
             })}
+            selectRow={ selectRow }
           />
+          <br />
+          <Button disabled={this.isDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
       </div>
     )

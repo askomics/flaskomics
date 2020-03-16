@@ -185,3 +185,39 @@ def add_user():
         'error': local_auth.get_error(),
         'errorMessage': local_auth.get_error_message()
     })
+
+
+@admin_bp.route("/api/admin/delete_users", methods=["POST"])
+@admin_required
+def delete_users():
+    """Change blocked status of a user
+
+    Returns
+    -------
+    json
+        users: remaining users
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+
+    try:
+        usernames = data["usersToDelete"]
+        usernames.pop(session["user"]["username"])
+        local_auth = LocalAuth(current_app, session)
+        local_auth.delete_users(usernames)
+        users = local_auth.get_all_users()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'users': {},
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'users': users,
+        'error': local_auth.get_error(),
+        'errorMessage': local_auth.get_error_message()
+    })

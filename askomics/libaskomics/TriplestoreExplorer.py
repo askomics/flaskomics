@@ -23,6 +23,36 @@ class TriplestoreExplorer(Params):
         """
         Params.__init__(self, app, session)
 
+    def get_graph_of_user(self, username):
+        """get all graph of a user
+
+        Parameters
+        ----------
+        username : string
+            Username
+
+        Returns
+        -------
+        list
+            List of graphs
+        """
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_builder = SparqlQueryBuilder(self.app, self.session)
+
+        query = """
+        SELECT DISTINCT ?graph
+        WHERE {{
+            ?graph dc:creator <{}> .
+        }}
+        """.format(username)
+
+        header, data = query_launcher.process_query(query_builder.prefix_query(query))
+
+        graphs = []
+        for result in data:
+            graphs.append(result["graph"])
+        return graphs
+
     def get_startpoints(self):
         """Get public and user startpoints
 
