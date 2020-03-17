@@ -240,7 +240,7 @@ def sparql_query(self, session, info):
 
 
 @celery.task(bind=True, name="delete_users_data")
-def delete_users_data(self, session, users):
+def delete_users_data(self, session, users, delete_user):
     """Delete users directory and RDF data
 
     Parameters
@@ -249,6 +249,8 @@ def delete_users_data(self, session, users):
         AskOmics session
     users : list
         list of user to delete
+    delete_user : boolean
+        True if delete all user or juste his data
 
     Returns
     -------
@@ -260,7 +262,7 @@ def delete_users_data(self, session, users):
         local_auth = LocalAuth(app, session)
 
         for user in users:
-            local_auth.delete_user_directory(user)
+            local_auth.delete_user_directory(user, delete_user)
             local_auth.delete_user_rdf(user["username"])
 
     except Exception as e:

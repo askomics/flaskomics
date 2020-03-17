@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+import glob
 import shutil
 import textwrap
 import time
@@ -1088,7 +1089,7 @@ class LocalAuth(Params):
             "message": message
         }
 
-    def delete_user_database(self, username):
+    def delete_user_database(self, username, delete_user=True):
         """Delete a user in database
 
         Parameters
@@ -1100,17 +1101,21 @@ class LocalAuth(Params):
 
         database = Database(self.app, self.session)
         queries = [
-            "DELETE FROM users WHERE user_id = ?",
-            "DELETE FROM abstraction WHERE user_id = ?",
             "DELETE FROM datasets WHERE user_id = ?",
             "DELETE FROM files WHERE user_id = ?",
             "DELETE FROM galaxy_accounts WHERE user_id = ?",
             "DELETE FROM results WHERE user_id = ?"
         ]
+
+        if delete_user:
+            queries.append("DELETE FROM users WHERE user_id = ?")
+            queries.append("DELETE FROM abstraction WHERE user_id = ?")
+            queries.append("DELETE FROM galaxy_accounts WHERE user_id = ?")
+
         for query in queries:
             database.execute_sql_query(query, (user["id"], ))
 
-    def delete_user_directory(self, user):
+    def delete_user_directory(self, user, delete_user=True):
         """Delete a user directory
 
         Delete in DB, TS and filesystem
@@ -1120,7 +1125,22 @@ class LocalAuth(Params):
         username : dict
             User to delete
         """
-        shutil.rmtree("{}/{}_{}".format(self.app.iniconfig.get("askomics", "data_directory"), user["id"], user["username"]))
+        user_dir = "{}/{}_{}".format(self.app.iniconfig.get("askomics", "data_directory"), user["id"], user["username"])
+        if delete_user:
+            shutil.rmtree(user_dir)
+        else:
+            file_lists = [
+                glob.glob("{}/results/*".format(user_dir), recursive=True),
+                glob.glob("{}/ttl/*".format(user_dir), recursive=True),
+                glob.glob("{}/upload/*".format(user_dir), recursive=True)
+            ]
+
+            for file_list in file_lists:
+                for file in file_list:
+                    try:
+                        os.remove(file)
+                    except OSError:
+                        self.log.error("Error while deleting file")
 
     def delete_user_rdf(self, username):
         """Delete a user rdf graphs

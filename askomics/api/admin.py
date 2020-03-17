@@ -218,7 +218,7 @@ def delete_users():
 
         # Celery task to delete users' data from filesystem and rdf triplestore
         session_dict = {'user': session['user']}
-        current_app.celery.send_task('delete_users_data', (session_dict, users))
+        current_app.celery.send_task('delete_users_data', (session_dict, users, True))
 
         # Get remaining users
         users = local_auth.get_all_users()
