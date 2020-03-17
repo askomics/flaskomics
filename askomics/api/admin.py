@@ -164,7 +164,7 @@ def add_user():
             mailer = Mailer(current_app, session)
             if mailer.check_mailer():
                 display_password = False
-                local_auth.send_mail_to_new_user(user)
+                current_app.celery.send_task('send_mail_new_user', ({'user': session['user']}, user))
                 # Don't send password user to frontend
                 user.pop("password")
 
@@ -190,7 +190,7 @@ def add_user():
 @admin_bp.route("/api/admin/delete_users", methods=["POST"])
 @admin_required
 def delete_users():
-    """Change blocked status of a user
+    """Delete users data
 
     Returns
     -------
@@ -203,13 +203,24 @@ def delete_users():
 
     try:
         usernames = data["usersToDelete"]
+        users = []
 
         # Remove current user from the list
         if session["user"]["username"] in usernames:
             usernames.remove(session["user"]["username"])
 
+        # Remove users from database
         local_auth = LocalAuth(current_app, session)
-        local_auth.delete_users(usernames)
+        for username in usernames:
+            # Get user info
+            users.append(local_auth.get_user(username))
+            local_auth.delete_user_database(username)
+
+        # Celery task to delete users' data from filesystem and rdf triplestore
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('delete_users_data', (session_dict, users))
+
+        # Get remaining users
         users = local_auth.get_all_users()
 
     except Exception as e:

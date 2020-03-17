@@ -318,3 +318,32 @@ def reset_password():
             "error": result["error"],
             "errorMessage": result["message"]
         })
+
+
+@auth_bp.route("/api/auth/delete_account", methods=["GET"])
+@login_required
+def delete_account():
+    """Remove account"""
+    try:
+        # Remove user from database
+        local_auth = LocalAuth(current_app, session)
+        local_auth.delete_user_database(session["user"]["username"])
+
+        # Celery task to delete user's data from filesystem and rdf triplestore
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('delete_users_data', (session_dict, [session["user"]["username"], ]))
+
+        # Remove user from session
+        session.pop('user', None)
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "error": True,
+            "errorMessage": str(e)
+        }), 500
+
+    return jsonify({
+        "error": False,
+        "errorMessage": ""
+    })

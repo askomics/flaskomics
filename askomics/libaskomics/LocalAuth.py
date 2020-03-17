@@ -1088,31 +1088,16 @@ class LocalAuth(Params):
             "message": message
         }
 
-    def delete_users(self, usernames):
-        """Delete selected users
-
-        Parameters
-        ----------
-        usernames : list
-            user to delete
-        """
-        for username in usernames:
-            self.delete_user(username)
-
-    def delete_user(self, username):
-        """Delete user by username
-
-        Delete in DB, TS and filesystem
+    def delete_user_database(self, username):
+        """Delete a user in database
 
         Parameters
         ----------
         username : string
             Username to delete
         """
-        # Get user info
         user = self.get_user(username)
 
-        # Delete user from database
         database = Database(self.app, self.session)
         queries = [
             "DELETE FROM users WHERE user_id = ?",
@@ -1125,10 +1110,28 @@ class LocalAuth(Params):
         for query in queries:
             database.execute_sql_query(query, (user["id"], ))
 
-        # Delete user directory
+    def delete_user_directory(self, user):
+        """Delete a user directory
+
+        Delete in DB, TS and filesystem
+
+        Parameters
+        ----------
+        username : dict
+            User to delete
+        """
         shutil.rmtree("{}/{}_{}".format(self.app.iniconfig.get("askomics", "data_directory"), user["id"], user["username"]))
 
-        # Delete RDF data
+    def delete_user_rdf(self, username):
+        """Delete a user rdf graphs
+
+        Delete in DB, TS and filesystem
+
+        Parameters
+        ----------
+        username : string
+            Username to delete
+        """
         tse = TriplestoreExplorer(self.app, self.session)
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         graphs = tse.get_graph_of_user(username)

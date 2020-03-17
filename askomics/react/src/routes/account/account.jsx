@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import UpdateProfile from './update_profile'
 import UpdatePassword from './update_password'
 import UpdateGalaxyAccount from './update_galaxy'
+import DeleteAccount from './delete_account'
 import UpdateApiKey from './update_apikey'
 import PropTypes from 'prop-types'
 import WaitingDiv from '../../components/waiting'
@@ -39,6 +40,8 @@ export default class Account extends Component {
         <UpdateGalaxyAccount config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
         <hr />
         <UpdateApiKey config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
+        <hr />
+        <DeleteAccount config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
       </div>
     )
   }

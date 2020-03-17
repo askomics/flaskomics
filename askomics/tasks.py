@@ -14,6 +14,7 @@ from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -236,3 +237,54 @@ def sparql_query(self, session, info):
         'error': False,
         'errorMessage': ''
     }
+
+
+@celery.task(bind=True, name="delete_users_data")
+def delete_users_data(self, session, users):
+    """Delete users directory and RDF data
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    users : list
+        list of user to delete
+
+    Returns
+    -------
+    dict
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        local_auth = LocalAuth(app, session)
+
+        for user in users:
+            local_auth.delete_user_directory(user)
+            local_auth.delete_user_rdf(user["username"])
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return {
+            'error': True,
+            'errorMessage': str(e)
+        }
+    return {
+        'error': False,
+        'errorMessage': ''
+    }
+
+
+@celery.task(bind=True, name="send_mail_new_user")
+def send_mail_new_user(self, session, user):
+    """Send a mail to the new user
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    user : dict
+        New user
+    """
+    local_auth = LocalAuth(app, session)
+    local_auth.send_mail_to_new_user(user)
