@@ -331,7 +331,7 @@ def delete_account():
 
         # Celery task to delete user's data from filesystem and rdf triplestore
         session_dict = {'user': session['user']}
-        current_app.celery.send_task('delete_users_data', (session_dict, [session["user"]["username"], ]))
+        current_app.celery.send_task('delete_users_data', (session_dict, [session["user"], ]))
 
         # Remove user from session
         session.pop('user', None)
