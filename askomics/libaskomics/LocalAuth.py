@@ -1114,11 +1114,16 @@ class LocalAuth(Params):
 
         # Delete user from database
         database = Database(self.app, self.session)
-        query = """
-        DELETE FROM users
-        WHERE username = ?
-        """
-        database.execute_sql_query(query, (username, ))
+        queries = [
+            "DELETE FROM users WHERE user_id = ?",
+            "DELETE FROM abstraction WHERE user_id = ?",
+            "DELETE FROM datasets WHERE user_id = ?",
+            "DELETE FROM files WHERE user_id = ?",
+            "DELETE FROM galaxy_accounts WHERE user_id = ?",
+            "DELETE FROM results WHERE user_id = ?"
+        ]
+        for query in queries:
+            database.execute_sql_query(query, (user["id"], ))
 
         # Delete user directory
         shutil.rmtree("{}/{}_{}".format(self.app.iniconfig.get("askomics", "data_directory"), user["id"], user["username"]))

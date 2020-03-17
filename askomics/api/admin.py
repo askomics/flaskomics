@@ -203,7 +203,11 @@ def delete_users():
 
     try:
         usernames = data["usersToDelete"]
-        usernames.pop(session["user"]["username"])
+
+        # Remove current user from the list
+        if session["user"]["username"] in usernames:
+            usernames.remove(session["user"]["username"])
+
         local_auth = LocalAuth(current_app, session)
         local_auth.delete_users(usernames)
         users = local_auth.get_all_users()
