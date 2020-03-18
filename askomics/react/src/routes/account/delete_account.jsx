@@ -39,6 +39,8 @@ export default class DeleteAccount extends Component {
       requestUrl = '/api/auth/delete_account'
     }
 
+    event.persist()
+
     axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
