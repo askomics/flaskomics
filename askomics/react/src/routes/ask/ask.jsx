@@ -303,7 +303,9 @@ export default class Ask extends Component {
         startpoints = (
           <div>
           <Alert color="info">
-            This instance is available only for logged user. <Link to="/login">Login</Link> or <Link to="/signup">signup</Link> to use.
+            This instance is available only for logged user. <Link to="/login">Login</Link>
+            {this.props.config.disableAccountCreation ? <></> : <> or <Link to="/signup">signup</Link></>}
+            <> to use.</>
           </Alert>
           </div>
         )
