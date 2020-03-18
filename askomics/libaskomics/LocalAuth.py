@@ -1156,4 +1156,4 @@ class LocalAuth(Params):
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         graphs = tse.get_graph_of_user(username)
         for graph in graphs:
-            query_launcher.drop_dataset(graph)
+            Utils.redo_if_failure(self.log, 3, 1, query_launcher.drop_dataset, graph)
