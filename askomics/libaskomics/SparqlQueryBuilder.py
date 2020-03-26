@@ -570,7 +570,7 @@ class SparqlQueryBuilder(Params):
 
         self.set_graphs_and_endpoints(entities=entities)
 
-        # self.log.debug(json_query)
+        self.log.debug(json_query)
 
         # Browse links (relations)
         for link in json_query["links"]:

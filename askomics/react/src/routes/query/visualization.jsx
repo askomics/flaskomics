@@ -257,5 +257,6 @@ Visualization.propTypes = {
   divHeight: PropTypes.number,
   handleNodeSelection: PropTypes.object,
   handleLinkSelection: PropTypes.object,
+  handleNodeConversion: PropTypes.object,
   graphState: PropTypes.object
 }

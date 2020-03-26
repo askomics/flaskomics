@@ -8,9 +8,7 @@ matrix:
       cache:
         - pip
       install:
-        - pip install -r requirements.txt
-        - pipenv install --dev
-        - python setup.py install
+        - make install-python MODE=dev
       before_script:
       - docker pull redis:4.0
       - docker pull askomics/virtuoso:7.2.5.1
@@ -25,8 +23,8 @@ matrix:
       - sudo docker run -d --name isql-api -p 5051:5050 -e VIRTUOSO_HOST=askomics-host -e VIRTUOSO_ISQL_PORT=1112 -t xgaia/isql-api:2.1.1  /bin/sh -c "netstat -nr | grep '^0\.0\.0\.0' | grep -oE '((1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])\.){3}(1?[0-9][0-9]?|2[0-4][0-9]|25[0-5])' | grep -v '^0\.0\.0\.0' | sed 's/$/ askomics-host/' >> /etc/hosts && sh /isqlapi/docker-run.sh"
       - sleep 1m
       script:
-        - flake8 askomics tests --ignore=E501,W504
-        - pytest --cov=. -vv
+        - make pylint MODE=dev TRAVIS=true
+        - make pytest MODE=dev TRAVIS=true
       after_success:
         coveralls
 
@@ -34,6 +32,6 @@ matrix:
       node_js:
         - 8
       install:
-        - npm install
+        - make install-js MODE=dev
       script:
-        - ./node_modules/.bin/eslint --config .eslintrc.yml "askomics/react/src/**"
+        - make eslint MODE=dev TRAVIS=true
