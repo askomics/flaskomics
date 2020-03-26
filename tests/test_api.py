@@ -8,14 +8,21 @@ class TestApi(AskomicsTestCase):
 
     def test_start(self, client):
         """Test /api/start route"""
+        front_message = None
+        try:
+            front_message = client.get_config('askomics', 'front_message')
+        except Exception:
+            pass
         # Non logged
         expected_config_nouser = {
             'footerMessage': client.get_config('askomics', 'footer_message'),
+            'frontMessage': front_message,
             "version": get_distribution('askomics').version,
             "commit": None,
             "gitUrl": "https://github.com/askomics/flaskomics",
             "disableIntegration": client.get_config('askomics', 'disable_integration', boolean=True),
             "disableAccountCreation": client.get_config('askomics', 'disable_account_creation', boolean=True),
+            "protectPublic": client.get_config('askomics', 'protect_public', boolean=True),
             "namespaceData": client.get_config('triplestore', 'namespace_data'),
             "namespaceInternal": client.get_config('triplestore', 'namespace_internal'),
             "proxyPath": "/",
