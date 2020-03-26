@@ -7,10 +7,13 @@ TESTPYTHON:=$(shell $(PYTHON) --version 2>/dev/null)
 PIPENVOPTS=
 FLASKOPTS=
 PYTESTOPTS=
+TESTFILE?=
 NTASKS?=1
 
 HOST?=0.0.0.0
 PORT?=5000
+
+DOCPORT?=8000
 
 NPM=npm
 TESTNPM:=$(shell $(NPM) -v 2>/dev/null)
@@ -51,6 +54,7 @@ help:
 	@echo '    make build [MODE=dev]                                              Build javascript (and watch for update if MODE=DEV)'
 	@echo '    make serve [MODE=dev] [HOST=0.0.0.0] [PORT=5000] [NTASKS=1]        Serve AskOmics at $(HOST):$(PORT)'
 	@echo '    make test                                                          Lint and test javascript and python code'
+	@echo '    make serve-doc [DOCPORT=8000]                                      Serve documentation at localhost:$(DOCPORT)'
 	@echo ''
 	@echo 'Examples:'
 	@echo '    make clean install build serve NTASKS=10                           Clean install and serve AskOmics in production mode, 10 celery tasks in parallel'
@@ -60,7 +64,14 @@ help:
 	@echo '    make clean install  MODE=dev                                       Clean install AskOmics in development mode'
 	@echo '    make serve NTASKS=10                                               Serve AskOmics, 10 celery tasks in parallel'
 	@echo '    make serve MODE=dev NTASKS=10                                      Serve AskOmics in development mode, 10 celery tasks in parallel'
+	@echo ''
+	@echo '    make pytest MODE=dev TESTFILE=tests/test_api.py                    Test tests/test_api file only'
 
+
+serve-doc: check-venv
+	@echo "Serving docs..."
+	. $(ACTIVATE)
+	mkdocs serve -a localhost:$(DOCPORT)
 
 test: test-js test-python
 
@@ -76,7 +87,7 @@ test-python: pylint pytest
 pytest: check-venv
 	@echo 'Testing python...'
 	. $(ACTIVATE)
-	pytest $(PYTESTOPTS)
+	pytest $(PYTESTOPTS) $(TESTFILE)
 
 pylint: check-venv
 	@echo -n 'Linting python...                                            '

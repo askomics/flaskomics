@@ -31,6 +31,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `disable_account_creation` (`true` or `false`): Disable new account creation
     - `default_locked_account` (`true` or `false`): Lock new account
     - `disable_integration` (`true` or `false`): Disable integration to non admin users
+    - `protect_public` (`true` or `false`): Public datasets and queries are visible only for logged users
     - `quota` (size): Default quota for new users
     - `github` (url): Github repository URL
     - `instance_url` (url): Instance URL. Used to send link by email when user reset his password
