@@ -95,7 +95,7 @@ pylint: check-venv
 	flake8 $(BASEDIR)/askomics $(BASEDIR)/tests --ignore=E501,W504
 	@echo "Done"
 
-serve:
+serve: check-venv build-config create-user
 ifeq ($(MODE), dev)
 	$(MAKE) -j 3 serve-askomics serve-celery build-js
 else
@@ -111,7 +111,7 @@ else
 	FLASK_ENV=production FLASK_APP=app gunicorn -b $(HOST):$(PORT) app
 endif
 
-serve-celery: check-venv
+serve-celery: check-venv build-config create-user
 	@echo 'Serving Celery...'
 	. $(ACTIVATE)
 ifeq ($(MODE), dev)
