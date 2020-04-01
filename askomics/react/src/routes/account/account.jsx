@@ -29,13 +29,32 @@ export default class Account extends Component {
       return <WaitingDiv waiting={this.props.waitForStart} center />
     }
 
+    let updateProfile
+    if (this.props.config.ldap == 0) {
+      updateProfile = (
+        <div>
+          <hr />
+          <UpdateProfile config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
+        </div>
+      )
+    }
+
+    let updatePassword
+    if (this.props.config.ldap == 0) {
+      updatePassword = (
+        <div>
+          <hr />
+          <UpdatePassword config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
+        </div>
+      )
+    }
+
+
     return (
       <div className="container">
         <h2>{this.props.config.user.fname} {this.props.config.user.lname}</h2>
-        <hr />
-        <UpdateProfile config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
-        <hr />
-        <UpdatePassword config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
+        {updateProfile}
+        {updatePassword}
         <hr />
         <UpdateGalaxyAccount config={this.props.config} setStateNavbar={this.props.setStateNavbar} />
         <hr />

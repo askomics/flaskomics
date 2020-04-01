@@ -9,6 +9,7 @@ import time
 
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Galaxy import Galaxy
+from askomics.libaskomics.LdapAuth import LdapAuth
 from askomics.libaskomics.Mailer import Mailer
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -146,7 +147,7 @@ class LocalAuth(Params):
         inputs["password"] = Utils.get_random_string(8)
         return self.persist_user(inputs, return_password=True)
 
-    def persist_user(self, inputs, ldap=False, return_password=False):
+    def persist_user(self, inputs, ldap_login=False, return_password=False):
         """
         Persist user in the TS
 
@@ -154,7 +155,7 @@ class LocalAuth(Params):
         ----------
         inputs : dict
             User infos
-        ldap : bool, optional
+        ldap_login : bool, optional
             If True, user is ldap
 
         Returns
@@ -195,8 +196,11 @@ class LocalAuth(Params):
 
         salt = None
         sha512_pw = None
+        email = None
+        fname = None
+        lname = None
 
-        if not ldap:
+        if not ldap_login:
             # Create a salt
             salt = Utils.get_random_string(20) if "salt" not in inputs else inputs["salt"]
             # Concat askomics_salt + user_password + salt
@@ -204,18 +208,22 @@ class LocalAuth(Params):
             # hash
             sha512_pw = hashlib.sha512(salted_pw.encode('utf8')).hexdigest()
 
+            email = inputs["email"]
+            fname = inputs["fname"]
+            lname = inputs["lname"]
+
         # Store user in db
         user_id = database.execute_sql_query(
-            query, (ldap, inputs['fname'], inputs['lname'], inputs['username'],
-                    inputs['email'], sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
+            query, (ldap_login, fname, lname, inputs['username'],
+                    email, sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
 
         user = {
             'id': user_id,
-            'ldap': ldap,
-            'fname': inputs['fname'],
-            'lname': inputs['lname'],
+            'ldap': ldap_login,
+            'fname': fname,
+            'lname': lname,
             'username': inputs['username'],
-            'email': inputs['email'],
+            'email': email,
             'admin': admin,
             'blocked': blocked,
             'quota': Utils.humansize_to_bytes(self.settings.get("askomics", "quota")),
@@ -223,7 +231,7 @@ class LocalAuth(Params):
             'galaxy': None
         }
 
-        if return_password:
+        if return_password and not ldap_login:
             user["password"] = inputs["password"]
 
         # Return user infos
@@ -305,6 +313,7 @@ class LocalAuth(Params):
             user info if authentication success
         """
         database = Database(self.app, self.session)
+        ldap_auth = LdapAuth(self.app, self.session)
 
         query = '''
         SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
@@ -336,6 +345,12 @@ class LocalAuth(Params):
                 'galaxy': None
             }
 
+            if user["ldap"] == 1 and ldap_auth.ldap:
+                ldap_user = ldap_auth.get_user(user["username"])
+                user["fname"] = ldap_user["fname"]
+                user["lname"] = ldap_user["lname"]
+                user["email"] = ldap_user["email"]
+
             if rows[0][10] is not None and rows[0][11] is not None:
                 user['galaxy'] = {
                     'url': rows[0][10],
@@ -348,28 +363,135 @@ class LocalAuth(Params):
 
         return {'error': error, 'error_messages': error_messages, 'user': user}
 
-    def authenticate_user(self, inputs):
-        """
-        check if the password is the good password associate with the email
+    def authenticate_user(self, login, password):
+        """Authenticate a user
 
         Parameters
         ----------
-        inputs : dict
-            login and password
+        login : str
+            User login (username or email)
+        password : str
+            User password
 
         Returns
         -------
         dict
-            user info if authentication success
+            user: User if authentication succed
+            error: True if auth fail
+            error_message: a message if auth fail
         """
-        database_field = 'username'
-        if validate_email(inputs['login']):
-            database_field = 'email'
+        ldap_auth = LdapAuth(self.app, self.session)
 
         error = False
         error_messages = []
         user = {}
 
+        # Try to auth user with db
+        user = self.get_user_from_db(login)
+        password_match = False
+
+        if user:
+            # If user is ldap and ldap is configured, get user from ldap and check password
+            if user["ldap"] == 1 and ldap_auth.ldap:
+                ldap_user = ldap_auth.get_user(login)
+                if ldap_user:
+                    user["username"] = ldap_user["username"]
+                    user["fname"] = ldap_user["fname"]
+                    user["lname"] = ldap_user["lname"]
+                    user["email"] = ldap_user["email"]
+                    password_match = ldap_auth.check_password(ldap_user["dn"], password)
+            # If user is local, check the password
+            else:
+                password_match = self.check_password(user["username"], password, user["password"], user["salt"])
+        else:
+            # No user in database, try to get it from ldap
+            ldap_user = ldap_auth.get_user(login)
+            # If user in ldap and not in db, create it in db
+            if ldap_user:
+                password_match = ldap_auth.check_password(ldap_user["dn"], password)
+                if password_match:
+                    inputs = {
+                        "username": ldap_user["username"]
+                    }
+                    # Create user in db
+                    user = self.persist_user(inputs, ldap_login=True)
+                    user["fname"] = ldap_user["fname"]
+                    user["lname"] = ldap_user["lname"]
+                    user["email"] = ldap_user["email"]
+                    # Create user directories
+                    self.create_user_directories(user["id"], user["username"])
+
+        if not password_match or not user:
+            error_messages.append("Bad login or password")
+            user = {}
+            error = True
+
+        return {
+            "user": user,
+            "error": error,
+            "error_messages": error_messages
+        }
+
+    @staticmethod
+    def get_login_type(login, ldap_login=False):
+        """Get login type from a login
+
+        Parameters
+        ----------
+        login : str
+            Login
+
+        Returns
+        -------
+        str
+            email or username/uid
+        """
+        if validate_email(login):
+            return 'email'
+        return 'username' if not ldap_login else 'uid'
+
+    def check_password(self, username, password_input, pasword_db, salt_db):
+        """Check password
+
+        Parameters
+        ----------
+        username : string
+            User username
+        password_input : string
+            Input password (clear)
+        pasword_db : string
+            Database password (hashed)
+        salt_db : string
+            Database salt
+
+        Returns
+        -------
+        bool
+            True if password match
+        """
+        concat = self.settings.get('askomics', 'password_salt') + password_input + salt_db
+        if len(pasword_db) == 64:
+            # Use sha256 (old askomics database use sha256)
+            shapw = hashlib.sha256(concat.encode('utf8')).hexdigest()
+        else:
+            # Use sha512
+            shapw = hashlib.sha512(concat.encode('utf8')).hexdigest()
+
+        return shapw == pasword_db
+
+    def get_user_from_db(self, login):
+        """Get a user from database
+
+        Parameters
+        ----------
+        login : str
+            email or username
+
+        Returns
+        -------
+        dict
+            User
+        """
         database = Database(self.app, self.session)
 
         query = '''
@@ -378,36 +500,28 @@ class LocalAuth(Params):
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE {} = ?
         GROUP BY u.user_id
-        '''.format(database_field)
+        '''.format(self.get_login_type(login))
 
-        rows = database.execute_sql_query(query, (inputs['login'], ))
+        rows = database.execute_sql_query(query, (login, ))
+
+        user = {}
 
         if len(rows) > 0:
-            concat = self.settings.get('askomics', 'password_salt') + inputs['password'] + rows[0][7]
-            if len(rows[0][6]) == 64:
-                # Use sha256 (old askomics database use sha256)
-                shapw = hashlib.sha256(concat.encode('utf8')).hexdigest()
-            else:
-                # Use sha512
-                shapw = hashlib.sha512(concat.encode('utf8')).hexdigest()
-
-            if rows[0][6] != shapw:
-                error = True
-                error_messages.append('Wrong password')
-            else:
-                user = {
-                    'id': rows[0][0],
-                    'ldap': rows[0][1],
-                    'fname': rows[0][2],
-                    'lname': rows[0][3],
-                    'username': rows[0][4],
-                    'email': rows[0][5],
-                    'apikey': rows[0][8],
-                    'admin': rows[0][9],
-                    'blocked': rows[0][10],
-                    'quota': rows[0][11],
-                    'galaxy': None
-                }
+            user = {
+                'id': rows[0][0],
+                'ldap': rows[0][1],
+                'fname': rows[0][2],
+                'lname': rows[0][3],
+                'username': rows[0][4],
+                'email': rows[0][5],
+                'password': rows[0][6],
+                'salt': rows[0][7],
+                'apikey': rows[0][8],
+                'admin': rows[0][9],
+                'blocked': rows[0][10],
+                'quota': rows[0][11],
+                'galaxy': None
+            }
 
             if rows[0][12] is not None and rows[0][13] is not None:
                 user['galaxy'] = {
@@ -415,11 +529,7 @@ class LocalAuth(Params):
                     'apikey': rows[0][13]
                 }
 
-        else:
-            error = True
-            error_messages.append('Wrong username')
-
-        return {'error': error, 'error_messages': error_messages, 'user': user}
+        return user
 
     def update_profile(self, inputs, user):
         """Update the profile of a user
@@ -664,48 +774,30 @@ class LocalAuth(Params):
         return {"error": not valid, "error_message": error_message, "user": user}
 
     def get_user(self, username):
-        """Get a specific user by his username
+        """Get user form database and ldap (if ldap user)
 
         Parameters
         ----------
-        username : string
+        username : str
             User username
 
         Returns
         -------
         dict
-            The corresponding user
+            User
         """
-        database = Database(self.app, self.session)
+        user = self.get_user_from_db(username)
+        user.pop("password")
+        user.pop("salt")
+        ldap_auth = LdapAuth(self.app, self.session)
 
-        query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
-        FROM users u
-        LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
-        WHERE username = ?
-        GROUP BY u.user_id
-        '''
-
-        rows = database.execute_sql_query(query, (username, ))
-
-        user = {}
-        user['id'] = rows[0][0]
-        user['ldap'] = rows[0][1]
-        user['fname'] = rows[0][2]
-        user['lname'] = rows[0][3]
-        user['username'] = rows[0][4]
-        user['email'] = rows[0][5]
-        user['apikey'] = rows[0][6]
-        user['admin'] = rows[0][7]
-        user['blocked'] = rows[0][8]
-        user['quota'] = rows[0][9]
-        user['galaxy'] = None
-
-        if rows[0][10] is not None and rows[0][11] is not None:
-            user['galaxy'] = {
-                'url': rows[0][10],
-                'apikey': rows[0][11]
-            }
+        if user["ldap"] == 1 and ldap_auth.ldap:
+            ldap_user = ldap_auth.get_user(username)
+            if ldap_user:
+                user["username"] = ldap_user["username"]
+                user["fname"] = ldap_user["fname"]
+                user["lname"] = ldap_user["lname"]
+                user["email"] = ldap_user["email"]
 
         return user
 
@@ -718,6 +810,7 @@ class LocalAuth(Params):
             All user info
         """
         database = Database(self.app, self.session)
+        ldap_auth = LdapAuth(self.app, self.session)
 
         query = '''
         SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, u.quota, g.url, g.apikey
@@ -748,6 +841,12 @@ class LocalAuth(Params):
                         'url': row[9],
                         'apikey': row[10]
                     }
+
+                if user["ldap"] == 1:
+                    ldap_user = ldap_auth.get_user(user["username"])
+                    user["fname"] = ldap_user["fname"]
+                    user["lname"] = ldap_user["lname"]
+                    user["email"] = ldap_user["email"]
 
                 users.append(user)
 
@@ -937,9 +1036,11 @@ class LocalAuth(Params):
         login : str
             username or email
         """
-        login_type = 'username'
-        if validate_email(login):
-            login_type = 'email'
+        login_type = self.get_login_type(login)
+
+        user = self.get_user(login)
+        if user["ldap"] == 1:
+            return
 
         if login_type == 'username':
             valid_user = self.is_username_in_db(login)

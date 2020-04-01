@@ -27,6 +27,7 @@ sentry-sdk = "*"
 configparser = "*"
 tld = "*"
 argh = "*"
+python-ldap = "*"
 
 [dev-packages]
 pytest = "*"

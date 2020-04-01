@@ -40,6 +40,21 @@ def admin_required(f):
     return decorated_function
 
 
+def local_required(f):
+    """Local required function"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Local required decorator"""
+        if "user" in session:
+            current_app.logger.debug(session["user"])
+            if not session["user"]["ldap"]:
+                return f(*args, **kwargs)
+            return jsonify({"error": True, "errorMessage": "Local user required"})
+        return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+    return decorated_function
+
+
 @auth_bp.route('/api/auth/signup', methods=['POST'])
 def signup():
     """Register a new user
@@ -87,7 +102,7 @@ def login():
     data = request.get_json()
 
     local_auth = LocalAuth(current_app, session)
-    authentication = local_auth.authenticate_user(data)
+    authentication = local_auth.authenticate_user(data["login"], data["password"])
 
     user = {}
     if not authentication['error']:
@@ -146,7 +161,7 @@ def login_api_key(key):
 
 
 @auth_bp.route('/api/auth/profile', methods=['POST'])
-@login_required
+@local_required
 def update_profile():
     """Update user profile (names and email)
 
@@ -170,7 +185,7 @@ def update_profile():
 
 
 @auth_bp.route('/api/auth/password', methods=['POST'])
-@login_required
+@local_required
 def update_password():
     """Update the user passord
 

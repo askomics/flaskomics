@@ -414,7 +414,7 @@ export default class Admin extends Component {
 
     let selectRow = {
       mode: 'checkbox',
-      clickToSelect: true,
+      clickToSelect: false,
       selected: this.state.selected,
       onSelect: this.handleSelection,
       onSelectAll: this.handleSelectionAll,
