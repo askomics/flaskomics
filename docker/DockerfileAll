@@ -33,7 +33,7 @@ RUN apk add --no-cache openssl py-pip && \
     apk --no-cache add --update openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community && \
     mkdir /corese && \
     apk add --no-cache redis sqlite && \
-    apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm
+    apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm openldap-dev
 
 COPY --from=virtuoso_builder /usr/local/virtuoso-opensource /usr/local/virtuoso-opensource
 COPY --from=virtuoso_builder /virtuoso /virtuoso
