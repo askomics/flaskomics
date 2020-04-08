@@ -64,7 +64,7 @@ export default class Login extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          success: !response.data.error
+          success: !error.response.data.error
         })
       })
     event.preventDefault()
