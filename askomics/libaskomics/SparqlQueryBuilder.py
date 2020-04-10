@@ -781,7 +781,7 @@ class SparqlQueryBuilder(Params):
 
             # Numeric
             if attribute["type"] == "decimal":
-                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in start_end or attribute["id"] in linked_attributes:
+                if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in start_end or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
@@ -797,12 +797,13 @@ class SparqlQueryBuilder(Params):
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
-                    if attribute['filterSign'] == "=":
-                        values.append("VALUES {} {{ {} }} .".format(obj, attribute["filterValue"]))
-                    else:
-                        filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
-                        filters.append(filter_string)
+                for filtr in attribute["filters"]:
+                    if filtr["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
+                        if filtr['filterSign'] == "=":
+                            values.append("VALUES {} {{ {} }} .".format(obj, filtr["filterValue"]))
+                        else:
+                            filter_string = "FILTER ( {} {} {} ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
+                            filters.append(filter_string)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],

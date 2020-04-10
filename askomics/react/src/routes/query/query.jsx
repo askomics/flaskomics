@@ -270,8 +270,12 @@ export default class Query extends Component {
         firstAttrVisibleForBnode = false
 
         if (attributeType == 'decimal') {
-          nodeAttribute.filterSign = '='
-          nodeAttribute.filterValue = ''
+          nodeAttribute.filters = [
+            {
+              filterValue: "",
+              filterSign: "="
+            }
+          ]
         }
 
         if (attributeType == 'text') {
@@ -941,10 +945,25 @@ export default class Query extends Component {
   handleFilterNumericSign (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.filterSign = event.target.value
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
       }
     })
+    this.updateGraphState()
+  }
 
+  toggleAddNumFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: "",
+          filterSign: "="
+        })
+      }
+    })
     this.updateGraphState()
   }
 
@@ -952,7 +971,11 @@ export default class Query extends Component {
     if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
-          attr.filterValue = event.target.value
+          attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
         }
       })
       this.updateGraphState()
@@ -1244,6 +1267,7 @@ export default class Query extends Component {
                 handleFilterNumericSign={p => this.handleFilterNumericSign(p)}
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
                 toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
+                toggleAddNumFilter={p => this.toggleAddNumFilter(p)}
               />
             )
           }

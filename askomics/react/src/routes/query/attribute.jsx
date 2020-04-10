@@ -25,6 +25,7 @@ export default class AttributeBox extends Component {
     this.handleFilterNumericValue = this.props.handleFilterNumericValue.bind(this)
     this.toggleLinkAttribute = this.props.toggleLinkAttribute.bind(this)
     this.handleChangeLink = this.props.handleChangeLink.bind(this)
+    this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
   }
 
   subNums (id) {
@@ -218,15 +219,6 @@ export default class AttributeBox extends Component {
       linkIcon = 'attr-icon fas fa-link'
     }
 
-    let selected = {
-      '=': false,
-      '<': false,
-      '<=': false,
-      '>': false,
-      '>=': false,
-      '!=': false
-    }
-
     let sign_display = {
       '=': '=',
       '<': '<',
@@ -236,27 +228,33 @@ export default class AttributeBox extends Component {
       '!=': '≠'
     }
 
-    selected[this.props.attribute.filterSign] = true
-
     let form
+    let numberOfFilters = this.props.attribute.filters.length - 1
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
     } else {
       form = (
         <table style={{ width: '100%' }}>
-          <tr>
-            <td>
-              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
-                {Object.keys(selected).map(sign => {
-                  return <option key={sign} selected={selected[sign]} value={sign}>{sign_display[sign]}</option>
-                })}
-              </CustomInput>
-            </td>
-            <td>
-              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterNumericValue} />
-            </td>
-          </tr>
+        {this.props.attribute.filters.map((filter, index) => {
+          return (
+            <tr>
+              <td>
+                <CustomInput data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+                  {Object.keys(sign_display).map(sign => {
+                    return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
+                  })}
+                </CustomInput>
+              </td>
+                <td>
+                  <div class="input-with-icon">
+                    <Input data-index={index} className="input-with-icon" disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleFilterNumericValue} />
+                    {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumFilter}></i></button> : <></>}
+                  </div>
+                </td>
+            </tr>
+          )
+        })}
         </table>
       )
     }

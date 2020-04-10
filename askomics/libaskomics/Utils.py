@@ -149,6 +149,28 @@ class Utils():
         return int(number * units[unit])
 
     @staticmethod
+    def check_key_in_list_of_dict(list_of_dict, key):
+        """Check if a key is empty in a list of dict
+
+        Parameters
+        ----------
+        list_of_dict : List of dict
+            List of dict to test
+        key : str
+            The key
+
+        Returns
+        -------
+        bool
+            False if all key are empty
+        """
+        for elem in list_of_dict:
+            if elem[key]:
+                return True
+
+        return False
+
+    @staticmethod
     def is_url(url):
         """Check is string is an url
 
