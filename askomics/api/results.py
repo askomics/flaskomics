@@ -13,8 +13,8 @@ from flask import (Blueprint, current_app, jsonify, session, request, send_from_
 results_bp = Blueprint('results', __name__, url_prefix='/')
 
 
-@login_required
 @results_bp.route('/api/results', methods=['GET'])
+@login_required
 def get_results():
     """Get ...
 
@@ -50,8 +50,8 @@ def get_results():
     })
 
 
-@login_required
 @results_bp.route('/api/results/preview', methods=['POST'])
+@login_required
 def get_preview():
     """Summary
 
@@ -88,8 +88,8 @@ def get_preview():
     })
 
 
-@login_required
 @results_bp.route('/api/results/getquery', methods=["POST"])
+@login_required
 def get_graph_and_sparql_query():
     """Get query (graphState or Sparql)
 
@@ -177,8 +177,8 @@ def get_graph_state():
     })
 
 
-@login_required
 @results_bp.route('/api/results/download', methods=['POST'])
+@login_required
 def download_result():
     """Download result file"""
     try:
@@ -198,8 +198,8 @@ def download_result():
     return(send_from_directory(dir_path, file_name))
 
 
-@login_required
 @results_bp.route('/api/results/delete', methods=['POST'])
+@login_required
 def delete_result():
     """Summary
 
@@ -229,8 +229,8 @@ def delete_result():
     })
 
 
-@login_required
 @results_bp.route('/api/results/sparqlquery', methods=['POST'])
+@login_required
 def get_sparql_query():
     """Get sparql query of result for the query editor
 
@@ -285,8 +285,8 @@ def get_sparql_query():
     })
 
 
-@login_required
 @results_bp.route('/api/results/description', methods=['POST'])
+@login_required
 def set_description():
     """Update a result description
 
@@ -323,8 +323,8 @@ def set_description():
     })
 
 
-@admin_required
 @results_bp.route('/api/results/publish', methods=['POST'])
+@admin_required
 def publish_query():
     """Publish a query template from a result
 
@@ -359,8 +359,8 @@ def publish_query():
     })
 
 
-@login_required
 @results_bp.route('/api/results/template', methods=['POST'])
+@login_required
 def template_query():
     """Template a query from a result
 

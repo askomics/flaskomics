@@ -48,6 +48,7 @@ export default class Sparql extends Component {
 
       waiting: true
     }
+    this.cancelRequest
     this.handleCodeChange = this.handleCodeChange.bind(this)
     this.previewQuery = this.previewQuery.bind(this)
     this.launchQuery = this.launchQuery.bind(this)
@@ -78,7 +79,9 @@ export default class Sparql extends Component {
             diskSpace: response.data.diskSpace,
             waiting: false,
             error: response.data.error,
-            errorMessage: response.data.errorMessage
+            errorMessage: response.data.errorMessage,
+            config: this.props.config,
+            status: response.status
           })
         })
         .catch(error => {
@@ -94,7 +97,9 @@ export default class Sparql extends Component {
 
   componentWillUnmount () {
     if (!this.props.waitForStart) {
-      this.cancelRequest()
+      if (this.utils.isFunction(this.cancelRequest)) {
+        this.cancelRequest()
+      }
     }
   }
 
@@ -237,6 +242,11 @@ export default class Sparql extends Component {
   }
 
   render () {
+    let redirectLogin
+    if (this.state.status == 401) {
+      redirectLogin = <Redirect to="/login" />
+    }
+
     let resultsTable
     if (this.state.results_header.length > 0) {
       resultsTable = (
@@ -266,6 +276,7 @@ export default class Sparql extends Component {
 
     return (
       <div className="container">
+        {redirectLogin}
         <h2>SPARQL query</h2>
         <hr />
         <br />

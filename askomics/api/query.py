@@ -139,8 +139,8 @@ def get_preview():
     })
 
 
-@login_required
 @query_bp.route('/api/query/save_result', methods=['POST'])
+@login_required
 def save_result():
     """Save a query in filesystem and db, using a celery task
 
