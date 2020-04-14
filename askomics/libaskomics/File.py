@@ -329,7 +329,7 @@ class File(Params):
 
         # Load the last chunk
         if self.graph_chunk.percent and dataset_id:
-            self.update_percent_in_db(100, dataset_id)
+            self.update_percent_in_db(99, dataset_id)
 
         if self.method == 'load':
             temp_file_name = 'tmp_{}_{}_chunk_{}.{}'.format(
@@ -365,6 +365,7 @@ class File(Params):
             # Insert
             sparql.insert_data(self.graph_abstraction_dk, self.file_graph)
 
+        self.update_percent_in_db(100, dataset_id)
         self.set_triples_number()
 
     def get_faldo_strand(self, raw_strand):
