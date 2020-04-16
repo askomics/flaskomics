@@ -52,6 +52,7 @@ export default class Query extends Component {
     this.divHeight = 650
 
     this.idNumber = 0
+    this.specialNodeIdNumber = 0
     this.previousSelected = null
     this.currentSelected = null
     this.cancelRequest
@@ -70,6 +71,7 @@ export default class Query extends Component {
   }
 
   initId () {
+    // init node id
     let listId = new Set()
     this.graphState.nodes.map(node => {
       listId.add(node.id)
@@ -84,11 +86,36 @@ export default class Query extends Component {
     })
 
     this.idNumber = Math.max(...listId)
+
+    // init specialNode id
+    let listSpecialId = new Set()
+    this.graphState.nodes.map(node => {
+      listSpecialId.add(node.specialNodeId)
+    })
+    this.specialNodeIdNumber = Math.max(...listSpecialId)
   }
 
   getId () {
     this.idNumber += 1
     return this.idNumber
+  }
+
+  getSpecialNodeId () {
+    this.specialNodeIdNumber += 1
+    return this.specialNodeIdNumber
+  }
+
+  getLargestSpecialNodeGroupId (node) {
+    let listIds = new Set()
+    this.graphState.links.map(link => {
+      if (link.source.id == node.id) {
+        listIds.add(link.target.specialNodeGroupId)
+      }
+      if (link.target.id == node.id) {
+        listIds.add(link.source.specialNodeGroupId)
+      }
+    })
+    return Math.max(...listIds)
   }
 
   getHumanNodeId (uri) {
@@ -301,12 +328,26 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested, special=null) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, forceSpecialGroupId=null) {
     /*
     Insert a new node in the graphState
     */
     let nodeId = this.getId()
     let humanId = this.getHumanNodeId(uri)
+    let specialNodeId = null
+    let specialNodeGroupId = null
+    if (special) {
+      specialNodeId = this.getSpecialNodeId()
+    }
+
+    if (forceSpecialId) {
+      specialNodeId = forceSpecialId
+    }
+
+    if (forceSpecialGroupId) {
+      specialNodeGroupId = forceSpecialGroupId
+    }
+
     let node = {
       uri: uri,
       type: special ? special : this.getType(uri),
@@ -315,6 +356,8 @@ export default class Query extends Component {
       graphs: this.getGraphs(uri),
       id: nodeId,
       humanId: humanId,
+      specialNodeId: specialNodeId,
+      specialNodeGroupId: specialNodeGroupId,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -381,7 +424,7 @@ export default class Query extends Component {
     return nodesAndLinks
   }
 
-  insertSuggestion (node) {
+  insertSuggestion (node, incrementSpecialNodeGroupId=null) {
     /*
     Insert suggestion for this node
 
@@ -398,6 +441,10 @@ export default class Query extends Component {
 
     let reNode = new RegExp(node.filterNode, 'g')
     let reLink = new RegExp(node.filterLink, 'g')
+
+    if (incrementSpecialNodeGroupId) {}
+
+    let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
     this.state.abstraction.relations.map(relation => {
       if (relation.source == node.uri) {
@@ -417,6 +464,8 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.target),
               id: targetId,
               humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
@@ -436,6 +485,7 @@ export default class Query extends Component {
               suggested: true,
               directed: true
             })
+            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
@@ -457,6 +507,8 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.source),
               id: sourceId,
               humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
@@ -476,6 +528,7 @@ export default class Query extends Component {
               suggested: true,
               directed: true
             })
+            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
@@ -495,6 +548,8 @@ export default class Query extends Component {
             graphs: this.getGraphs(entity.uri),
             id: new_id,
             humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
@@ -515,6 +570,7 @@ export default class Query extends Component {
             suggested: true,
             directed: true
           })
+          incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
       })
     }
@@ -689,7 +745,14 @@ export default class Query extends Component {
       // remove all suggestion
       this.removeAllSuggestion()
       // insert suggestion
-      this.insertSuggestion(this.currentSelected)
+
+      // if node is a special node, get the greatest specialNodeGroupId
+      if (clickedNode.type == "unionNode") {
+        this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(clickedNode) + 1)
+      } else {
+        this.insertSuggestion(this.currentSelected)
+      }
+
     }
     // update graph state
     this.updateGraphState()
@@ -789,8 +852,8 @@ export default class Query extends Component {
     // insert a special node and select it
     let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo)
 
-    // insert target node
-    let targetNode = this.insertNode(data.node.uri, false, false)
+    // insert target node with specialNodeGroupId = 1
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1)
 
     // insert link between source and special node
     this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
@@ -803,8 +866,8 @@ export default class Query extends Component {
     relation.selected = false
     this.graphState.links.push(relation)
 
-    //insert suggestion
-    this.insertSuggestion(specialNode)
+    //insert suggestion with first specialNodeGroupId = 2 (will be incremented for each suggestion)
+    this.insertSuggestion(specialNode, 2)
 
     // Manage selection
     this.manageCurrentPreviousSelected(specialNode)
@@ -1111,6 +1174,8 @@ export default class Query extends Component {
       disablePreview: true,
       previewIcon: "spinner"
     })
+    console.log("graphState.nodes", this.graphState.nodes)
+    console.log("graphState.links", this.graphState.links)
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)

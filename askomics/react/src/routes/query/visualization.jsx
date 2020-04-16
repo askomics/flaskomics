@@ -255,8 +255,8 @@ export default class Visualization extends Component {
 
 Visualization.propTypes = {
   divHeight: PropTypes.number,
-  handleNodeSelection: PropTypes.object,
-  handleLinkSelection: PropTypes.object,
-  handleNodeConversion: PropTypes.object,
+  handleNodeSelection: PropTypes.function,
+  handleLinkSelection: PropTypes.function,
+  handleNodeConversion: PropTypes.function,
   graphState: PropTypes.object
 }
