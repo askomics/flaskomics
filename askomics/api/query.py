@@ -6,7 +6,7 @@ from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, session, request)
@@ -111,17 +111,17 @@ def get_preview():
         else:
             data = request.get_json()
 
-            query_builder = SparqlQueryBuilder(current_app, session)
+            query = SparqlQuery(current_app, session, data["graphState"])
+            query.build_query_from_json(preview=True, for_editor=False)
 
-            query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
-            endpoints = query_builder.endpoints
-            federated = query_builder.federated
+            endpoints = query.endpoints
+            federated = query.federated
 
-            header = query_builder.selects
+            header = query.selects
             preview = []
-            if query_builder.graphs:
+            if query.graphs:
                 query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-                header, preview = query_launcher.process_query(query)
+                header, preview = query_launcher.process_query(query.sparql)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -163,17 +163,14 @@ def save_result():
             }), 500
 
         # Get query and endpoints and graphs of the query
-        graph_state = request.get_json()["graphState"]
-        query_builder = SparqlQueryBuilder(current_app, session)
-        query = query_builder.build_query_from_json(graph_state, preview=False, for_editor=False)
-        endpoints = query_builder.endpoints
-        graphs = query_builder.graphs
+        query = SparqlQuery(current_app, session, request.get_json()["graphState"])
+        query.build_query_from_json(preview=False, for_editor=False)
 
         info = {
-            "graph_state": graph_state,
-            "query": query,
-            "graphs": graphs,
-            "endpoints": endpoints,
+            "graph_state": query.json,
+            "query": query.sparql,
+            "graphs": query.graphs,
+            "endpoints": query.endpoints,
             "celery_id": None
         }
 

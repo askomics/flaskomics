@@ -16,7 +16,7 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -156,17 +156,15 @@ def query(self, session, info):
         result.update_db_status("started", update_celery=True, update_date=True)
 
         # launch query
-        query_builder = SparqlQueryBuilder(app, session)
+        query = SparqlQuery(app, session, info["graph_state"])
 
-        query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
-        endpoints = query_builder.endpoints
-        federated = query_builder.federated
+        query.build_query_from_json(for_editor=False)
 
-        headers = query_builder.selects
+        headers = query.selects
         results = []
-        if query_builder.graphs:
-            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            headers, results = query_launcher.process_query(query, isql_api=True)
+        if query.graphs:
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=query.federated, endpoints=query.endpoints)
+            headers, results = query_launcher.process_query(query.sparql, isql_api=True)
 
         # write result to a file
         file_size = result.save_result_in_file(headers, results)

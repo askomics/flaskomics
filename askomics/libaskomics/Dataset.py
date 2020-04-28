@@ -1,6 +1,6 @@
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 
 
@@ -108,11 +108,11 @@ class Dataset(Params):
             True if public
         """
         # Update in TS
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query = SparqlQuery(self.app, self.session)
         tse = TriplestoreExplorer(self.app, self.session)
 
         string_status = "true" if new_status else "false"
-        query_builder.toggle_public(self.graph_name, string_status)
+        query.toggle_public(self.graph_name, string_status)
 
         # Update in DB
         database = Database(self.app, self.session)

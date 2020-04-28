@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -37,7 +37,7 @@ class TriplestoreExplorer(Params):
             List of graphs
         """
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = """
         SELECT DISTINCT ?graph
@@ -66,7 +66,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity ?entity_label ?creator ?public
@@ -250,7 +250,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label
@@ -329,7 +329,7 @@ class TriplestoreExplorer(Params):
         )
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?attribute_uri ?attribute_type ?attribute_faldo ?attribute_label ?attribute_range ?category_value_uri ?category_value_label
@@ -435,7 +435,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label

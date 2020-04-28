@@ -1174,8 +1174,7 @@ export default class Query extends Component {
       disablePreview: true,
       previewIcon: "spinner"
     })
-    console.log("graphState.nodes", this.graphState.nodes)
-    console.log("graphState.links", this.graphState.links)
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
