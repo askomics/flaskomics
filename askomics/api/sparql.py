@@ -100,13 +100,13 @@ def query():
         federated = query.is_federated()
         replace_froms = query.replace_froms()
 
-        query = query.format_query(q, replace_froms=replace_froms, federated=federated)
+        sparql = query.format_query(q, replace_froms=replace_froms, federated=federated)
         # header, data = query_launcher.process_query(query)
         header = query.selects
         data = []
         if query.graphs or query.endpoints:
             query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            header, data = query_launcher.process_query(query)
+            header, data = query_launcher.process_query(sparql)
 
     except Exception as e:
         current_app.logger.error(str(e).replace('\\n', '\n'))
@@ -134,7 +134,7 @@ def save_query():
     json
         query results
     """
-    query = request.get_json()['query']
+    q = request.get_json()['query']
     graphs = request.get_json()['graphs']
     endpoints = request.get_json()['endpoints']
 
@@ -178,10 +178,10 @@ def save_query():
         federated = query.is_federated()
         replace_froms = query.replace_froms()
 
-        formatted_query = query.format_query(query, limit=None, replace_froms=replace_froms, federated=federated)
+        formatted_query = query.format_query(q, limit=None, replace_froms=replace_froms, federated=federated)
 
         info = {
-            "sparql_query": query,  # Store the non formatted query in db
+            "sparql_query": q,  # Store the non formatted query in db
             "graphs": graphs,
             "endpoints": endpoints,
             "federated": federated,
