@@ -647,7 +647,7 @@ class SparqlQuery(Params):
         if blockid:
             self.store_filter_block(filtr, blockid, sblockid)
         else:
-            self.filter.append(filtr)
+            self.filters.append(filtr)
 
     def store_value(self, value, blockid, sblockid):
         """Store a VALUES inthe right list
