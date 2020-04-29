@@ -1093,7 +1093,7 @@ class SparqlQuery(Params):
                         if attribute["negative"]:
                             self.store_filter("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]), block_id, sblock_id)
                         else:
-                            self.store_value("VALUES {} {{ '{}'^^xsd:string }} .".format(obj, attribute["filterValue"]), block_id, sblock_id)
+                            self.store_value("VALUES {} {{ '{}' }} .".format(obj, attribute["filterValue"]), block_id, sblock_id)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
