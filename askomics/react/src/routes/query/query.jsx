@@ -328,24 +328,20 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, forceSpecialGroupId=null) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null]) {
     /*
     Insert a new node in the graphState
     */
     let nodeId = this.getId()
     let humanId = this.getHumanNodeId(uri)
     let specialNodeId = null
-    let specialNodeGroupId = null
+
     if (special) {
       specialNodeId = this.getSpecialNodeId()
     }
 
     if (forceSpecialId) {
       specialNodeId = forceSpecialId
-    }
-
-    if (forceSpecialGroupId) {
-      specialNodeGroupId = forceSpecialGroupId
     }
 
     let node = {
@@ -358,6 +354,7 @@ export default class Query extends Component {
       humanId: humanId,
       specialNodeId: specialNodeId,
       specialNodeGroupId: specialNodeGroupId,
+      specialPreviousIds: specialPreviousIds,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -442,8 +439,6 @@ export default class Query extends Component {
     let reNode = new RegExp(node.filterNode, 'g')
     let reLink = new RegExp(node.filterLink, 'g')
 
-    if (incrementSpecialNodeGroupId) {}
-
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
     this.state.abstraction.relations.map(relation => {
@@ -466,6 +461,7 @@ export default class Query extends Component {
               humanId: null,
               specialNodeId: node.specialNodeId,
               specialNodeGroupId: specialNodeGroupId,
+              specialPreviousIds: node.specialPreviousIds,
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
@@ -509,6 +505,7 @@ export default class Query extends Component {
               humanId: null,
               specialNodeId: node.specialNodeId,
               specialNodeGroupId: specialNodeGroupId,
+              specialPreviousIds: node.specialPreviousIds,
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
@@ -548,8 +545,9 @@ export default class Query extends Component {
             graphs: this.getGraphs(entity.uri),
             id: new_id,
             humanId: null,
-              specialNodeId: node.specialNodeId,
-              specialNodeGroupId: specialNodeGroupId,
+            specialNodeId: node.specialNodeId,
+            specialNodeGroupId: specialNodeGroupId,
+            specialPreviousIds: node.specialPreviousIds,
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
@@ -849,11 +847,14 @@ export default class Query extends Component {
     this.removeAllSuggestion()
     this.unselectAllObjects()
 
+    // Get previous special node ids
+    let specialPreviousIds = [sourceNode.specialNodeId, sourceNode.specialNodeGroupId]
+
     // insert a special node and select it
-    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo)
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds)
 
     // insert target node with specialNodeGroupId = 1
-    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1)
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds)
 
     // insert link between source and special node
     this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
