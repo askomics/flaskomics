@@ -921,7 +921,7 @@ class SparqlQuery(Params):
                                 strand_2 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
                                 strands.append(attr["id"])
 
-                    self.store_block({
+                    self.store_triple({
                         "subject": source,
                         "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         "object": common_block,
@@ -929,7 +929,7 @@ class SparqlQuery(Params):
 
                     }, block_id, sblock_id)
 
-                    self.store_block({
+                    self.store_triple({
                         "subject": target,
                         "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         "object": common_block,
