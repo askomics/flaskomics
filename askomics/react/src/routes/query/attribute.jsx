@@ -238,9 +238,9 @@ export default class AttributeBox extends Component {
         <table style={{ width: '100%' }}>
         {this.props.attribute.filters.map((filter, index) => {
           return (
-            <tr key={sign}>
-              <td key={sign}>
-                <CustomInput key={sign} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
                   {Object.keys(sign_display).map(sign => {
                     return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
                   })}
