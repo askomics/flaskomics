@@ -260,7 +260,7 @@ export default class Ask extends Component {
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
       templateQueries = (
         <div>
-          <p>Or start with an template:</p>
+          <p>Or start with a template:</p>
             <ListGroup>
               {this.state.publicQueries.map(query => {
                 if (query.public == 0) {

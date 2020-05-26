@@ -238,16 +238,16 @@ export default class AttributeBox extends Component {
         <table style={{ width: '100%' }}>
         {this.props.attribute.filters.map((filter, index) => {
           return (
-            <tr>
-              <td>
-                <CustomInput data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+            <tr key={sign}>
+              <td key={sign}>
+                <CustomInput key={sign} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
                   {Object.keys(sign_display).map(sign => {
                     return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
                   })}
                 </CustomInput>
               </td>
                 <td>
-                  <div class="input-with-icon">
+                  <div className="input-with-icon">
                     <Input data-index={index} className="input-with-icon" disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleFilterNumericValue} />
                     {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumFilter}></i></button> : <></>}
                   </div>
@@ -384,6 +384,7 @@ AttributeBox.propTypes = {
   handleNegative: PropTypes.func,
   toggleVisibility: PropTypes.func,
   toggleOptional: PropTypes.func,
+  toggleAddNumFilter: PropTypes.func,
   handleFilterType: PropTypes.func,
   handleFilterValue: PropTypes.func,
   handleFilterCategory: PropTypes.func,
