@@ -242,9 +242,11 @@ export default class Visualization extends Component {
         <MenuItem data={{node: this.state.rightClickedNode, convertTo: "unionNode"}} onClick={this.handleNodeConversion}>
           Convert to UNION node
         </MenuItem>
+        {/*
         <MenuItem data={{node: this.state.rightClickedNode, convertTo: "notNode"}} onClick={this.handleNodeConversion}>
           Convert to NOT node
         </MenuItem>
+        */}
       </ContextMenu>
     </div>
 
