@@ -171,6 +171,18 @@ install-js: check-npm
 
 clean: clean-js clean-python
 
+clean-lock: clean-lockfile-python clean-lockfile-js
+
+clean-lockfile-python:
+	@echo -n 'Cleaning Pipfile.lock files...                                     '
+	$(RM) -rf Pipfile.lock
+	@echo 'Done'
+
+clean-lockfile-js:
+	@echo -n 'Cleaning package-lock.json files...                                     '
+	$(RM) -rf package-lock.json
+	@echo 'Done'
+
 clean-python:
 	@echo -n 'Cleaning python files...                                     '
 	$(RM) -rf $(VENVDIR)
@@ -217,6 +229,6 @@ ifndef TESTNPM
 	$(error $(NPM) not found. Abording)
 endif
 
-.PHONY: test test-js eslint test-python pytest pylint build build-js help clean-install install install-python install-js check check-python check-npm clean clean-python clean-js serve-celery serve-askomics serve
+.PHONY: test test-js eslint test-python pytest pylint build build-js help clean-install install install-python install-js check check-python check-npm clean clean-python clean-js serve-celery serve-askomics serve clean-lock clean-lockfile-python clean-lockfile-js
 .SILENT: serve test test-js check-venv check-node-modules
 .ONESHELL:
