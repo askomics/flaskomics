@@ -183,7 +183,7 @@ class TestApiAuth(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == {
             'error': True,
-            'errorMessage': ["Wrong username"],
+            'errorMessage': ["Bad login or password"],
             'user': {}
         }
 
@@ -192,7 +192,7 @@ class TestApiAuth(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == {
             'error': True,
-            'errorMessage': ["Wrong username"],
+            'errorMessage': ["Bad login or password"],
             'user': {}
         }
 
@@ -201,7 +201,7 @@ class TestApiAuth(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == {
             'error': True,
-            'errorMessage': ["Wrong password"],
+            'errorMessage': ["Bad login or password"],
             'user': {}
         }
 
@@ -231,13 +231,13 @@ class TestApiAuth(AskomicsTestCase):
             'errorMessage': [],
             'user': {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
@@ -252,13 +252,13 @@ class TestApiAuth(AskomicsTestCase):
             'errorMessage': [],
             'user': {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
@@ -270,13 +270,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}

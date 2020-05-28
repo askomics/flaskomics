@@ -7,7 +7,7 @@ TESTPYTHON:=$(shell $(PYTHON) --version 2>/dev/null)
 PIPENVOPTS=
 FLASKOPTS=
 PYTESTOPTS=
-TESTFILE?=
+TESTFILE?=tests
 NTASKS?=1
 
 HOST?=0.0.0.0

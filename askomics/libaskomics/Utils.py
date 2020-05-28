@@ -88,9 +88,9 @@ class Utils():
         return ''.join(x for x in string.title() if not x.isspace())
 
     @staticmethod
-    def unique(l):
+    def unique(dup_list):
         """return the list with duplicate elements removed and keep order"""
-        return [i for n, i in enumerate(l) if i not in l[n + 1:]]
+        return [i for n, i in enumerate(dup_list) if i not in dup_list[n + 1:]]
 
     @staticmethod
     def intersect(a, b):

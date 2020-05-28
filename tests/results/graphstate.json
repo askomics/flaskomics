@@ -9,6 +9,7 @@
         "faldo": false,
         "filterType": "exact",
         "filterValue": "",
+        "humanNodeId": 1,
         "id": 2,
         "label": "Uri",
         "linked": false,
@@ -26,6 +27,7 @@
         "faldo": false,
         "filterType": "exact",
         "filterValue": "",
+        "humanNodeId": 1,
         "id": 3,
         "label": "Label",
         "linked": false,
@@ -40,49 +42,28 @@
       {
         "entityLabel": "transcript",
         "entityUri": "http://askomics.org/test/data/transcript",
-        "faldo": "http://askomics.org/test/internal/faldoReference",
+        "faldo": "http://askomics.org/internal/faldoStrand",
         "filterSelectedValues": [],
         "filterValues": [
           {
-            "label": "At3",
-            "uri": "http://askomics.org/test/data/At3"
+            "label": "plus",
+            "uri": "http://askomics.org/test/data/plus"
           },
-          {
-            "label": "At1",
-            "uri": "http://askomics.org/test/data/At1"
-          },
-          {
-            "label": "At5",
-            "uri": "http://askomics.org/test/data/At5"
-          }
-        ],
-        "id": 4,
-        "label": "chromosomeName",
-        "linked": false,
-        "linkedWith": null,
-        "negative": false,
-        "nodeId": 1,
-        "optional": false,
-        "type": "category",
-        "uri": "http://askomics.org/test/data/chromosomeName",
-        "visible": false
-      },
-      {
-        "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
-        "faldo": "http://askomics.org/test/internal/faldoStrand",
-        "filterSelectedValues": [],
-        "filterValues": [
           {
             "label": "minus",
             "uri": "http://askomics.org/test/data/minus"
           },
           {
-            "label": "plus",
-            "uri": "http://askomics.org/test/data/plus"
+            "label": "-",
+            "uri": "http://askomics.org/test/data/-"
+          },
+          {
+            "label": "+",
+            "uri": "http://askomics.org/test/data/%2B"
           }
         ],
-        "id": 5,
+        "humanNodeId": 1,
+        "id": 4,
         "label": "strand",
         "linked": false,
         "linkedWith": null,
@@ -96,6 +77,60 @@
       {
         "entityLabel": "transcript",
         "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": "http://askomics.org/internal/faldoReference",
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "1",
+            "uri": "http://askomics.org/test/data/1"
+          }
+        ],
+        "humanNodeId": 1,
+        "id": 5,
+        "label": "reference",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://askomics.org/test/data/reference",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": "http://askomics.org/internal/faldoReference",
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "At3",
+            "uri": "http://askomics.org/test/data/At3"
+          },
+          {
+            "label": "At5",
+            "uri": "http://askomics.org/test/data/At5"
+          },
+          {
+            "label": "At1",
+            "uri": "http://askomics.org/test/data/At1"
+          }
+        ],
+        "humanNodeId": 1,
+        "id": 6,
+        "label": "chromosomeName",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "category",
+        "uri": "http://askomics.org/test/data/chromosomeName",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
         "faldo": null,
         "filterSelectedValues": [],
         "filterValues": [
@@ -104,7 +139,8 @@
             "uri": "http://askomics.org/test/data/Arabidopsis_thaliana"
           }
         ],
-        "id": 6,
+        "humanNodeId": 1,
+        "id": 7,
         "label": "taxon",
         "linked": false,
         "linkedWith": null,
@@ -134,7 +170,8 @@
             "uri": "http://askomics.org/test/data/ncRNA_gene"
           }
         ],
-        "id": 7,
+        "humanNodeId": 1,
+        "id": 8,
         "label": "featureType",
         "linked": false,
         "linkedWith": null,
@@ -148,27 +185,50 @@
       {
         "entityLabel": "transcript",
         "entityUri": "http://askomics.org/test/data/transcript",
-        "faldo": "http://askomics.org/test/internal/faldoEnd",
-        "filterSign": "=",
-        "filterValue": "",
-        "id": 8,
-        "label": "end",
+        "faldo": null,
+        "filterSelectedValues": [],
+        "filterValues": [
+          {
+            "label": "miRNA",
+            "uri": "http://askomics.org/test/data/miRNA"
+          },
+          {
+            "label": "ncRNA",
+            "uri": "http://askomics.org/test/data/ncRNA"
+          },
+          {
+            "label": "protein_coding",
+            "uri": "http://askomics.org/test/data/protein_coding"
+          },
+          {
+            "label": "transposable_element",
+            "uri": "http://askomics.org/test/data/transposable_element"
+          }
+        ],
+        "humanNodeId": 1,
+        "id": 9,
+        "label": "biotype",
         "linked": false,
         "linkedWith": null,
         "negative": false,
         "nodeId": 1,
         "optional": false,
-        "type": "decimal",
-        "uri": "http://askomics.org/test/data/end",
+        "type": "category",
+        "uri": "http://askomics.org/test/data/biotype",
         "visible": false
       },
       {
         "entityLabel": "transcript",
         "entityUri": "http://askomics.org/test/data/transcript",
-        "faldo": "http://askomics.org/test/internal/faldoStart",
-        "filterSign": "=",
-        "filterValue": "",
-        "id": 9,
+        "faldo": "http://askomics.org/internal/faldoStart",
+        "filters": [
+          {
+            "filterSign": "=",
+            "filterValue": ""
+          }
+        ],
+        "humanNodeId": 1,
+        "id": 10,
         "label": "start",
         "linked": false,
         "linkedWith": null,
@@ -182,18 +242,23 @@
       {
         "entityLabel": "transcript",
         "entityUri": "http://askomics.org/test/data/transcript",
-        "faldo": null,
-        "filterType": "exact",
-        "filterValue": "",
-        "id": 10,
-        "label": "biotype",
+        "faldo": "http://askomics.org/internal/faldoEnd",
+        "filters": [
+          {
+            "filterSign": "=",
+            "filterValue": ""
+          }
+        ],
+        "humanNodeId": 1,
+        "id": 11,
+        "label": "end",
         "linked": false,
         "linkedWith": null,
         "negative": false,
         "nodeId": 1,
         "optional": false,
-        "type": "text",
-        "uri": "http://askomics.org/test/data/biotype",
+        "type": "decimal",
+        "uri": "http://askomics.org/test/data/end",
         "visible": false
       },
       {
@@ -202,7 +267,8 @@
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
-        "id": 11,
+        "humanNodeId": 1,
+        "id": 12,
         "label": "description",
         "linked": false,
         "linkedWith": null,
@@ -219,7 +285,8 @@
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
-        "id": 12,
+        "humanNodeId": 1,
+        "id": 13,
         "label": "featureName",
         "linked": false,
         "linkedWith": null,
@@ -228,6 +295,78 @@
         "optional": false,
         "type": "text",
         "uri": "http://askomics.org/test/data/featureName",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "humanNodeId": 1,
+        "id": 14,
+        "label": "ID",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://askomics.org/test/data/ID",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "humanNodeId": 1,
+        "id": 15,
+        "label": "Name",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://askomics.org/test/data/Name",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "humanNodeId": 1,
+        "id": 16,
+        "label": "source",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://askomics.org/test/data/source",
+        "visible": false
+      },
+      {
+        "entityLabel": "transcript",
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": null,
+        "filterType": "exact",
+        "filterValue": "",
+        "humanNodeId": 1,
+        "id": 17,
+        "label": "transcript_id",
+        "linked": false,
+        "linkedWith": null,
+        "negative": false,
+        "nodeId": 1,
+        "optional": false,
+        "type": "text",
+        "uri": "http://askomics.org/test/data/transcript_id",
         "visible": false
       }
     ],
@@ -238,12 +377,22 @@
         "filterLink": "",
         "filterNode": "",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
         ],
         "humanId": 1,
         "id": 1,
         "label": "transcript",
         "selected": true,
+        "specialNodeGroupId": null,
+        "specialNodeId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
         "suggested": false,
         "type": "node",
         "uri": "http://askomics.org/test/data/transcript"

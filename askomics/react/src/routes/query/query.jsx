@@ -592,7 +592,7 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
-          type: "link",
+          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -609,7 +609,7 @@ export default class Query extends Component {
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
-          type: "link",
+          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -823,6 +823,7 @@ export default class Query extends Component {
       saveIcon: "play",
       waiting: waiting
     })
+    console.log(this.graphState)
   }
 
   initGraph () {

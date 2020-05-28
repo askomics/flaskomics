@@ -13,6 +13,19 @@ class TestApi(AskomicsTestCase):
             front_message = client.get_config('askomics', 'front_message')
         except Exception:
             pass
+        # Get ldap password reset link if set
+        password_reset_link = None
+        try:
+            password_reset_link = client.get_config("askomics", "ldap_password_reset_link")
+        except Exception:
+            pass
+        # Get ldap password reset link if set
+        account_link = None
+        try:
+            account_link = client.get_config("askomics", "ldap_account_link")
+        except Exception:
+            pass
+
         # Non logged
         expected_config_nouser = {
             'footerMessage': client.get_config('askomics', 'footer_message'),
@@ -20,9 +33,11 @@ class TestApi(AskomicsTestCase):
             "version": get_distribution('askomics').version,
             "commit": None,
             "gitUrl": "https://github.com/askomics/flaskomics",
-            "disableIntegration": client.get_config('askomics', 'disable_integration', boolean=True),
             "disableAccountCreation": client.get_config('askomics', 'disable_account_creation', boolean=True),
+            "disableIntegration": client.get_config('askomics', 'disable_integration', boolean=True),
             "protectPublic": client.get_config('askomics', 'protect_public', boolean=True),
+            "passwordResetLink": password_reset_link,
+            "accountLink": account_link,
             "namespaceData": client.get_config('triplestore', 'namespace_data'),
             "namespaceInternal": client.get_config('triplestore', 'namespace_internal'),
             "proxyPath": "/",

@@ -403,23 +403,31 @@ class LocalAuth(Params):
             # If user is local, check the password
             else:
                 password_match = self.check_password(user["username"], password, user["password"], user["salt"])
+            # Don't return password and salt
+            user.pop("password")
+            user.pop("salt")
         else:
             # No user in database, try to get it from ldap
-            ldap_user = ldap_auth.get_user(login)
-            # If user in ldap and not in db, create it in db
-            if ldap_user:
-                password_match = ldap_auth.check_password(ldap_user["dn"], password)
-                if password_match:
-                    inputs = {
-                        "username": ldap_user["username"]
-                    }
-                    # Create user in db
-                    user = self.persist_user(inputs, ldap_login=True)
-                    user["fname"] = ldap_user["fname"]
-                    user["lname"] = ldap_user["lname"]
-                    user["email"] = ldap_user["email"]
-                    # Create user directories
-                    self.create_user_directories(user["id"], user["username"])
+            if ldap_auth.ldap:
+                ldap_user = ldap_auth.get_user(login)
+                # If user in ldap and not in db, create it in db
+                if ldap_user:
+                    password_match = ldap_auth.check_password(ldap_user["dn"], password)
+                    if password_match:
+                        inputs = {
+                            "username": ldap_user["username"]
+                        }
+                        # Create user in db
+                        user = self.persist_user(inputs, ldap_login=True)
+                        user["fname"] = ldap_user["fname"]
+                        user["lname"] = ldap_user["lname"]
+                        user["email"] = ldap_user["email"]
+                        # Create user directories
+                        self.create_user_directories(user["id"], user["username"])
+
+                # Don't return password and salt
+                user.pop("password")
+                user.pop("salt")
 
         if not password_match or not user:
             error_messages.append("Bad login or password")
@@ -638,8 +646,7 @@ class LocalAuth(Params):
         if not inputs["newPassword"] == '':
             if password_identical:
                 # Try to authenticate the user with his old password
-                credentials = {'login': user['username'], 'password': inputs['oldPassword']}
-                authentication = self.authenticate_user(credentials)
+                authentication = self.authenticate_user(user['username'], inputs['oldPassword'])
                 if not authentication['error']:
                     self.update_pw_db(user['username'], inputs['newPassword'])
                 else:
@@ -787,17 +794,18 @@ class LocalAuth(Params):
             User
         """
         user = self.get_user_from_db(username)
-        user.pop("password")
-        user.pop("salt")
-        ldap_auth = LdapAuth(self.app, self.session)
+        if user:
+            user.pop("password")
+            user.pop("salt")
+            ldap_auth = LdapAuth(self.app, self.session)
 
-        if user["ldap"] == 1 and ldap_auth.ldap:
-            ldap_user = ldap_auth.get_user(username)
-            if ldap_user:
-                user["username"] = ldap_user["username"]
-                user["fname"] = ldap_user["fname"]
-                user["lname"] = ldap_user["lname"]
-                user["email"] = ldap_user["email"]
+            if user["ldap"] == 1 and ldap_auth.ldap:
+                ldap_user = ldap_auth.get_user(username)
+                if ldap_user:
+                    user["username"] = ldap_user["username"]
+                    user["fname"] = ldap_user["fname"]
+                    user["lname"] = ldap_user["lname"]
+                    user["email"] = ldap_user["email"]
 
         return user
 
@@ -1039,51 +1047,52 @@ class LocalAuth(Params):
         login_type = self.get_login_type(login)
 
         user = self.get_user(login)
-        if user["ldap"] == 1:
-            return
+        if user:
+            if user["ldap"] == 1:
+                return
 
-        if login_type == 'username':
-            valid_user = self.is_username_in_db(login)
-            username = login
-            email = self.get_email_with_username(login) if valid_user else None
-        else:
-            valid_user = self.is_email_in_db(login)
-            username = self.get_username_with_email(login) if valid_user else None
-            email = login
+            if login_type == 'username':
+                valid_user = self.is_username_in_db(login)
+                username = login
+                email = self.get_email_with_username(login) if valid_user else None
+            else:
+                valid_user = self.is_email_in_db(login)
+                username = self.get_username_with_email(login) if valid_user else None
+                email = login
 
-        if valid_user:
-            token = self.create_reset_token(login)
+            if valid_user:
+                token = self.create_reset_token(login)
 
-            mailer = Mailer(self.app, self.session)
-            if mailer.check_mailer():
-                body = textwrap.dedent("""
-                Dear {user},
+                mailer = Mailer(self.app, self.session)
+                if mailer.check_mailer():
+                    body = textwrap.dedent("""
+                    Dear {user},
 
-                We heard that you lost your AskOmics password. Sorry about that!
+                    We heard that you lost your AskOmics password. Sorry about that!
 
-                But don’t worry! You can use the following link to reset your password:
+                    But don’t worry! You can use the following link to reset your password:
 
-                {url}/password_reset?token={token}
+                    {url}/password_reset?token={token}
 
-                If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit {url}/password_reset
+                    If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit {url}/password_reset
 
 
-                Thanks,
-                The AskOmics Team
+                    Thanks,
+                    The AskOmics Team
 
-                """.format(
-                    user=username,
-                    url=self.settings.get('askomics', 'instance_url'),
-                    token=token
-                ))
+                    """.format(
+                        user=username,
+                        url=self.settings.get('askomics', 'instance_url'),
+                        token=token
+                    ))
 
-                asko_subtitle = ""
-                try:
-                    asko_subtitle = " | {}".format(self.settings.get("askomics", "subtitle"))
-                except Exception:
-                    pass
+                    asko_subtitle = ""
+                    try:
+                        asko_subtitle = " | {}".format(self.settings.get("askomics", "subtitle"))
+                    except Exception:
+                        pass
 
-                mailer.send_mail(email, "[AskOmics{}] Password reset".format(asko_subtitle), body)
+                    mailer.send_mail(email, "[AskOmics{}] Password reset".format(asko_subtitle), body)
 
     def check_token(self, token):
         """Get username corresponding to the token

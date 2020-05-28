@@ -79,6 +79,7 @@ class TestApiResults(AskomicsTestCase):
         expected = json.loads(content)
 
         response = client.client.post("/api/results/getquery", json=data)
+        print(json.dumps(response.json, indent=2))
 
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)

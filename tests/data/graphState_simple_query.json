@@ -1,122 +1,737 @@
 {
+  "nodes": [
+    {
+      "uri": "http://askomics.org/test/data/transcript",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+        "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+        null,
+        null,
+        null
+      ],
+      "id": 1,
+      "humanId": 1,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "transcript",
+      "faldo": true,
+      "selected": true,
+      "suggested": false,
+      "__indexColor": "#ec0001",
+      "index": 0,
+      "x": 2.4610529943331394,
+      "y": 2.226874027134668,
+      "vx": 2.353770443806525e-10,
+      "vy": 1.892184783500829e-10
+    },
+    {
+      "uri": "http://askomics.org/test/data/gene",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        null,
+        null,
+        "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+        "urn:sparql:askomics_test:1_jdoe:gene.bed_1590576352",
+        null
+      ],
+      "id": 18,
+      "humanId": null,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "gene",
+      "faldo": true,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#d80002",
+      "index": 1,
+      "x": -18.936663966428853,
+      "y": 27.854539518654068,
+      "vx": 3.0435888926329303e-10,
+      "vy": 2.455944547131252e-10
+    },
+    {
+      "uri": "http://askomics.org/test/data/DifferentialExpression",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        null,
+        null,
+        null,
+        "urn:sparql:askomics_test:1_jdoe:de.tsv_1590570405"
+      ],
+      "id": 20,
+      "humanId": null,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "DifferentialExpression",
+      "faldo": false,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#c40003",
+      "index": 2,
+      "x": -5.504944105164966,
+      "y": -30.053414398937772,
+      "vx": 1.6289496823647462e-10,
+      "vy": 1.9886120976258667e-10
+    },
+    {
+      "uri": "http://askomics.org/test/data/transcript",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+        "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+        null,
+        null,
+        null
+      ],
+      "id": 23,
+      "humanId": null,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "transcript",
+      "faldo": true,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#b00004",
+      "index": 3,
+      "x": 24.169971227492816,
+      "y": 27.218300246800673,
+      "vx": 3.366634402979017e-10,
+      "vy": 1.1297513262220989e-10
+    },
+    {
+      "uri": "http://askomics.org/test/data/QTL",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        null,
+        "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1590570413",
+        null,
+        null
+      ],
+      "id": 25,
+      "humanId": null,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "QTL",
+      "faldo": true,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#9c0005",
+      "index": 4,
+      "x": -29.503539254383465,
+      "y": -7.095712074145055,
+      "vx": 2.1843706072578676e-10,
+      "vy": 2.560853024904153e-10
+    },
+    {
+      "uri": "http://askomics.org/test/data/gene",
+      "type": "node",
+      "filterNode": "",
+      "filterLink": "",
+      "graphs": [
+        null,
+        null,
+        "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+        "urn:sparql:askomics_test:1_jdoe:gene.bed_1590576352",
+        null
+      ],
+      "id": 27,
+      "humanId": null,
+      "specialNodeId": null,
+      "specialNodeGroupId": null,
+      "specialPreviousIds": [
+        null,
+        null
+      ],
+      "label": "gene",
+      "faldo": true,
+      "selected": false,
+      "suggested": true,
+      "__indexColor": "#880006",
+      "index": 5,
+      "x": 27.314123105593524,
+      "y": -20.150587318393672,
+      "vx": 1.8446839255154e-10,
+      "vy": 1.1018030967605363e-10
+    }
+  ],
+  "links": [
+    {
+      "uri": "http://askomics.org/test/data/Parent",
+      "type": "link",
+      "sameStrand": true,
+      "sameRef": true,
+      "id": 19,
+      "label": "Parent",
+      "source": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "humanId": 1,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": true,
+        "suggested": false,
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": 2.4610529943331394,
+        "y": 2.226874027134668,
+        "vx": 2.353770443806525e-10,
+        "vy": 1.892184783500829e-10
+      },
+      "target": {
+        "uri": "http://askomics.org/test/data/gene",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          null,
+          null,
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_1590576352",
+          null
+        ],
+        "id": 18,
+        "humanId": null,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "gene",
+        "faldo": true,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#d80002",
+        "index": 1,
+        "x": -18.936663966428853,
+        "y": 27.854539518654068,
+        "vx": 3.0435888926329303e-10,
+        "vy": 2.455944547131252e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "directed": true,
+      "__indexColor": "#740007",
+      "__controlPoints": null,
+      "index": 0
+    },
+    {
+      "uri": "http://askomics.org/test/data/concern",
+      "type": "link",
+      "sameStrand": false,
+      "sameRef": false,
+      "id": 22,
+      "label": "concern",
+      "source": {
+        "uri": "http://askomics.org/test/data/DifferentialExpression",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          null,
+          null,
+          null,
+          "urn:sparql:askomics_test:1_jdoe:de.tsv_1590570405"
+        ],
+        "id": 20,
+        "humanId": null,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "DifferentialExpression",
+        "faldo": false,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#c40003",
+        "index": 2,
+        "x": -5.504944105164966,
+        "y": -30.053414398937772,
+        "vx": 1.6289496823647462e-10,
+        "vy": 1.9886120976258667e-10
+      },
+      "target": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "humanId": 1,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": true,
+        "suggested": false,
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": 2.4610529943331394,
+        "y": 2.226874027134668,
+        "vx": 2.353770443806525e-10,
+        "vy": 1.892184783500829e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "directed": true,
+      "__indexColor": "#600008",
+      "__controlPoints": null,
+      "index": 1
+    },
+    {
+      "uri": "included_in",
+      "type": "posLink",
+      "id": 24,
+      "sameStrand": true,
+      "sameRef": true,
+      "strict": true,
+      "label": "Included in",
+      "source": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "humanId": 1,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": true,
+        "suggested": false,
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": 2.4610529943331394,
+        "y": 2.226874027134668,
+        "vx": 2.353770443806525e-10,
+        "vy": 1.892184783500829e-10
+      },
+      "target": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 23,
+        "humanId": null,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#b00004",
+        "index": 3,
+        "x": 24.169971227492816,
+        "y": 27.218300246800673,
+        "vx": 3.366634402979017e-10,
+        "vy": 1.1297513262220989e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "directed": true,
+      "__indexColor": "#4c0009",
+      "__controlPoints": null,
+      "index": 2
+    },
+    {
+      "uri": "included_in",
+      "type": "posLink",
+      "id": 26,
+      "sameStrand": false,
+      "sameRef": true,
+      "strict": true,
+      "label": "Included in",
+      "source": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "humanId": 1,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": true,
+        "suggested": false,
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": 2.4610529943331394,
+        "y": 2.226874027134668,
+        "vx": 2.353770443806525e-10,
+        "vy": 1.892184783500829e-10
+      },
+      "target": {
+        "uri": "http://askomics.org/test/data/QTL",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          null,
+          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1590570413",
+          null,
+          null
+        ],
+        "id": 25,
+        "humanId": null,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "QTL",
+        "faldo": true,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#9c0005",
+        "index": 4,
+        "x": -29.503539254383465,
+        "y": -7.095712074145055,
+        "vx": 2.1843706072578676e-10,
+        "vy": 2.560853024904153e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "directed": true,
+      "__indexColor": "#38000a",
+      "__controlPoints": null,
+      "index": 3
+    },
+    {
+      "uri": "included_in",
+      "type": "posLink",
+      "id": 28,
+      "sameStrand": true,
+      "sameRef": true,
+      "strict": true,
+      "label": "Included in",
+      "source": {
+        "uri": "http://askomics.org/test/data/transcript",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1590570429",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "humanId": 1,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "transcript",
+        "faldo": true,
+        "selected": true,
+        "suggested": false,
+        "__indexColor": "#ec0001",
+        "index": 0,
+        "x": 2.4610529943331394,
+        "y": 2.226874027134668,
+        "vx": 2.353770443806525e-10,
+        "vy": 1.892184783500829e-10
+      },
+      "target": {
+        "uri": "http://askomics.org/test/data/gene",
+        "type": "node",
+        "filterNode": "",
+        "filterLink": "",
+        "graphs": [
+          null,
+          null,
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_1590576352",
+          "urn:sparql:askomics_test:1_jdoe:gene.bed_1590576352",
+          null
+        ],
+        "id": 27,
+        "humanId": null,
+        "specialNodeId": null,
+        "specialNodeGroupId": null,
+        "specialPreviousIds": [
+          null,
+          null
+        ],
+        "label": "gene",
+        "faldo": true,
+        "selected": false,
+        "suggested": true,
+        "__indexColor": "#880006",
+        "index": 5,
+        "x": 27.314123105593524,
+        "y": -20.150587318393672,
+        "vx": 1.8446839255154e-10,
+        "vy": 1.1018030967605363e-10
+      },
+      "selected": false,
+      "suggested": true,
+      "directed": true,
+      "__indexColor": "#24000b",
+      "__controlPoints": null,
+      "index": 4
+    }
+  ],
   "attr": [
     {
-      "entityLabel": "transcript",
-      "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": false,
-      "filterType": "exact",
-      "filterValue": "",
       "id": 2,
-      "label": "Uri",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
+      "visible": false,
       "nodeId": 1,
-      "optional": false,
-      "type": "uri",
+      "humanNodeId": 1,
       "uri": "rdf:type",
-      "visible": false
-    },
-    {
+      "label": "Uri",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "uri",
       "faldo": false,
       "filterType": "exact",
       "filterValue": "",
-      "id": 3,
-      "label": "Label",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
       "optional": false,
-      "type": "text",
-      "uri": "rdfs:label",
-      "visible": true
+      "negative": false,
+      "linked": false,
+      "linkedWith": null
     },
     {
+      "id": 3,
+      "visible": true,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "rdfs:label",
+      "label": "Label",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": "http://askomics.org/test/internal/faldoReference",
-      "filterSelectedValues": [],
+      "type": "text",
+      "faldo": false,
+      "filterType": "exact",
+      "filterValue": "",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null
+    },
+    {
+      "id": 4,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/strand",
+      "label": "strand",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
+      "faldo": "http://askomics.org/internal/faldoStrand",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterValues": [
+        {
+          "label": "plus",
+          "uri": "http://askomics.org/test/data/plus"
+        },
+        {
+          "label": "minus",
+          "uri": "http://askomics.org/test/data/minus"
+        },
+        {
+          "label": "-",
+          "uri": "http://askomics.org/test/data/-"
+        },
+        {
+          "label": "+",
+          "uri": "http://askomics.org/test/data/%2B"
+        }
+      ],
+      "filterSelectedValues": []
+    },
+    {
+      "id": 5,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/reference",
+      "label": "reference",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
+      "faldo": "http://askomics.org/internal/faldoReference",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterValues": [
+        {
+          "label": "1",
+          "uri": "http://askomics.org/test/data/1"
+        }
+      ],
+      "filterSelectedValues": []
+    },
+    {
+      "id": 6,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/chromosomeName",
+      "label": "chromosomeName",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
+      "faldo": "http://askomics.org/internal/faldoReference",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
       "filterValues": [
         {
           "label": "At3",
           "uri": "http://askomics.org/test/data/At3"
         },
         {
-          "label": "At1",
-          "uri": "http://askomics.org/test/data/At1"
-        },
-        {
           "label": "At5",
           "uri": "http://askomics.org/test/data/At5"
-        }
-      ],
-      "id": 4,
-      "label": "chromosomeName",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "category",
-      "uri": "http://askomics.org/test/data/chromosomeName",
-      "visible": false
-    },
-    {
-      "entityLabel": "transcript",
-      "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": "http://askomics.org/test/internal/faldoStrand",
-      "filterSelectedValues": [],
-      "filterValues": [
-        {
-          "label": "minus",
-          "uri": "http://askomics.org/test/data/minus"
         },
         {
-          "label": "plus",
-          "uri": "http://askomics.org/test/data/plus"
+          "label": "At1",
+          "uri": "http://askomics.org/test/data/At1"
         }
       ],
-      "id": 5,
-      "label": "strand",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "category",
-      "uri": "http://askomics.org/test/data/strand",
-      "visible": false
+      "filterSelectedValues": []
     },
     {
+      "id": 7,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/taxon",
+      "label": "taxon",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
       "faldo": null,
-      "filterSelectedValues": [],
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
       "filterValues": [
         {
           "label": "Arabidopsis_thaliana",
           "uri": "http://askomics.org/test/data/Arabidopsis_thaliana"
         }
       ],
-      "id": 6,
-      "label": "taxon",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "category",
-      "uri": "http://askomics.org/test/data/taxon",
-      "visible": false
+      "filterSelectedValues": []
     },
     {
+      "id": 8,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/featureType",
+      "label": "featureType",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
       "faldo": null,
-      "filterSelectedValues": [],
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
       "filterValues": [
         {
           "label": "gene",
@@ -131,356 +746,194 @@
           "uri": "http://askomics.org/test/data/ncRNA_gene"
         }
       ],
-      "id": 7,
-      "label": "featureType",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "category",
-      "uri": "http://askomics.org/test/data/featureType",
-      "visible": false
+      "filterSelectedValues": []
     },
     {
-      "entityLabel": "transcript",
-      "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": "http://askomics.org/test/internal/faldoEnd",
-      "filterSign": "=",
-      "filterValue": "",
-      "id": 8,
-      "label": "end",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://askomics.org/test/data/end",
-      "visible": false
-    },
-    {
-      "entityLabel": "transcript",
-      "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": "http://askomics.org/test/internal/faldoStart",
-      "filterSign": "=",
-      "filterValue": "",
       "id": 9,
-      "label": "start",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
+      "visible": false,
       "nodeId": 1,
-      "optional": false,
-      "type": "decimal",
-      "uri": "http://askomics.org/test/data/start",
-      "visible": false
-    },
-    {
-      "entityLabel": "transcript",
-      "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": null,
-      "filterType": "exact",
-      "filterValue": "",
-      "id": 10,
-      "label": "biotype",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
-      "nodeId": 1,
-      "optional": false,
-      "type": "text",
+      "humanNodeId": 1,
       "uri": "http://askomics.org/test/data/biotype",
-      "visible": false
-    },
-    {
+      "label": "biotype",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "category",
       "faldo": null,
-      "filterType": "exact",
-      "filterValue": "",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterValues": [
+        {
+          "label": "miRNA",
+          "uri": "http://askomics.org/test/data/miRNA"
+        },
+        {
+          "label": "ncRNA",
+          "uri": "http://askomics.org/test/data/ncRNA"
+        },
+        {
+          "label": "protein_coding",
+          "uri": "http://askomics.org/test/data/protein_coding"
+        },
+        {
+          "label": "transposable_element",
+          "uri": "http://askomics.org/test/data/transposable_element"
+        }
+      ],
+      "filterSelectedValues": []
+    },
+    {
+      "id": 10,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/start",
+      "label": "start",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "decimal",
+      "faldo": "http://askomics.org/internal/faldoStart",
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filters": [
+        {
+          "filterValue": "",
+          "filterSign": "="
+        }
+      ]
+    },
+    {
       "id": 11,
-      "label": "description",
-      "linked": false,
-      "linkedWith": null,
-      "negative": false,
+      "visible": false,
       "nodeId": 1,
-      "optional": false,
-      "type": "text",
-      "uri": "http://askomics.org/test/data/description",
-      "visible": false
-    },
-    {
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/end",
+      "label": "end",
       "entityLabel": "transcript",
       "entityUri": "http://askomics.org/test/data/transcript",
-      "faldo": null,
-      "filterType": "exact",
-      "filterValue": "",
-      "id": 12,
-      "label": "featureName",
+      "type": "decimal",
+      "faldo": "http://askomics.org/internal/faldoEnd",
+      "optional": false,
+      "negative": false,
       "linked": false,
       "linkedWith": null,
-      "negative": false,
+      "filters": [
+        {
+          "filterValue": "",
+          "filterSign": "="
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "visible": false,
       "nodeId": 1,
-      "optional": false,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/description",
+      "label": "description",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "type": "text",
-      "uri": "http://askomics.org/test/data/featureName",
-      "visible": false
-    }
-  ],
-  "links": [
-    {
-      "uri": "http://askomics.org/test/data/concern",
-      "type": "link",
-      "sameStrand": false,
-      "sameRef": false,
-      "id": 15,
-      "label": "concern",
-      "source": {
-        "uri": "http://askomics.org/test/data/DifferentialExpression",
-        "type": "node",
-        "filterNode": "",
-        "filterLink": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:de.tsv_1572453097"
-        ],
-        "id": 13,
-        "humanId": null,
-        "label": "DifferentialExpression",
-        "faldo": false,
-        "selected": false,
-        "suggested": true,
-        "__indexColor": "#d80002",
-        "index": 1,
-        "x": -29.684405983363952,
-        "y": 15.226650949977444,
-        "vx": -1.7590532694720358e-10,
-        "vy": -3.762027904105187e-11
-      },
-      "target": {
-        "faldo": true,
-        "filterLink": "",
-        "filterNode": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-        ],
-        "humanId": 1,
-        "id": 1,
-        "label": "transcript",
-        "selected": true,
-        "suggested": false,
-        "type": "node",
-        "uri": "http://askomics.org/test/data/transcript",
-        "__indexColor": "#ec0001",
-        "index": 0,
-        "x": -1.077046710613891,
-        "y": -0.015787811459209433,
-        "vx": -1.3207033169214517e-10,
-        "vy": 2.3148471548331512e-11
-      },
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#9c0005",
-      "__controlPoints": null,
-      "index": 0
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
     },
     {
-      "uri": "included_in",
-      "type": "link",
-      "id": 17,
-      "sameStrand": true,
-      "sameRef": true,
-      "strict": true,
-      "label": "Included in",
-      "source": {
-        "faldo": true,
-        "filterLink": "",
-        "filterNode": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-        ],
-        "humanId": 1,
-        "id": 1,
-        "label": "transcript",
-        "selected": true,
-        "suggested": false,
-        "type": "node",
-        "uri": "http://askomics.org/test/data/transcript",
-        "__indexColor": "#ec0001",
-        "index": 0,
-        "x": -1.077046710613891,
-        "y": -0.015787811459209433,
-        "vx": -1.3207033169214517e-10,
-        "vy": 2.3148471548331512e-11
-      },
-      "target": {
-        "uri": "http://askomics.org/test/data/transcript",
-        "type": "node",
-        "filterNode": "",
-        "filterLink": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-        ],
-        "id": 16,
-        "humanId": null,
-        "label": "transcript",
-        "faldo": true,
-        "selected": false,
-        "suggested": true,
-        "__indexColor": "#c40003",
-        "index": 2,
-        "x": 4.095828927720537,
-        "y": -31.999999999906972,
-        "vx": -2.4948166710565723e-11,
-        "vy": -4.885618974960262e-11
-      },
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#880006",
-      "__controlPoints": null,
-      "index": 1
-    },
-    {
-      "uri": "included_in",
-      "type": "link",
-      "id": 19,
-      "sameStrand": false,
-      "sameRef": true,
-      "strict": true,
-      "label": "Included in",
-      "source": {
-        "faldo": true,
-        "filterLink": "",
-        "filterNode": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-        ],
-        "humanId": 1,
-        "id": 1,
-        "label": "transcript",
-        "selected": true,
-        "suggested": false,
-        "type": "node",
-        "uri": "http://askomics.org/test/data/transcript",
-        "__indexColor": "#ec0001",
-        "index": 0,
-        "x": -1.077046710613891,
-        "y": -0.015787811459209433,
-        "vx": -1.3207033169214517e-10,
-        "vy": 2.3148471548331512e-11
-      },
-      "target": {
-        "uri": "http://askomics.org/test/data/QTL",
-        "type": "node",
-        "filterNode": "",
-        "filterLink": "",
-        "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1572453096"
-        ],
-        "id": 18,
-        "humanId": null,
-        "label": "QTL",
-        "faldo": true,
-        "selected": false,
-        "suggested": true,
-        "__indexColor": "#b00004",
-        "index": 3,
-        "x": 26.66562376596576,
-        "y": 16.78913686121677,
-        "vx": 4.1373315817942216e-11,
-        "vy": -1.0863569913571731e-10
-      },
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#740007",
-      "__controlPoints": null,
-      "index": 2
-    }
-  ],
-  "nodes": [
-    {
-      "faldo": true,
-      "filterLink": "",
-      "filterNode": "",
-      "graphs": [
-        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-      ],
-      "humanId": 1,
-      "id": 1,
-      "label": "transcript",
-      "selected": true,
-      "suggested": false,
-      "type": "node",
-      "uri": "http://askomics.org/test/data/transcript",
-      "__indexColor": "#ec0001",
-      "index": 0,
-      "x": -1.077046710613891,
-      "y": -0.015787811459209433,
-      "vx": -1.3207033169214517e-10,
-      "vy": 2.3148471548331512e-11
-    },
-    {
-      "uri": "http://askomics.org/test/data/DifferentialExpression",
-      "type": "node",
-      "filterNode": "",
-      "filterLink": "",
-      "graphs": [
-        "urn:sparql:askomics_test:1_jdoe:de.tsv_1572453097"
-      ],
       "id": 13,
-      "humanId": null,
-      "label": "DifferentialExpression",
-      "faldo": false,
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#d80002",
-      "index": 1,
-      "x": -29.684405983363952,
-      "y": 15.226650949977444,
-      "vx": -1.7590532694720358e-10,
-      "vy": -3.762027904105187e-11
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/featureName",
+      "label": "featureName",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "text",
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
     },
     {
-      "uri": "http://askomics.org/test/data/transcript",
-      "type": "node",
-      "filterNode": "",
-      "filterLink": "",
-      "graphs": [
-        "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_1572453098"
-      ],
+      "id": 14,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/ID",
+      "label": "ID",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "text",
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
+    },
+    {
+      "id": 15,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/Name",
+      "label": "Name",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "text",
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
+    },
+    {
       "id": 16,
-      "humanId": null,
-      "label": "transcript",
-      "faldo": true,
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#c40003",
-      "index": 2,
-      "x": 4.095828927720537,
-      "y": -31.999999999906972,
-      "vx": -2.4948166710565723e-11,
-      "vy": -4.885618974960262e-11
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/source",
+      "label": "source",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "text",
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
     },
     {
-      "uri": "http://askomics.org/test/data/QTL",
-      "type": "node",
-      "filterNode": "",
-      "filterLink": "",
-      "graphs": [
-        "urn:sparql:askomics_test:1_jdoe:qtl.tsv_1572453096"
-      ],
-      "id": 18,
-      "humanId": null,
-      "label": "QTL",
-      "faldo": true,
-      "selected": false,
-      "suggested": true,
-      "__indexColor": "#b00004",
-      "index": 3,
-      "x": 26.66562376596576,
-      "y": 16.78913686121677,
-      "vx": 4.1373315817942216e-11,
-      "vy": -1.0863569913571731e-10
+      "id": 17,
+      "visible": false,
+      "nodeId": 1,
+      "humanNodeId": 1,
+      "uri": "http://askomics.org/test/data/transcript_id",
+      "label": "transcript_id",
+      "entityLabel": "transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "type": "text",
+      "faldo": null,
+      "optional": false,
+      "negative": false,
+      "linked": false,
+      "linkedWith": null,
+      "filterType": "exact",
+      "filterValue": ""
     }
   ]
 }

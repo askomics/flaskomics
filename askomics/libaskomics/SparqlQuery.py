@@ -1117,7 +1117,7 @@ class SparqlQuery(Params):
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
-                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,

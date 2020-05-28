@@ -17,7 +17,7 @@ from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.Utils import Utils
 
 import pytest
@@ -423,24 +423,24 @@ class Client(object):
         dict
             Result info
         """
+        # Query: transcript concerned by DE and included in QTL
+
         with open("tests/data/graphState_simple_query.json", "r") as file:
             file_content = file.read()
 
         json_query = json.loads(file_content)
 
         # Get query and endpoints and graphs of the query
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query = SparqlQuery(self.app, self.session, json_query)
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query = query_builder.build_query_from_json(json_query, preview=False, for_editor=False)
-        endpoints = query_builder.endpoints
-        graphs = query_builder.graphs
+        query.build_query_from_json(preview=False, for_editor=False)
 
         info = {
             "graph_state": json_query,
-            "query": query,
+            "query": query.sparql,
             "celery_id": '00000000-0000-0000-0000-000000000000',
-            "graphs": graphs,
-            "endpoints": endpoints
+            "graphs": query.graphs,
+            "endpoints": query.endpoints
         }
 
         # Save job in database database
@@ -449,7 +449,7 @@ class Client(object):
         result.save_in_db()
 
         # Execute query and write result to file
-        headers, results = query_launcher.process_query(query)
+        headers, results = query_launcher.process_query(query.sparql)
         file_size = result.save_result_in_file(headers, results)
 
         # Update database status
