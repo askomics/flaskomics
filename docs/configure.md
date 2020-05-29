@@ -1,9 +1,5 @@
 All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics is deployed with `docker-compose`, configuration is set with environment variables. The environment variable should be prefixed with `ASKO_` and have a format like `ASKO_$SECTION_$KEY`. $SECTION and $KEY are case sensitive. *E.g.* property `footer_message` in the `askomics` section should be configured as `ASKO_askomics_footer_message=Welcome to my AskOmics!`
 
-
-
-
-
 - `flask`
 
     - `debug` (`true` or `false`): Set to true if you run AskOmics in development mode, or for debug purpose
@@ -41,6 +37,19 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `smtp_sender` (email): SMTP sender 
     - `smtp_password` (string): SMTP password
     - `smtp_connection` (string): SMTP connectin (starttls or null)
+    - `ldap_auth` (`true` or `false`): Use LDAP authentication
+    - `ldap_host` (string):LDAP host 
+    - `ldap_port` (int): LDAP port
+    - `ldap_bind_dn` (string): LDAP bind DN string
+    - `ldap_bind_password` (strig): LDAP password
+    - `ldap_search_base` (string): LDAP search base
+    - `ldap_user_filter` (string): LDAP user filter
+    - `ldap_username_attribute` (string): Username attribute
+    - `ldap_first_name_attribute` (string): First name attribute
+    - `ldap_surname_attribute` (string): Surname attribute
+    - `ldap_mail_attribute` (string): Mail attribute
+    - `ldap_password_reset_link` (url): Link to manage the LDAP password
+    - `ldap_account_link` (url): Link to the LDAP account manager
 
 
 - `virtuoso`
