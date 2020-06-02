@@ -197,6 +197,10 @@ class Client(object):
 
         return user
 
+    def set_ldap(self):
+        """Set config to use ldap server"""
+        self.app.iniconfig.set('askomics', 'ldap_auth', "true")
+
     def create_two_users(self):
         """Create jdoe and jsmith"""
         self.create_user("jdoe")

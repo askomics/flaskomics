@@ -209,6 +209,86 @@ class TestApiAuth(AskomicsTestCase):
         with client.client.session_transaction() as sess:
             assert 'user' not in sess
 
+    def test_ldap_login(self, client):
+        """test /api/auth/login with ldap credentials"""
+        client.set_ldap()
+
+        ok_inputs_email = {
+            "login": "john.wick@askomics.org",
+            "password": "jwick"
+        }
+
+        ok_inputs_username = {
+            "login": "jwick",
+            "password": "jwick"
+        }
+
+        # First login create user in DB with a new API key
+        response = client.client.post('/api/auth/login', json=ok_inputs_email)
+        api_key = response.json["user"]["apikey"]
+
+        assert response.json == {
+            'error': False,
+            'errorMessage': [],
+            'user': {
+                'admin': True,
+                'apikey': api_key,
+                'blocked': False,
+                'email': 'john.wick@askomics.org',
+                'fname': 'John',
+                'galaxy': None,
+                'id': 1,
+                'ldap': True,
+                'lname': 'Wick',
+                'quota': 0,
+                'username': 'jwick'
+            }
+        }
+
+        # Second login get the user with the same API key
+        client.session.pop("user", None)
+        response = client.client.post('/api/auth/login', json=ok_inputs_email)
+
+        assert response.json == {
+            'error': False,
+            'errorMessage': [],
+            'user': {
+                'admin': True,
+                'apikey': api_key,
+                'blocked': False,
+                'email': 'john.wick@askomics.org',
+                'fname': 'John',
+                'galaxy': None,
+                'id': 1,
+                'ldap': True,
+                'lname': 'Wick',
+                'quota': 0,
+                'username': 'jwick'
+            }
+        }
+
+        # login with username
+        client.session.pop("user", None)
+        response = client.client.post('/api/auth/login', json=ok_inputs_username)
+
+        assert response.json == {
+            'error': False,
+            'errorMessage': [],
+            'user': {
+                'admin': True,
+                'apikey': api_key,
+                'blocked': False,
+                'email': 'john.wick@askomics.org',
+                'fname': 'John',
+                'galaxy': None,
+                'id': 1,
+                'ldap': True,
+                'lname': 'Wick',
+                'quota': 0,
+                'username': 'jwick'
+            }
+        }
+
     def test_ok_login(self, client):
         """Test /api/auth/login route with good credentials"""
         ok_inputs_email = {
