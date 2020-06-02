@@ -403,9 +403,6 @@ class LocalAuth(Params):
             # If user is local, check the password
             else:
                 password_match = self.check_password(user["username"], password, user["password"], user["salt"])
-            # Don't return password and salt
-            user.pop("password")
-            user.pop("salt")
         else:
             # No user in database, try to get it from ldap
             if ldap_auth.ldap:
@@ -425,14 +422,16 @@ class LocalAuth(Params):
                         # Create user directories
                         self.create_user_directories(user["id"], user["username"])
 
-                # Don't return password and salt
-                user.pop("password")
-                user.pop("salt")
-
         if not password_match or not user:
             error_messages.append("Bad login or password")
             user = {}
             error = True
+
+        # Don't return password and salt
+        if "password" in user:
+            user.pop("password")
+        if "salt" in user:
+            user.pop("salt")
 
         return {
             "user": user,
