@@ -407,6 +407,11 @@ class LocalAuth(Params):
             # No user in database, try to get it from ldap
             if ldap_auth.ldap:
                 ldap_user = ldap_auth.get_user(login)
+
+                # we have a ldap user authenticated with email, redo auth with username (because email is not stored in db)
+                if self.get_login_type(login) == "email":
+                    return self.authenticate_user(ldap_user["username"], password)
+
                 # If user in ldap and not in db, create it in db
                 if ldap_user:
                     password_match = ldap_auth.check_password(ldap_user["dn"], password)
