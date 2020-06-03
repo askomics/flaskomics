@@ -246,7 +246,7 @@ class TestApiAuth(AskomicsTestCase):
         }
 
         # Second login get the user with the same API key
-        client.session.pop("user", None)
+        client.logout()
         response = client.client.post('/api/auth/login', json=ok_inputs_email)
 
         assert response.json == {
@@ -707,6 +707,118 @@ class TestApiAuth(AskomicsTestCase):
         assert not response.json["user"]["apikey"] == "0000000001"
         assert response.json["user"]["galaxy"] == {"url": "http://localhost:8081", "apikey": "admin"}
 
+    def test_update_galaxy(self, client):
+        """test /api/auth/galaxy route"""
+        client.create_two_users()
+        client.log_user("jsmith")  # jsmith don't gave galaxy account linked
+
+        fake_data = {
+            "gurl": "http://nogalaxy.org",
+            "gkey": "nokey"
+        }
+
+        ok_data = {
+            "gurl": "http://localhost:8081",
+            "gkey": "admin"
+        }
+
+        response = client.client.post("/api/auth/galaxy", json=fake_data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': True,
+            'errorMessage': 'Not a valid Galaxy',
+            'user': {
+                'admin': False,
+                'apikey': '0000000002',
+                'blocked': False,
+                'email': 'jsmith@askomics.org',
+                'fname': 'Jane',
+                'galaxy': None,
+                'id': 2,
+                'ldap': False,
+                'lname': 'Smith',
+                'quota': 0,
+                'username': 'jsmith'
+            }
+        }
+
+        response = client.client.post("/api/auth/galaxy", json=ok_data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'user': {
+                'admin': False,
+                'apikey': '0000000002',
+                'blocked': False,
+                'email': 'jsmith@askomics.org',
+                'fname': 'Jane',
+                'id': 2,
+                'ldap': False,
+                'lname': 'Smith',
+                'quota': 0,
+                'username': 'jsmith',
+                'galaxy': {
+                    "url": "http://localhost:8081",
+                    "apikey": "admin"
+                }
+            }
+        }
+
+        # Update jode galaxy account
+        client.logout()
+        client.log_user("jdoe")
+
+        response = client.client.post("/api/auth/galaxy", json=fake_data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': True,
+            'errorMessage': 'Not a valid Galaxy',
+            'user': {
+                'admin': True,
+                'apikey': '0000000001',
+                'blocked': False,
+                'email': 'jdoe@askomics.org',
+                'fname': 'John',
+                'id': 1,
+                'ldap': False,
+                'lname': 'Doe',
+                'quota': 0,
+                'username': 'jdoe',
+                'galaxy': {
+                    "url": "http://localhost:8081",
+                    "apikey": "admin"
+                },
+            }
+        }
+
+        response = client.client.post("/api/auth/galaxy", json=ok_data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'user': {
+                'admin': True,
+                'apikey': '0000000001',
+                'blocked': False,
+                'email': 'jdoe@askomics.org',
+                'fname': 'John',
+                'id': 1,
+                'ldap': False,
+                'lname': 'Doe',
+                'quota': 0,
+                'username': 'jdoe',
+                'galaxy': {
+                    "url": "http://localhost:8081",
+                    "apikey": "admin"
+                }
+            }
+        }
+
     def test_logout(self, client):
         """test /api/auth/logout route"""
         client.create_two_users()
@@ -828,6 +940,32 @@ class TestApiAuth(AskomicsTestCase):
             "passwordConf": "coucou",
         }
         response = client.client.post("/api/auth/reset_password", json=old_data)
+        assert response.status_code == 200
+        assert response.json == {
+            "error": False,
+            "errorMessage": ""
+        }
+
+    def test_delete_account(self, client):
+        """test /api/auth/delete_account route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.get("/api/auth/delete_account")
+
+        assert response.status_code == 200
+        assert response.json == {
+            "error": False,
+            "errorMessage": ""
+        }
+
+    def test_reset_account(self, client):
+        """test /api/auth/reset_account route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        response = client.client.get("/api/auth/reset_account")
+
         assert response.status_code == 200
         assert response.json == {
             "error": False,

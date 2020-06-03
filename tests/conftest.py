@@ -153,6 +153,10 @@ class Client(object):
 
         self.session = sess
 
+    def logout(self):
+        """logout user"""
+        self.session.pop("user", None)
+
     def init_database(self):
         """Init database"""
         starter = Start(self.app, self.session)
