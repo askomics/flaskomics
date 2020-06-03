@@ -226,7 +226,7 @@ def delete_users():
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            'users': {},
+            'users': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
