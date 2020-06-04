@@ -68,7 +68,7 @@ def get_abstraction():
     try:
         # If public datasets and queries are protected, dont return anything to unlogged users
         if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
-            abstraction = []
+            abstraction = {}
             disk_space = None
         else:
             tse = TriplestoreExplorer(current_app, session)
@@ -79,7 +79,7 @@ def get_abstraction():
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'diskSpace': None,
-            'abstraction': [],
+            'abstraction': {},
             'error': True,
             'errorMessage': str(e)
         }), 500

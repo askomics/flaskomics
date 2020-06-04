@@ -112,7 +112,18 @@ class TestApiAuth(AskomicsTestCase):
             'user': {}
         }
 
+        # Account creation disabled in config file
+        client.set_config("askomics", "disable_account_creation", "true")
+        response = client.client.post("/api/auth/signup", json=ok_data)
+        assert response.status_code == 500
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Account creation is disabled",
+            "user": {}
+        }
+
         # ok inputs
+        client.set_config("askomics", "disable_account_creation", "false")
         response = client.client.post('/api/auth/signup', json=ok_data)
         assert response.status_code == 200
         assert response.json == {
@@ -211,7 +222,7 @@ class TestApiAuth(AskomicsTestCase):
 
     def test_ldap_login(self, client):
         """test /api/auth/login with ldap credentials"""
-        client.set_ldap()
+        client.set_config("askomics", "ldap_auth", "true")
 
         ok_inputs_email = {
             "login": "john.wick@askomics.org",
@@ -970,4 +981,65 @@ class TestApiAuth(AskomicsTestCase):
         assert response.json == {
             "error": False,
             "errorMessage": ""
+        }
+
+    def test_login_required(self, client):
+        """test login_required decorator"""
+        client.create_two_users()
+
+        response = client.client.get("/api/auth/apikey")
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Login required"
+        }
+
+        client.log_user("jsmith", blocked=True)
+        response = client.client.get("/api/auth/apikey")
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Blocked account"
+        }
+
+    def test_admin_required(self, client):
+        """test admin_required decorator"""
+        client.create_two_users()
+        response = client.client.get("/api/admin/getusers")
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Login required"
+        }
+
+        client.log_user("jsmith")
+        response = client.client.get("/api/admin/getusers")
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Admin required"
+        }
+
+    def test_local_required(self, client):
+        """test local_required decorator"""
+        client.create_two_users()
+        response = client.client.post("/api/auth/profile", json={})
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Login required"
+        }
+
+        client.log_user("jsmith", ldap=True)
+        response = client.client.post("/api/auth/profile", json={})
+
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Local user required"
         }

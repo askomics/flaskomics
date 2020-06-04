@@ -20,7 +20,7 @@ def login_required(f):
         if 'user' in session:
             if not session['user']['blocked']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Blocked account"})
+            return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
@@ -34,7 +34,7 @@ def admin_required(f):
         if 'user' in session:
             if session['user']['admin']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Admin required"})
+            return jsonify({"error": True, "errorMessage": "Admin required"}), 401
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
@@ -49,7 +49,7 @@ def local_required(f):
             current_app.logger.debug(session["user"])
             if not session["user"]["ldap"]:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Local user required"})
+            return jsonify({"error": True, "errorMessage": "Local user required"}), 401
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function

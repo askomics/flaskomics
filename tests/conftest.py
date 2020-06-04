@@ -124,7 +124,7 @@ class Client(object):
         """
         return self.client
 
-    def log_user(self, username):
+    def log_user(self, username, quota=0, blocked=False, ldap=False):
         """Summary
 
         Parameters
@@ -139,14 +139,14 @@ class Client(object):
         with self.client.session_transaction() as sess:
             sess["user"] = {
                 'id': 1 if username == "jdoe" else 2,
-                'ldap': False,
+                'ldap': ldap,
                 'fname': "John" if username == "jdoe" else "Jane",
                 'lname': "Doe" if username == "jdoe" else "Smith",
                 'username': username,
                 'email': "{}@askomics.org".format(username),
                 'admin': True if username == "jdoe" else False,
-                'blocked': False,
-                'quota': 0,
+                'blocked': blocked,
+                'quota': quota,
                 'apikey': "000000000{}".format("1" if username == "jdoe" else "2"),
                 "galaxy": galaxy
             }
@@ -155,7 +155,9 @@ class Client(object):
 
     def logout(self):
         """logout user"""
-        self.session.pop("user", None)
+        with self.client.session_transaction() as sess:
+            sess.pop("user", None)
+        self.session = sess
 
     def init_database(self):
         """Init database"""
@@ -201,9 +203,9 @@ class Client(object):
 
         return user
 
-    def set_ldap(self):
-        """Set config to use ldap server"""
-        self.app.iniconfig.set('askomics', 'ldap_auth', "true")
+    def set_config(self, entry, key, value):
+        """update ini config"""
+        self.app.iniconfig.set(entry, key, value)
 
     def create_two_users(self):
         """Create jdoe and jsmith"""
