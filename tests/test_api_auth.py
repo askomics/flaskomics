@@ -37,6 +37,16 @@ class TestApiAuth(AskomicsTestCase):
             "galaxy": None
         }
 
+        empty_password_data = {
+            "fname": "John",
+            "lname": "Doe",
+            "username": "jwick",
+            "password": "",
+            "passwordconf": "",
+            "email": "jwick@askomics.org",
+            "galaxy": None
+        }
+
         empty_username_data = {
             "fname": "John",
             "lname": "Wick",
@@ -91,6 +101,15 @@ class TestApiAuth(AskomicsTestCase):
         assert response.json == {
             'error': True,
             'errorMessage': ['Username name empty'],
+            'user': {}
+        }
+
+        # username password
+        response = client.client.post('/api/auth/signup', json=empty_password_data)
+        assert response.status_code == 200
+        assert response.json == {
+            'error': True,
+            'errorMessage': ['Password empty'],
             'user': {}
         }
 

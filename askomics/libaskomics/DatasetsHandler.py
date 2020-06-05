@@ -111,21 +111,6 @@ class DatasetsHandler(Params):
 
         return self.get_datasets()
 
-    def delete_datasets_in_db(self):
-        """Delete datasets of the database"""
-        database = Database(self.app, self.session)
-
-        where_str = '(' + ' OR '.join(['id = ?'] * len(self.datasets)) + ')'
-        datasets_id = [dataset.id for dataset in self.datasets]
-
-        query = '''
-        DELETE FROM datasets
-        WHERE user_id=?
-        AND {}
-        '''.format(where_str)
-
-        database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(datasets_id))
-
     def delete_datasets(self):
         """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
