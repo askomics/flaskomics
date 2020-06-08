@@ -974,11 +974,6 @@ class SparqlQuery(Params):
                         "optional": False
                     }
 
-                    self.log.debug(triple)
-                    self.log.debug(block_id)
-                    self.log.debug(sblock_id)
-                    self.log.debug(pblock_ids)
-
                     self.store_triple(triple, block_id, sblock_id, pblock_ids)
 
         # Store linked attributes
@@ -1163,7 +1158,7 @@ class SparqlQuery(Params):
                                 "predicate": "rdfs:label",
                                 "object": category_label,
                                 "optional": True if attribute["optional"] else False
-                            })
+                            }, block_id, sblock_id, pblock_ids)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
                         self.store_triple({
