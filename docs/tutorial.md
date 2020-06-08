@@ -9,14 +9,14 @@ In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq resul
 
 Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> containing tutorial instruction to perform in order to get started with AskOmics.
 
-To complete the tutorial, you will need an Askomics instance. You can [install your own](production-deployment.md) or use this [public instance](https://askomics.genouest.org).
+To complete the tutorial, you will need an AskOmics instance. You can [install your own](production-deployment.md) or use this [public instance](https://use.askomics.org).
 
 
 # Account creation and management
 
 ## Login or signup into AskOmics
 
-AskOmics is a mutli-user plateform. To use it, you will need an account on the instance. Use the <navbar><i class="fa fa-sign-in"></i> Login</navbar> button on the navbar, and log in using your AskOmics credentials. If you don't have already an account, fill the signup form by clicking on <askolink>signup</askolink> below the login form.
+AskOmics is a multi-user platform. To use it, you will need an account on the instance. Use the <navbar><i class="fa fa-sign-in"></i> Login</navbar> button on the navbar, and log in using your AskOmics credentials. If you don't have already an account, fill the signup form by clicking on <askolink>signup</askolink> below the login form.
 
 !!! Hands-on
     Create your AskOmics account (or login with your existing one)
@@ -52,6 +52,8 @@ You can upload files from your computer, or distant files using an URL.
 !!! Hands-on
     Upload the files `limma-voom_luminalpregnant-luminallactate`, `Mus_musculus.GRCm38.98.subset.gff3`, `symbol-ensembl.tsv` and `MGIBatchReport_Qtl_Subset.txt` from your computer into AskOmics
 
+!!! Tip
+    You can also copy files URL and use the <navbar><i class="fa fa-upload"></i> URL</navbar> button.
 
 Uploaded files are displayed into the files table. Filenames can be change by clicking on it.
 
@@ -235,7 +237,7 @@ On the query builder interface, FALDO entities are represented with a green circ
 
 !!! Hands-on
     1. First, remove the reference filter (unselect `X` and `Y` using `ctrl`+`click`)
-    2. Hide `strand` using the eye
+    2. Hide `strand` and `reference` using the eye
     3. Instantiate `QTL`
     4. Click on the link between `gene` and `QTL` to edit the relation
     5. check that the relation is `gene` `included in` `QTL` `on the same reference` with `strict` ticked
