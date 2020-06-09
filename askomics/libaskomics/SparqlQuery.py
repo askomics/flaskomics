@@ -831,6 +831,27 @@ class SparqlQuery(Params):
 
                 self.triples_blocks[nblock]["sblocks"][nsblock]["triples"] = Utils.unique(self.triples_blocks[nblock]["sblocks"][nsblock]["triples"])
 
+    def get_source_of_special_node(self, special_node_id):
+        """Get if of original node of a special one
+
+        Parameters
+        ----------
+        special_node_id : int
+            Special node id
+
+        Returns
+        -------
+        int or None
+            Original node id
+        """
+        for link in self.json["links"]:
+            if link["type"] == "specialLink":
+                if link["source"]["id"] == special_node_id:
+                    return link["target"]["id"]
+                if link["target"]["id"] == special_node_id:
+                    return link["source"]["id"]
+        return None
+
     def build_query_from_json(self, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
@@ -897,12 +918,21 @@ class SparqlQuery(Params):
 
                 # Position
                 if link["uri"] in ('included_in', 'overlap_with'):
+
+                    # If source of target is a special node, replace the id with the id of the concerned node
+                    source_id = link["source"]["id"]
+                    target_id = link["target"]["id"]
+                    if link["source"]["type"] in ("unionNode", ):
+                        source_id = self.get_source_of_special_node(link["source"]["id"])
+                    if link["target"]["type"] in ("unionNode", ):
+                        target_id = self.get_source_of_special_node(link["target"]["id"])
+
                     common_block = self.format_sparql_variable("block_{}_{}".format(link["source"]["id"], link["target"]["id"]))
                     # Get start & end sparql variables
                     for attr in self.json["attr"]:
                         if not attr["faldo"]:
                             continue
-                        if attr["nodeId"] == link["source"]["id"]:
+                        if attr["nodeId"] == source_id:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
                                 start_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
@@ -912,7 +942,7 @@ class SparqlQuery(Params):
                             if attr["faldo"].endswith("faldoStrand"):
                                 strand_1 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
                                 strands.append(attr["id"])
-                        if attr["nodeId"] == link["target"]["id"]:
+                        if attr["nodeId"] == target_id:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
                                 start_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
