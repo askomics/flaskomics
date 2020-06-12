@@ -1,0 +1,10 @@
+<http://nextprot.org/rdf#Mutagenesis> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://askomics.org/internal/entity> .
+<http://nextprot.org/rdf#site> <http://www.w3.org/2000/01/rdf-schema#range> <http://nextprot.org/rdf#ActiveSite> .
+<http://nextprot.org/rdf#related> <http://www.w3.org/2000/01/rdf-schema#domain> <http://nextprot.org/rdf#EvidenceCodeOntologyCv> .
+<http://nextprot.org/rdf#start> <http://www.w3.org/2000/01/rdf-schema#domain> <http://nextprot.org/rdf#DnaBindingRegion> .
+<http://nextprot.org/rdf#UniprotSubcellularLocationCv> <http://www.w3.org/2000/01/rdf-schema#label> "Uniprot Subcellular Location Cv" .
+<http://nextprot.org/rdf#isoformSpecificity> <http://www.w3.org/2000/01/rdf-schema#domain> <http://nextprot.org/rdf#EnzymeClassification> .
+<http://nextprot.org/rdf#dnaBindingRegion> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://askomics.org/internal/AskomicsRelation> .
+<http://nextprot.org/rdf#GlycosylationSite> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://nextprot.org/rdf#entryAnnotationId> <http://www.w3.org/2000/01/rdf-schema#domain> <http://nextprot.org/rdf#ModifiedResidue> .
+<http://nextprot.org/rdf#AnnotationType> <http://www.w3.org/2000/01/rdf-schema#label> "Annotation Type" .

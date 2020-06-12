@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:askomics="http://askomics.org/internal/"
+   xmlns:ns1="http://www.w3.org/ns/prov#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+  <rdf:Description rdf:about="http://nextprot.org/rdf#entryAnnotationId">
+    <rdfs:domain rdf:resource="http://nextprot.org/rdf#InitiatorMethionine"/>
+    <rdfs:domain rdf:resource="http://nextprot.org/rdf#SubcellularLocationNote"/>
