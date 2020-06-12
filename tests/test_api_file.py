@@ -161,6 +161,90 @@ class TestApiFile(AskomicsTestCase):
         assert response.json["errorMessage"] == ''
         assert len(response.json["path"]) == 10
 
+        # Load a one chunk GFF file
+        filepath = 'test-data/gene.gff3'
+        with open(filepath, 'r') as content:
+            chunk0_gff = content.read()
+
+        chunk0_gff = {
+            "first": True,
+            "last": True,
+            "chunk": chunk0_gff,
+            "name": "gene.gff3",
+            "type": "",
+            "size": os.path.getsize(filepath)
+        }
+        response = client.client.post("/api/files/upload_chunk", json=chunk0_gff)
+        assert response.status_code == 200
+        # print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["path"]) == 10
+
+        # Load a one chunk ttl file
+        filepath = 'test-data/abstraction.ttl'
+        with open(filepath, 'r') as content:
+            chunk0_ttl = content.read()
+
+        chunk0_ttl = {
+            "first": True,
+            "last": True,
+            "chunk": chunk0_ttl,
+            "name": "abstraction.ttl",
+            "type": "",
+            "size": os.path.getsize(filepath)
+        }
+        response = client.client.post("/api/files/upload_chunk", json=chunk0_ttl)
+        assert response.status_code == 200
+        # print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["path"]) == 10
+
+        # Load a one chunk xml file
+        filepath = 'test-data/abstraction.xml'
+        with open(filepath, 'r') as content:
+            chunk0_xml = content.read()
+
+        chunk0_xml = {
+            "first": True,
+            "last": True,
+            "chunk": chunk0_xml,
+            "name": "abstraction.xml",
+            "type": "",
+            "size": os.path.getsize(filepath)
+        }
+        response = client.client.post("/api/files/upload_chunk", json=chunk0_xml)
+        assert response.status_code == 200
+        # print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["path"]) == 10
+
+        # Load a one chunk NT file
+        filepath = 'test-data/abstraction.nt'
+        with open(filepath, 'r') as content:
+            chunk0_nt = content.read()
+
+        chunk0_nt = {
+            "first": True,
+            "last": True,
+            "chunk": chunk0_nt,
+            "name": "abstraction.nt",
+            "type": "",
+            "size": os.path.getsize(filepath)
+        }
+        response = client.client.post("/api/files/upload_chunk", json=chunk0_nt)
+        assert response.status_code == 200
+        # print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["path"]) == 10
+
         # Load a 3 chunk file
         with open('test-data/transcripts_chunk1.tsv', 'r') as content:
             chunk1 = content.read()
