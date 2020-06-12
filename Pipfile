@@ -20,7 +20,7 @@ gitpython = "*"
 biopython = "*"
 bcbio-gff = "*"
 bioblend = "*"
-pysam = "==0.15.3"
+pysam = "*"
 pybedtools = "*"
 deepdiff = "*"
 sentry-sdk = {extras = ["flask"], version = "*"}
