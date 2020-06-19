@@ -89,7 +89,6 @@ def get_preview():
 
 
 @results_bp.route('/api/results/getquery', methods=["POST"])
-@login_required
 def get_graph_and_sparql_query():
     """Get query (graphState or Sparql)
 
