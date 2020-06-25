@@ -20,15 +20,19 @@ abstractor -e <endpoint_url> -p <entity_prefix> -o <output_file>
 
 ## Integrate external abstraction into AskOmics
 
-Once external endpoint's abstraction is generated, its time to add it into AskOmis. Upload it and integrate it. During integration, use `advanced options` and specify the external endpoint.
-
+Once external endpoint's abstraction is generated, its time to add it into AskOmis. Upload it and integrate it.
 ![integrate_external](img/integrate_external.png)
+
+!!! Warning
+    Check that `advanced options` > `Distant endpoint` contain URL of the external endpoint
+
+
 
 # Query external endpoint
 
 ## Simple query
 
-External startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
+If AskOmics contain local data, external startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
 
 ![external_startpoint](img/external_startpoint.png)
 

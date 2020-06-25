@@ -2,13 +2,13 @@ During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples th
 
 Raw RDF can be integrated into AskOmics. In this case, abstraction have to be built manually. The following documentation explain how to write an AskOmics abstraction in turtle format.
 
-# Prefixes
+# Namespaces
 
-AskOmics use the following prefixes.
+AskOmics use the following namespaces.
 
 ```turtle
-PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>
-PREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>
+PREFIX : <http://askomics.org/data/>
+PREFIX askomics: <http://askomics.org/internal/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX faldo: <http://biohackathon.org/resource/faldo/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -20,16 +20,16 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 <br />
 
 !!! info
-    Prefixes `:` and `askomics:` are defined in the AskOmics config file (`config/askomics.ini`)
+    Namespaces `:` and `askomics:` are defined in the AskOmics config file (`config/askomics.ini`)
 
 # Entity
 
 The entity is a class. In the query builder, it is represented with a graph node.
 
 ```turtle
-:EntityName rdf:type :entity .
+:EntityName rdf:type askomics:entity .
 :EntityName rdf:type owl:Class .
-:EntityName rdf:type :startPoint .
+:EntityName rdf:type askomics:startPoint .
 :EntityName rdfs:label "EntityName" .
 ```
 <br />
@@ -65,7 +65,7 @@ Category is an attribute that have a limited number of values. All values of the
 
 ```turtle
 :category_attribute rdf:type owl:ObjectProperty .
-:category_attribute rdf:type :AskomicsCategory .
+:category_attribute rdf:type askomics:AskomicsCategory .
 :category_attribute rdfs:label "category_attribute" .
 :category_attribute rdfs:domain :EntityName .
 :category_attribute rdfs:range :category_attributeCategory .
@@ -87,10 +87,10 @@ Category is an attribute that have a limited number of values. All values of the
 A FALDO entity have to be declared as FALDO on the abstraction. If attribute are decribed as FALDO in the abstractio, The data triples have to use FALDO to describe the data.
 
 ```turtle
-:FaldoEntity rdf:type :entity .
-:FaldoEntity rdf:type :faldo .
+:FaldoEntity rdf:type askomics:entity .
+:FaldoEntity rdf:type askomics:faldo .
 :FaldoEntity rdf:type owl:Class .
-:FaldoEntity rdf:type :startPoint .
+:FaldoEntity rdf:type askomics:startPoint .
 :FaldoEntity rdfs:label "FaldoEntity" .
 ```
 
@@ -102,7 +102,7 @@ A faldo:reference attribute derive from a Category attribute.
 
 ```turtle
 :reference_attribute rdf:type askomics:faldoReference .
-:reference_attribute rdf:type :AskomicsCategory .
+:reference_attribute rdf:type askomics:AskomicsCategory .
 :reference_attribute rdf:type owl:ObjectProperty .
 :reference_attribute rdfs:label "reference_attribute" .
 :reference_attribute rdfs:domain :EntityName .
@@ -115,7 +115,7 @@ faldo:strand is also a category.
 
 ```turtle
 :strand_attribute rdf:type askomics:faldoStrand .
-:strand_attribute rdf:type :AskomicsCategory .
+:strand_attribute rdf:type askomics:AskomicsCategory .
 :strand_attribute rdf:type owl:ObjectProperty .
 :strand_attribute rdfs:label "strand_attribute" .
 :strand_attribute rdfs:domain :EntityName .
@@ -147,7 +147,7 @@ faldo:start and faldo:end are numeric attributes.
 Entities are linked between them with relations. Relations are displayed with arrows between nodes on the query builder. The following turtle explain how relations are described.
 
 ```turtle
-:relation_example a :AskomicsRelation .
+:relation_example a askomics:AskomicsRelation .
 :relation_example a owl:ObjectProperty .
 :relation_example rdfs:label "relation_example" .
 :relation_example rdfs:domain :EntityName .

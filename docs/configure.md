@@ -68,8 +68,8 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `serialization_format` (string): RDF serialization format. Can be `nt`, `turtle` or `xml`
     - `default_graph` (string): Triplestore default graph
     - `users_graph` (string): User base graph 
-    - `prefix` (url): Default AskOmics prefix 
-    - `namespace` (url): Default AskOmics namespace 
+    - `namespace_data` (url): AskOmics namespace for data. Correspond to the `:` prefix
+    - `namespace_internal` (url): AskOmics namespace for internal triples. Correspond to the `askomics:` prefix
     - `preview_limit` (int): Number of line to be previewed in the results page 
     - `result_set_max_rows` (int): Triplestore max row. Must be the same as SPARQL[ResultSetMaxRows] in virtuoso.ini config
 

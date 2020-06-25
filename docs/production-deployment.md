@@ -47,7 +47,7 @@ ls -1
 Two directories are used for production deployment
 
 - `standalone`: deploy AskOmics with all its dependencies for a standalone usage
-- `federated`: deploy AskOmics with all its dependencies for a federated usage (Ask external endpoint such as [NeXtProt](https://sparql.nextprot.org))
+- `federated`: deploy AskOmics with all its dependencies and a federated query engine for a federated usage (Cross external endpoint such as [NeXtProt](https://sparql.nextprot.org) with local data)
 
 Choose one of this directory depending of your needs
 
