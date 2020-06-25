@@ -1,5 +1,8 @@
 """Authentication routes"""
 
+import traceback
+import sys
+
 from functools import wraps
 
 from askomics.libaskomics.LocalAuth import LocalAuth
@@ -17,7 +20,7 @@ def login_required(f):
         if 'user' in session:
             if not session['user']['blocked']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Blocked account"})
+            return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
@@ -31,7 +34,22 @@ def admin_required(f):
         if 'user' in session:
             if session['user']['admin']:
                 return f(*args, **kwargs)
-            return jsonify({"error": True, "errorMessage": "Admin required"})
+            return jsonify({"error": True, "errorMessage": "Admin required"}), 401
+        return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+    return decorated_function
+
+
+def local_required(f):
+    """Local required function"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Local required decorator"""
+        if "user" in session:
+            current_app.logger.debug(session["user"])
+            if not session["user"]["ldap"]:
+                return f(*args, **kwargs)
+            return jsonify({"error": True, "errorMessage": "Local user required"}), 401
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function
@@ -84,7 +102,7 @@ def login():
     data = request.get_json()
 
     local_auth = LocalAuth(current_app, session)
-    authentication = local_auth.authenticate_user(data)
+    authentication = local_auth.authenticate_user(data["login"], data["password"])
 
     user = {}
     if not authentication['error']:
@@ -143,7 +161,7 @@ def login_api_key(key):
 
 
 @auth_bp.route('/api/auth/profile', methods=['POST'])
-@login_required
+@local_required
 def update_profile():
     """Update user profile (names and email)
 
@@ -167,7 +185,7 @@ def update_profile():
 
 
 @auth_bp.route('/api/auth/password', methods=['POST'])
-@login_required
+@local_required
 def update_password():
     """Update the user passord
 
@@ -250,3 +268,123 @@ def logout():
 
     current_app.logger.debug(session)
     return jsonify({'user': {}, 'logged': False})
+
+
+@auth_bp.route("/api/auth/reset_password", methods=["POST"])
+def reset_password():
+    """Reset password route"""
+    data = request.get_json()
+
+    # Send a reset link
+    if "login" in data:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            local_auth.send_reset_link(data["login"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "error": False,
+            "errorMessage": ""
+        })
+
+    # check if token is valid
+    elif "token" in data and "password" not in data:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            result = local_auth.check_token(data["token"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "token": None,
+                "username": None,
+                "fname": None,
+                "lname": None,
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "token": data["token"],
+            "username": result["username"],
+            "fname": result["fname"],
+            "lname": result["lname"],
+            "error": False if result["username"] else True,
+            "errorMessage": result["message"]
+        })
+
+    # Update password
+    else:
+        try:
+            local_auth = LocalAuth(current_app, session)
+            result = local_auth.reset_password_with_token(data["token"], data["password"], data["passwordConf"])
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            return jsonify({
+                "error": True,
+                "errorMessage": str(e)
+            }), 500
+
+        return jsonify({
+            "error": result["error"],
+            "errorMessage": result["message"]
+        })
+
+
+@auth_bp.route("/api/auth/delete_account", methods=["GET"])
+@login_required
+def delete_account():
+    """Remove account"""
+    try:
+        # Remove user from database
+        local_auth = LocalAuth(current_app, session)
+        local_auth.delete_user_database(session["user"]["username"])
+
+        # Celery task to delete user's data from filesystem and rdf triplestore
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('delete_users_data', (session_dict, [session["user"], ], True))
+
+        # Remove user from session
+        session.pop('user', None)
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "error": True,
+            "errorMessage": str(e)
+        }), 500
+
+    return jsonify({
+        "error": False,
+        "errorMessage": ""
+    })
+
+
+@auth_bp.route("/api/auth/reset_account", methods=["GET"])
+@login_required
+def reset_account():
+    """Reset account"""
+    try:
+        # Remove user from database
+        local_auth = LocalAuth(current_app, session)
+        local_auth.delete_user_database(session["user"]["username"], delete_user=False)
+
+        # Celery task to delete user's data from filesystem and rdf triplestore
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('delete_users_data', (session_dict, [session["user"], ], False))
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "error": True,
+            "errorMessage": str(e)
+        }), 500
+
+    return jsonify({
+        "error": False,
+        "errorMessage": ""
+    })

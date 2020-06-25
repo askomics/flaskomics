@@ -35,6 +35,7 @@ export default class ErrorDiv extends Component {
       "511": this.utils.objectHaveKeys(this.props, "customMessages", "511") ? this.props.customMessages["511"] : "511 Network authentication required",
 
       "500": this.utils.objectHaveKeys(this.props, "customMessages", "500") ? this.props.customMessages["500"] : this.props.errorMessage ? this.props.errorMessage : "500 Internal Server Error",
+      "200": this.props.errorMessage
     }
 
     let error
@@ -66,6 +67,6 @@ export default class ErrorDiv extends Component {
 ErrorDiv.propTypes = {
   status: PropTypes.number,
   error: PropTypes.bool,
-  errorMessage: PropTypes.string,
+  errorMessage: PropTypes.array,
   customMessages: PropTypes.object
 }

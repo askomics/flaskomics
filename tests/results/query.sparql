@@ -1,5 +1,5 @@
-PREFIX : <http://www.semanticweb.org/user/ontologies/2018/1#>
-PREFIX askomics: <http://www.semanticweb.org/askomics/ontologies/2018/1#>
+PREFIX : <http://askomics.org/test/data/>
+PREFIX askomics: <http://askomics.org/test/internal/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX faldo: <http://biohackathon.org/resource/faldo/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -11,7 +11,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?transcript1_Label
 WHERE {
 
-    ?transcript1_uri rdf:type <http://www.semanticweb.org/user/ontologies/2018/1#transcript> .
+    ?transcript1_uri rdf:type <http://askomics.org/test/data/transcript> .
     ?transcript1_uri rdfs:label ?transcript1_Label .
 
 }

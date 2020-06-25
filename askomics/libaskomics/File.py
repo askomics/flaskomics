@@ -8,6 +8,7 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 
 from pkg_resources import get_distribution
 
@@ -20,9 +21,9 @@ class File(Params):
 
     Attributes
     ----------
-    askomics_namespace : Namespace
+    namespace_internal : Namespace
         AskOmics namespace askomics:
-    askomics_prefix : Namespace
+    namespace_data : Namespace
         AskOmics prefix :
     dc : Namespace
         dc namespace
@@ -120,9 +121,9 @@ class File(Params):
 
         self.now = datetime.datetime.now().isoformat()
 
-        self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
-        self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
-        self.entity_prefix = Namespace(custom_uri) if custom_uri else self.askomics_prefix
+        self.namespace_internal = Namespace(self.settings.get('triplestore', 'namespace_internal'))
+        self.namespace_data = Namespace(self.settings.get('triplestore', 'namespace_data'))
+        self.namespace_entity = Namespace(custom_uri) if custom_uri else self.namespace_data
 
         self.faldo = Namespace('http://biohackathon.org/resource/faldo/')
         self.prov = Namespace('http://www.w3.org/ns/prov#')
@@ -136,10 +137,10 @@ class File(Params):
             "reference": None
         }
         self.faldo_abstraction_eq = {
-            "start": self.askomics_namespace["faldoStart"],
-            "end": self.askomics_namespace["faldoEnd"],
-            "strand": self.askomics_namespace["faldoStrand"],
-            "reference": self.askomics_namespace["faldoReference"]
+            "start": self.namespace_internal["faldoStart"],
+            "end": self.namespace_internal["faldoEnd"],
+            "strand": self.namespace_internal["faldoStrand"],
+            "reference": self.namespace_internal["faldoReference"]
         }
 
         self.method = self.settings.get('triplestore', 'upload_method')
@@ -149,6 +150,7 @@ class File(Params):
 
         self.graph_chunk = RdfGraph(self.app, self.session)
         self.graph_abstraction_dk = RdfGraph(self.app, self.session)
+        self.graph_metadata = RdfGraph(self.app, self.session)
 
         self.error = False
         self.error_message = ""
@@ -214,9 +216,9 @@ class File(Params):
         if Utils.is_valid_url(string):
             return rdflib.URIRef(string)
         else:
-            return self.askomics_prefix[self.format_uri(string)]
+            return self.namespace_data[self.format_uri(string)]
 
-    def get_metadata(self):
+    def set_metadata(self):
         """Get a rdflib graph of the metadata
 
         Returns
@@ -224,22 +226,19 @@ class File(Params):
         Graph
             graph containing metadata of the file
         """
-        rdf_graph = RdfGraph(self.app, self.session)
         location_endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
 
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.atLocation, location_endpoint))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
-        rdf_graph.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.atLocation, location_endpoint))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.generatedAtTime, rdflib.Literal(self.now)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.creator, rdflib.Literal(self.session['user']['username'])))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
+        self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
 
         if self.public:
-            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(True)))
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(True)))
         else:
-            rdf_graph.add((rdflib.Literal(self.file_graph), self.askomics_prefix['public'], rdflib.Literal(False)))
-
-        return rdf_graph
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(False)))
 
     def load_graph(self, rdf_graph, tmp_file_name):
         """Load a rdflib graph into the triplestore
@@ -290,9 +289,11 @@ class File(Params):
     def integrate(self, dataset_id=None):
         """Integrate the file into the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
 
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
+        self.set_metadata()
+        sparql.insert_data(self.graph_metadata, self.file_graph, metadata=True)
 
         content_generator = self.generate_rdf_content()
 
@@ -328,7 +329,7 @@ class File(Params):
 
         # Load the last chunk
         if self.graph_chunk.percent and dataset_id:
-            self.update_percent_in_db(100, dataset_id)
+            self.update_percent_in_db(99, dataset_id)
 
         if self.method == 'load':
             temp_file_name = 'tmp_{}_{}_chunk_{}.{}'.format(
@@ -348,6 +349,9 @@ class File(Params):
         # Content is inserted, now insert abstraction and domain_knowledge
         self.set_rdf_abstraction_domain_knowledge()
 
+        # Remove chached abstraction
+        tse.uncache_abstraction(public=self.public)
+
         if self.method == 'load':
 
             temp_file_name = 'tmp_{}_{}_abstraction_domain_knowledge.{}'.format(
@@ -361,6 +365,7 @@ class File(Params):
             # Insert
             sparql.insert_data(self.graph_abstraction_dk, self.file_graph)
 
+        self.update_percent_in_db(100, dataset_id)
         self.set_triples_number()
 
     def get_faldo_strand(self, raw_strand):

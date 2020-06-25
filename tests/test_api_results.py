@@ -58,6 +58,32 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
+    def test_get_graph_and_sparql_query(self, client):
+        """test /api/results/getquery route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        info = client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"fileId": result_info["id"]}
+
+        with open("tests/results/sparql_and_graph.json", "r") as file:
+            content = file.read()
+        content = content.replace("###TRANSCRIPTS_TIMESTAMP###", str(info["transcripts"]["timestamp"]))
+        content = content.replace("###QTL_TIMESTAMP###", str(info["qtl"]["timestamp"]))
+        content = content.replace("###DE_TIMESTAMP###", str(info["de"]["timestamp"]))
+        content = content.replace("###GFF_TIMESTAMP###", str(info["gff"]["timestamp"]))
+        content = content.replace("###BED_TIMESTAMP###", str(info["bed"]["timestamp"]))
+        content = content.replace("###LOCAL_ENDPOINT###", str(client.get_config("federation", "local_endpoint")))
+        content = content.replace("###SIZE###", str(client.get_size_occupied_by_user()))
+        expected = json.loads(content)
+
+        response = client.client.post("/api/results/getquery", json=data)
+        print(json.dumps(response.json, indent=2))
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
     def test_get_graph_state(self, client):
         """test /api/results/graphstate"""
         client.create_two_users()

@@ -64,7 +64,7 @@ export default class Login extends Component {
           error: true,
           errorMessage: error.response.data.errorMessage,
           status: error.response.status,
-          success: !response.data.error
+          success: !error.response.data.error
         })
       })
     event.preventDefault()
@@ -77,6 +77,23 @@ export default class Login extends Component {
   }
 
   render () {
+
+    let passwordResetLink = <Link to="/password_reset"> (Forgot password?)</Link>
+    if (this.props.config.passwordResetLink) {
+      passwordResetLink = <a target="_newtab" href={this.props.config.passwordResetLink}> (Forgot password?)</a>
+    }
+
+    let loginMessage
+    if (this.props.config.accountLink) {
+      loginMessage = (
+        <div>
+          <Alert color="info">
+            Login with your <a target="_newtab" href={this.props.config.accountLink}>Ldap</a> credential
+          </Alert>
+        </div>
+      )
+    }
+
     let html = <Redirect to="/" />
     if (!this.state.logged) {
       html = (
@@ -84,13 +101,14 @@ export default class Login extends Component {
           <h2>Login</h2>
           <hr />
           <div className="col-md-4">
+          {loginMessage}
             <Form onSubmit={this.handleSubmit}>
               <FormGroup>
                 <Label for="login">Login (username or email)</Label>
                 <Input type="text" name="login" id="login" placeholder="login" value={this.state.login} onChange={this.handleChange} />
               </FormGroup>
               <FormGroup>
-                <Label for="password">Password</Label>
+                <Label for="password">Password</Label> {passwordResetLink}
                 <Input type="password" name="password" id="password" placeholder="password" value={this.state.password} onChange={this.handleChange} />
               </FormGroup>
               <Button disabled={!this.validateForm()}>Login</Button>

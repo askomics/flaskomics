@@ -75,6 +75,7 @@ class Database(Params):
         self.create_endpoints_table()
         self.create_files_table()
         self.create_datasets_table()
+        self.create_abstraction_table()
 
     def create_user_table(self):
         """Create the user table"""
@@ -91,7 +92,8 @@ class Database(Params):
             apikey text,
             admin boolean,
             blocked boolean,
-            quota INTEGER
+            quota INTEGER,
+            reset_token text
         )
         '''
         self.execute_sql_query(query)
@@ -108,6 +110,16 @@ class Database(Params):
         ALTER TABLE users
         ADD quota INTEGER NOT NULL DEFAULT {}
         '''.format(default_quota)
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE users
+        ADD reset_token text NULL
+        DEFAULT(null)
+        '''
         try:
             self.execute_sql_query(query)
         except Exception:
@@ -301,4 +313,16 @@ class Database(Params):
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
+        self.execute_sql_query(query)
+
+    def create_abstraction_table(self):
+        """Create abstraction table"""
+        query = """
+        CREATE TABLE IF NOT EXISTS abstraction (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            abstraction text,
+            FOREIGN KEY(user_id) REFERENCES users(user_id)
+        )
+        """
         self.execute_sql_query(query)

@@ -7,7 +7,7 @@ from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
 
-class SparqlQueryBuilder(Params):
+class SparqlQuery(Params):
     """Format a sparql query
 
     Attributes
@@ -18,7 +18,7 @@ class SparqlQueryBuilder(Params):
         all public graph
     """
 
-    def __init__(self, app, session):
+    def __init__(self, app, session, json_query=None):
         """init
 
         Parameters
@@ -29,6 +29,9 @@ class SparqlQueryBuilder(Params):
             AskOmics session
         """
         Params.__init__(self, app, session)
+
+        self.json = json_query
+        self.sparql = None
 
         self.graphs = []
         self.endpoints = []
@@ -168,7 +171,7 @@ class SparqlQueryBuilder(Params):
             return "local triplestore"
         return endpoint
 
-    def get_graphs_and_endpoints(self, selected_graphs=None, selected_endpoints=None):
+    def get_graphs_and_endpoints(self, selected_graphs=[], selected_endpoints=[], all_selected=False):
         """get graphs and endpoints (uri and names)
 
         Returns
@@ -182,13 +185,13 @@ class SparqlQueryBuilder(Params):
             graphs[graph] = {
                 "uri": graph,
                 "name": self.format_graph_name(graph),
-                "selected": True if graph in selected_graphs else False
+                "selected": True if all_selected else True if graph in selected_graphs else False
             }
         for endpoint in self.endpoints:
             endpoints[endpoint] = {
                 "uri": endpoint,
                 "name": self.format_endpoint_name(endpoint),
-                "selected": True if endpoint in selected_endpoints else False
+                "selected": True if all_selected else True if endpoint in selected_endpoints else False
             }
 
         return (graphs, endpoints)
@@ -207,7 +210,6 @@ class SparqlQueryBuilder(Params):
             WHERE {
                 ?s ?p ?o
             }
-            LIMIT 25
             '''
         )
 
@@ -246,13 +248,13 @@ class SparqlQueryBuilder(Params):
         query = '''
         WITH GRAPH <{graph}>
         DELETE {{
-            <{graph}> :public ?public .
+            <{graph}> askomics:public ?public .
         }}
         INSERT {{
-            <{graph}> :public <{public}> .
+            <{graph}> askomics:public <{public}> .
         }}
         WHERE {{
-            <{graph}> :public ?public .
+            <{graph}> askomics:public ?public .
         }}
         '''.format(graph=graph, public=public)
 
@@ -411,11 +413,11 @@ class SparqlQueryBuilder(Params):
         query = '''
         SELECT DISTINCT ?graph ?endpoint
         WHERE {{
-          ?graph :public ?public .
+          ?graph askomics:public ?public .
           ?graph dc:creator ?creator .
           GRAPH ?graph {{
             ?graph prov:atLocation ?endpoint .
-            ?entity_uri a :entity .
+            ?entity_uri a askomics:entity .
           }}
           {}
           {}
@@ -477,6 +479,59 @@ class SparqlQueryBuilder(Params):
                 return True
         return False
 
+    def get_block_ids(self, node_id):
+        """Get blockid and sblockid of a node with its id
+
+        Parameters
+        ----------
+        node_id : int
+            Node id
+
+        Returns
+        -------
+        int, int
+            blockid and sblockid
+        """
+        for node in self.json["nodes"]:
+            if node["id"] == node_id:
+                return node["specialNodeId"], node["specialNodeGroupId"], node["specialPreviousIds"]
+
+        return None, None, (None, None)
+
+    def triple_block_to_string(self, triple_block):
+        """Convert a triple block to a SPARQL string
+
+        Parameters
+        ----------
+        triple_block : dict
+            A triple block
+
+        Returns
+        -------
+        str
+            Corresponding SPARQL
+        """
+        if triple_block["type"] == "UNION":
+
+            block_string = ""
+            length = len(triple_block) - 1
+            i = 1
+
+            for sblock in triple_block["sblocks"]:
+                sblock_string = "{"
+                triples_string = '\n'.join([self.triple_dict_to_string(triple_dict) for triple_dict in sblock["triples"]])
+                triples_string += '\n'
+                triples_string += '\n'.join([filtr for filtr in sblock["filters"]])
+                triples_string += '\n'
+                triples_string += '\n'.join([value for value in sblock["values"]])
+                sblock_string += "\n    {}\n}}".format(triples_string)
+
+                block_string += "UNION" if i == length else ""
+                i += 1
+                block_string += sblock_string + "\n"
+
+        return block_string
+
     def triple_dict_to_string(self, triple_dict):
         """Convert a triple dict into a triple string
 
@@ -537,56 +592,347 @@ class SparqlQueryBuilder(Params):
 
         raise ValueError("{} is not a valid URI or CURIE".format(value))
 
-    def build_query_from_json(self, json_query, preview=False, for_editor=False):
+    def get_block_type(self, blockid):
+        """Summary
+
+        Parameters
+        ----------
+        blockid : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        types_dict = {
+            "unionNode": "UNION",
+        }
+
+        for node in self.json["nodes"]:
+            if node["type"] in ("unionNode", ):
+                if node["specialNodeId"] == blockid:
+                    return types_dict[node["type"]]
+        return None
+
+    def store_triple(self, triple, blockid, sblockid, pblock_ids):
+        """Store a triple inthe right list
+
+        Parameters
+        ----------
+        triple : dict
+            triple dict
+        typ : str
+            relatin or attribute
+        block_info : None, optional
+            block info if triple is part of a block
+        """
+        if blockid:
+            self.store_block(triple, blockid, sblockid, pblock_ids)
+        else:
+            self.triples.append(triple)
+
+    def store_filter(self, filtr, blockid, sblockid, pblock_ids):
+        """Store a FILTER in the right list
+
+        Parameters
+        ----------
+        triple : dict
+            triple dict
+        typ : str
+            relatin or attribute
+        block_info : None, optional
+            block info if triple is part of a block
+        """
+        if blockid:
+            self.store_filter_block(filtr, blockid, sblockid)
+        else:
+            self.filters.append(filtr)
+
+    def store_value(self, value, blockid, sblockid, pblock_ids):
+        """Store a VALUES inthe right list
+
+        Parameters
+        ----------
+        triple : dict
+            triple dict
+        typ : str
+            relatin or attribute
+        block_info : None, optional
+            block info if triple is part of a block
+        """
+        if blockid:
+            self.store_values_block(value, blockid, sblockid)
+        else:
+            self.values.append(value)
+
+    def store_values_block(self, value, blockid, sblockid):
+        """Add a VALUES in a block. If block exist, add the triples, else, create a new block.
+
+        Same for the sub block
+
+        Parameters
+        ----------
+        triple : dict
+            The triple dict to add
+        blockid : int
+            Block id
+        sblockid : int
+            Sub block id
+        """
+        for block in self.triples_blocks:
+            if block["id"] == blockid:
+                for sblock in block["sblocks"]:
+                    if sblock["id"] == sblockid:
+                        sblock["values"].append(value)
+                        return
+                block["sblocks"].append({
+                    "id": sblockid,
+                    "triples": [],
+                    "filters": [],
+                    "values": [value, ]
+                })
+                return
+        self.triples_blocks.append({
+            "id": blockid,
+            "type": self.get_block_type(blockid),
+            "sblocks": [{
+                "id": sblockid,
+                "triples": [],
+                "filters": [],
+                "values": [value, ]
+            }, ]
+        })
+
+    def store_filter_block(self, filtr, blockid, sblockid):
+        """Add a FILTER in a block. If block exist, add the triples, else, create a new block.
+
+        Same for the sub block
+
+        Parameters
+        ----------
+        triple : dict
+            The triple dict to add
+        blockid : int
+            Block id
+        sblockid : int
+            Sub block id
+        """
+        for block in self.triples_blocks:
+            if block["id"] == blockid:
+                for sblock in block["sblocks"]:
+                    if sblock["id"] == sblockid:
+                        sblock["filters"].append(filtr)
+                        return
+                block["sblocks"].append({
+                    "id": sblockid,
+                    "triples": [],
+                    "filters": [filtr, ],
+                    "values": []
+                })
+                return
+        self.triples_blocks.append({
+            "id": blockid,
+            "type": self.get_block_type(blockid),
+            "sblocks": [{
+                "id": sblockid,
+                "triples": [],
+                "filters": [filtr, ],
+                "values": []
+            }, ]
+        })
+
+    def store_block(self, triple, blockid, sblockid, pblock_ids):
+        """Add a triple in a block. If block exist, add the triples, else, create a new block.
+
+        Same for the sub block
+
+        Parameters
+        ----------
+        triple : dict
+            The triple dict to add
+        blockid : int
+            Block id
+        sblockid : int
+            Sub block id
+        """
+        for block in self.triples_blocks:
+            if block["id"] == blockid:
+                for sblock in block["sblocks"]:
+                    if sblock["id"] == sblockid:
+                        sblock["triples"].append(triple)
+                        return
+                block["sblocks"].append({
+                    "id": sblockid,
+                    "triples": [triple, ],
+                    "filters": [],
+                    "values": []
+                })
+                return
+        self.triples_blocks.append({
+            "id": blockid,
+            "type": self.get_block_type(blockid),
+            "sblocks": [{
+                "id": sblockid,
+                "triples": [triple, ],
+                "filters": [],
+                "values": []
+            }, ]
+        })
+
+    def replace_variables_in_triples(self, var_to_replace):
+        """Replace variables in triples
+
+        Parameters
+        ----------
+        var_to_replace : list of tuples
+            var to replace in triples
+        """
+        for tpl_var in var_to_replace:
+            var_source = tpl_var[0]
+            var_target = tpl_var[1]
+            for i, triple_dict in enumerate(self.triples):
+                for key, value in triple_dict.items():
+                    if key != "optional":
+                        self.triples[i][key] = value.replace(var_source, var_target)
+            for i, select in enumerate(self.selects):
+                self.selects[i] = select.replace(var_source, var_target)
+            for i, filtr in enumerate(self.filters):
+                self.filters[i] = filtr.replace(var_source, var_target)
+
+        # uniq lists
+        self.triples = Utils.unique(self.triples)
+        self.selects = Utils.unique(self.selects)
+
+    def replace_variables_in_blocks(self, var_to_replace):
+        """Replace variables in blocks
+
+        Parameters
+        ----------
+        var_to_replace : list of tuples
+            var to replace in block
+        """
+        for var_source, var_target in var_to_replace:
+            # Interate throught blocks
+            for nblock, block in enumerate(self.triples_blocks):
+                # Iterate over sub-blocks
+                for nsblock, sblock in enumerate(block["sblocks"]):
+                    # Iterate over triples
+                    for ntriple, triple_dict in enumerate(sblock["triples"]):
+                        for key, value in triple_dict.items():
+                            if key != "optional":
+                                self.triples_blocks[nblock]["sblocks"][nsblock]["triples"][ntriple][key] = value.replace(var_source, var_target)
+
+                    for i, filtr in enumerate(sblock["filters"]):
+                        self.triples_blocks[nblock]["sblocks"][nsblock]["filters"][i] = filtr.replace(var_source, var_target)
+
+                    for i, value in enumerate(sblock["values"]):
+                        self.triples_blocks[nblock]["sblocks"][nsblock]["values"][i] = value.replace(var_source, var_target)
+
+                self.triples_blocks[nblock]["sblocks"][nsblock]["triples"] = Utils.unique(self.triples_blocks[nblock]["sblocks"][nsblock]["triples"])
+
+    def get_source_of_special_node(self, special_node_id):
+        """Get if of original node of a special one
+
+        Parameters
+        ----------
+        special_node_id : int
+            Special node id
+
+        Returns
+        -------
+        int or None
+            Original node id
+        """
+        for link in self.json["links"]:
+            if link["type"] == "specialLink":
+                if link["source"]["id"] == special_node_id:
+                    return link["target"]["id"]
+                if link["target"]["id"] == special_node_id:
+                    return link["source"]["id"]
+        return None
+
+    def build_query_from_json(self, preview=False, for_editor=False):
         """Build a sparql query for the json dict of the query builder
 
         Parameters
         ----------
-        json_query : dict
-            The json query from the query builder
-
-        Returns
-        -------
-        str
-            SPARQL query
+        preview : bool, optional
+            Build a preview query (with LIMIT)
+        for_editor : bool, optional
+            Remove FROMS and @federate
         """
         entities = []
         attributes = {}
         linked_attributes = []
 
         self.selects = []
-        triples_relations = []
-        triples_attributes = []
-        values = []
-        filters = []
+
+        self.triples = []
+        self.triples_blocks = []
+
+        self.values = []
+        self.filters = []
+
         start_end = []
         strands = []
 
         var_to_replace = []
 
         # Browse node to get graphs
-        for node in json_query["nodes"]:
+        for node in self.json["nodes"]:
             if not node["suggested"]:
                 entities.append(node["uri"])
 
         self.set_graphs_and_endpoints(entities=entities)
 
-        # self.log.debug(json_query)
+        # self.log.debug(self.json)
 
         # Browse links (relations)
-        for link in json_query["links"]:
+        for link in self.json["links"]:
             if not link["suggested"]:
+
+                # if link is special, replace the special node variable with its real node
+                if link["type"] == "specialLink":
+                    special_node = link["source"] if link["source"]["type"] in ("unionNode", ) else link["target"]
+                    real_node = link["target"] if link["source"]["type"] in ("unionNode", ) else link["source"]
+
+                    var_to_replace.append((
+                        self.format_sparql_variable("{}{}_uri".format(special_node["label"], special_node["id"])),
+                        self.format_sparql_variable("{}{}_uri".format(real_node["label"], real_node["id"]))
+                    ))
+
+                    continue
+
                 source = self.format_sparql_variable("{}{}_uri".format(link["source"]["label"], link["source"]["id"]))
                 target = self.format_sparql_variable("{}{}_uri".format(link["target"]["label"], link["target"]["id"]))
 
+                # Check if relation is in a block
+                block_id = None
+                sblock_id = None
+                pblock_ids = (None, None)
+                if link["source"]["specialNodeId"] or link["target"]["specialNodeId"]:
+                    block_id = link["source"]["specialNodeId"]
+                    sblock_id = link["source"]["specialNodeGroupId"] if link["source"]["specialNodeGroupId"] else link["target"]["specialNodeGroupId"]
+                    pblock_ids = link["source"]["specialPreviousIds"]
+
                 # Position
                 if link["uri"] in ('included_in', 'overlap_with'):
+
+                    # If source of target is a special node, replace the id with the id of the concerned node
+                    source_id = link["source"]["id"]
+                    target_id = link["target"]["id"]
+                    if link["source"]["type"] in ("unionNode", ):
+                        source_id = self.get_source_of_special_node(link["source"]["id"])
+                    if link["target"]["type"] in ("unionNode", ):
+                        target_id = self.get_source_of_special_node(link["target"]["id"])
+
                     common_block = self.format_sparql_variable("block_{}_{}".format(link["source"]["id"], link["target"]["id"]))
                     # Get start & end sparql variables
-                    for attr in json_query["attr"]:
+                    for attr in self.json["attr"]:
                         if not attr["faldo"]:
                             continue
-                        if attr["nodeId"] == link["source"]["id"]:
+                        if attr["nodeId"] == source_id:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
                                 start_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
@@ -596,7 +942,7 @@ class SparqlQueryBuilder(Params):
                             if attr["faldo"].endswith("faldoStrand"):
                                 strand_1 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
                                 strands.append(attr["id"])
-                        if attr["nodeId"] == link["target"]["id"]:
+                        if attr["nodeId"] == target_id:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
                                 start_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
@@ -607,19 +953,21 @@ class SparqlQueryBuilder(Params):
                                 strand_2 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
                                 strands.append(attr["id"])
 
-                    triples_relations.append({
+                    self.store_triple({
                         "subject": source,
                         "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         "object": common_block,
                         "optional": False
-                    })
 
-                    triples_relations.append({
+                    }, block_id, sblock_id, pblock_ids)
+
+                    self.store_triple({
                         "subject": target,
                         "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
                         "object": common_block,
                         "optional": False
-                    })
+
+                    }, block_id, sblock_id, pblock_ids)
 
                     if link["sameStrand"]:
                         var_to_replace.append((strand_1, strand_2))
@@ -629,34 +977,37 @@ class SparqlQueryBuilder(Params):
                     equal_sign = "" if link["strict"] else "="
 
                     if link["uri"] == "included_in":
-                        filters.append("FILTER ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}) .".format(
+                        self.store_filter("FILTER ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}) .".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
                             end2=end_2,
                             equalsign=equal_sign
-                        ))
+                        ), block_id, sblock_id, pblock_ids)
+
                     elif link["uri"] == "overlap_with":
-                        filters.append("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}))".format(
+                        self.store_filter("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}))".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
                             end2=end_2,
                             equalsign=equal_sign
-                        ))
+                        ), block_id, sblock_id, pblock_ids)
 
                 # Classic relation
                 else:
                     relation = "<{}>".format(link["uri"])
-                    triples_relations.append({
+                    triple = {
                         "subject": source,
                         "predicate": relation,
                         "object": target,
                         "optional": False
-                    })
+                    }
+
+                    self.store_triple(triple, block_id, sblock_id, pblock_ids)
 
         # Store linked attributes
-        for attribute in json_query["attr"]:
+        for attribute in self.json["attr"]:
             attributes[attribute["id"]] = {
                 "label": attribute["label"],
                 "entity_label": attribute["entityLabel"],
@@ -666,19 +1017,24 @@ class SparqlQueryBuilder(Params):
                 linked_attributes.extend((attribute["id"], attribute["linkedWith"]))
 
         # Browse attributes
-        for attribute in json_query["attr"]:
+        for attribute in self.json["attr"]:
+
+            # Get blockid and sblockid of the attribute node
+            block_id, sblock_id, pblock_ids = self.get_block_ids(attribute["nodeId"])
+
             # URI ---
             if attribute["type"] == "uri":
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = "<{}>".format(attribute["entityUri"])
-                if not self.is_bnode(attribute["entityUri"], json_query["nodes"]):
-                    triples_attributes.append({
+                if not self.is_bnode(attribute["entityUri"], self.json["nodes"]):
+                    self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
                         "optional": False
-                    })
+                    }, block_id, sblock_id, pblock_ids)
+
                 if attribute["visible"]:
                     self.selects.append(subject)
                 # filters/values
@@ -688,12 +1044,12 @@ class SparqlQueryBuilder(Params):
                         negative_sign = ""
                         if attribute["negative"]:
                             negative_sign = "!"
-                        filters.append("FILTER ({}regex({}, {}, 'i'))".format(negative_sign, subject, filter_value))
+                            self.store_filter("FILTER ({}regex({}, {}, 'i'))".format(negative_sign, subject, filter_value), block_id, sblock_id, pblock_ids)
                     elif attribute["filterType"] == "exact":
                         if attribute["negative"]:
-                            filters.append("FILTER (str({}) != {}) .".format(subject, filter_value))
+                            self.store_filter("FILTER (str({}) != {}) .".format(subject, filter_value), block_id, sblock_id, pblock_ids)
                         else:
-                            values.append("VALUES {} {{ {} }} .".format(subject, filter_value))
+                            self.store_value("VALUES {} {{ {} }} .".format(subject, filter_value), block_id, sblock_id, pblock_ids)
 
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_uri".format(
@@ -701,6 +1057,43 @@ class SparqlQueryBuilder(Params):
                         attributes[attribute["linkedWith"]]["entity_id"]
                     ))
                     var_to_replace.append((subject, var_2))
+
+            if attribute["type"] == "boolean":
+                if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in linked_attributes:
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
+
+                    self.store_triple({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    }, block_id, sblock_id, pblock_ids)
+
+                    if attribute["visible"]:
+                        self.selects.append(obj)
+
+                # values
+                if attribute["filterSelectedValues"] != [] and not attribute["optional"] and not attribute["linked"]:
+                    uri_val_list = []
+                    for value in attribute["filterSelectedValues"]:
+                        if value == "true":
+                            bool_value = "'true'^^xsd:boolean"
+                        else:
+                            bool_value = "'false'^^xsd:boolean"
+                        value_var = obj
+                        uri_val_list.append(bool_value)
+
+                    if uri_val_list:
+                        self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
+                if attribute["linked"]:
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
 
             # Text
             if attribute["type"] == "text":
@@ -711,14 +1104,14 @@ class SparqlQueryBuilder(Params):
                     else:
                         predicate = "<{}>".format(attribute["uri"])
 
-                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
 
-                    triples_attributes.append({
+                    self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
                         "optional": True if attribute["optional"] else False
-                    })
+                    }, block_id, sblock_id, pblock_ids)
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters/values
@@ -727,13 +1120,12 @@ class SparqlQueryBuilder(Params):
                         negative_sign = ""
                         if attribute["negative"]:
                             negative_sign = "!"
-                        filters.append("FILTER ({}regex({}, '{}', 'i'))".format(negative_sign, obj, attribute["filterValue"]))
+                        self.store_filter("FILTER ({}regex({}, '{}', 'i'))".format(negative_sign, obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                     elif attribute["filterType"] == "exact":
                         if attribute["negative"]:
-                            filters.append("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]))
+                            self.store_filter("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                         else:
-                            values.append("VALUES {} {{ '{}'^^xsd:string }} .".format(obj, attribute["filterValue"]))
-
+                            self.store_value("VALUES {} {{ '{}' }} .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
@@ -744,28 +1136,29 @@ class SparqlQueryBuilder(Params):
 
             # Numeric
             if attribute["type"] == "decimal":
-                if attribute["visible"] or attribute["filterValue"] != "" or attribute["id"] in start_end or attribute["id"] in linked_attributes:
+                if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in start_end or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    triples_attributes.append({
+                    self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
                         "optional": True if attribute["optional"] else False
-                    })
+                    }, block_id, sblock_id, pblock_ids)
                     if attribute["visible"]:
                         self.selects.append(obj)
                 # filters
-                if attribute["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
-                    if attribute['filterSign'] == "=":
-                        values.append("VALUES {} {{ {} }} .".format(obj, attribute["filterValue"]))
-                    else:
-                        filter_string = "FILTER ( {} {} {} ) .".format(obj, attribute["filterSign"], attribute["filterValue"])
-                        filters.append(filter_string)
+                for filtr in attribute["filters"]:
+                    if filtr["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
+                        if filtr['filterSign'] == "=":
+                            self.store_value("VALUES {} {{ {} }} .".format(obj, filtr["filterValue"]), block_id, sblock_id, pblock_ids)
+                        else:
+                            filter_string = "FILTER ( {} {} {} ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
@@ -779,60 +1172,60 @@ class SparqlQueryBuilder(Params):
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
-                    category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
                     faldo_strand = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
                         category_name = 'faldo:location/faldo:begin/faldo:reference'
-                        triples_attributes.append({
+                        self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
-                        })
+                        }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
-                            triples_attributes.append({
+                            self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
                                 "optional": True if attribute["optional"] else False
-                            })
+                            }, block_id, sblock_id, pblock_ids)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
-                        triples_attributes.append({
+                        self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
-                        })
-                        triples_attributes.append({
+                        }, block_id, sblock_id, pblock_ids)
+                        self.store_triple({
                             "subject": faldo_strand,
                             "predicate": "a",
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
-                        })
+                        }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
-                            triples_attributes.append({
+                            self.store_triple({
                                 "subject": faldo_strand,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
                                 "optional": False
-                            })
-                        values.append("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri))
+                            }, block_id, sblock_id, pblock_ids)
+                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
                     else:
                         category_name = "<{}>".format(attribute["uri"])
-                        triples_attributes.append({
+                        self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False
-                        })
+                        }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
-                            triples_attributes.append({
+                            self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
                                 "optional": True if attribute["optional"] else False
-                            })
+                            }, block_id, sblock_id, pblock_ids)
 
                     if attribute["visible"]:
                         self.selects.append(category_label)
@@ -848,7 +1241,7 @@ class SparqlQueryBuilder(Params):
                             uri_val_list.append("<{}>".format(value))
 
                     if uri_val_list:
-                        values.append("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)))
+                        self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
 
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}Category".format(
@@ -863,26 +1256,8 @@ class SparqlQueryBuilder(Params):
         endpoints_string = self.get_endpoints_string()
 
         # Linked attributes: replace SPARQL variable target by source
-        for tpl_var in var_to_replace:
-            var_source = tpl_var[0]
-            var_target = tpl_var[1]
-            for i, triple_dict in enumerate(triples_relations):
-                for key, value in triple_dict.items():
-                    if key != "optional":
-                        triples_relations[i][key] = value.replace(var_source, var_target)
-            for i, triple_dict in enumerate(triples_attributes):
-                for key, value in triple_dict.items():
-                    if key != "optional":
-                        triples_attributes[i][key] = value.replace(var_source, var_target)
-            for i, select in enumerate(self.selects):
-                self.selects[i] = select.replace(var_source, var_target)
-            for i, filtr in enumerate(filters):
-                filters[i] = filtr.replace(var_source, var_target)
-
-        # uniq lists
-        triples_relations = Utils.unique(triples_relations)
-        triples_attributes = Utils.unique(triples_attributes)
-        self.selects = Utils.unique(self.selects)
+        self.replace_variables_in_blocks(var_to_replace)
+        self.replace_variables_in_triples(var_to_replace)
 
         # Write the query
 
@@ -891,17 +1266,17 @@ class SparqlQueryBuilder(Params):
             query = """
 SELECT DISTINCT {selects}
 WHERE {{
-    {relations}
-    {attributes}
+    {triples}
+    {blocks}
     {filters}
     {values}
 }}
             """.format(
                 selects=' '.join(self.selects),
-                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
-                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
-                filters='\n    '.join(filters),
-                values='\n    '.join(values))
+                triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
+                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                filters='\n    '.join(self.filters),
+                values='\n    '.join(self.values))
 
         # Query is federated, add federated lines @federate & @from)
         elif self.federated:
@@ -911,8 +1286,8 @@ WHERE {{
 
 SELECT DISTINCT {selects}
 WHERE {{
-    {relations}
-    {attributes}
+    {triples}
+    {blocks}
     {filters}
     {values}
 }}
@@ -920,10 +1295,10 @@ WHERE {{
                 endpoints=endpoints_string,
                 federated=federated_from_string,
                 selects=' '.join(self.selects),
-                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
-                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
-                filters='\n    '.join(filters),
-                values='\n    '.join(values)
+                triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
+                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                filters='\n    '.join(self.filters),
+                values='\n    '.join(self.values)
             )
 
         # Query on the local endpoint (add froms)
@@ -932,37 +1307,37 @@ WHERE {{
 SELECT DISTINCT {selects}
 {froms}
 WHERE {{
-    {relations}
-    {attributes}
+    {triples}
+    {blocks}
     {filters}
     {values}
 }}
             """.format(
                 selects=' '.join(self.selects),
                 froms=from_string,
-                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
-                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
-                filters='\n    '.join(filters),
-                values='\n    '.join(values))
+                triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
+                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                filters='\n    '.join(self.filters),
+                values='\n    '.join(self.values))
 
         # Query an external endpoint (no froms)
         else:
             query = """
 SELECT DISTINCT {selects}
 WHERE {{
-    {relations}
-    {attributes}
+    {triples}
+    {blocks}
     {filters}
     {values}
 }}
             """.format(
                 selects=' '.join(self.selects),
-                relations='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_relations]),
-                attributes='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in triples_attributes]),
-                filters='\n    '.join(filters),
-                values='\n    '.join(values))
+                triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
+                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                filters='\n    '.join(self.filters),
+                values='\n    '.join(self.values))
 
         if preview:
             query += "\nLIMIT {}".format(self.settings.getint('triplestore', 'preview_limit'))
 
-        return self.prefix_query(textwrap.dedent(query))
+        self.sparql = self.prefix_query(textwrap.dedent(query))

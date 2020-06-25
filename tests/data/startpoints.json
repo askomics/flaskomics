@@ -4,7 +4,7 @@
     "publicQueries": [],
     "startpoints": [
         {
-            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+            "entity": "http://askomics.org/test/data/transcript",
             "entity_label": "transcript",
             "graphs": [
                 {
@@ -17,7 +17,7 @@
             "public": false
         },
         {
-            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#QTL",
+            "entity": "http://askomics.org/test/data/QTL",
             "entity_label": "QTL",
             "graphs": [
                 {
@@ -30,7 +30,7 @@
             "public": false
         },
         {
-            "entity": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+            "entity": "http://askomics.org/test/data/DifferentialExpression",
             "entity_label": "DifferentialExpression",
             "graphs": [
                 {

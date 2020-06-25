@@ -2,7 +2,7 @@
   "attr": [
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": false,
       "filterType": "exact",
       "filterValue": "",
@@ -19,7 +19,7 @@
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": false,
       "filterType": "exact",
       "filterValue": "",
@@ -36,23 +36,23 @@
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoReference",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "faldo": "http://askomics.org/test/internal/faldoReference",
       "filterSelectedValues": [
-        "http://www.semanticweb.org/user/ontologies/2018/1#At1"
+        "http://askomics.org/test/data/At1"
       ],
       "filterValues": [
         {
           "label": "At3",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At3"
+          "uri": "http://askomics.org/test/data/At3"
         },
         {
           "label": "At1",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At1"
+          "uri": "http://askomics.org/test/data/At1"
         },
         {
           "label": "At5",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#At5"
+          "uri": "http://askomics.org/test/data/At5"
         }
       ],
       "id": 4,
@@ -63,22 +63,22 @@
       "nodeId": 1,
       "optional": false,
       "type": "category",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeName",
+      "uri": "http://askomics.org/test/data/chromosomeName",
       "visible": true
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStrand",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "faldo": "http://askomics.org/test/internal/faldoStrand",
       "filterSelectedValues": [],
       "filterValues": [
         {
           "label": "minus",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#minus"
+          "uri": "http://askomics.org/test/data/minus"
         },
         {
           "label": "plus",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#plus"
+          "uri": "http://askomics.org/test/data/plus"
         }
       ],
       "id": 5,
@@ -89,18 +89,18 @@
       "nodeId": 1,
       "optional": false,
       "type": "category",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
+      "uri": "http://askomics.org/test/data/strand",
       "visible": true
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": null,
       "filterSelectedValues": [],
       "filterValues": [
         {
           "label": "Arabidopsis_thaliana",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis_thaliana"
+          "uri": "http://askomics.org/test/data/Arabidopsis_thaliana"
         }
       ],
       "id": 6,
@@ -111,26 +111,26 @@
       "nodeId": 1,
       "optional": false,
       "type": "category",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#taxon",
+      "uri": "http://askomics.org/test/data/taxon",
       "visible": false
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": null,
       "filterSelectedValues": [],
       "filterValues": [
         {
           "label": "gene",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#gene"
+          "uri": "http://askomics.org/test/data/gene"
         },
         {
           "label": "miRNA_gene",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#miRNA_gene"
+          "uri": "http://askomics.org/test/data/miRNA_gene"
         },
         {
           "label": "ncRNA_gene",
-          "uri": "http://www.semanticweb.org/user/ontologies/2018/1#ncRNA_gene"
+          "uri": "http://askomics.org/test/data/ncRNA_gene"
         }
       ],
       "id": 7,
@@ -141,13 +141,13 @@
       "nodeId": 1,
       "optional": false,
       "type": "category",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#featureType",
+      "uri": "http://askomics.org/test/data/featureType",
       "visible": false
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoEnd",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "faldo": "http://askomics.org/test/internal/faldoEnd",
       "filterSign": "=",
       "filterValue": "",
       "id": 8,
@@ -158,13 +158,13 @@
       "nodeId": 1,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
+      "uri": "http://askomics.org/test/data/end",
       "visible": false
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
-      "faldo": "http://www.semanticweb.org/askomics/ontologies/2018/1#faldoStart",
+      "entityUri": "http://askomics.org/test/data/transcript",
+      "faldo": "http://askomics.org/test/internal/faldoStart",
       "filterSign": "=",
       "filterValue": "",
       "id": 9,
@@ -175,12 +175,12 @@
       "nodeId": 1,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
+      "uri": "http://askomics.org/test/data/start",
       "visible": false
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": null,
       "filterType": "exact",
       "filterValue": "",
@@ -192,12 +192,12 @@
       "nodeId": 1,
       "optional": false,
       "type": "text",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#biotype",
+      "uri": "http://askomics.org/test/data/biotype",
       "visible": true
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": null,
       "filterType": "exact",
       "filterValue": "",
@@ -209,12 +209,12 @@
       "nodeId": 1,
       "optional": false,
       "type": "text",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#description",
+      "uri": "http://askomics.org/test/data/description",
       "visible": false
     },
     {
       "entityLabel": "transcript",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "entityUri": "http://askomics.org/test/data/transcript",
       "faldo": null,
       "filterType": "exact",
       "filterValue": "",
@@ -226,12 +226,12 @@
       "nodeId": 1,
       "optional": false,
       "type": "text",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#featureName",
+      "uri": "http://askomics.org/test/data/featureName",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": false,
       "filterType": "exact",
       "filterValue": "",
@@ -248,7 +248,7 @@
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": false,
       "filterType": "exact",
       "filterValue": "",
@@ -265,7 +265,7 @@
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterType": "exact",
       "filterValue": "",
@@ -277,12 +277,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "text",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Expression",
+      "uri": "http://askomics.org/test/data/Expression",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -294,12 +294,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FC",
+      "uri": "http://askomics.org/test/data/FC",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -311,12 +311,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#FDR",
+      "uri": "http://askomics.org/test/data/FDR",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -328,12 +328,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Leaves/Leaves",
+      "uri": "http://askomics.org/test/data/Leaves/Leaves",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "<=",
       "filterValue": "0.05",
@@ -345,12 +345,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#PValue",
+      "uri": "http://askomics.org/test/data/PValue",
       "visible": true
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -362,12 +362,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Roots/Roots",
+      "uri": "http://askomics.org/test/data/Roots/Roots",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -379,12 +379,12 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Significance",
+      "uri": "http://askomics.org/test/data/Significance",
       "visible": false
     },
     {
       "entityLabel": "DifferentialExpression",
-      "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "entityUri": "http://askomics.org/test/data/DifferentialExpression",
       "faldo": null,
       "filterSign": "=",
       "filterValue": "",
@@ -396,7 +396,7 @@
       "nodeId": 13,
       "optional": false,
       "type": "decimal",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#logFC",
+      "uri": "http://askomics.org/test/data/logFC",
       "visible": true
     }
   ],
@@ -420,7 +420,7 @@
         "selected": true,
         "suggested": false,
         "type": "node",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "uri": "http://askomics.org/test/data/DifferentialExpression",
         "__indexColor": "#d80002",
         "index": 1,
         "x": -7.753825381665853,
@@ -443,7 +443,7 @@
         "selected": false,
         "suggested": false,
         "type": "node",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "uri": "http://askomics.org/test/data/transcript",
         "__indexColor": "#ec0001",
         "index": 0,
         "x": 23.688204491958494,
@@ -452,13 +452,13 @@
         "vy": 7.427487735045244e-10
       },
       "type": "link",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern",
+      "uri": "http://askomics.org/test/data/concern",
       "__indexColor": "#b00004",
       "__controlPoints": null,
       "index": 0
     },
     {
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#concern",
+      "uri": "http://askomics.org/test/data/concern",
       "type": "link",
       "sameStrand": false,
       "sameRef": false,
@@ -477,7 +477,7 @@
         "selected": true,
         "suggested": false,
         "type": "node",
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+        "uri": "http://askomics.org/test/data/DifferentialExpression",
         "__indexColor": "#d80002",
         "index": 1,
         "x": -7.753825381665853,
@@ -486,7 +486,7 @@
         "vy": 4.0412582091094435e-10
       },
       "target": {
-        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+        "uri": "http://askomics.org/test/data/transcript",
         "type": "node",
         "filterNode": "",
         "filterLink": "",
@@ -527,7 +527,7 @@
       "selected": false,
       "suggested": false,
       "type": "node",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "uri": "http://askomics.org/test/data/transcript",
       "__indexColor": "#ec0001",
       "index": 0,
       "x": 23.688204491958494,
@@ -548,7 +548,7 @@
       "selected": true,
       "suggested": false,
       "type": "node",
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#DifferentialExpression",
+      "uri": "http://askomics.org/test/data/DifferentialExpression",
       "__indexColor": "#d80002",
       "index": 1,
       "x": -7.753825381665853,
@@ -557,7 +557,7 @@
       "vy": 4.0412582091094435e-10
     },
     {
-      "uri": "http://www.semanticweb.org/user/ontologies/2018/1#transcript",
+      "uri": "http://askomics.org/test/data/transcript",
       "type": "node",
       "filterNode": "",
       "filterLink": "",

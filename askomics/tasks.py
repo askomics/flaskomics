@@ -14,8 +14,9 @@ from askomics.app import create_app, create_celery
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
+from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -68,7 +69,7 @@ def integrate(self, session, data, host_url):
                 file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)
             elif file.type == "gff/gff3":
                 file.integrate(data["dataset_id"], data["entities"], public=public)
-            elif file.type == "turtle":
+            elif file.type in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
                 file.integrate(public=public)
             elif file.type == "bed":
                 file.integrate(data["dataset_id"], data["entity_name"], public=public)
@@ -155,17 +156,15 @@ def query(self, session, info):
         result.update_db_status("started", update_celery=True, update_date=True)
 
         # launch query
-        query_builder = SparqlQueryBuilder(app, session)
+        query = SparqlQuery(app, session, info["graph_state"])
 
-        query = query_builder.build_query_from_json(info["graph_state"], for_editor=False)
-        endpoints = query_builder.endpoints
-        federated = query_builder.federated
+        query.build_query_from_json(for_editor=False)
 
-        headers = query_builder.selects
+        headers = query.selects
         results = []
-        if query_builder.graphs:
-            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            headers, results = query_launcher.process_query(query, isql_api=True)
+        if query.graphs:
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=query.federated, endpoints=query.endpoints)
+            headers, results = query_launcher.process_query(query.sparql, isql_api=True)
 
         # write result to a file
         file_size = result.save_result_in_file(headers, results)
@@ -236,3 +235,56 @@ def sparql_query(self, session, info):
         'error': False,
         'errorMessage': ''
     }
+
+
+@celery.task(bind=True, name="delete_users_data")
+def delete_users_data(self, session, users, delete_user):
+    """Delete users directory and RDF data
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    users : list
+        list of user to delete
+    delete_user : boolean
+        True if delete all user or juste his data
+
+    Returns
+    -------
+    dict
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        local_auth = LocalAuth(app, session)
+
+        for user in users:
+            local_auth.delete_user_directory(user, delete_user)
+            local_auth.delete_user_rdf(user["username"])
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return {
+            'error': True,
+            'errorMessage': str(e)
+        }
+    return {
+        'error': False,
+        'errorMessage': ''
+    }
+
+
+@celery.task(bind=True, name="send_mail_new_user")
+def send_mail_new_user(self, session, user):
+    """Send a mail to the new user
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    user : dict
+        New user
+    """
+    local_auth = LocalAuth(app, session)
+    local_auth.send_mail_to_new_user(user)

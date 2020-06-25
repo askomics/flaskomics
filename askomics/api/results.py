@@ -5,7 +5,7 @@ from askomics.api.auth import login_required, admin_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 
 from flask import (Blueprint, current_app, jsonify, session, request, send_from_directory)
 
@@ -13,8 +13,8 @@ from flask import (Blueprint, current_app, jsonify, session, request, send_from_
 results_bp = Blueprint('results', __name__, url_prefix='/')
 
 
-@login_required
 @results_bp.route('/api/results', methods=['GET'])
+@login_required
 def get_results():
     """Get ...
 
@@ -50,8 +50,8 @@ def get_results():
     })
 
 
-@login_required
 @results_bp.route('/api/results/preview', methods=['POST'])
+@login_required
 def get_preview():
     """Summary
 
@@ -88,7 +88,6 @@ def get_preview():
     })
 
 
-@login_required
 @results_bp.route('/api/results/getquery', methods=["POST"])
 def get_graph_and_sparql_query():
     """Get query (graphState or Sparql)
@@ -116,8 +115,8 @@ def get_graph_and_sparql_query():
         graphs = result.graphs
         endpoints = result.endpoints
         # Get all graphs and endpoint, and mark as selected the used one
-        query_builder = SparqlQueryBuilder(current_app, session)
-        graphs, endpoints = query_builder.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
+        query = SparqlQuery(current_app, session)
+        graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -177,8 +176,8 @@ def get_graph_state():
     })
 
 
-@login_required
 @results_bp.route('/api/results/download', methods=['POST'])
+@login_required
 def download_result():
     """Download result file"""
     try:
@@ -198,8 +197,8 @@ def download_result():
     return(send_from_directory(dir_path, file_name))
 
 
-@login_required
 @results_bp.route('/api/results/delete', methods=['POST'])
+@login_required
 def delete_result():
     """Summary
 
@@ -229,8 +228,8 @@ def delete_result():
     })
 
 
-@login_required
 @results_bp.route('/api/results/sparqlquery', methods=['POST'])
+@login_required
 def get_sparql_query():
     """Get sparql query of result for the query editor
 
@@ -249,20 +248,21 @@ def get_sparql_query():
         result_info = {"id": file_id}
 
         result = Result(current_app, session, result_info)
-        query_builder = SparqlQueryBuilder(current_app, session)
+        query = SparqlQuery(current_app, session)
 
-        query = result.get_sparql_query()
+        sparql = result.get_sparql_query()
 
         # get graphs and endpoints used in the query
         graphs = result.graphs
         endpoints = result.endpoints
         # Get all graphs and endpoint, and mark as selected the used one
-        graphs, endpoints = query_builder.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
+        graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
 
-        # Build query from json if needed
-        if query is None:
-            graph_state = result.get_graph_state()
-            query = query_builder.build_query_from_json(graph_state, for_editor=True)
+        # Build sparql query from json if needed
+        if sparql is None:
+            query.json = result.get_graph_state()
+            query.build_query_from_json(for_editor=True)
+            sparql = query.sparql
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -276,7 +276,7 @@ def get_sparql_query():
         }), 500
 
     return jsonify({
-        'query': query,
+        'query': sparql,
         'graphs': graphs,
         'endpoints': endpoints,
         'diskSpace': disk_space,
@@ -285,8 +285,8 @@ def get_sparql_query():
     })
 
 
-@login_required
 @results_bp.route('/api/results/description', methods=['POST'])
+@login_required
 def set_description():
     """Update a result description
 
@@ -323,8 +323,8 @@ def set_description():
     })
 
 
-@admin_required
 @results_bp.route('/api/results/publish', methods=['POST'])
+@admin_required
 def publish_query():
     """Publish a query template from a result
 
@@ -359,8 +359,8 @@ def publish_query():
     })
 
 
-@login_required
 @results_bp.route('/api/results/template', methods=['POST'])
+@login_required
 def template_query():
     """Template a query from a result
 

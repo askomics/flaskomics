@@ -32,7 +32,7 @@ export default class AdvancedOptions extends Component {
             <FormGroup hidden={this.props.hideCustomUri} row>
               <Label for="uri" sm={2}>Custom URI</Label>
               <Col sm={8}>
-                <Input onChange={this.handleChangeUri} value={this.props.customUri} type="text" name="uri" id="uri" placeholder={this.props.config.prefix} />
+                <Input onChange={this.handleChangeUri} value={this.props.customUri} type="text" name="uri" id="uri" placeholder={this.props.config.namespaceData} />
               </Col>
             </FormGroup>
             <FormGroup hidden={this.props.hideDistantEndpoint} row>

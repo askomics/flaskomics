@@ -16,7 +16,7 @@ Commit and push your modification to your [fork](https://help.github.com/article
 
 Write tests for your changes, and make sure that they [passes](dev-deployment.md#launch-continuous-integration-locally).
 
-Open a pull request against the master branch of flaskomics. The message of your pull request should describe your modifications (why and how).
+Open a pull request against the `dev` branch of flaskomics. The message of your pull request should describe your modifications (why and how).
 
 The pull request should pass all the [continuous integration](ci.md) which is automatically run by Github using Travis CI. The coverage must be at least remain the same (but it's better if it increases)
 

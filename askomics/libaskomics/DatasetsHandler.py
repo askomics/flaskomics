@@ -3,6 +3,7 @@ from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 
 
 class DatasetsHandler(Params):
@@ -110,27 +111,17 @@ class DatasetsHandler(Params):
 
         return self.get_datasets()
 
-    def delete_datasets_in_db(self):
-        """Delete datasets of the database"""
-        database = Database(self.app, self.session)
-
-        where_str = '(' + ' OR '.join(['id = ?'] * len(self.datasets)) + ')'
-        datasets_id = [dataset.id for dataset in self.datasets]
-
-        query = '''
-        DELETE FROM datasets
-        WHERE user_id=?
-        AND {}
-        '''.format(where_str)
-
-        database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(datasets_id))
-
     def delete_datasets(self):
         """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
+
         for dataset in self.datasets:
             # Delete from triplestore
             if dataset.graph_name:
                 Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
             # Delete from db
             dataset.delete_from_db()
+
+            # Uncache abstraction
+            tse.uncache_abstraction(public=dataset.public)

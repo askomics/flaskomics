@@ -36,6 +36,12 @@ def start():
             except Exception:
                 pass
 
+        front_message = None
+        try:
+            front_message = current_app.iniconfig.get('askomics', 'front_message')
+        except Exception:
+            pass
+
         # get proxy path
         proxy_path = "/"
         try:
@@ -43,15 +49,32 @@ def start():
         except Exception:
             pass
 
+        # Get ldap password reset link if set
+        password_reset_link = None
+        try:
+            password_reset_link = current_app.iniconfig.get("askomics", "ldap_password_reset_link")
+        except Exception:
+            pass
+        # Get ldap password reset link if set
+        account_link = None
+        try:
+            account_link = current_app.iniconfig.get("askomics", "ldap_account_link")
+        except Exception:
+            pass
+
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
+            "frontMessage": front_message,
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
             "disableAccountCreation": current_app.iniconfig.getboolean("askomics", "disable_account_creation"),
             "disableIntegration": current_app.iniconfig.getboolean('askomics', 'disable_integration'),
-            "prefix": current_app.iniconfig.get('triplestore', 'prefix'),
-            "namespace": current_app.iniconfig.get('triplestore', 'namespace'),
+            "protectPublic": current_app.iniconfig.getboolean('askomics', 'protect_public'),
+            "passwordResetLink": password_reset_link,
+            "accountLink": account_link,
+            "namespaceData": current_app.iniconfig.get('triplestore', 'namespace_data'),
+            "namespaceInternal": current_app.iniconfig.get('triplestore', 'namespace_internal'),
             "proxyPath": proxy_path,
             "user": {},
             "logged": False

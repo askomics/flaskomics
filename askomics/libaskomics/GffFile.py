@@ -98,11 +98,11 @@ class GffFile(File):
         """Set the abstraction and domain knowledge"""
         # Abstraction
         for entity in self.entities_to_integrate:
-            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
-            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
-            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
-            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
-            self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
+            self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("entity")]))
+            self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("startPoint")]))
+            self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("faldo")]))
+            self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
+            self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
         for attribute in self.attribute_abstraction:
             for attr_type in attribute["type"]:
@@ -114,12 +114,12 @@ class GffFile(File):
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
 
                     if attribute["label"] == rdflib.Literal("strand"):
-                        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
+                        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
 
         # Faldo:
         if self.faldo_entity:
@@ -169,7 +169,7 @@ class GffFile(File):
             for feature in rec.features:
 
                 # Entity type
-                entity_type = self.askomics_prefix[self.format_uri(feature.type, remove_space=True)]
+                entity_type = self.namespace_data[self.format_uri(feature.type, remove_space=True)]
 
                 # Faldo
                 faldo_reference = None
@@ -187,13 +187,13 @@ class GffFile(File):
                         else:
                             indexes[feature.type] = 1
                             index = 1
-                        entity = self.entity_prefix[self.format_uri("{}_{}".format(str(feature.type), str(index)))]
+                        entity = self.namespace_entity[self.format_uri("{}_{}".format(str(feature.type), str(index)))]
                         entity_label = "{}_{}".format(str(feature.type), str(index))
                     else:
-                        entity = self.entity_prefix[self.format_uri(self.format_gff_entity(feature.qualifiers["ID"][0]))]
+                        entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.qualifiers["ID"][0]))]
                         entity_label = self.format_gff_entity(feature.qualifiers["ID"][0])
                 else:
-                    entity = self.entity_prefix[self.format_uri(self.format_gff_entity(feature.id))]
+                    entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.id))]
                     entity_label = self.format_gff_entity(feature.id)
 
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
@@ -201,8 +201,8 @@ class GffFile(File):
 
                 # Chrom
                 self.category_values["reference"] = {rec.id, }
-                relation = self.askomics_prefix[self.format_uri("reference")]
-                attribute = self.askomics_prefix[self.format_uri(rec.id)]
+                relation = self.namespace_data[self.format_uri("reference")]
+                attribute = self.namespace_data[self.format_uri(rec.id)]
                 faldo_reference = attribute
                 self.faldo_abstraction["reference"] = relation
                 # self.graph_chunk.add((entity, relation, attribute))
@@ -210,21 +210,21 @@ class GffFile(File):
                 if (feature.type, "reference") not in attribute_list:
                     attribute_list.append((feature.type, "reference"))
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("reference")],
+                        "uri": self.namespace_data[self.format_uri("reference")],
                         "label": rdflib.Literal("reference"),
-                        "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
+                        "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": self.askomics_prefix[self.format_uri("{}Category".format("reference"))],
+                        "range": self.namespace_data[self.format_uri("{}Category".format("reference"))],
                         "values": [rec.id]
                     })
                 else:
                     # add the value
                     for at in self.attribute_abstraction:
-                        if at["uri"] == self.askomics_prefix[self.format_uri("reference")] and at["domain"] == entity_type and rec.id not in at["values"]:
+                        if at["uri"] == self.namespace_data[self.format_uri("reference")] and at["domain"] == entity_type and rec.id not in at["values"]:
                             at["values"].append(rec.id)
 
                 # Start
-                relation = self.askomics_prefix[self.format_uri("start")]
+                relation = self.namespace_data[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
                 self.faldo_abstraction["start"] = relation
@@ -233,7 +233,7 @@ class GffFile(File):
                 if (feature.type, "start") not in attribute_list:
                     attribute_list.append((feature.type, "start"))
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("start")],
+                        "uri": self.namespace_data[self.format_uri("start")],
                         "label": rdflib.Literal("start"),
                         "type": [rdflib.OWL.DatatypeProperty],
                         "domain": entity_type,
@@ -241,7 +241,7 @@ class GffFile(File):
                     })
 
                 # End
-                relation = self.askomics_prefix[self.format_uri("end")]
+                relation = self.namespace_data[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
                 self.faldo_abstraction["end"] = relation
@@ -250,7 +250,7 @@ class GffFile(File):
                 if (feature.type, "end") not in attribute_list:
                     attribute_list.append((feature.type, "end"))
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("end")],
+                        "uri": self.namespace_data[self.format_uri("end")],
                         "label": rdflib.Literal("end"),
                         "type": [rdflib.OWL.DatatypeProperty],
                         "domain": entity_type,
@@ -260,15 +260,15 @@ class GffFile(File):
                 # Strand
                 if feature.location.strand == 1:
                     self.category_values["strand"] = {"+", }
-                    relation = self.askomics_prefix[self.format_uri("strand")]
-                    attribute = self.askomics_prefix[self.format_uri("+")]
+                    relation = self.namespace_data[self.format_uri("strand")]
+                    attribute = self.namespace_data[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
                     self.faldo_abstraction["strand"] = relation
                     # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
-                    relation = self.askomics_prefix[self.format_uri("strand")]
-                    attribute = self.askomics_prefix[self.format_uri("-")]
+                    relation = self.namespace_data[self.format_uri("strand")]
+                    attribute = self.namespace_data[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
                     # self.graph_chunk.add((entity, relation, attribute))
@@ -276,11 +276,11 @@ class GffFile(File):
                 if (feature.type, "strand") not in attribute_list:
                     attribute_list.append((feature.type, "strand"))
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("strand")],
+                        "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
-                        "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
+                        "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": self.askomics_prefix[self.format_uri("{}Category".format("strand"))],
+                        "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
                         "values": ["+", "-"]
                     })
 
@@ -290,27 +290,27 @@ class GffFile(File):
                     for value in qualifier_value:
 
                         if qualifier_key in ("Parent", "Derives_from"):
-                            relation = self.askomics_prefix[self.format_uri(qualifier_key)]
-                            attribute = self.askomics_prefix[self.format_uri(self.format_gff_entity(value))]
+                            relation = self.namespace_data[self.format_uri(qualifier_key)]
+                            attribute = self.namespace_data[self.format_uri(self.format_gff_entity(value))]
 
                             if (feature.type, qualifier_key) not in attribute_list:
                                 attribute_list.append((feature.type, qualifier_key))
                                 self.attribute_abstraction.append({
-                                    "uri": self.askomics_prefix[self.format_uri(qualifier_key)],
+                                    "uri": self.namespace_data[self.format_uri(qualifier_key)],
                                     "label": rdflib.Literal(qualifier_key),
-                                    "type": [rdflib.OWL.ObjectProperty, self.askomics_prefix[self.format_uri("AskomicsRelation")]],
+                                    "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                     "domain": entity_type,
-                                    "range": self.askomics_prefix[self.format_uri(value.split(":")[0])]
+                                    "range": self.namespace_data[self.format_uri(value.split(":")[0])]
                                 })
 
                         else:
-                            relation = self.askomics_prefix[self.format_uri(qualifier_key)]
+                            relation = self.namespace_data[self.format_uri(qualifier_key)]
                             attribute = rdflib.Literal(self.convert_type(value))
 
                             if (feature.type, qualifier_key) not in attribute_list:
                                 attribute_list.append((feature.type, qualifier_key))
                                 self.attribute_abstraction.append({
-                                    "uri": self.askomics_prefix[self.format_uri(qualifier_key)],
+                                    "uri": self.namespace_data[self.format_uri(qualifier_key)],
                                     "label": rdflib.Literal(qualifier_key),
                                     "type": [rdflib.OWL.DatatypeProperty],
                                     "domain": entity_type,
@@ -348,8 +348,8 @@ class GffFile(File):
                     block_end = int(self.convert_type(feature.location.end)) // block_base
 
                     for slice_block in range(block_start, block_end + 1):
-                        self.graph_chunk.add((entity, self.askomics_namespace['includeIn'], rdflib.Literal(int(slice_block))))
+                        self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
                         block_reference = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
-                        self.graph_chunk.add((entity, self.askomics_namespace["includeInReference"], block_reference))
+                        self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
 
                 yield
