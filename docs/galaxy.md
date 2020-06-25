@@ -42,22 +42,19 @@ On the <navbar><i class="fa fa-play"></i> Ask!</navbar> page, the <btn><i class=
 # Galaxy AskOmics Interactive Tool
 
 
-
-
-[Galaxy Interactive Tools (GxITs)]() are a method to run containerized tools that are interactive in nature into the Galaxy interface. AskOmics have is GxIT available into several instances
+Galaxy Interactive Tools (GxITs) are a method to run containerized tools that are interactive in nature into the Galaxy interface. AskOmics have his GxIT available into several instances:
 
 - [usegalaxy.eu](https://usegalaxy.eu)
 - [galaxy.genouest.org](https://galaxy.genouest.org)
 
-## Lauch AskOmics IT
+## Launch AskOmics IT
 
 Search for the AskOmics Interactive tool using the search bar.
 
 ![Search a Galaxy Tool](img/galaxy_search_tool.png)
 
 
-
-Choose intput files to automaticaly upload into AskOmics
+Choose input files to automatically upload them into AskOmics
 
 ![Input files](img/galaxy_input_data.png)
 
