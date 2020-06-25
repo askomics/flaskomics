@@ -52,6 +52,7 @@ export default class Query extends Component {
     this.divHeight = 650
 
     this.idNumber = 0
+    this.specialNodeIdNumber = 0
     this.previousSelected = null
     this.currentSelected = null
     this.cancelRequest
@@ -70,6 +71,7 @@ export default class Query extends Component {
   }
 
   initId () {
+    // init node id
     let listId = new Set()
     this.graphState.nodes.map(node => {
       listId.add(node.id)
@@ -84,11 +86,36 @@ export default class Query extends Component {
     })
 
     this.idNumber = Math.max(...listId)
+
+    // init specialNode id
+    let listSpecialId = new Set()
+    this.graphState.nodes.map(node => {
+      listSpecialId.add(node.specialNodeId)
+    })
+    this.specialNodeIdNumber = Math.max(...listSpecialId)
   }
 
   getId () {
     this.idNumber += 1
     return this.idNumber
+  }
+
+  getSpecialNodeId () {
+    this.specialNodeIdNumber += 1
+    return this.specialNodeIdNumber
+  }
+
+  getLargestSpecialNodeGroupId (node) {
+    let listIds = new Set()
+    this.graphState.links.map(link => {
+      if (link.source.id == node.id) {
+        listIds.add(link.target.specialNodeGroupId)
+      }
+      if (link.target.id == node.id) {
+        listIds.add(link.source.specialNodeGroupId)
+      }
+    })
+    return Math.max(...listIds)
   }
 
   getHumanNodeId (uri) {
@@ -140,11 +167,14 @@ export default class Query extends Component {
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
       return 'decimal'
     }
-    if (typeUri == this.state.config.prefix + 'AskomicsCategory') {
+    if (typeUri == this.state.config.namespaceInternal + 'AskomicsCategory') {
       return 'category'
     }
     if (typeUri == 'http://www.w3.org/2001/XMLSchema#string') {
       return 'text'
+    }
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
+      return "boolean"
     }
   }
 
@@ -178,6 +208,16 @@ export default class Query extends Component {
     })
   }
 
+  getHumanIdFromId(nodeId) {
+    return this.graphState.nodes.map(node => {
+      if (node.id == nodeId) {
+        return node.humanId
+      } else {
+        return null
+      }
+    }).filter(humanId => humanId != null).reduce(humanId => humanId)
+  }
+
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
@@ -194,6 +234,7 @@ export default class Query extends Component {
         id: this.getId(),
         visible: !labelExist,
         nodeId: nodeId,
+        humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
         label: 'Uri',
         entityLabel: this.getLabel(nodeUri),
@@ -215,6 +256,7 @@ export default class Query extends Component {
         id: this.getId(),
         visible: true,
         nodeId: nodeId,
+        humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdfs:label',
         label: 'Label',
         entityLabel: this.getLabel(nodeUri),
@@ -239,6 +281,7 @@ export default class Query extends Component {
           id: this.getId(),
           visible: firstAttrVisibleForBnode,
           nodeId: nodeId,
+          humanNodeId: this.getHumanIdFromId(nodeId),
           uri: attr.uri,
           label: attr.label,
           entityLabel: this.getLabel(nodeUri),
@@ -254,8 +297,12 @@ export default class Query extends Component {
         firstAttrVisibleForBnode = false
 
         if (attributeType == 'decimal') {
-          nodeAttribute.filterSign = '='
-          nodeAttribute.filterValue = ''
+          nodeAttribute.filters = [
+            {
+              filterValue: "",
+              filterSign: "="
+            }
+          ]
         }
 
         if (attributeType == 'text') {
@@ -268,6 +315,11 @@ export default class Query extends Component {
           nodeAttribute.filterSelectedValues = []
         }
 
+        if (attributeType == 'boolean') {
+          nodeAttribute.filterValues = ["true", "false"]
+          nodeAttribute.filterSelectedValues = []
+        }
+
         return nodeAttribute
       }
     }).filter(attr => {return attr != null}))
@@ -276,20 +328,33 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null]) {
     /*
     Insert a new node in the graphState
     */
     let nodeId = this.getId()
     let humanId = this.getHumanNodeId(uri)
+    let specialNodeId = null
+
+    if (special) {
+      specialNodeId = this.getSpecialNodeId()
+    }
+
+    if (forceSpecialId) {
+      specialNodeId = forceSpecialId
+    }
+
     let node = {
       uri: uri,
-      type: this.getType(uri),
+      type: special ? special : this.getType(uri),
       filterNode: "",
       filterLink: "",
       graphs: this.getGraphs(uri),
       id: nodeId,
       humanId: humanId,
+      specialNodeId: specialNodeId,
+      specialNodeGroupId: specialNodeGroupId,
+      specialPreviousIds: specialPreviousIds,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -297,12 +362,14 @@ export default class Query extends Component {
     }
     this.graphState.nodes.push(node)
     if (selected) {
+      this.previousSelected = this.currentSelected
       this.currentSelected = node
     }
 
-    if (!suggested) {
+    if (!suggested && !special) {
       this.setNodeAttributes(uri, nodeId)
     }
+    return node
   }
 
   removeNode (id) {
@@ -354,7 +421,7 @@ export default class Query extends Component {
     return nodesAndLinks
   }
 
-  insertSuggestion (node) {
+  insertSuggestion (node, incrementSpecialNodeGroupId=null) {
     /*
     Insert suggestion for this node
 
@@ -371,6 +438,8 @@ export default class Query extends Component {
 
     let reNode = new RegExp(node.filterNode, 'g')
     let reLink = new RegExp(node.filterLink, 'g')
+
+    let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
     this.state.abstraction.relations.map(relation => {
       if (relation.source == node.uri) {
@@ -390,6 +459,9 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.target),
               id: targetId,
               humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
+              specialPreviousIds: node.specialPreviousIds,
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
@@ -401,13 +473,16 @@ export default class Query extends Component {
               type: "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
+              strict: true,
               id: linkId,
               label: relation.label,
               source: node.id,
               target: targetId,
               selected: false,
-              suggested: true
+              suggested: true,
+              directed: true
             })
+            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
@@ -429,6 +504,9 @@ export default class Query extends Component {
               graphs: this.getGraphs(relation.source),
               id: sourceId,
               humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
+              specialPreviousIds: node.specialPreviousIds,
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
@@ -445,8 +523,10 @@ export default class Query extends Component {
               source: sourceId,
               target: node.id,
               selected: false,
-              suggested: true
+              suggested: true,
+              directed: true
             })
+            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
@@ -466,6 +546,9 @@ export default class Query extends Component {
             graphs: this.getGraphs(entity.uri),
             id: new_id,
             humanId: null,
+            specialNodeId: node.specialNodeId,
+            specialNodeGroupId: specialNodeGroupId,
+            specialPreviousIds: node.specialPreviousIds,
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
@@ -474,7 +557,7 @@ export default class Query extends Component {
           // push suggested link
           this.graphState.links.push({
             uri: "included_in",
-            type: "link",
+            type: "posLink",
             id: this.getId(),
             sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
             sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
@@ -483,8 +566,10 @@ export default class Query extends Component {
             source: node.id,
             target: new_id,
             selected: false,
-            suggested: true
+            suggested: true,
+            directed: true
           })
+          incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
       })
     }
@@ -508,7 +593,7 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
-          type: "link",
+          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -517,14 +602,15 @@ export default class Query extends Component {
           source: node1.id,
           target: node2.id,
           selected: false,
-          suggested: false
+          suggested: false,
+          directed: true
         }
       }
 
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
-          type: "link",
+          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -533,7 +619,8 @@ export default class Query extends Component {
           source: node2.id,
           target: node1.id,
           selected: false,
-          suggested: false
+          suggested: false,
+          directed: true
         }
       }
     })
@@ -570,8 +657,10 @@ export default class Query extends Component {
         inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
-    // get attributes
-    this.setNodeAttributes(node.uri, node.id)
+    // get attributes (only for nodes)
+    if (node.type =="node") {
+      this.setNodeAttributes(node.uri, node.id)
+    }
   }
 
   instanciateNode (node) {
@@ -580,8 +669,10 @@ export default class Query extends Component {
         inode.suggested = false
       }
     })
-    // get attributes
-    this.setNodeAttributes(node.uri, node.id)
+    // get attributes (only for nodes)
+    if (node.type =="node") {
+      this.setNodeAttributes(node.uri, node.id)
+    }
   }
 
   selectAndInstanciateLink (link) {
@@ -594,33 +685,36 @@ export default class Query extends Component {
   }
 
   handleLinkSelection (clickedLink) {
-    // case 1: link is selected, so deselect it
-    if (clickedLink.selected) {
-      // Update current and previous
-      this.manageCurrentPreviousSelected(null)
+    // Only position link are clickabl
+    if (clickedLink.type == "posLink") {
+      // case 1: link is selected, so deselect it
+      if (clickedLink.selected) {
+        // Update current and previous
+        this.manageCurrentPreviousSelected(null)
 
-      // Deselect nodes and links
-      this.unselectAllObjects()
+        // Deselect nodes and links
+        this.unselectAllObjects()
 
-      // Remove all suggestion
-      this.removeAllSuggestion()
-    } else {
-      // case 2: link is unselected, so select it
-      let suggested = clickedLink.suggested
-      // Update current and previous
-      this.manageCurrentPreviousSelected(clickedLink)
-      // Deselect nodes and links
-      this.unselectAllObjects()
-      // Select and instanciate the link
-      this.selectAndInstanciateLink(clickedLink)
-      // instanciate node only if node is suggested
-      if (suggested) {
-        this.instanciateNode(clickedLink.target)
+        // Remove all suggestion
+        this.removeAllSuggestion()
+      } else {
+        // case 2: link is unselected, so select it
+        let suggested = clickedLink.suggested
+        // Update current and previous
+        this.manageCurrentPreviousSelected(clickedLink)
+        // Deselect nodes and links
+        this.unselectAllObjects()
+        // Select and instanciate the link
+        this.selectAndInstanciateLink(clickedLink)
+        // instanciate node only if node is suggested
+        if (suggested) {
+          this.instanciateNode(clickedLink.target)
+        }
+        // reload suggestions
+        this.removeAllSuggestion()
       }
-      // reload suggestions
-      this.removeAllSuggestion()
+      this.updateGraphState()
     }
-    this.updateGraphState()
   }
 
   handleNodeSelection (clickedNode) {
@@ -650,12 +744,17 @@ export default class Query extends Component {
       // remove all suggestion
       this.removeAllSuggestion()
       // insert suggestion
-      this.insertSuggestion(this.currentSelected)
+
+      // if node is a special node, get the greatest specialNodeGroupId
+      if (clickedNode.type == "unionNode") {
+        this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(clickedNode) + 1)
+      } else {
+        this.insertSuggestion(this.currentSelected)
+      }
+
     }
     // update graph state
     this.updateGraphState()
-    // // manage node filter
-    // this.manageFilterNodes(this.currentSelected.filter)
   }
 
   handleRemoveNode () {
@@ -725,6 +824,7 @@ export default class Query extends Component {
       saveIcon: "play",
       waiting: waiting
     })
+    console.log(this.graphState)
   }
 
   initGraph () {
@@ -733,6 +833,92 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // Node conversion
+  handleNodeConversion(event, data) {
+    /*
+      Source node
+      Special node
+      Target node
+    */
+    let sourceNode = this.currentSelected
+
+    // Get info about the relation between source and target
+    let relation = this.getInfoAboutRelation(sourceNode.id, data.node.id)
+
+    // remove suggestionand unselect all
+    this.removeAllSuggestion()
+    this.unselectAllObjects()
+
+    // Get previous special node ids
+    let specialPreviousIds = [sourceNode.specialNodeId, sourceNode.specialNodeGroupId]
+
+    // insert a special node and select it
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds)
+
+    // insert target node with specialNodeGroupId = 1
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds)
+
+    // insert link between source and special node
+    this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
+
+    // insert link between special node and target
+    relation.source = relation.source == "source" ? specialNode.id : targetNode.id
+    relation.target = relation.target == "target" ? targetNode.id : specialNode.id
+    relation.id = this.getId()
+    relation.suggested = false
+    relation.selected = false
+    this.graphState.links.push(relation)
+
+    //insert suggestion with first specialNodeGroupId = 2 (will be incremented for each suggestion)
+    this.insertSuggestion(specialNode, 2)
+
+    // Manage selection
+    this.manageCurrentPreviousSelected(specialNode)
+
+    // Update graph
+    this.updateGraphState()
+  }
+
+  getInfoAboutRelation(sourceId, targetId) {
+    let relation
+    this.graphState.links.map(link => {
+      if ((link.source.id == sourceId && link.target.id == targetId) || link.source.id == targetId && link.target.id == sourceId) {
+        relation =  {
+          uri: link.uri,
+          type: link.type,
+          sameStrand: link.sameStrand,
+          sameRef: link.sameRef,
+          strict: link.strict,
+          id: null,
+          label: link.label,
+          source: link.source.id == sourceId ? "source" : "target",
+          target: link.target.id == targetId ? "target" : "source",
+          selected: link.selected,
+          suggested: link.suggested,
+          directed: link.directed
+        }
+      }
+    })
+    return relation
+  }
+
+  insertSpecialLink(node1, node2, relation) {
+    let link = {
+      uri: null,
+      type: "specialLink",
+      sameStrand: null,
+      sameRef: null,
+      strict: null,
+      id: this.getId(),
+      label: relation == "unionNode" ? "Union" : "Not",
+      source: node1.id,
+      target: node2.id,
+      selected: false,
+      suggested: false,
+      directed: false
+    }
+    this.graphState.links.push(link)
+  }
 
   // Filter nodes --------------------------
   handleFilterNodes (event) {
@@ -827,10 +1013,25 @@ export default class Query extends Component {
   handleFilterNumericSign (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.filterSign = event.target.value
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
       }
     })
+    this.updateGraphState()
+  }
 
+  toggleAddNumFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: "",
+          filterSign: "="
+        })
+      }
+    })
     this.updateGraphState()
   }
 
@@ -838,7 +1039,11 @@ export default class Query extends Component {
     if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
-          attr.filterValue = event.target.value
+          attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
         }
       })
       this.updateGraphState()
@@ -974,6 +1179,7 @@ export default class Query extends Component {
       disablePreview: true,
       previewIcon: "spinner"
     })
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -1112,10 +1318,10 @@ export default class Query extends Component {
     let graphFilters
 
     if (!this.state.waiting) {
-      // attribute boxes (right view)
+      // attribute boxes (right view) only for node
       if (this.currentSelected) {
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
-          if (attribute.nodeId == this.currentSelected.id) {
+          if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
               <AttributeBox
                 attribute={attribute}
@@ -1130,12 +1336,13 @@ export default class Query extends Component {
                 handleFilterNumericSign={p => this.handleFilterNumericSign(p)}
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
                 toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
+                toggleAddNumFilter={p => this.toggleAddNumFilter(p)}
               />
             )
           }
         })
         // Link view (rightview)
-        if (this.currentSelected.type == "link") {
+        if (this.currentSelected.type == "posLink") {
 
           let link = Object.assign(this.currentSelected)
           this.state.graphState.nodes.map(node => {
@@ -1170,6 +1377,7 @@ export default class Query extends Component {
           waiting={this.state.waiting}
           handleNodeSelection={p => this.handleNodeSelection(p)}
           handleLinkSelection={p => this.handleLinkSelection(p)}
+          handleNodeConversion={(p, d) => this.handleNodeConversion(p, d)}
         />
       )
 

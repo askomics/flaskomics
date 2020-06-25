@@ -84,12 +84,12 @@ class BedFile(File):
     def set_rdf_abstraction_domain_knowledge(self):
         """Set the abstraction and domain knowledge"""
         # Abstraction
-        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("entity")]))
-        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("startPoint")]))
-        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("faldo")]))
+        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("entity")]))
+        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("startPoint")]))
+        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, self.namespace_internal[self.format_uri("faldo")]))
 
-        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
-        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(self.entity_name)))
+        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
+        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(self.entity_name)))
 
         for attribute in self.attribute_abstraction:
             for attr_type in attribute["type"]:
@@ -101,12 +101,12 @@ class BedFile(File):
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.askomics_prefix[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri("{}Category".format(attribute["label"]))], self.askomics_namespace[self.format_uri("category")], self.askomics_prefix[self.format_uri(value)]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
 
                     if attribute["label"] == rdflib.Literal("strand"):
-                        self.graph_abstraction_dk.add((self.askomics_prefix[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
+                        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
 
         # Faldo:
         if self.faldo_entity:
@@ -130,7 +130,7 @@ class BedFile(File):
         total_lines = sum(1 for line in open(self.path))
         row_number = 0
 
-        entity_type = self.askomics_prefix[self.format_uri(self.entity_name, remove_space=True)]
+        entity_type = self.namespace_data[self.format_uri(self.entity_name, remove_space=True)]
 
         for feature in bedfile:
 
@@ -144,7 +144,7 @@ class BedFile(File):
             else:
                 entity_label = "{}_{}".format(self.entity_name, str(count))
             count += 1
-            entity = self.entity_prefix[self.format_uri(entity_label)]
+            entity = self.namespace_entity[self.format_uri(entity_label)]
 
             self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
             self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
@@ -157,8 +157,8 @@ class BedFile(File):
 
             # Chromosome
             self.category_values["reference"] = {feature.chrom, }
-            relation = self.askomics_prefix[self.format_uri("reference")]
-            attribute = self.askomics_prefix[self.format_uri(feature.chrom)]
+            relation = self.namespace_data[self.format_uri("reference")]
+            attribute = self.namespace_data[self.format_uri(feature.chrom)]
             faldo_reference = attribute
             self.faldo_abstraction["reference"] = relation
             self.graph_chunk.add((entity, relation, attribute))
@@ -166,21 +166,21 @@ class BedFile(File):
             if "reference" not in attribute_list:
                 attribute_list.append("reference")
                 self.attribute_abstraction.append({
-                    "uri": self.askomics_prefix[self.format_uri("reference")],
+                    "uri": self.namespace_data[self.format_uri("reference")],
                     "label": rdflib.Literal("reference"),
-                    "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
+                    "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                     "domain": entity_type,
-                    "range": self.askomics_prefix[self.format_uri("{}Category".format("reference"))],
+                    "range": self.namespace_data[self.format_uri("{}Category".format("reference"))],
                     "values": [feature.chrom]
                 })
             else:
                 # add the value
                 for at in self.attribute_abstraction:
-                    if at["uri"] == self.askomics_prefix[self.format_uri("reference")] and at["domain"] == entity_type and feature.chrom not in at["values"]:
+                    if at["uri"] == self.namespace_data[self.format_uri("reference")] and at["domain"] == entity_type and feature.chrom not in at["values"]:
                         at["values"].append(feature.chrom)
 
             # Start
-            relation = self.askomics_prefix[self.format_uri("start")]
+            relation = self.namespace_data[self.format_uri("start")]
             attribute = rdflib.Literal(self.convert_type(feature.start + 1))  # +1 because bed is 0 based
             faldo_start = attribute
             self.faldo_abstraction["start"] = relation
@@ -189,7 +189,7 @@ class BedFile(File):
             if "start" not in attribute_list:
                 attribute_list.append("start")
                 self.attribute_abstraction.append({
-                    "uri": self.askomics_prefix[self.format_uri("start")],
+                    "uri": self.namespace_data[self.format_uri("start")],
                     "label": rdflib.Literal("start"),
                     "type": [rdflib.OWL.DatatypeProperty],
                     "domain": entity_type,
@@ -197,7 +197,7 @@ class BedFile(File):
                 })
 
             # End
-            relation = self.askomics_prefix[self.format_uri("end")]
+            relation = self.namespace_data[self.format_uri("end")]
             attribute = rdflib.Literal(self.convert_type(feature.end))
             faldo_end = attribute
             self.faldo_abstraction["end"] = relation
@@ -206,7 +206,7 @@ class BedFile(File):
             if "end" not in attribute_list:
                 attribute_list.append("end")
                 self.attribute_abstraction.append({
-                    "uri": self.askomics_prefix[self.format_uri("end")],
+                    "uri": self.namespace_data[self.format_uri("end")],
                     "label": rdflib.Literal("end"),
                     "type": [rdflib.OWL.DatatypeProperty],
                     "domain": entity_type,
@@ -217,16 +217,16 @@ class BedFile(File):
             strand = False
             if feature.strand == "+":
                 self.category_values["strand"] = {"+", }
-                relation = self.askomics_prefix[self.format_uri("strand")]
-                attribute = self.askomics_prefix[self.format_uri("+")]
+                relation = self.namespace_data[self.format_uri("strand")]
+                attribute = self.namespace_data[self.format_uri("+")]
                 faldo_strand = self.get_faldo_strand("+")
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
             elif feature.strand == "-":
                 self.category_values["strand"] = {"-", }
-                relation = self.askomics_prefix[self.format_uri("strand")]
-                attribute = self.askomics_prefix[self.format_uri("-")]
+                relation = self.namespace_data[self.format_uri("strand")]
+                attribute = self.namespace_data[self.format_uri("-")]
                 faldo_strand = self.get_faldo_strand("-")
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
@@ -236,24 +236,24 @@ class BedFile(File):
                 if "strand" not in attribute_list:
                     attribute_list.append("strand")
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("strand")],
+                        "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
-                        "type": [self.askomics_prefix[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
+                        "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": self.askomics_prefix[self.format_uri("{}Category".format("strand"))],
+                        "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
                         "values": ["+", "-"]
                     })
 
             # Score
             if feature.score != '.':
-                relation = self.askomics_prefix[self.format_uri("score")]
+                relation = self.namespace_data[self.format_uri("score")]
                 attribute = rdflib.Literal(self.convert_type(feature.score))
                 self.graph_chunk.add((entity, relation, attribute))
 
                 if "score" not in attribute_list:
                     attribute_list.append("score")
                     self.attribute_abstraction.append({
-                        "uri": self.askomics_prefix[self.format_uri("score")],
+                        "uri": self.namespace_data[self.format_uri("score")],
                         "label": rdflib.Literal("score"),
                         "type": [rdflib.OWL.DatatypeProperty],
                         "domain": entity_type,

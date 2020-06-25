@@ -6,7 +6,7 @@ from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, session, request)
@@ -27,11 +27,16 @@ def query():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        tse = TriplestoreExplorer(current_app, session)
-        results_handler = ResultsHandler(current_app, session)
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            startpoints = []
+            public_queries = []
+        else:
+            tse = TriplestoreExplorer(current_app, session)
+            results_handler = ResultsHandler(current_app, session)
+            startpoints = tse.get_startpoints()
+            public_queries = results_handler.get_public_queries()
 
-        startpoints = tse.get_startpoints()
-        public_queries = results_handler.get_public_queries()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -61,15 +66,20 @@ def get_abstraction():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        tse = TriplestoreExplorer(current_app, session)
-        abstraction = tse.get_abstraction()
-        files_utils = FilesUtils(current_app, session)
-        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            abstraction = {}
+            disk_space = None
+        else:
+            tse = TriplestoreExplorer(current_app, session)
+            abstraction = tse.get_abstraction()
+            files_utils = FilesUtils(current_app, session)
+            disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            'diskSpace': disk_space,
-            'abstraction': [],
+            'diskSpace': None,
+            'abstraction': {},
             'error': True,
             'errorMessage': str(e)
         }), 500
@@ -94,19 +104,24 @@ def get_preview():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        data = request.get_json()
+        # If public datasets and queries are protected, dont return anything to unlogged users
+        if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+            preview = []
+            header = []
+        else:
+            data = request.get_json()
 
-        query_builder = SparqlQueryBuilder(current_app, session)
+            query = SparqlQuery(current_app, session, data["graphState"])
+            query.build_query_from_json(preview=True, for_editor=False)
 
-        query = query_builder.build_query_from_json(data["graphState"], preview=True, for_editor=False)
-        endpoints = query_builder.endpoints
-        federated = query_builder.federated
+            endpoints = query.endpoints
+            federated = query.federated
 
-        header = query_builder.selects
-        preview = []
-        if query_builder.graphs:
-            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            header, preview = query_launcher.process_query(query)
+            header = query.selects
+            preview = []
+            if query.graphs:
+                query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
+                header, preview = query_launcher.process_query(query.sparql)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -124,8 +139,8 @@ def get_preview():
     })
 
 
-@login_required
 @query_bp.route('/api/query/save_result', methods=['POST'])
+@login_required
 def save_result():
     """Save a query in filesystem and db, using a celery task
 
@@ -148,17 +163,14 @@ def save_result():
             }), 500
 
         # Get query and endpoints and graphs of the query
-        graph_state = request.get_json()["graphState"]
-        query_builder = SparqlQueryBuilder(current_app, session)
-        query = query_builder.build_query_from_json(graph_state, preview=False, for_editor=False)
-        endpoints = query_builder.endpoints
-        graphs = query_builder.graphs
+        query = SparqlQuery(current_app, session, request.get_json()["graphState"])
+        query.build_query_from_json(preview=False, for_editor=False)
 
         info = {
-            "graph_state": graph_state,
-            "query": query,
-            "graphs": graphs,
-            "endpoints": endpoints,
+            "graph_state": query.json,
+            "query": query.sparql,
+            "graphs": query.graphs,
+            "endpoints": query.endpoints,
             "celery_id": None
         }
 

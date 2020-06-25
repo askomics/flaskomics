@@ -4,10 +4,12 @@ import shutil
 import tempfile
 import json
 import random
+import time
 
 from bioblend.galaxy import GalaxyInstance
 
 from askomics.app import create_app, create_celery
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
@@ -15,7 +17,8 @@ from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
+from askomics.libaskomics.Utils import Utils
 
 import pytest
 
@@ -121,7 +124,7 @@ class Client(object):
         """
         return self.client
 
-    def log_user(self, username):
+    def log_user(self, username, quota=0, blocked=False, ldap=False):
         """Summary
 
         Parameters
@@ -136,18 +139,24 @@ class Client(object):
         with self.client.session_transaction() as sess:
             sess["user"] = {
                 'id': 1 if username == "jdoe" else 2,
-                'ldap': False,
+                'ldap': ldap,
                 'fname': "John" if username == "jdoe" else "Jane",
                 'lname': "Doe" if username == "jdoe" else "Smith",
                 'username': username,
                 'email': "{}@askomics.org".format(username),
                 'admin': True if username == "jdoe" else False,
-                'blocked': False,
-                'quota': 0,
+                'blocked': blocked,
+                'quota': quota,
                 'apikey': "000000000{}".format("1" if username == "jdoe" else "2"),
                 "galaxy": galaxy
             }
 
+        self.session = sess
+
+    def logout(self):
+        """logout user"""
+        with self.client.session_transaction() as sess:
+            sess.pop("user", None)
         self.session = sess
 
     def init_database(self):
@@ -194,10 +203,31 @@ class Client(object):
 
         return user
 
+    def set_config(self, entry, key, value):
+        """update ini config"""
+        self.app.iniconfig.set(entry, key, value)
+
     def create_two_users(self):
         """Create jdoe and jsmith"""
         self.create_user("jdoe")
         self.create_user("jsmith")
+
+    def create_reset_token(self, username, old_token=False):
+        """Create a reset token"""
+        if old_token:
+            old_timestamp = int(time.time()) - 14400
+            token = "{}:{}".format(old_timestamp, Utils.get_random_string(20))
+            database = Database(self.app, self.session)
+            query = """
+            UPDATE users
+            SET reset_token=?
+            WHERE username=?
+            """
+            database.execute_sql_query(query, (token, username))
+            return token
+        else:
+            auth = LocalAuth(self.app, self.session)
+            return auth.create_reset_token(username)
 
     def upload_file(self, file_path):
         """Summary
@@ -403,24 +433,24 @@ class Client(object):
         dict
             Result info
         """
+        # Query: transcript concerned by DE and included in QTL
+
         with open("tests/data/graphState_simple_query.json", "r") as file:
             file_content = file.read()
 
         json_query = json.loads(file_content)
 
         # Get query and endpoints and graphs of the query
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query = SparqlQuery(self.app, self.session, json_query)
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query = query_builder.build_query_from_json(json_query, preview=False, for_editor=False)
-        endpoints = query_builder.endpoints
-        graphs = query_builder.graphs
+        query.build_query_from_json(preview=False, for_editor=False)
 
         info = {
             "graph_state": json_query,
-            "query": query,
+            "query": query.sparql,
             "celery_id": '00000000-0000-0000-0000-000000000000',
-            "graphs": graphs,
-            "endpoints": endpoints
+            "graphs": query.graphs,
+            "endpoints": query.endpoints
         }
 
         # Save job in database database
@@ -429,7 +459,7 @@ class Client(object):
         result.save_in_db()
 
         # Execute query and write result to file
-        headers, results = query_launcher.process_query(query)
+        headers, results = query_launcher.process_query(query.sparql)
         file_size = result.save_result_in_file(headers, results)
 
         # Update database status

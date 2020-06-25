@@ -1,14 +1,11 @@
 # Build AskOmics
-FROM askomics/flaskomics-base:3.2.7-alpine3.9 AS askomics_builder
+FROM askomics/flaskomics-base:4.0.0-alpine3.9 AS askomics_builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
 WORKDIR /askomics
 
-RUN rm -f config/askomics.ini && \
-    /askomics/install.sh && \
-    /askomics/build.sh && \
-    mv /askomics/docker/start_all.sh /askomics/start_all.sh
+RUN make clean-config fast-install build
 
 # Build Corese
 FROM xgaia/corese:latest AS corese_builder
@@ -19,8 +16,8 @@ FROM askomics/virtuoso:7.2.5.1 AS virtuoso_builder
 # Final image
 FROM alpine:3.8
 
-ENV DEPMODE="prod" \
-    MAX_CELERY_QUEUE="5" \
+ENV MODE="prod" \
+    NTASKS="5" \
     SPARQL_UPDATE=true \
     ASKO_triplestore_load_url="http://localhost:5000" \
     ASKO_federation_query_engine="corese" \
@@ -36,7 +33,7 @@ RUN apk add --no-cache openssl py-pip && \
     apk --no-cache add --update openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community && \
     mkdir /corese && \
     apk add --no-cache redis sqlite && \
-    apk add --no-cache python3 bash git libc-dev libstdc++ nodejs nodejs-npm
+    apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm openldap-dev
 
 COPY --from=virtuoso_builder /usr/local/virtuoso-opensource /usr/local/virtuoso-opensource
 COPY --from=virtuoso_builder /virtuoso /virtuoso
@@ -44,4 +41,4 @@ COPY --from=corese_builder /corese /corese
 COPY --from=askomics_builder /askomics /askomics
 
 EXPOSE 5000
-CMD bash /askomics/start_all.sh
+CMD bash /askomics/docker/start_all.sh

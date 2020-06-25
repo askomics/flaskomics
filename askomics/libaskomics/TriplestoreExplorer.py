@@ -1,8 +1,10 @@
 import tld
+import json
 from urllib.parse import urlparse
 
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -21,6 +23,36 @@ class TriplestoreExplorer(Params):
         """
         Params.__init__(self, app, session)
 
+    def get_graph_of_user(self, username):
+        """get all graph of a user
+
+        Parameters
+        ----------
+        username : string
+            Username
+
+        Returns
+        -------
+        list
+            List of graphs
+        """
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
+
+        query = """
+        SELECT DISTINCT ?graph
+        WHERE {{
+            ?graph dc:creator <{}> .
+        }}
+        """.format(username)
+
+        header, data = query_launcher.process_query(query_builder.prefix_query(query))
+
+        graphs = []
+        for result in data:
+            graphs.append(result["graph"])
+        return graphs
+
     def get_startpoints(self):
         """Get public and user startpoints
 
@@ -34,17 +66,17 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity ?entity_label ?creator ?public
         WHERE {{
-            ?graph :public ?public .
+            ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 ?graph prov:atLocation ?endpoint .
-                ?entity a :entity .
-                ?entity a :startPoint .
+                ?entity a askomics:entity .
+                ?entity a askomics:startPoint .
                 ?entity rdfs:label ?entity_label .
             }}
             FILTER (
@@ -109,11 +141,101 @@ class TriplestoreExplorer(Params):
         dict
             AskOmics abstraction
         """
-        return {
-            "entities": self.get_abstraction_entities(),
-            "attributes": self.get_abstraction_attributes(),
-            "relations": self.get_abstraction_relations()
-        }
+        insert, abstraction = self.get_cached_asbtraction()
+
+        # No abstraction entry in database, create it
+        if not abstraction:
+            abstraction = {
+                "entities": self.get_abstraction_entities(),
+                "attributes": self.get_abstraction_attributes(),
+                "relations": self.get_abstraction_relations()
+            }
+
+            # Cache abstraction in DB, only for logged users
+            if "user" in self.session:
+                self.cache_asbtraction(abstraction, insert)
+
+        return abstraction
+
+    def get_cached_asbtraction(self):
+        """Get cached abstraction from database
+
+        Returns
+        -------
+        (bool, dict):
+            bool: True if no row exist, else False if row exist
+            dict: {} if no abstraction, else, return abstraction
+
+        """
+        if "user" not in self.session:
+            return True, {}
+
+        database = Database(self.app, self.session)
+
+        query = """
+        SELECT abstraction
+        FROM abstraction
+        WHERE user_id=?
+        """
+        results = database.execute_sql_query(query, (self.session["user"]["id"], ))
+
+        if results:
+            if results[0][0]:
+                return False, json.loads(results[0][0])
+            else:
+                return False, {}
+        return True, {}
+
+    def cache_asbtraction(self, abstraction, insert):
+        """Summary
+
+        Parameters
+        ----------
+        abstraction : TYPE
+            Description
+        insert : bool, optional
+            Description
+        """
+        database = Database(self.app, self.session)
+
+        if insert:
+            query = """
+            INSERT INTO abstraction VALUES (
+                NULL,
+                ?,
+                ?
+            )
+            """
+            database.execute_sql_query(query, (self.session["user"]["id"], json.dumps(abstraction)))
+        else:
+            query = """
+            UPDATE abstraction SET
+            abstraction=?
+            WHERE user_id=?
+            """
+            database.execute_sql_query(query, (json.dumps(abstraction), self.session["user"]["id"]))
+
+    def uncache_abstraction(self, public=True):
+        """Remove cached abstraction from database
+
+        Parameters
+        ----------
+        public : bool, optional
+            Remove for all users if True, else, for logged user only
+        """
+        if "user" in self.session:
+            database = Database(self.app, self.session)
+
+            sub_query = "WHERE user_id=?" if not public else ""
+            sql_var = (self.session["user"]["id"], ) if not public else ()
+
+            query = """
+            UPDATE abstraction SET
+            abstraction=NULL
+            {}
+            """.format(sub_query)
+
+            database.execute_sql_query(query, sql_var)
 
     def get_abstraction_entities(self):
         """Get abstraction entities
@@ -128,25 +250,25 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label
         WHERE {{
-            ?graph :public ?public .
+            ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 ?graph prov:atLocation ?endpoint .
                 ?entity_uri a ?entity_type .
-                VALUES ?entity_type {{ :entity :bnode }} .
+                VALUES ?entity_type {{ askomics:entity askomics:bnode }} .
                 # Faldo
                 OPTIONAL {{
                     ?entity_uri a ?entity_faldo .
-                    VALUES ?entity_faldo {{ :faldo }} .
+                    VALUES ?entity_faldo {{ askomics:faldo }} .
                 }}
                 # Label
                 OPTIONAL {{ ?entity_uri rdfs:label ?entity_label . }}
-                OPTIONAL {{ ?entity_uri :instancesHaveNoLabels ?have_no_label . }}
+                OPTIONAL {{ ?entity_uri askomics:instancesHaveNoLabels ?have_no_label . }}
             }}
             FILTER (
                 ?public = <true>{}
@@ -165,7 +287,7 @@ class TriplestoreExplorer(Params):
                 entities_list.append(result["entity_uri"])
                 # Uri, graph and label
                 label = "" if "entity_label" not in result else result["entity_label"]
-                entity_type = "bnode" if result["entity_type"] == "{}bnode".format(self.settings.get("triplestore", "prefix")) else "node"
+                entity_type = "bnode" if result["entity_type"] == "{}bnode".format(self.settings.get("triplestore", "namespace_internal")) else "node"
                 entity = {
                     "uri": result["entity_uri"],
                     "type": entity_type,
@@ -200,20 +322,24 @@ class TriplestoreExplorer(Params):
         if self.logged_user():
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
-        litterals = ("http://www.w3.org/2001/XMLSchema#string", "http://www.w3.org/2001/XMLSchema#decimal")
+        litterals = (
+            "http://www.w3.org/2001/XMLSchema#string",
+            "http://www.w3.org/2001/XMLSchema#decimal",
+            "http://www.w3.org/2001/XMLSchema#boolean"
+        )
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?attribute_uri ?attribute_type ?attribute_faldo ?attribute_label ?attribute_range ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
-            ?graph :public ?public .
+            ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 ?attribute_uri a ?attribute_type .
-                VALUES ?attribute_type {{ owl:DatatypeProperty :AskomicsCategory }}
+                VALUES ?attribute_type {{ owl:DatatypeProperty askomics:AskomicsCategory }}
                 ?attribute_uri rdfs:label ?attribute_label .
                 ?attribute_uri rdfs:domain ?entity_uri .
                 ?attribute_uri rdfs:range ?attribute_range .
@@ -241,7 +367,7 @@ class TriplestoreExplorer(Params):
 
         for result in data:
             # Attributes
-            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")) and result["attribute_range"] in litterals:
+            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
                 attr_tpl = (result["attribute_uri"], result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
@@ -264,7 +390,7 @@ class TriplestoreExplorer(Params):
                 index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
-            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "prefix")):
+            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")):
                 attr_tpl = (result["attribute_uri"], result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
@@ -309,18 +435,18 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQueryBuilder(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
-            ?graph :public ?public .
+            ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 # Property (relations and categories)
                 ?property_uri a owl:ObjectProperty .
-                ?property_uri a :AskomicsRelation .
+                ?property_uri a askomics:AskomicsRelation .
                 ?property_uri rdfs:label ?property_label .
                 ?property_uri rdfs:domain ?entity_uri .
                 ?property_uri rdfs:range ?range_uri .

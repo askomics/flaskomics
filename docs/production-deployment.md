@@ -47,7 +47,7 @@ ls -1
 Two directories are used for production deployment
 
 - `standalone`: deploy AskOmics with all its dependencies for a standalone usage
-- `federated`: deploy AskOmics with all its dependencies for a federated usage (Ask external endpoint such as [NeXtProt](https://sparql.nextprot.org))
+- `federated`: deploy AskOmics with all its dependencies and a federated query engine for a federated usage (Cross external endpoint such as [NeXtProt](https://sparql.nextprot.org) with local data)
 
 Choose one of this directory depending of your needs
 
@@ -56,13 +56,9 @@ cd federated
 ```
 ## Configure
 
-First, edit the `docker-compose.yml` file. You can change the following entries:
+First, edit the `docker-compose.yml` file. You can change the main port:
 
-- `services` > `askomics` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/flaskomics:3.2.7`
-- `services` > `celery_askomics` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/celery-flaskomics:3.2.7` 
-- `services` > `isqlapi` > `image`: Use the [latest](https://github.com/xgaia/isql-api/releases/latest) image tag. Example: `xgaia/isql-api:2.2.1` 
-- `services` > `virtuoso` > `image`: Use the [latest](https://github.com/askomics/flaskomics/releases/latest) image tag. Example: `askomics/virtuoso:7.2.5.1` 
-- `services` > `nginx` > `ports`: You can change the default port if `80` is already used on your machine. Example: `"8080:80"`
+- `services` > `nginx` > `ports`: You can change the default port if `80` is already used on your machine. Example: `"8080:80"` to use `8080` instead of `80`.
 
 ### Virtuoso
 
@@ -71,7 +67,7 @@ Then, configure virtuoso by editing `virtuoso.env`
 Edit `VIRT_Parameters_NumberOfBuffers` and `VIRT_Parameters_MaxDirtyBuffers` following rules described [here](https://github.com/askomics/flaskomics-docker-compose#configure-virtuoso).
 
 !!! warning
-    Change the `DBA_PASSWORD` if you plan to expose the virtuoso endpoint.
+    Change the `DBA_PASSWORD` if you plan to expose the virtuoso endpoint. The password endpoint have to be the same in `askomics.env` > `ASKO_triplestore_password`
 
 ### Nginx (web proxy)
 

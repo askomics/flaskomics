@@ -25,16 +25,16 @@ export default class Sparql extends Component {
     super(props)
     this.utils = new Utils()
     this.state = {
-      config: this.props.location.state.config,
+      config: this.props.config,
       results_data: [],
       results_header: [],
       error: false,
       errorMessage: null,
-      sparqlInput: this.props.location.state.sparqlQuery,
-      graphs: this.props.location.state.graphs,
-      endpoints: this.props.location.state.endpoints,
-      exceededQuota: this.props.location.state.config.user.quota > 0 && this.props.location.state.diskSpace >= this.props.location.state.config.user.quota,
-      diskSpace: this.props.location.state.diskSpace,
+      sparqlInput: "",
+      graphs: {},
+      endpoints: {},
+      exceededQuota: false,
+      diskSpace: 0,
       // save query icons
       disableSave: false,
       saveIcon: "play",
@@ -44,14 +44,63 @@ export default class Sparql extends Component {
       previewIcon: "table",
 
       editorHeight: 500,
-      editorWidth: "auto"
+      editorWidth: "auto",
+
+      waiting: true
     }
+    this.cancelRequest
     this.handleCodeChange = this.handleCodeChange.bind(this)
     this.previewQuery = this.previewQuery.bind(this)
     this.launchQuery = this.launchQuery.bind(this)
     this.onResize = this.onResize.bind(this)
     this.handleChangeGraphs = this.handleChangeGraphs.bind(this)
     this.handleChangeEndpoints = this.handleChangeEndpoints.bind(this)
+  }
+
+  componentDidMount () {
+    if (this.props.location.state) {
+      this.setState({
+        sparqlInput: this.props.location.state.sparqlQuery,
+        graphs: this.props.location.state.graphs,
+        endpoints: this.props.location.state.endpoints,
+        diskSpace: this.props.location.state.diskSpace,
+        config: this.props.location.state.config,
+        waiting: false,
+      })
+    } else {
+      let requestUrl = '/api/sparql/init'
+      axios.get(requestUrl, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+        .then(response => {
+          console.log(requestUrl, response.data)
+          this.setState({
+            sparqlInput: response.data.defaultQuery,
+            graphs: response.data.graphs,
+            endpoints: response.data.endpoints,
+            diskSpace: response.data.diskSpace,
+            waiting: false,
+            error: response.data.error,
+            errorMessage: response.data.errorMessage,
+            config: this.props.config,
+            status: response.status
+          })
+        })
+        .catch(error => {
+          console.log(error, error.response.data.errorMessage)
+          this.setState({
+            error: true,
+            errorMessage: error.response.data.errorMessage,
+            status: error.response.status
+          })
+        })
+    }
+  }
+
+  componentWillUnmount () {
+    if (!this.props.waitForStart) {
+      if (this.utils.isFunction(this.cancelRequest)) {
+        this.cancelRequest()
+      }
+    }
   }
 
   handleCodeChange (code) {
@@ -193,6 +242,11 @@ export default class Sparql extends Component {
   }
 
   render () {
+    let redirectLogin
+    if (this.state.status == 401) {
+      redirectLogin = <Redirect to="/login" />
+    }
+
     let resultsTable
     if (this.state.results_header.length > 0) {
       resultsTable = (
@@ -222,6 +276,7 @@ export default class Sparql extends Component {
 
     return (
       <div className="container">
+        {redirectLogin}
         <h2>SPARQL query</h2>
         <hr />
         <br />
@@ -271,4 +326,6 @@ export default class Sparql extends Component {
 
 Sparql.propTypes = {
   location: PropTypes.object,
+  config: PropTypes.object,
+  waitForStart: PropTypes.bool,
 }

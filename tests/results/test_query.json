@@ -1,129 +1,129 @@
 {
     "data": [
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT001"
+            "s": "http://askomics.org/test/data/AT001"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT002"
+            "s": "http://askomics.org/test/data/AT002"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT003"
+            "s": "http://askomics.org/test/data/AT003"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT004"
+            "s": "http://askomics.org/test/data/AT004"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT005"
+            "s": "http://askomics.org/test/data/AT005"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN001"
+            "s": "http://askomics.org/test/data/BN001"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN002"
+            "s": "http://askomics.org/test/data/BN002"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+            "o": "http://askomics.org/test/data/Gene",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN003"
+            "s": "http://askomics.org/test/data/BN003"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#Class",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+            "s": "http://askomics.org/test/data/Gene"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#entity",
+            "o": "http://askomics.org/test/data/entity",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+            "s": "http://askomics.org/test/data/Gene"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#startPoint",
+            "o": "http://askomics.org/test/data/startPoint",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+            "s": "http://askomics.org/test/data/Gene"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome"
+            "s": "http://askomics.org/test/data/chromosome"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "o": "http://askomics.org/test/data/AskomicsCategory",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome"
+            "s": "http://askomics.org/test/data/chromosome"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#end"
+            "s": "http://askomics.org/test/data/end"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#organism"
+            "s": "http://askomics.org/test/data/organism"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "o": "http://askomics.org/test/data/AskomicsCategory",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#organism"
+            "s": "http://askomics.org/test/data/organism"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#DatatypeProperty",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#start"
+            "s": "http://askomics.org/test/data/start"
         },
         {
             "o": "http://www.w3.org/2002/07/owl#ObjectProperty",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+            "s": "http://askomics.org/test/data/strand"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#AskomicsCategory",
+            "o": "http://askomics.org/test/data/AskomicsCategory",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#strand"
+            "s": "http://askomics.org/test/data/strand"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "o": "http://askomics.org/test/data/chromosomeCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT1"
+            "s": "http://askomics.org/test/data/AT1"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "o": "http://askomics.org/test/data/chromosomeCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT2"
+            "s": "http://askomics.org/test/data/AT2"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "o": "http://askomics.org/test/data/chromosomeCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#AT3"
+            "s": "http://askomics.org/test/data/AT3"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#organismCategoryValue",
+            "o": "http://askomics.org/test/data/organismCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis%20thaliana"
+            "s": "http://askomics.org/test/data/Arabidopsis%20thaliana"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "o": "http://askomics.org/test/data/chromosomeCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN1"
+            "s": "http://askomics.org/test/data/BN1"
         },
         {
-            "o": "http://www.semanticweb.org/user/ontologies/2018/1#chromosomeCategoryValue",
+            "o": "http://askomics.org/test/data/chromosomeCategoryValue",
             "p": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "s": "http://www.semanticweb.org/user/ontologies/2018/1#BN2"
+            "s": "http://askomics.org/test/data/BN2"
         }
     ],
     "header": [

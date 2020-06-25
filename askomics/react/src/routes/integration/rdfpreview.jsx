@@ -8,9 +8,11 @@ import AdvancedOptions from './advancedoptions'
 import ErrorDiv from '../error/error'
 
 import "ace-builds/src-noconflict/mode-turtle";
+// import "ace-builds/src-noconflict/mode-nt";
+import "ace-builds/src-noconflict/mode-xml";
 import "ace-builds/src-noconflict/theme-tomorrow";
 
-export default class TtlPreview extends Component {
+export default class RdfPreview extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -21,7 +23,7 @@ export default class TtlPreview extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: "",
+      externalEndpoint: props.file.data.location ? props.file.data.location : "",
       error: false,
       errorMessage: null,
       status: null
@@ -45,7 +47,7 @@ export default class TtlPreview extends Component {
     let data = {
       fileId: this.state.id,
       public: event.target.value == 'public',
-      type: 'turtle',
+      type: this.props.file.type,
       customUri: this.state.customUri,
       externalEndpoint: this.state.externalEndpoint
     }
@@ -83,6 +85,18 @@ export default class TtlPreview extends Component {
     })
   }
 
+  guess_mode(type) {
+    if (type == "rdf/ttl") {
+      return "turtle"
+    }
+    if (type == "rdf/xml") {
+      return "xml"
+    }
+    if (type == "rdf/nt") {
+      return "text"
+    }
+  }
+
   render () {
 
     let privateIcon = <i className="fas fa-lock"></i>
@@ -106,7 +120,7 @@ export default class TtlPreview extends Component {
         <div className="center-div">
             <div>
               <AceEditor
-                mode="turtle"
+                mode={this.guess_mode(this.props.file.type)}
                 theme="tomorrow"
                 name="ttl_preview"
                 fontSize={14}
@@ -123,9 +137,9 @@ export default class TtlPreview extends Component {
         <AdvancedOptions
           hideCustomUri={true}
           config={this.props.config}
-          handleChangeUri={p => this.handleChangeUri(p)}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
-          customUri={this.state.customUri}
+          externalEndpoint={this.state.externalEndpoint}
+          handleChangeUri={p => this.handleChangeUri(p)}
         />
         <br />
         <div className="center-div">
@@ -142,7 +156,7 @@ export default class TtlPreview extends Component {
   }
 }
 
-TtlPreview.propTypes = {
+RdfPreview.propTypes = {
   file: PropTypes.object,
   config: PropTypes.object
 }

@@ -7,9 +7,8 @@ First, [install askomics in dev mode](/dev-deployment/#install-askomics).
 Then, run
 
 ```bash
-# source the askomics virtual env
-source venv/bin/activate
-mkdocs serve
+make serve-doc
 ```
+Doc will be available at [localhost:8000](localhost:8000)
 
-Site will be available at [localhost:8000](localhost:8000)
+To change port, use `make serve-doc DOCPORT=8001`

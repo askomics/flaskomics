@@ -1,8 +1,9 @@
 import traceback
 import sys
+from askomics.api.auth import login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Result import Result
-from askomics.libaskomics.SparqlQueryBuilder import SparqlQueryBuilder
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, request, session)
@@ -11,35 +12,50 @@ from flask import (Blueprint, current_app, jsonify, request, session)
 sparql_bp = Blueprint('sparql', __name__, url_prefix='/')
 
 
-@sparql_bp.route('/api/sparql/getquery', methods=['GET'])
-def prefix():
+@sparql_bp.route("/api/sparql/init", methods=["GET"])
+@login_required
+def init():
     """Get the default sparql query
 
     Returns
     -------
     json
-        default query
     """
     try:
-        query_builder = SparqlQueryBuilder(current_app, session)
-        query = query_builder.get_default_query_with_prefix()
+        # Disk space
+        files_utils = FilesUtils(current_app, session)
+        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
+
+        # Get graphs and endpoints
+        query = SparqlQuery(current_app, session)
+        graphs, endpoints = query.get_graphs_and_endpoints(all_selected=True)
+
+        # Default query
+        default_query = query.prefix_query(query.get_default_query())
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            'error': True,
-            'errorMessage': str(e),
-            'query': ''
+            "error": True,
+            "errorMessage": str(e),
+            "defaultQuery": "",
+            "graphs": {},
+            "endpoints": {},
+            "diskSpace": None
         }), 500
 
     return jsonify({
-        'error': False,
-        'errorMessage': '',
-        'query': query
+        "error": False,
+        "errorMessage": "",
+        "defaultQuery": default_query,
+        "graphs": graphs,
+        "endpoints": endpoints,
+        "diskSpace": disk_space
     })
 
 
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
+@login_required
 def query():
     """Perform a sparql query
 
@@ -77,20 +93,20 @@ def query():
         }), 500
 
     try:
-        query_builder = SparqlQueryBuilder(current_app, session)
+        query = SparqlQuery(current_app, session)
 
-        query_builder.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
+        query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
-        federated = query_builder.is_federated()
-        replace_froms = query_builder.replace_froms()
+        federated = query.is_federated()
+        replace_froms = query.replace_froms()
 
-        query = query_builder.format_query(q, replace_froms=replace_froms, federated=federated)
+        sparql = query.format_query(q, replace_froms=replace_froms, federated=federated)
         # header, data = query_launcher.process_query(query)
-        header = query_builder.selects
+        header = query.selects
         data = []
-        if query_builder.graphs or query_builder.endpoints:
+        if query.graphs or query.endpoints:
             query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            header, data = query_launcher.process_query(query)
+            header, data = query_launcher.process_query(sparql)
 
     except Exception as e:
         current_app.logger.error(str(e).replace('\\n', '\n'))
@@ -109,6 +125,7 @@ def query():
 
 
 @sparql_bp.route('/api/sparql/savequery', methods=["POST"])
+@login_required
 def save_query():
     """Perform a sparql query
 
@@ -117,7 +134,7 @@ def save_query():
     json
         query results
     """
-    query = request.get_json()['query']
+    q = request.get_json()['query']
     graphs = request.get_json()['graphs']
     endpoints = request.get_json()['endpoints']
 
@@ -155,16 +172,16 @@ def save_query():
             }), 500
 
         # Is query federated?
-        query_builder = SparqlQueryBuilder(current_app, session)
-        query_builder.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
+        query = SparqlQuery(current_app, session)
+        query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
-        federated = query_builder.is_federated()
-        replace_froms = query_builder.replace_froms()
+        federated = query.is_federated()
+        replace_froms = query.replace_froms()
 
-        formatted_query = query_builder.format_query(query, limit=None, replace_froms=replace_froms, federated=federated)
+        formatted_query = query.format_query(q, limit=None, replace_froms=replace_froms, federated=federated)
 
         info = {
-            "sparql_query": query,  # Store the non formatted query in db
+            "sparql_query": q,  # Store the non formatted query in db
             "graphs": graphs,
             "endpoints": endpoints,
             "federated": federated,

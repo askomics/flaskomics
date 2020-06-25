@@ -1,4 +1,4 @@
-In development mode, AskOmics dependencies can be deployed with docker-compose, but AsKomics have to be running locally, on your dev machine.
+In development mode, AskOmics dependencies can be deployed with docker-compose, but AskOmics have to be running locally, on your dev machine.
 
 # Prerequisites
 
@@ -59,18 +59,18 @@ then, clone your fork locally
 git clone https://github.com/USERNAME/flaskomics.git # replace USERNAME with your github username
 ```
 
-# Install AskOmics
+# Deploy AskOmics in development mode
 
-Use the `install.sh` script to setup the python virtual environment and to download python and node modules needed. Use the `-d dev` to get the dev dependencies.
+AskOmics installation and deployment is made with `make`. Use `make help` to see available commands.
+
+## Install
 
 ```bash
-./install.sh -d dev
+make install MODE=dev
 ```
 
-# Run
-
-Run in dev mode
+## Run
 
 ```bash
-./run_all.sh -d dev
+make serve MODE=dev NTASKS=10
 ```

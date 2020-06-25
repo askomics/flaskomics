@@ -5,7 +5,7 @@
         "attr": [
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterType": "exact",
                 "filterValue": "",
                 "id": 2,
@@ -21,7 +21,7 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterType": "exact",
                 "filterValue": "",
                 "id": 3,
@@ -37,14 +37,14 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterSign": "=",
                 "filterValue": "",
                 "id": 4,
                 "label": "end",
                 "nodeId": 1,
                 "type": "decimal",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#end",
+                "uri": "http://askomics.org/test/data/end",
                 "visible": false,
                 "optional": false,
                 "negative": false,
@@ -53,23 +53,23 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterSelectedValues": [],
                 "filterValues": [
                     {
                         "label": "+",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#%2B"
+                        "uri": "http://askomics.org/test/data/%2B"
                     },
                     {
                         "label": "-",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#-"
+                        "uri": "http://askomics.org/test/data/-"
                     }
                 ],
                 "id": 5,
                 "label": "strand",
                 "nodeId": 1,
                 "type": "category",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#strand",
+                "uri": "http://askomics.org/test/data/strand",
                 "visible": false,
                 "optional": false,
                 "negative": false,
@@ -78,14 +78,14 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterSign": "=",
                 "filterValue": "",
                 "id": 6,
                 "label": "start",
                 "nodeId": 1,
                 "type": "decimal",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#start",
+                "uri": "http://askomics.org/test/data/start",
                 "visible": false,
                 "optional": false,
                 "negative": false,
@@ -94,35 +94,35 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterSelectedValues": [],
                 "filterValues": [
                     {
                         "label": "AT1",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT1"
+                        "uri": "http://askomics.org/test/data/AT1"
                     },
                     {
                         "label": "AT2",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT2"
+                        "uri": "http://askomics.org/test/data/AT2"
                     },
                     {
                         "label": "AT3",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#AT3"
+                        "uri": "http://askomics.org/test/data/AT3"
                     },
                     {
                         "label": "BN1",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#BN1"
+                        "uri": "http://askomics.org/test/data/BN1"
                     },
                     {
                         "label": "BN2",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#BN2"
+                        "uri": "http://askomics.org/test/data/BN2"
                     }
                 ],
                 "id": 7,
                 "label": "chromosome",
                 "nodeId": 1,
                 "type": "category",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#chromosome",
+                "uri": "http://askomics.org/test/data/chromosome",
                 "visible": false,
                 "optional": false,
                 "negative": false,
@@ -131,23 +131,23 @@
             },
             {
                 "entityLabel": "Gene",
-                "entityUri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene",
+                "entityUri": "http://askomics.org/test/data/Gene",
                 "filterSelectedValues": [],
                 "filterValues": [
                     {
                         "label": "Arabidopsis thaliana",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Arabidopsis%20thaliana"
+                        "uri": "http://askomics.org/test/data/Arabidopsis%20thaliana"
                     },
                     {
                         "label": "Brassica napus",
-                        "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Brassica%20napus"
+                        "uri": "http://askomics.org/test/data/Brassica%20napus"
                     }
                 ],
                 "id": 8,
                 "label": "organism",
                 "nodeId": 1,
                 "type": "category",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#organism",
+                "uri": "http://askomics.org/test/data/organism",
                 "visible": false,
                 "optional": false,
                 "negative": false,
@@ -167,7 +167,7 @@
                 "suggested": false,
                 "filterNode": "",
                 "filterLink": "",
-                "uri": "http://www.semanticweb.org/user/ontologies/2018/1#Gene"
+                "uri": "http://askomics.org/test/data/Gene"
             }
         ]
     },

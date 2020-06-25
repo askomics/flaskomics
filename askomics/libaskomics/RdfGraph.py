@@ -9,9 +9,9 @@ class RdfGraph(Params):
 
     Attributes
     ----------
-    askomics_namespace : Namespace
+    namespace_internal : Namespace
         AskOmics napespace
-    askomics_prefix : Namespace
+    namespace_data : Namespace
         AskOmics prefix
     graph : Graph
         rdflib graph
@@ -31,17 +31,21 @@ class RdfGraph(Params):
         """
         Params.__init__(self, app, session)
 
-        self.askomics_namespace = Namespace(self.settings.get('triplestore', 'namespace'))
-        self.askomics_prefix = Namespace(self.settings.get('triplestore', 'prefix'))
+        self.namespace_data = Namespace(self.settings.get('triplestore', 'namespace_data'))
+        self.namespace_internal = Namespace(self.settings.get('triplestore', 'namespace_internal'))
 
         self.graph = rdflib.Graph()
-        self.graph.bind('', self.askomics_prefix)
-        self.graph.bind('askomics', self.askomics_namespace)
+        self.graph.bind('', self.namespace_data)
+        self.graph.bind('askomics', self.namespace_internal)
         self.graph.bind('faldo', "http://biohackathon.org/resource/faldo/")
         self.graph.bind('dc', 'http://purl.org/dc/elements/1.1/')
         self.graph.bind('prov', 'http://www.w3.org/ns/prov#')
         self.ntriple = 0
         self.percent = None
+
+    def parse(self, source=None, publicID=None, format=None, location=None, file=None, data=None, **args):
+        """Parse a RDF file"""
+        self.graph.parse(source=source, publicID=publicID, format=format, location=location, file=file, data=data, **args)
 
     def add(self, triple):
         """Add a triple into the rdf graph
@@ -53,6 +57,17 @@ class RdfGraph(Params):
         """
         self.graph.add(triple)
         self.ntriple += 1
+
+    def remove(self, triple):
+        """Remove a triple into the rdf graph
+
+        Parameters
+        ----------
+        triple : tuple
+            triple to remove
+        """
+        self.graph.remove(triple)
+        self.ntriple -= 1
 
     def bind(self, a, b):
         """Bind a namespace
@@ -71,18 +86,6 @@ class RdfGraph(Params):
         for s, p, o in self.graph:
             yield s, p, o
 
-    def merge(self, other_graph):
-        """Merge a graph into this graph
-
-        Parameters
-        ----------
-        other_graph : RdfGraph
-            The graph to merge
-        """
-        self.graph += other_graph.graph
-        self.ntriple += other_graph.ntriple
-        # self.percent = self.maxi(self.percent, other_graph.percent)
-
     def serialize(self, destination=None, format='xml', base=None, encoding=None, **args):
         """Serialize the graph into a file
 
@@ -99,28 +102,3 @@ class RdfGraph(Params):
 
         if destination is None:
             return result
-
-    @staticmethod
-    def maxi(a, b):
-        """Get the max between two valuesthat can be int or None
-
-        Parameters
-        ----------
-        a : Int or None
-            first value
-        b : Int or None
-            2nd value
-
-        Returns
-        -------
-        Int or None
-            Max of the two values
-        """
-        try:
-            return max(a, b)
-        except Exception:
-            if a is None:
-                return b
-            if b is None:
-                return a
-            return None

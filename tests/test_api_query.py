@@ -12,6 +12,33 @@ class TestApiStartpoints(AskomicsTestCase):
         client.log_user("jdoe")
         info = client.upload_and_integrate()
 
+        # non logged user
+        client.logout()
+        response = client.client.get('/api/query/startpoints')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'publicQueries': [],
+            'startpoints': []
+        }
+
+        # Non logged user and protected askomics
+        client.set_config("askomics", "protect_public", "true")
+        response = client.client.get('/api/query/startpoints')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'publicQueries': [],
+            'startpoints': []
+        }
+
+        # Logged user
+        client.log_user("jdoe")
+
         response = client.client.get('/api/query/startpoints')
 
         with open("tests/results/startpoints.json") as file:
@@ -31,6 +58,39 @@ class TestApiStartpoints(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jdoe")
         info = client.upload_and_integrate()
+
+        # non logged user
+        client.logout()
+
+        response = client.client.get('/api/query/abstraction')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'abstraction': {
+                "attributes": [],
+                "entities": [],
+                "relations": []
+            },
+            'diskSpace': None
+        }
+
+        # Non logged user and protected askomics
+        client.set_config("askomics", "protect_public", "true")
+
+        response = client.client.get('/api/query/abstraction')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'abstraction': {},
+            'diskSpace': None
+        }
+
+        # Logged user
+        client.log_user("jdoe")
 
         with open("tests/results/abstraction.json") as file:
             file_content = file.read()
@@ -60,6 +120,35 @@ class TestApiStartpoints(AskomicsTestCase):
         data = {
             "graphState": json_query,
         }
+
+        # non logged user
+        client.logout()
+
+        response = client.client.post('/api/query/preview', json=data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'headerPreview': ['?transcript1_Label'],
+            'resultsPreview': []
+        }
+
+        # Non logged user and protected askomics
+        client.set_config("askomics", "protect_public", "true")
+
+        response = client.client.post('/api/query/preview', json=data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': '',
+            'headerPreview': [],
+            'resultsPreview': []
+        }
+
+        # Logged user
+        client.log_user("jdoe")
 
         response = client.client.post('/api/query/preview', json=data)
         expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT1G57800'}, {'transcript1_Label': 'AT5G35334'}, {'transcript1_Label': 'AT3G10460'}, {'transcript1_Label': 'AT1G49500'}, {'transcript1_Label': 'AT3G10490'}, {'transcript1_Label': 'AT3G51470'}, {'transcript1_Label': 'AT5G41905'}, {'transcript1_Label': 'AT1G33615'}, {'transcript1_Label': 'AT3G22640'}, {'transcript1_Label': 'AT3G13660'}, {'transcript1_Label': 'AT1G01010.1'}]}
@@ -100,7 +189,7 @@ class TestApiStartpoints(AskomicsTestCase):
         # URI
         with open("tests/data/graphState_filtered_query.json") as file:
             file_content = file.read()
-            file_content = file_content.replace("###FILTER_VALUE###", "{}AT3G10490".format(client.get_config("triplestore", "prefix")))
+            file_content = file_content.replace("###FILTER_VALUE###", "{}AT3G10490".format(client.get_config("triplestore", "namespace_data")))
         json_query = json.loads(file_content)
         data = {
             "graphState": json_query,
@@ -151,6 +240,23 @@ class TestApiStartpoints(AskomicsTestCase):
         data = {
             "graphState": json_query,
         }
+
+        client.logout()
+        client.log_user("jdoe", quota=100)
+
+        print(client.session)
+
+        response = client.client.post('/api/query/save_result', json=data)
+        assert response.status_code == 500
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Exceeded quota",
+            "task_id": None
+        }
+
+        # remove quota
+        client.logout()
+        client.log_user("jdoe")
 
         response = client.client.post('/api/query/save_result', json=data)
         assert response.status_code == 200

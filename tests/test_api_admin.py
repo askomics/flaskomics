@@ -110,3 +110,72 @@ class TestApiAdmin(AskomicsTestCase):
         response = client.client.post('/api/admin/setblocked', json=set_jsmith_admin)
         assert response.status_code == 200
         assert response.json == {'error': False, 'errorMessage': ''}
+
+    def test_add_user(self, client):
+        """test /api/admin/adduser route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        data = {
+            "fname": "John",
+            "lname": "Wick",
+            "username": "jwick",
+            "email": "jwick@askomics.org"
+        }
+
+        response = client.client.post("/api/admin/adduser", json=data)
+        password = response.json["user"]["password"]
+        apikey = response.json["user"]["apikey"]
+
+        assert response.status_code == 200
+        assert response.json == {
+            'displayPassword': True,
+            'error': False,
+            'errorMessage': [],
+            'instanceUrl': 'http://localhost:5000',
+            'user': {
+                'admin': False,
+                'apikey': apikey,
+                'blocked': False,
+                'email': 'jwick@askomics.org',
+                'fname': 'John',
+                'galaxy': None,
+                'id': 3,
+                'ldap': False,
+                'lname': 'Wick',
+                'password': password,
+                'quota': 0,
+                'username': 'jwick'
+            }
+        }
+
+    def test_delete_user(self, client):
+        """test /api/admin/delete_users route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+
+        data = {
+            "usersToDelete": ["jsmith", "jdoe"]  # jdoe will be removed from the list and no deleted from DB
+        }
+
+        response = client.client.post("/api/admin/delete_users", json=data)
+
+        assert response.status_code == 200
+        assert response.json == {
+            'error': False,
+            'errorMessage': [],
+            'users': [{
+                'admin': 1,
+                'blocked': 0,
+                'email': 'jdoe@askomics.org',
+                'fname': 'John',
+                'galaxy': {
+                    'apikey': 'admin',
+                    'url': 'http://localhost:8081'
+                },
+                'ldap': 0,
+                'lname': 'Doe',
+                'quota': 0,
+                'username': 'jdoe'
+            }]
+        }

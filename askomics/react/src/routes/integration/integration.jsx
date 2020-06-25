@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import CsvTable from './csvtable'
-import TtlPreview from './ttlpreview'
+import RdfPreview from './rdfpreview'
 import GffPreview from './gffpreview'
 import BedPreview from './bedpreview'
 import PropTypes from 'prop-types'
@@ -76,13 +76,13 @@ export default class Integration extends Component {
             if (file.type == 'csv/tsv') {
               return <CsvTable config={this.state.config} key={file.name} file={file} />
             }
-            if (file.type == 'turtle') {
-              return <TtlPreview config={this.state.config} file={file} />
+            if (["rdf/ttl", "rdf/xml", "rdf/nt"].includes(file.type)) {
+              return <RdfPreview config={this.state.config} file={file} />
             }
             if (file.type == 'gff/gff3') {
               return <GffPreview config={this.state.config} file={file} />
             }
-            if (file.type = 'bed') {
+            if (file.type == 'bed') {
               return <BedPreview config={this.state.config} file={file} />
             }
           })

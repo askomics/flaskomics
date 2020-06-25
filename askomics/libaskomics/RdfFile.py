@@ -1,8 +1,7 @@
-import os
-from shutil import copyfile
-
 from askomics.libaskomics.File import File
+from askomics.libaskomics.RdfGraph import RdfGraph
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
+from askomics.libaskomics.TriplestoreExplorer import TriplestoreExplorer
 from askomics.libaskomics.Utils import Utils
 
 
@@ -31,9 +30,30 @@ class RdfFile(File):
         """
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
+        self.type_dict = {
+            "rdf/ttl": "turtle",
+            "rdf/xml": "xml",
+            "rdf/nt": "nt"
+        }
+
     def set_preview(self):
         """Summary"""
         pass
+
+    def get_location(self):
+        """Get location of data if specified
+
+        Returns
+        -------
+        str
+            Location
+        """
+        graph = RdfGraph(self.app, self.session)
+        graph.parse(self.path, format=self.type_dict[self.type])
+        triple = (None, self.prov.atLocation, None)
+        for s, p, o in graph.graph.triples(triple):
+            return str(o)
+        return None
 
     def get_preview(self):
         """Get a preview of the frist 100 lines of a ttl file
@@ -56,9 +76,14 @@ class RdfFile(File):
             'error': self.error,
             'error_message': self.error_message,
             'data': {
-                'preview': head
+                'preview': head,
+                'location': self.get_location()
             }
         }
+
+    def delete_metadata_location(self):
+        """Delete metadata from data"""
+        self.graph_chunk.remove((None, self.prov.atLocation, None))
 
     def integrate(self, public=False):
         """Integrate the file into the triplestore
@@ -69,32 +94,41 @@ class RdfFile(File):
             Integrate in private or public graph
         """
         sparql = SparqlQueryLauncher(self.app, self.session)
+        tse = TriplestoreExplorer(self.app, self.session)
 
         self.public = public
 
         method = self.settings.get('triplestore', 'upload_method')
 
+        # Load file into a RDF graph
+        self.graph_chunk.parse(self.path, format=self.type_dict[self.type])
+
+        # get metadata
+        self.set_metadata()
+
+        # Remove metadata from data
+        self.delete_metadata_location()
+
         # insert metadata
-        sparql.insert_data(self.get_metadata(), self.file_graph, metadata=True)
+        sparql.insert_data(self.graph_metadata, self.file_graph, metadata=True)
 
         if method == "load":
-            # cp file into ttl dir
-            tmp_file_name = 'tmp_{}_{}.ttl'.format(
+            # write rdf into a tmpfile and load it
+            temp_file_name = 'tmp_{}_{}.{}'.format(
                 Utils.get_random_string(5),
                 self.name,
+                self.rdf_extention
             )
-            temp_file_path = '{}/{}'.format(self.ttl_dir, tmp_file_name)
-            copyfile(self.path, temp_file_path)
-            # Load the chunk
-            sparql.load_data(tmp_file_name, self.file_graph, self.host_url)
 
-            # Remove tmp file
-            if not self.settings.getboolean('askomics', 'debug_ttl'):
-                os.remove(temp_file_path)
+            # Try to load data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, self.load_graph, self.graph_chunk, temp_file_name)
+
         else:
+            # Insert
+            # Try to insert data. if failure, wait 5 sec and retry 5 time
+            Utils.redo_if_failure(self.log, 5, 5, sparql.insert_data, self.graph_chunk, self.file_graph)
 
-            with open(self.path) as ttl_file:
-                ttl_content = ttl_file.read()
-                sparql.insert_ttl_string(ttl_content, self.user_graph)
+        # Remove chached abstraction
+        tse.uncache_abstraction(public=self.public)
 
         self.set_triples_number()
