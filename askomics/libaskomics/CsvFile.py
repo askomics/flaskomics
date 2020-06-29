@@ -219,8 +219,8 @@ class CsvFile(File):
                     return stype
 
         # Then, check goterm
-        if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
-            return "goterm"
+        # if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
+        #     return "goterm"
 
         # If header contain ID, it is text
         if re.match(r".*ID.*", self.header[header_index]) is not None:
