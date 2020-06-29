@@ -143,6 +143,12 @@ class CsvFile(File):
         # Change start and end into numeric if here is not only one start and one end
         if not (self.columns_type.count("start") == 1 and self.columns_type.count("end") == 1):
             self.columns_type = ["numeric" if ctype in ("start", "end") else ctype for ctype in self.columns_type]
+        # Change ref into text if their is more than one
+        if not self.columns_type.count("reference") == 1:
+            self.columns_type = ["text" if ctype == "reference" else ctype for ctype in self.columns_type]
+        # Change strand into text if their is more than one
+        if not self.columns_type.count("strand") == 1:
+            self.columns_type = ["text" if ctype == "strand" else ctype for ctype in self.columns_type]
 
     def is_category(self, values):
         """Check if a list af values are categories
@@ -215,6 +221,10 @@ class CsvFile(File):
         # Then, check goterm
         if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
             return "goterm"
+
+        # If header contain ID, it is text
+        if re.match(r".*ID.*", self.header[header_index]) is not None:
+            return "text"
 
         # Finaly, check numerical/text
         if all(self.is_decimal(val) for val in values):
