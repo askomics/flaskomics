@@ -24,20 +24,11 @@ export default class About extends Component {
           the user creates a path on an abstraction graph. This path can then be transformed
           into a SPARQL query that can be executed on the original dataset.
         </p>
-        <h4>Running instances</h4>
+
         <p>
-          Several AskOmics instance are publicly available:
-          <br /><br />
-          <div>
-            <a target="_newtab" rel="noopener noreferrer" href="https://bipaa.genouest.org/askomics/bnapus_gene/">BIPAA</a>, Contain <em>Brassica napus</em> datasets
-          </div>
-          <div>
-            <a target="_newtab" rel="noopener noreferrer" href="https://bbip.genouest.org/askomics/bbric/">BBIP</a>, empty instance, used for training
-          </div>
-          <div>
-            <a target="_newtab" rel="noopener noreferrer" href="https://askomics.genouest.org">Genouest</a>, Sandbox instance with examples datasets
-          </div>
+          Visit <a target="_newtab" rel="noopener noreferrer" href="https://askomics.org">askomics.org</a> to learn how to use and deploy AskOmics.
         </p>
+
         <h4>Usefull links</h4>
         <p>
           <div>
@@ -53,6 +44,11 @@ export default class About extends Component {
         <h4>Need help?</h4>
         <p>
           Use <a target="_newtab" rel="noopener noreferrer" href="https://github.com/askomics/flaskomics/issues">Github issues</a> to report a bug, get help or request for a new feature.
+        </p>
+
+        <h4>Acknowledgement</h4>
+        <p>
+          We acknowledge the <a target="_newtab" rel="noopener noreferrer" href="https://www.genouest.org/">GenOuest bioinformatics core facility</a> for providing the computing infrastructure.
         </p>
       </div>
     )
