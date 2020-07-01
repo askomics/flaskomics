@@ -274,6 +274,14 @@ export default class Sparql extends Component {
       previewIcon = <Spinner size="sm" color="light" />
     }
 
+    // launch buttons
+    let previewButton
+    let launchQueryButton
+    previewButton = <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
+    if (this.state.config.logged) {
+      launchQueryButton = <Button onClick={this.launchQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
+    }
+
     return (
       <div className="container">
         {redirectLogin}
@@ -308,8 +316,8 @@ export default class Sparql extends Component {
         />
         <br />
         <ButtonGroup>
-          <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
-          <Button onClick={this.launchQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
+            {previewButton}
+            {launchQueryButton}
         </ButtonGroup>
         <br />
         <br />
