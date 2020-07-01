@@ -55,7 +55,6 @@ def init():
 
 
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
-@login_required
 def query():
     """Perform a sparql query
 
