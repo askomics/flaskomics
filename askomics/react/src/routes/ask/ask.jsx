@@ -1,14 +1,16 @@
-import React, { Component } from 'react'
+import React, { Component, lazy, Suspense } from 'react'
 import axios from 'axios'
 import { Alert, Badge, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, InputGroupButtonDropdown } from 'reactstrap'
 import { Redirect, Link } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
+import Template from '../../components/template'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import UploadGalaxyForm from '../upload/uploadgalaxyform'
 import Utils from '../../classes/utils'
 
+import htmlTemplate from '../../../../static/welcome.html'
 
 export default class Ask extends Component {
   constructor (props) {
@@ -314,8 +316,8 @@ export default class Ask extends Component {
           <div>
           <Alert color="info">
             This instance is available only for logged user. <Link to="/login">Login</Link>
-            {this.props.config.disableAccountCreation ? <></> : <> or <Link to="/signup">signup</Link></>}
-            <> to use.</>
+            {this.props.config.disableAccountCreation ? <nodiv></nodiv> : <> or <Link to="/signup">signup</Link></>}
+            <nodiv> to use.</nodiv>
           </Alert>
           </div>
         )
@@ -397,19 +399,8 @@ export default class Ask extends Component {
         <hr />
       </div>
     )
-    if (this.props.config.frontMessage) {
-      frontMessage = (
-      <div>
-        <Alert color="secondary">
-          <h4 className="alert-heading">{this.props.config.footerMessage}</h4>
-          <hr />
-          <div className="wrap-line">
-            {this.props.config.frontMessage}
-          </div>
-        </Alert>
-      </div>
-      )
-    }
+
+    frontMessage = <Template template={htmlTemplate}/>
 
     return (
       <div className="container">
