@@ -218,6 +218,12 @@ export default class Query extends Component {
     }).filter(humanId => humanId != null).reduce(humanId => humanId)
   }
 
+  count_displayed_attributes() {
+    return this.graphState.attr.map(attr => {
+      return attr.visible ? 1 : 0
+    }).reduce((a, b) => a + b)
+  }
+
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
@@ -1180,6 +1186,17 @@ export default class Query extends Component {
       previewIcon: "spinner"
     })
 
+    // display an error message if user don't display attribute to avoid the virtuoso SPARQL error
+    if (this.count_displayed_attributes() == 0) {
+      this.setState({
+        error: true,
+        errorMessage: ["No attribute are displayed. Use eye icon to display at least one attribute", ],
+        disablePreview: false,
+        previewIcon: "times text-error"
+      })
+      return
+    }
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -1208,6 +1225,18 @@ export default class Query extends Component {
     let data = {
       graphState: this.graphState
     }
+
+    // display an error message if user don't display attribute to avoid the virtuoso SPARQL error
+    if (this.count_displayed_attributes() == 0) {
+      this.setState({
+        error: true,
+        errorMessage: ["No attribute are displayed. Use eye icon to display at least one attribute", ],
+        disableSave: false,
+        saveIcon: "times text-error"
+      })
+      return
+    }
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
