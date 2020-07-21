@@ -13,10 +13,6 @@ module.exports = (env, argv) => ({
                 use: ['babel-loader']
             },
             {
-                test: /\.html$/,
-                loader: ['html-loader']
-            },
-            {
                 test: /\.css$/,
                 loader: ['style-loader', 'css-loader']
             }
