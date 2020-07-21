@@ -96,11 +96,7 @@ pylint: check-venv
 	@echo "Done"
 
 serve: check-venv build-config create-user
-ifeq ($(MODE), dev)
 	$(MAKE) -j 3 serve-askomics serve-celery build-js
-else
-	$(MAKE) -j 2 serve-askomics serve-celery
-endif
 
 serve-askomics: check-venv build-config create-user
 	@echo 'Serving AskOmics...'

@@ -14,4 +14,4 @@ RUN apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-np
 COPY --from=builder /askomics .
 
 EXPOSE 5000
-CMD make serve-askomics
+CMD make build serve-askomics
