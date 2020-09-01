@@ -341,7 +341,14 @@ class TriplestoreExplorer(Params):
                 ?attribute_uri a ?attribute_type .
                 VALUES ?attribute_type {{ owl:DatatypeProperty askomics:AskomicsCategory }}
                 ?attribute_uri rdfs:label ?attribute_label .
-                ?attribute_uri rdfs:domain ?entity_uri .
+
+                {{
+                    ?attribute_uri rdfs:domain ?mother .
+                    ?entity_uri rdfs:subClassOf ?mother .
+                }} UNION {{
+                    ?attribute_uri rdfs:domain ?entity_uri .
+                }}
+
                 ?attribute_uri rdfs:range ?attribute_range .
                 # Faldo
                 OPTIONAL {{
