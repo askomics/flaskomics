@@ -155,11 +155,20 @@ export default class Query extends Component {
   }
 
   getGraphs (uri) {
-    return this.state.abstraction.entities.flatMap(node => {
-      if (node.uri == uri) {
-        return node.graphs
+    return [...new Set(this.state.abstraction.attributes.flatMap(attr => {
+      if (attr.entityUri == uri) {
+        return attr.graphs
       }
-    })
+    }).filter(graph => graph != null))]
+  }
+
+
+  getEntityUris (uri) {
+    return [...new Set(this.state.abstraction.attributes.flatMap(attr => {
+      if (attr.uri == uri) {
+        return attr.entityUri
+      }
+    }).filter(entityUri => entityUri != null))]
   }
 
   getAttributeType (typeUri) {
@@ -244,7 +253,7 @@ export default class Query extends Component {
         uri: 'rdf:type',
         label: 'Uri',
         entityLabel: this.getLabel(nodeUri),
-        entityUri: nodeUri,
+        entityUris: [nodeUri, ],
         type: 'uri',
         faldo: false,
         filterType: 'exact',
@@ -266,7 +275,7 @@ export default class Query extends Component {
         uri: 'rdfs:label',
         label: 'Label',
         entityLabel: this.getLabel(nodeUri),
-        entityUri: nodeUri,
+        entityUris: [nodeUri, ],
         type: 'text',
         faldo: false,
         filterType: 'exact',
@@ -291,7 +300,7 @@ export default class Query extends Component {
           uri: attr.uri,
           label: attr.label,
           entityLabel: this.getLabel(nodeUri),
-          entityUri: attr.entityUri,
+          entityUris: this.getEntityUris(attr.uri),
           type: attributeType,
           faldo: attr.faldo,
           optional: false,

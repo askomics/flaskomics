@@ -879,11 +879,13 @@ class SparqlQuery(Params):
 
         var_to_replace = []
 
-        # Browse node to get graphs
-        for node in self.json["nodes"]:
-            if not node["suggested"]:
-                entities.append(node["uri"])
+        # Browse attributes to get entities
+        for attr in self.json["attr"]:
+            if attr["visible"]:
+                entities = entities + attr["entityUris"]
+        entities = list(set(entities))  # uniq list
 
+        # Set graphs in function of entities needed
         self.set_graphs_and_endpoints(entities=entities)
 
         # self.log.debug(self.json)
@@ -1026,8 +1028,8 @@ class SparqlQuery(Params):
             if attribute["type"] == "uri":
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
-                obj = "<{}>".format(attribute["entityUri"])
-                if not self.is_bnode(attribute["entityUri"], self.json["nodes"]):
+                obj = "<{}>".format(attribute["entityUris"][0])
+                if not self.is_bnode(attribute["entityUris"][0], self.json["nodes"]):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,

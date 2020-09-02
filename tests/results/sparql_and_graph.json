@@ -13,7 +13,7 @@
     "attr": [
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": false,
         "filterType": "exact",
         "filterValue": "",
@@ -31,7 +31,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": false,
         "filterType": "exact",
         "filterValue": "",
@@ -49,7 +49,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": "http://askomics.org/internal/faldoStrand",
         "filterSelectedValues": [],
         "filterValues": [
@@ -84,7 +84,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": "http://askomics.org/internal/faldoReference",
         "filterSelectedValues": [],
         "filterValues": [
@@ -107,7 +107,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": "http://askomics.org/internal/faldoReference",
         "filterSelectedValues": [],
         "filterValues": [
@@ -138,7 +138,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterSelectedValues": [],
         "filterValues": [
@@ -161,7 +161,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterSelectedValues": [],
         "filterValues": [
@@ -192,7 +192,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterSelectedValues": [],
         "filterValues": [
@@ -227,7 +227,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": "http://askomics.org/internal/faldoStart",
         "filters": [
           {
@@ -249,7 +249,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": "http://askomics.org/internal/faldoEnd",
         "filters": [
           {
@@ -271,7 +271,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
@@ -289,7 +289,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
@@ -307,7 +307,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
@@ -325,7 +325,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
@@ -343,7 +343,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
@@ -361,7 +361,7 @@
       },
       {
         "entityLabel": "transcript",
-        "entityUri": "http://askomics.org/test/data/transcript",
+        "entityUris": ["http://askomics.org/test/data/transcript"],
         "faldo": null,
         "filterType": "exact",
         "filterValue": "",
