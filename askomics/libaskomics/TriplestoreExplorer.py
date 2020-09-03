@@ -454,8 +454,14 @@ class TriplestoreExplorer(Params):
                 ?property_uri a owl:ObjectProperty .
                 ?property_uri a askomics:AskomicsRelation .
                 ?property_uri rdfs:label ?property_label .
-                ?property_uri rdfs:domain ?entity_uri .
                 ?property_uri rdfs:range ?range_uri .
+            }}
+            # Relation of entity (or motherclass of entity)
+            {{
+                ?property_uri rdfs:domain ?mother .
+                ?entity_uri rdfs:subClassOf ?mother .
+            }} UNION {{
+                ?property_uri rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
