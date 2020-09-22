@@ -925,7 +925,7 @@ export default class Query extends Component {
       sameRef: null,
       strict: null,
       id: this.getId(),
-      label: relation == "unionNode" ? "Union" : "Not",
+      label: relation == "unionNode" ? "Union" : "Minus",
       source: node1.id,
       target: node2.id,
       selected: false,
