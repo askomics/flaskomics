@@ -454,6 +454,11 @@ class LocalAuth(Params):
         ----------
         username : str
             Username
+
+        Returns
+        -------
+        int
+            timestamp
         """
         database = Database(self.app, self.session)
 
@@ -466,6 +471,7 @@ class LocalAuth(Params):
         '''
 
         database.execute_sql_query(query, (now, username))
+        return now
 
     @staticmethod
     def get_login_type(login, ldap_login=False):
@@ -874,8 +880,8 @@ class LocalAuth(Params):
 
                 if row[10] is not None and row[11] is not None:
                     user['galaxy'] = {
-                        'url': row[9],
-                        'apikey': row[10]
+                        'url': row[10],
+                        'apikey': row[11]
                     }
 
                 if user["ldap"] == 1:
