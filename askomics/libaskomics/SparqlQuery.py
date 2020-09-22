@@ -511,7 +511,8 @@ class SparqlQuery(Params):
         str
             Corresponding SPARQL
         """
-        if triple_block["type"] == "UNION":
+        # if triple_block["type"] == "UNION":
+        if triple_block["type"] in ("UNION", "MINUS"):
 
             block_string = ""
             length = len(triple_block) - 1
@@ -526,7 +527,7 @@ class SparqlQuery(Params):
                 triples_string += '\n'.join([value for value in sblock["values"]])
                 sblock_string += "\n    {}\n}}".format(triples_string)
 
-                block_string += "UNION" if i == length else ""
+                block_string += triple_block["type"] if i == length else ""
                 i += 1
                 block_string += sblock_string + "\n"
 
@@ -607,10 +608,11 @@ class SparqlQuery(Params):
         """
         types_dict = {
             "unionNode": "UNION",
+            "minusNode": "MINUS"
         }
 
         for node in self.json["nodes"]:
-            if node["type"] in ("unionNode", ):
+            if node["type"] in ("unionNode", "minusNode"):
                 if node["specialNodeId"] == blockid:
                     return types_dict[node["type"]]
         return None
@@ -896,8 +898,8 @@ class SparqlQuery(Params):
 
                 # if link is special, replace the special node variable with its real node
                 if link["type"] == "specialLink":
-                    special_node = link["source"] if link["source"]["type"] in ("unionNode", ) else link["target"]
-                    real_node = link["target"] if link["source"]["type"] in ("unionNode", ) else link["source"]
+                    special_node = link["source"] if link["source"]["type"] in ("unionNode", "minusNode" ) else link["target"]
+                    real_node = link["target"] if link["source"]["type"] in ("unionNode", "minusNode" ) else link["source"]
 
                     var_to_replace.append((
                         self.format_sparql_variable("{}{}_uri".format(special_node["label"], special_node["id"])),
@@ -924,9 +926,9 @@ class SparqlQuery(Params):
                     # If source of target is a special node, replace the id with the id of the concerned node
                     source_id = link["source"]["id"]
                     target_id = link["target"]["id"]
-                    if link["source"]["type"] in ("unionNode", ):
+                    if link["source"]["type"] in ("unionNode", "minusNode" ):
                         source_id = self.get_source_of_special_node(link["source"]["id"])
-                    if link["target"]["type"] in ("unionNode", ):
+                    if link["target"]["type"] in ("unionNode", "minusNode" ):
                         target_id = self.get_source_of_special_node(link["target"]["id"])
 
                     common_block = self.format_sparql_variable("block_{}_{}".format(link["source"]["id"], link["target"]["id"]))
