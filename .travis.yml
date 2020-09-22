@@ -12,7 +12,7 @@ matrix:
       before_script:
       - docker pull redis:4.0
       - docker pull askomics/virtuoso:7.2.5.1
-      - docker pull bgruening/galaxy-stable:19.01
+      - docker pull bgruening/galaxy-stable:19.05
       - docker pull xgaia/corese:latest
       - docker pull xgaia/isql-api:2.1.1
       - docker pull xgaia/simple-ldap:latest
