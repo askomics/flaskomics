@@ -88,7 +88,7 @@ class Client(object):
 
         # Galaxy
         self.gurl = "http://localhost:8081"
-        self.gkey = "admin"
+        self.gkey = "fakekey"
         self.galaxy_history = None
 
         self.init_database()
@@ -134,7 +134,7 @@ class Client(object):
         """
         galaxy = None
         if username == "jdoe":
-            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+            galaxy = {"url": "http://localhost:8081", "apikey": "fakekey"}
 
         with self.client.session_transaction() as sess:
             sess["user"] = {
@@ -179,7 +179,7 @@ class Client(object):
         """
         galaxy = None
         if username == "jdoe":
-            galaxy = {"url": "http://localhost:8081", "apikey": "admin"}
+            galaxy = {"url": "http://localhost:8081", "apikey": "fakekey"}
 
         uinfo = {
             "fname": "John" if username == "jdoe" else "Jane",
