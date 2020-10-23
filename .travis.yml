@@ -26,7 +26,7 @@ matrix:
       - sleep 1m
       script:
         - make pylint MODE=dev TRAVIS=true
-        - make pytest MODE=dev TRAVIS=true
+        - make pytest MODE=dev TRAVIS=true || docker logs virtuoso
       after_success:
         coveralls
 
