@@ -25,17 +25,10 @@ echo "Updating dba password and sparql update..."
 if [ "$DBA_PASSWORD" ]; then echo "user_set_password('dba', '$DBA_PASSWORD');" >> /sql-query.sql ; fi
 if [ "$SPARQL_UPDATE" = "true" ]; then echo "GRANT SPARQL_UPDATE to \"SPARQL\";" >> /sql-query.sql ; fi
 virtuoso-t +wait && isql-v -U dba -P dba < /virtuoso/dump_nquads_procedure.sql && isql-v -U dba -P dba < /sql-query.sql
-
-echo "-------------Will kill:"
-ps ax
-ps ax | egrep '[v]irtuoso-t'
-ps ax | egrep '[v]irtuoso-t' | awk '{print $1}'
-
 kill $(ps ax | egrep '[v]irtuoso-t' | awk '{print $1}')
 
-echo "------------Did it kill?"
-ps ax
-
+# Make sure killing is done
+sleep 2
 
 # Load data
 if [ -d "toLoad" ] ;
