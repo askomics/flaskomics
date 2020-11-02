@@ -321,8 +321,7 @@ class TestApiAuth(AskomicsTestCase):
                 'ldap': 1,
                 'lname': 'Wick',
                 'quota': 0,
-                'username': 'jwick',
-                'last_action': None
+                'username': 'jwick'
             }
         }
 
@@ -382,8 +381,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
-                'last_action': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
             }
         }
 
