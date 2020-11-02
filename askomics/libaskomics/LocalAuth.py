@@ -317,7 +317,7 @@ class LocalAuth(Params):
         ldap_auth = LdapAuth(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, u.last_action, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE u.apikey = ?
@@ -343,6 +343,7 @@ class LocalAuth(Params):
                 'admin': rows[0][7],
                 'blocked': rows[0][8],
                 'quota': rows[0][9],
+                'last_action': rows[0][10],
                 'galaxy': None
             }
 
@@ -352,10 +353,10 @@ class LocalAuth(Params):
                 user["lname"] = ldap_user["lname"]
                 user["email"] = ldap_user["email"]
 
-            if rows[0][10] is not None and rows[0][11] is not None:
+            if rows[0][11] is not None and rows[0][12] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][10],
-                    'apikey': rows[0][11]
+                    'url': rows[0][11],
+                    'apikey': rows[0][12]
                 }
 
         else:
@@ -536,7 +537,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, u.last_action, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE {} = ?
@@ -561,13 +562,14 @@ class LocalAuth(Params):
                 'admin': rows[0][9],
                 'blocked': rows[0][10],
                 'quota': rows[0][11],
+                'last_action': rows[0][12],
                 'galaxy': None
             }
 
-            if rows[0][12] is not None and rows[0][13] is not None:
+            if rows[0][13] is not None and rows[0][14] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][12],
-                    'apikey': rows[0][13]
+                    'url': rows[0][13],
+                    'apikey': rows[0][14]
                 }
 
         return user
