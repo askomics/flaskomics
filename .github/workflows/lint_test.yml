@@ -35,7 +35,7 @@ jobs:
       with:
         python-version: 3.6
     - name: Install libldap2-dev
-      run: sudo apt-get install libldap2-dev
+      run: sudo apt-get install libldap2-dev libsasl2-dev
     - name: Install deps
       run: make install-python MODE=dev
     - name: Launch containers
