@@ -197,7 +197,9 @@ class Client(object):
         user = auth.persist_user(uinfo)
         if galaxy:
             self.session["user"] = user
-            user = auth.add_galaxy_account(user, galaxy["url"], galaxy["apikey"])["user"]
+            user = auth.add_galaxy_account(user, galaxy["url"], galaxy["apikey"])
+            assert "fuck" == user
+            user = user["user"]
             self.session = {}
         auth.create_user_directories(user["id"], user["username"])
 
