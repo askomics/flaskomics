@@ -257,10 +257,7 @@ class TestApiAuth(AskomicsTestCase):
         response = client.client.post('/api/auth/login', json=ok_inputs_email)
         api_key = response.json["user"]["apikey"]
 
-        resp = response.json
-        assert resp['user']['last_action'] > 1000
-        del resp['user']['last_action']
-        assert resp == {
+        assert response.json == {
             'error': False,
             'errorMessage': [],
             'user': {
@@ -282,7 +279,10 @@ class TestApiAuth(AskomicsTestCase):
         client.logout()
         response = client.client.post('/api/auth/login', json=ok_inputs_email)
 
-        assert response.json == {
+        resp = response.json
+        assert resp['user']['last_action'] > 1000
+        del resp['user']['last_action']
+        assert resp == {
             'error': False,
             'errorMessage': [],
             'user': {
@@ -318,7 +318,8 @@ class TestApiAuth(AskomicsTestCase):
                 'ldap': 1,
                 'lname': 'Wick',
                 'quota': 0,
-                'username': 'jwick'
+                'username': 'jwick',
+                'last_action': None
             }
         }
 
@@ -353,7 +354,8 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
+                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
+                'last_action': None
             }
         }
 
@@ -374,7 +376,8 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
+                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
+                'last_action': None
             }
         }
 
@@ -392,7 +395,8 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
+                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
+                'last_action': None
             }
 
     def test_login_apikey(self, client):
