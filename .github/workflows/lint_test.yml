@@ -36,8 +36,8 @@ jobs:
         python-version: 3.6
     - name: Install python-ldap deps
       run: sudo apt-get install libldap2-dev libsasl2-dev
-    - name: Install ephemeris
-      run: pip install ephemeris
+    - name: Install python dev deps
+      run: pip install ephemeris coveralls
     - name: Install deps
       run: make install-python MODE=dev
     - name: Launch containers
