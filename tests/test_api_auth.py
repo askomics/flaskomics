@@ -304,7 +304,10 @@ class TestApiAuth(AskomicsTestCase):
         client.session.pop("user", None)
         response = client.client.post('/api/auth/login', json=ok_inputs_username)
 
-        assert response.json == {
+        resp = response.json
+        assert resp['user']['last_action'] > 1000
+        del resp['user']['last_action']
+        assert resp == {
             'error': False,
             'errorMessage': [],
             'user': {
@@ -362,7 +365,10 @@ class TestApiAuth(AskomicsTestCase):
         response = client.client.post('/api/auth/login', json=ok_inputs_email)
 
         assert response.status_code == 200
-        assert response.json == {
+        resp = response.json
+        assert resp['user']['last_action'] > 1000
+        del resp['user']['last_action']
+        assert resp == {
             'error': False,
             'errorMessage': [],
             'user': {
