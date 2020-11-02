@@ -368,6 +368,12 @@ export default class Admin extends Component {
         return cell === 0 ? "Unlimited" : this.utils.humanFileSize(cell, true)
       },
       sort: true
+    }, {
+      dataField: 'last_action',
+      text: 'Last action',
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
+      editable: false,
+      sort: true
     }]
 
     let defaultSorted = [{

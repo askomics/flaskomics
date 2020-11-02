@@ -1,7 +1,7 @@
 ### AskOmics ###
 config/askomics.ini
-askomics/static/js/askomics.js
-askomics/static/js/askomics.js.LICENSE.txt
+askomics/static/js/*
+
 
 ### Flask ###
 instance/*

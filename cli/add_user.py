@@ -75,6 +75,7 @@ class AddUser(object):
             result = local_auth.add_galaxy_account(self.user, self.args.galaxy_url, self.args.galaxy_apikey)
             self.user = result["user"]
 
+
 if __name__ == '__main__':
     """main"""
     AddUser().main()

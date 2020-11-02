@@ -89,6 +89,7 @@ def start():
         if 'user' in session:
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
+            local_auth.update_last_action(session["user"]["username"])
             session['user'] = user
             json['config']['user'] = user
             json['config']['logged'] = True

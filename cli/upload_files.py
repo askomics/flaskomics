@@ -125,6 +125,7 @@ class UploadFiles(object):
                 first = False
                 file_path_on_askomics = files.persist_chunk(data)
 
+
 if __name__ == '__main__':
     """main"""
     UploadFiles().main()

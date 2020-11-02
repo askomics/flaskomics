@@ -40,7 +40,7 @@ endif
 
 TRAVIS?=false
 ifeq ($(TRAVIS), true)
-	PYTESTOPTS+=--cov=.
+	PYTESTOPTS+=--cov=. --cov-config=.coveragerc
 endif
 
 
@@ -96,11 +96,7 @@ pylint: check-venv
 	@echo "Done"
 
 serve: check-venv build-config create-user
-ifeq ($(MODE), dev)
 	$(MAKE) -j 3 serve-askomics serve-celery build-js
-else
-	$(MAKE) -j 2 serve-askomics serve-celery
-endif
 
 serve-askomics: check-venv build-config create-user
 	@echo 'Serving AskOmics...'
@@ -142,7 +138,7 @@ build: build-js
 build-js: check-node-modules
 	@echo 'Building askomics.js...                                        '
 	$(NPM) run --silent $(NPMOPTS)
-	@echo '                                                             Done' 
+	@echo '                                                             Done'
 
 install: install-python install-js
 

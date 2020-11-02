@@ -1,14 +1,15 @@
-import React, { Component } from 'react'
+import React, { Component, lazy, Suspense } from 'react'
 import axios from 'axios'
+import DOMPurify from 'dompurify'
 import { Alert, Badge, Button, InputGroupAddon, Input, InputGroup, Row, Col, ListGroup, ListGroupItem, Modal, ModalHeader, ModalBody, ModalFooter, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, InputGroupButtonDropdown } from 'reactstrap'
 import { Redirect, Link } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
+import Template from '../../components/template'
 import update from 'react-addons-update'
 import PropTypes from 'prop-types'
 import UploadGalaxyForm from '../upload/uploadgalaxyform'
 import Utils from '../../classes/utils'
-
 
 export default class Ask extends Component {
   constructor (props) {
@@ -25,7 +26,8 @@ export default class Ask extends Component {
       modalGalaxy: false,
       showGalaxyButton: false,
       dropdownOpen: false,
-      selectedEndpoint: []
+      selectedEndpoint: [],
+      frontMessage: ""
     }
     this.utils = new Utils()
     this.cancelRequest
@@ -98,6 +100,15 @@ export default class Ask extends Component {
             status: error.response.status
           })
         })
+
+        // load welcome.html message
+        requestUrl = 'static/welcome.html'
+        axios.get(requestUrl).then(response => {
+          this.setState({
+            frontMessage: DOMPurify.sanitize(response.data)
+          })
+        })
+
     }
   }
 
@@ -314,8 +325,8 @@ export default class Ask extends Component {
           <div>
           <Alert color="info">
             This instance is available only for logged user. <Link to="/login">Login</Link>
-            {this.props.config.disableAccountCreation ? <></> : <> or <Link to="/signup">signup</Link></>}
-            <> to use.</>
+            {this.props.config.disableAccountCreation ? <nodiv></nodiv> : <> or <Link to="/signup">signup</Link></>}
+            <nodiv> to use.</nodiv>
           </Alert>
           </div>
         )
@@ -390,33 +401,14 @@ export default class Ask extends Component {
       }
     }
 
-    // message
-    let frontMessage = (
-      <div>
-        <h2>Ask!</h2>
-        <hr />
-      </div>
-    )
-    if (this.props.config.frontMessage) {
-      frontMessage = (
-      <div>
-        <Alert color="secondary">
-          <h4 className="alert-heading">{this.props.config.footerMessage}</h4>
-          <hr />
-          <div className="wrap-line">
-            {this.props.config.frontMessage}
-          </div>
-        </Alert>
-      </div>
-      )
-    }
+    let HtmlFrontMessage = <Template template={this.state.frontMessage}/>
 
     return (
       <div className="container">
         {redirectQueryBuilder}
         {redirectLogin}
         {redirectSparqlEditor}
-        {frontMessage}
+        {HtmlFrontMessage}
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
             <Col xs="5">

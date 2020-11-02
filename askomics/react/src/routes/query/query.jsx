@@ -155,11 +155,20 @@ export default class Query extends Component {
   }
 
   getGraphs (uri) {
-    return this.state.abstraction.entities.flatMap(node => {
-      if (node.uri == uri) {
-        return node.graphs
+    return [...new Set(this.state.abstraction.attributes.flatMap(attr => {
+      if (attr.entityUri == uri) {
+        return attr.graphs
       }
-    })
+    }).filter(graph => graph != null))]
+  }
+
+
+  getEntityUris (uri) {
+    return [...new Set(this.state.abstraction.attributes.flatMap(attr => {
+      if (attr.uri == uri) {
+        return attr.entityUri
+      }
+    }).filter(entityUri => entityUri != null))]
   }
 
   getAttributeType (typeUri) {
@@ -218,6 +227,12 @@ export default class Query extends Component {
     }).filter(humanId => humanId != null).reduce(humanId => humanId)
   }
 
+  count_displayed_attributes() {
+    return this.graphState.attr.map(attr => {
+      return attr.visible ? 1 : 0
+    }).reduce((a, b) => a + b)
+  }
+
   setNodeAttributes (nodeUri, nodeId) {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
@@ -238,7 +253,7 @@ export default class Query extends Component {
         uri: 'rdf:type',
         label: 'Uri',
         entityLabel: this.getLabel(nodeUri),
-        entityUri: nodeUri,
+        entityUris: [nodeUri, ],
         type: 'uri',
         faldo: false,
         filterType: 'exact',
@@ -260,7 +275,7 @@ export default class Query extends Component {
         uri: 'rdfs:label',
         label: 'Label',
         entityLabel: this.getLabel(nodeUri),
-        entityUri: nodeUri,
+        entityUris: [nodeUri, ],
         type: 'text',
         faldo: false,
         filterType: 'exact',
@@ -285,7 +300,7 @@ export default class Query extends Component {
           uri: attr.uri,
           label: attr.label,
           entityLabel: this.getLabel(nodeUri),
-          entityUri: attr.entityUri,
+          entityUris: this.getEntityUris(attr.uri),
           type: attributeType,
           faldo: attr.faldo,
           optional: false,
@@ -910,7 +925,7 @@ export default class Query extends Component {
       sameRef: null,
       strict: null,
       id: this.getId(),
-      label: relation == "unionNode" ? "Union" : "Not",
+      label: relation == "unionNode" ? "Union" : "Minus",
       source: node1.id,
       target: node2.id,
       selected: false,
@@ -1180,6 +1195,17 @@ export default class Query extends Component {
       previewIcon: "spinner"
     })
 
+    // display an error message if user don't display attribute to avoid the virtuoso SPARQL error
+    if (this.count_displayed_attributes() == 0) {
+      this.setState({
+        error: true,
+        errorMessage: ["No attribute are displayed. Use eye icon to display at least one attribute", ],
+        disablePreview: false,
+        previewIcon: "times text-error"
+      })
+      return
+    }
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -1208,6 +1234,18 @@ export default class Query extends Component {
     let data = {
       graphState: this.graphState
     }
+
+    // display an error message if user don't display attribute to avoid the virtuoso SPARQL error
+    if (this.count_displayed_attributes() == 0) {
+      this.setState({
+        error: true,
+        errorMessage: ["No attribute are displayed. Use eye icon to display at least one attribute", ],
+        disableSave: false,
+        saveIcon: "times text-error"
+      })
+      return
+    }
+
     axios.post(requestUrl, data, { baseURL: this.state.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)

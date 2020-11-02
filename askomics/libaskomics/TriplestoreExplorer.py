@@ -341,7 +341,6 @@ class TriplestoreExplorer(Params):
                 ?attribute_uri a ?attribute_type .
                 VALUES ?attribute_type {{ owl:DatatypeProperty askomics:AskomicsCategory }}
                 ?attribute_uri rdfs:label ?attribute_label .
-                ?attribute_uri rdfs:domain ?entity_uri .
                 ?attribute_uri rdfs:range ?attribute_range .
                 # Faldo
                 OPTIONAL {{
@@ -353,6 +352,13 @@ class TriplestoreExplorer(Params):
                     ?attribute_range askomics:category ?category_value_uri .
                     ?category_value_uri rdfs:label ?category_value_label .
                 }}
+            }}
+            # Attribute of entity (or motherclass of entity)
+            {{
+                ?attribute_uri rdfs:domain ?mother .
+                ?entity_uri rdfs:subClassOf ?mother .
+            }} UNION {{
+                ?attribute_uri rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
@@ -390,7 +396,7 @@ class TriplestoreExplorer(Params):
                 index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
-            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")):
+            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
                 attr_tpl = (result["attribute_uri"], result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
@@ -448,8 +454,14 @@ class TriplestoreExplorer(Params):
                 ?property_uri a owl:ObjectProperty .
                 ?property_uri a askomics:AskomicsRelation .
                 ?property_uri rdfs:label ?property_label .
-                ?property_uri rdfs:domain ?entity_uri .
                 ?property_uri rdfs:range ?range_uri .
+            }}
+            # Relation of entity (or motherclass of entity)
+            {{
+                ?property_uri rdfs:domain ?mother .
+                ?entity_uri rdfs:subClassOf ?mother .
+            }} UNION {{
+                ?property_uri rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}

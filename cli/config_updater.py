@@ -28,5 +28,6 @@ def main():
     config[section][key] = value
     config.write(open(path, 'w'))
 
+
 if __name__ == '__main__':
     main()

@@ -62,16 +62,17 @@ class TestApi(AskomicsTestCase):
         expected_config_jdoe["logged"] = True
         expected_config_jdoe["user"] = {
             'id': 1,
-            'ldap': False,
+            'ldap': 0,
             'fname': "John",
             'lname': "Doe",
             'username': "jdoe",
             'email': "jdoe@askomics.org",
-            'admin': True,
-            'blocked': False,
+            'admin': 1,
+            'blocked': 0,
             "quota": 0,
             'apikey': "0000000001",
-            'galaxy': {"url": "http://localhost:8081", "apikey": "admin"}
+            'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
+            'last_action': None
         }
         response = client.client.get('/api/start')
 
@@ -89,16 +90,17 @@ class TestApi(AskomicsTestCase):
         expected_config_jsmith["logged"] = True
         expected_config_jsmith["user"] = {
             'id': 2,
-            'ldap': False,
+            'ldap': 0,
             'fname': "Jane",
             'lname': "Smith",
             'username': "jsmith",
             'email': "jsmith@askomics.org",
-            'admin': False,
-            'blocked': False,
+            'admin': 0,
+            'blocked': 0,
             "quota": 0,
             'apikey': "0000000002",
-            'galaxy': None
+            'galaxy': None,
+            'last_action': None
         }
         response = client.client.get('/api/start')
 
