@@ -60,7 +60,7 @@ jobs:
         sleep 1m
     - name: Run tests
       run: |
-        make pytest MODE=dev TRAVIS=true || docker logs galaxy
+        make pytest MODE=dev TRAVIS=true
 
   coveralls:
     needs: py_test
