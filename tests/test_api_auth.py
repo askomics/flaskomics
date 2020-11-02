@@ -388,6 +388,8 @@ class TestApiAuth(AskomicsTestCase):
         # Test logged
         with client.client.session_transaction() as sess:
             assert 'user' in sess
+            assert sess['user']['last_action'] > 1000
+            del sess['user']['last_action']
             assert sess["user"] == {
                 'id': 1,
                 'ldap': 0,
@@ -399,8 +401,7 @@ class TestApiAuth(AskomicsTestCase):
                 'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
-                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
-                'last_action': None
+                'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
             }
 
     def test_login_apikey(self, client):
