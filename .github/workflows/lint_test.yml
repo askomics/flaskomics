@@ -1,5 +1,5 @@
 name: Lint and test
-on: [push]
+on: ["push", "pull_request"]
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -62,6 +62,12 @@ jobs:
       run: |
         make pytest MODE=dev TRAVIS=true
 
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel: true
+
   coveralls:
     needs: py_test
     runs-on: ubuntu-latest
@@ -70,3 +76,4 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true
