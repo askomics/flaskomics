@@ -150,13 +150,13 @@ class TestApiAuth(AskomicsTestCase):
             'errorMessage': [],
             'user': {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Wick",
                 'username': "jwick",
                 'email': "jwick@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': None
@@ -168,13 +168,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Wick",
                 'username': "jwick",
                 'email': "jwick@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': None
@@ -257,18 +257,21 @@ class TestApiAuth(AskomicsTestCase):
         response = client.client.post('/api/auth/login', json=ok_inputs_email)
         api_key = response.json["user"]["apikey"]
 
-        assert response.json == {
+        resp = response.json
+        assert resp['user']['last_action'] > 1000
+        del resp['user']['last_action']
+        assert resp == {
             'error': False,
             'errorMessage': [],
             'user': {
-                'admin': True,
+                'admin': 1,
                 'apikey': api_key,
-                'blocked': False,
+                'blocked': 0,
                 'email': 'john.wick@askomics.org',
                 'fname': 'John',
                 'galaxy': None,
                 'id': 1,
-                'ldap': True,
+                'ldap': 1,
                 'lname': 'Wick',
                 'quota': 0,
                 'username': 'jwick'
@@ -283,14 +286,14 @@ class TestApiAuth(AskomicsTestCase):
             'error': False,
             'errorMessage': [],
             'user': {
-                'admin': True,
+                'admin': 1,
                 'apikey': api_key,
-                'blocked': False,
+                'blocked': 0,
                 'email': 'john.wick@askomics.org',
                 'fname': 'John',
                 'galaxy': None,
                 'id': 1,
-                'ldap': True,
+                'ldap': 1,
                 'lname': 'Wick',
                 'quota': 0,
                 'username': 'jwick'
@@ -305,14 +308,14 @@ class TestApiAuth(AskomicsTestCase):
             'error': False,
             'errorMessage': [],
             'user': {
-                'admin': True,
+                'admin': 1,
                 'apikey': api_key,
-                'blocked': False,
+                'blocked': 0,
                 'email': 'john.wick@askomics.org',
                 'fname': 'John',
                 'galaxy': None,
                 'id': 1,
-                'ldap': True,
+                'ldap': 1,
                 'lname': 'Wick',
                 'quota': 0,
                 'username': 'jwick'
@@ -455,13 +458,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": '',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -475,13 +478,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -499,8 +502,8 @@ class TestApiAuth(AskomicsTestCase):
                 'lname': "Dodo",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -514,13 +517,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Dodo",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -533,13 +536,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": '',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Dodo",
                 'username': "jdoe",
                 'email': "jdodo@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -553,13 +556,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Dodo",
                 'username': "jdoe",
                 'email': "jdodo@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -572,13 +575,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": '',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "Johnny",
                 'lname': "Dododo",
                 'username': "jdoe",
                 'email': "jdododo@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -592,13 +595,13 @@ class TestApiAuth(AskomicsTestCase):
             assert 'user' in sess
             assert sess["user"] == {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "Johnny",
                 'lname': "Dododo",
                 'username': "jdoe",
                 'email': "jdododo@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -640,13 +643,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": 'Empty password',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -660,13 +663,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": 'New passwords are not identical',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -680,13 +683,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": 'Incorrect old password',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -700,13 +703,13 @@ class TestApiAuth(AskomicsTestCase):
             "errorMessage": '',
             "user": {
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'fname': "John",
                 'lname': "Doe",
                 'username': "jdoe",
                 'email': "jdoe@askomics.org",
-                'admin': True,
-                'blocked': False,
+                'admin': 1,
+                'blocked': 0,
                 'quota': 0,
                 'apikey': "0000000001",
                 'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"}
@@ -759,14 +762,14 @@ class TestApiAuth(AskomicsTestCase):
             'error': True,
             'errorMessage': 'Not a valid Galaxy',
             'user': {
-                'admin': False,
+                'admin': 0,
                 'apikey': '0000000002',
-                'blocked': False,
+                'blocked': 0,
                 'email': 'jsmith@askomics.org',
                 'fname': 'Jane',
                 'galaxy': None,
                 'id': 2,
-                'ldap': False,
+                'ldap': 0,
                 'lname': 'Smith',
                 'quota': 0,
                 'username': 'jsmith'
@@ -780,13 +783,13 @@ class TestApiAuth(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'user': {
-                'admin': False,
+                'admin': 0,
                 'apikey': '0000000002',
-                'blocked': False,
+                'blocked': 0,
                 'email': 'jsmith@askomics.org',
                 'fname': 'Jane',
                 'id': 2,
-                'ldap': False,
+                'ldap': 0,
                 'lname': 'Smith',
                 'quota': 0,
                 'username': 'jsmith',
@@ -808,13 +811,13 @@ class TestApiAuth(AskomicsTestCase):
             'error': True,
             'errorMessage': 'Not a valid Galaxy',
             'user': {
-                'admin': True,
+                'admin': 1,
                 'apikey': '0000000001',
-                'blocked': False,
+                'blocked': 0,
                 'email': 'jdoe@askomics.org',
                 'fname': 'John',
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'lname': 'Doe',
                 'quota': 0,
                 'username': 'jdoe',
@@ -832,13 +835,13 @@ class TestApiAuth(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'user': {
-                'admin': True,
+                'admin': 1,
                 'apikey': '0000000001',
-                'blocked': False,
+                'blocked': 0,
                 'email': 'jdoe@askomics.org',
                 'fname': 'John',
                 'id': 1,
-                'ldap': False,
+                'ldap': 0,
                 'lname': 'Doe',
                 'quota': 0,
                 'username': 'jdoe',

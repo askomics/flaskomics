@@ -90,7 +90,7 @@ class TestApi(AskomicsTestCase):
         expected_config_jsmith["logged"] = True
         expected_config_jsmith["user"] = {
             'id': 2,
-            'ldap': False,
+            'ldap': 0,
             'fname': "Jane",
             'lname': "Smith",
             'username': "jsmith",
@@ -99,7 +99,8 @@ class TestApi(AskomicsTestCase):
             'blocked': 0,
             "quota": 0,
             'apikey': "0000000002",
-            'galaxy': None
+            'galaxy': None,
+            'last_action': None
         }
         response = client.client.get('/api/start')
 
