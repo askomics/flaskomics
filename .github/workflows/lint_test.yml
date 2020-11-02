@@ -61,19 +61,8 @@ jobs:
     - name: Run tests
       run: |
         make pytest MODE=dev TRAVIS=true
-
     - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel: true
-
-  coveralls:
-    needs: py_test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        coveralls

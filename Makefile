@@ -40,7 +40,7 @@ endif
 
 TRAVIS?=false
 ifeq ($(TRAVIS), true)
-	PYTESTOPTS+=--cov=.
+	PYTESTOPTS+=--cov=. --cov-config=.coveragerc
 endif
 
 
@@ -138,7 +138,7 @@ build: build-js
 build-js: check-node-modules
 	@echo 'Building askomics.js...                                        '
 	$(NPM) run --silent $(NPMOPTS)
-	@echo '                                                             Done' 
+	@echo '                                                             Done'
 
 install: install-python install-js
 
