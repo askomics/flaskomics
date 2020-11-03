@@ -190,6 +190,7 @@ class LocalAuth(Params):
             ?,
             ?,
             ?,
+            ?,
             NULL
         )
         '''
@@ -215,7 +216,7 @@ class LocalAuth(Params):
         # Store user in db
         user_id = database.execute_sql_query(
             query, (ldap_login, fname, lname, inputs['username'],
-                    email, sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota"))), True)
+                    email, sha512_pw, salt, api_key, admin, blocked, Utils.humansize_to_bytes(self.settings.get("askomics", "quota")), int(time.time())), True)
 
         user = {
             'id': user_id,
@@ -316,7 +317,7 @@ class LocalAuth(Params):
         ldap_auth = LdapAuth(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.apikey, u.admin, u.blocked, u.quota, u.last_action, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE u.apikey = ?
@@ -342,6 +343,7 @@ class LocalAuth(Params):
                 'admin': rows[0][7],
                 'blocked': rows[0][8],
                 'quota': rows[0][9],
+                'last_action': rows[0][10],
                 'galaxy': None
             }
 
@@ -351,10 +353,10 @@ class LocalAuth(Params):
                 user["lname"] = ldap_user["lname"]
                 user["email"] = ldap_user["email"]
 
-            if rows[0][10] is not None and rows[0][11] is not None:
+            if rows[0][11] is not None and rows[0][12] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][10],
-                    'apikey': rows[0][11]
+                    'url': rows[0][11],
+                    'apikey': rows[0][12]
                 }
 
         else:
@@ -431,6 +433,8 @@ class LocalAuth(Params):
             error_messages.append("Bad login or password")
             user = {}
             error = True
+        else:
+            self.update_last_action(user["username"])
 
         # Don't return password and salt
         if "password" in user:
@@ -443,6 +447,32 @@ class LocalAuth(Params):
             "error": error,
             "error_messages": error_messages
         }
+
+    def update_last_action(self, username):
+        """Update last login time into user database
+
+        Parameters
+        ----------
+        username : str
+            Username
+
+        Returns
+        -------
+        int
+            timestamp
+        """
+        database = Database(self.app, self.session)
+
+        now = int(time.time())
+
+        query = '''
+        UPDATE users SET
+        last_action=?
+        WHERE username=?
+        '''
+
+        database.execute_sql_query(query, (now, username))
+        return now
 
     @staticmethod
     def get_login_type(login, ldap_login=False):
@@ -507,7 +537,7 @@ class LocalAuth(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.password, u.salt, u.apikey, u.admin, u.blocked, u.quota, u.last_action, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         WHERE {} = ?
@@ -532,13 +562,14 @@ class LocalAuth(Params):
                 'admin': rows[0][9],
                 'blocked': rows[0][10],
                 'quota': rows[0][11],
+                'last_action': rows[0][12],
                 'galaxy': None
             }
 
-            if rows[0][12] is not None and rows[0][13] is not None:
+            if rows[0][13] is not None and rows[0][14] is not None:
                 user['galaxy'] = {
-                    'url': rows[0][12],
-                    'apikey': rows[0][13]
+                    'url': rows[0][13],
+                    'apikey': rows[0][14]
                 }
 
         return user
@@ -825,7 +856,7 @@ class LocalAuth(Params):
         ldap_auth = LdapAuth(self.app, self.session)
 
         query = '''
-        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, u.quota, g.url, g.apikey
+        SELECT u.user_id, u.ldap, u.fname, u.lname, u.username, u.email, u.admin, u.blocked, u.quota, u.last_action, g.url, g.apikey
         FROM users u
         LEFT JOIN galaxy_accounts g ON u.user_id=g.user_id
         GROUP BY u.user_id
@@ -846,12 +877,13 @@ class LocalAuth(Params):
                 user['admin'] = row[6]
                 user['blocked'] = row[7]
                 user['quota'] = row[8]
+                user['last_action'] = row[9]
                 user['galaxy'] = None
 
-                if row[9] is not None and row[10] is not None:
+                if row[10] is not None and row[11] is not None:
                     user['galaxy'] = {
-                        'url': row[9],
-                        'apikey': row[10]
+                        'url': row[10],
+                        'apikey': row[11]
                     }
 
                 if user["ldap"] == 1:

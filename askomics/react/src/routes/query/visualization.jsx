@@ -107,9 +107,9 @@ export default class Visualization extends Component {
 
 
   drawNode (node, ctx, globalScale) {
-    if (node.type == "unionNode" || node.type == "notNode") {
+    if (node.type == "unionNode" || node.type == "minusNode") {
       // node style
-      ctx.fillStyle = "#f5d273"
+      ctx.fillStyle = node.type == "unionNode" ? "#f5d273" : "#ff653b"
       ctx.lineWidth = this.lineWidth
       ctx.strokeStyle = node.selected ? this.colorFirebrick : this.colorGrey
       ctx.globalAlpha = 1
@@ -132,7 +132,7 @@ export default class Visualization extends Component {
       ctx.font = this.nodeSize + 'px Sans-Serif'
       ctx.textAlign = 'middle'
       ctx.textBaseline = 'middle'
-      let label = node.type == "unionNode" ? "Union" : "Not"
+      let label = node.type == "unionNode" ? "Union" : "Minus"
       ctx.fillText(label, node.x + this.nodeSize, node.y + this.nodeSize)
       ctx.closePath()
 
@@ -242,11 +242,9 @@ export default class Visualization extends Component {
         <MenuItem data={{node: this.state.rightClickedNode, convertTo: "unionNode"}} onClick={this.handleNodeConversion}>
           Convert to UNION node
         </MenuItem>
-        {/*
-        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "notNode"}} onClick={this.handleNodeConversion}>
-          Convert to NOT node
+        <MenuItem data={{node: this.state.rightClickedNode, convertTo: "minusNode"}} onClick={this.handleNodeConversion}>
+          Convert to MINUS node
         </MenuItem>
-        */}
       </ContextMenu>
     </div>
 

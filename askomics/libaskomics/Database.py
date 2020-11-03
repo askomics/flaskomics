@@ -93,7 +93,8 @@ class Database(Params):
             admin boolean,
             blocked boolean,
             quota INTEGER,
-            reset_token text
+            reset_token text,
+            last_action INTEGER
         )
         '''
         self.execute_sql_query(query)
@@ -118,6 +119,16 @@ class Database(Params):
         query = '''
         ALTER TABLE users
         ADD reset_token text NULL
+        DEFAULT(null)
+        '''
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE users
+        ADD last_action INTEGER NULL
         DEFAULT(null)
         '''
         try:
