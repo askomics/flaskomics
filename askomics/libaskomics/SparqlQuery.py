@@ -884,7 +884,7 @@ class SparqlQuery(Params):
         # Browse attributes to get entities
         for attr in self.json["attr"]:
             if attr["visible"]:
-                entities = entities + attr["entityUris"]
+                entities.append(attr["entityUri"])
         entities = list(set(entities))  # uniq list
 
         # Set graphs in function of entities needed
@@ -1030,8 +1030,8 @@ class SparqlQuery(Params):
             if attribute["type"] == "uri":
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
-                obj = "<{}>".format(attribute["entityUris"][0])
-                if not self.is_bnode(attribute["entityUris"][0], self.json["nodes"]):
+                obj = "<{}>".format(attribute["entityUri"][0])
+                if not self.is_bnode(attribute["entityUri"][0], self.json["nodes"]):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
