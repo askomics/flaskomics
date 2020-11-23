@@ -1030,8 +1030,8 @@ class SparqlQuery(Params):
             if attribute["type"] == "uri":
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
-                obj = "<{}>".format(attribute["entityUri"][0])
-                if not self.is_bnode(attribute["entityUri"][0], self.json["nodes"]):
+                obj = "<{}>".format(attribute["entityUri"])
+                if not self.is_bnode(attribute["entityUri"], self.json["nodes"]):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
