@@ -883,7 +883,8 @@ class SparqlQuery(Params):
 
         # Browse attributes to get entities
         for attr in self.json["attr"]:
-                entities.append(attr["entityUri"])
+            entities.append(attr["entityUri"])
+
         entities = list(set(entities))  # uniq list
 
         # Set graphs in function of entities needed
