@@ -8,7 +8,7 @@
     "ontology"
   ],
   "name": "AskOmics",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Visual SPARQL query builder",
   "author": "Xavier Garnier",
   "license": "AGPL-3.0",
