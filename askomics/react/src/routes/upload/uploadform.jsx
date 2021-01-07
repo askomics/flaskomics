@@ -65,7 +65,7 @@ export default class UploadForm extends Component {
         last = true
       }
 
-      reader.readAsBinaryString(blob)
+      reader.readAsText(blob)
       reader.onload = (event) => {
         let data = {
           chunk: reader.result,
@@ -94,7 +94,7 @@ export default class UploadForm extends Component {
               if (totalSize - loaded <= chunkSize) {
                 last = true
               }
-              reader.readAsBinaryString(blob)
+              reader.readAsText(blob)
             } else {
               loaded = totalSize
               this.setState({
