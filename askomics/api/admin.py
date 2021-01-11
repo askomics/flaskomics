@@ -3,6 +3,8 @@ import sys
 import traceback
 
 from askomics.api.auth import admin_required
+from askomics.libaskomics.DatasetsHandler import DatasetsHandler
+from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
 
@@ -40,6 +42,68 @@ def get_users():
         'errorMessage': ''
     })
 
+@admin_bp.route('/api/admin/getdatasets', methods=['GET'])
+@admin_required
+def get_datasets():
+    """Get all datasets
+
+    Returns
+    -------
+    json
+        users: list of all datasets
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        datasets_handler = DatasetsHandler(current_app, session)
+        datasets = datasets_handler.get_datasets(admin=True)
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+@admin_bp.route('/api/admin/getfiles', methods=['GET'])
+@admin_required
+def get_files():
+    """Get all files info
+    Returns
+    -------
+    json
+        files: list of all files
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    files_id = None
+    if request.method == 'POST':
+        data = request.get_json()
+        files_id = data['filesId']
+    try:
+        files_handler = FilesHandler(current_app, session)
+        files = files_handler.get_files_infos(files_id=files_id, admin=True)
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
 
 @admin_bp.route('/api/admin/setadmin', methods=['POST'])
 @admin_required

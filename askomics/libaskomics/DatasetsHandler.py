@@ -40,7 +40,7 @@ class DatasetsHandler(Params):
             dataset.set_info_from_db()
             self.datasets.append(dataset)
 
-    def get_datasets(self):
+    def get_datasets(self, admin=False):
         """Get info about the datasets
 
         Returns
@@ -50,13 +50,17 @@ class DatasetsHandler(Params):
         """
         database = Database(self.app, self.session)
 
+        user_id = self.session['user']['id']
+        if admin and self.session['user'].is_admin:
+            user_id = "user_id"
+
         query = '''
         SELECT id, name, public, status, start, end, ntriples, error_message, traceback, percent
         FROM datasets
         WHERE user_id = ?
         '''
 
-        rows = database.execute_sql_query(query, (self.session['user']['id'], ))
+        rows = database.execute_sql_query(query, (user_id, ))
 
         datasets = []
         for row in rows:

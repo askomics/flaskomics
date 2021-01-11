@@ -15,10 +15,14 @@ export default class Admin extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.state = { isLoading: true,
+    this.state = { usersLoading: true,
+      datasetsLoading: true,
+      filesLoading: true,
       error: false,
       errorMessage: '',
       users: [],
+      datasets: [],
+      files: [],
       fname: "",
       lname: "",
       username: "",
@@ -241,7 +245,51 @@ export default class Admin extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       this.loadUsers()
+      this.loadDataSets()
+      this.loadFiles()
     }
+  }
+
+  loadDataSets(){
+    let requestUrl = '/api/admin/getdatasets'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          datasetsLoading: false,
+          datasets: response.data.datasets
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !error.response.data.error
+        })
+      })
+  }
+
+  loadFiles(){
+    let requestUrl = '/api/admin/getfiles'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          filesLoading: false,
+          files: response.data.files
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          success: !error.response.data.error
+        })
+      })
   }
 
   loadUsers() {
@@ -254,7 +302,7 @@ export default class Admin extends Component {
           lname: "",
           username: "",
           email: "",
-          isLoading: false,
+          usersLoading: false,
           users: response.data.users
         })
       })
@@ -287,7 +335,7 @@ export default class Admin extends Component {
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          isLoading: false,
+          userLoading: false,
           error: response.data.error,
           errorMessage: response.data.errorMessage,
           users: response.data.users
@@ -310,7 +358,7 @@ export default class Admin extends Component {
   }
 
   render () {
-    let columns = [{
+    let usersColumns = [{
       editable: false,
       dataField: 'ldap',
       text: 'Authentication type',
@@ -376,10 +424,133 @@ export default class Admin extends Component {
       sort: true
     }]
 
-    let defaultSorted = [{
+    let filesColumns = [{
+      dataField: 'name',
+      text: 'File name',
+      sort: true
+    }, {
+      dataField: 'date',
+      text: 'Date',
+      sort: true,
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
+      editable: false
+    }, {
+      dataField: 'type',
+      text: 'Type',
+      sort: true,
+      editable: false
+    }, {
+      dataField: 'size',
+      text: 'File size',
+      formatter: (cell, row) => { return this.utils.humanFileSize(cell, true) },
+      sort: true,
+      editable: false
+    }]
+
+    let datasetsColumns = [{
+      dataField: 'name',
+      text: 'Dataset name',
+      sort: true
+    }, {
+      dataField: 'start',
+      text: 'Creation date',
+      sort: true,
+      formatter: (cell, row) => { return this.utils.humanDate(cell) }
+    }, {
+      dataField: 'exec_time',
+      text: 'Exec time',
+      sort: true,
+      formatter: (cell, row) => { return ["started", "queued"].indexOf(row.status) == -1 ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
+      editable: false
+    }, {
+
+      dataField: 'public',
+      text: 'Public',
+      sort: true,
+      formatter: (cell, row) => {
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={true} type="switch" id={row.id} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
+      }
+    }, {
+      dataField: 'ntriples',
+      text: 'Triples',
+      sort: true,
+      formatter: (cell, row) => {
+        return cell == 0 ? '' : new Intl.NumberFormat('fr-FR').format(cell)
+      }
+    }, {
+      dataField: 'status',
+      text: 'Status',
+      formatter: (cell, row) => {
+        if (cell == 'queued') {
+          return <Badge color="secondary">Queued</Badge>
+        }
+        if (cell == 'started') {
+          return <Badge color="info">{row.percent ? "processing (" + Math.round(row.percent) + "%)" : "started"}</Badge>
+        }
+        if (cell == 'success') {
+          return <Badge color="success">Success</Badge>
+        }
+        if (cell == 'deleting') {
+          return <Badge color="warning">Deleting</Badge>
+        }
+        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
+      },
+      sort: true
+    }]
+
+    let usersDefaultSorted = [{
       dataField: 'fname',
       order: 'asc'
     }]
+
+    let filesDefaultSorted = [{
+      dataField: 'date',
+      order: 'desc'
+    }]
+
+    let datasetsDefaultSorted = [{
+      dataField: 'start',
+      order: 'desc'
+    }]
+
+    let usersSelectRow = {
+      mode: 'checkbox',
+      clickToSelect: false,
+      selected: this.state.selected,
+      onSelect: this.handleSelection,
+      onSelectAll: this.handleSelectionAll,
+      nonSelectable: [this.props.config.user.username]
+    }
+
+    let filesSelectRow = {
+      mode: 'checkbox',
+      selected: this.props.selected,
+      onSelect: this.handleSelection,
+      onSelectAll: this.handleSelectionAll
+    }
+
+    let datasetsSelectRow = {
+      mode: 'checkbox',
+      selected: this.props.selected,
+      onSelect: this.handleSelection,
+      onSelectAll: this.handleSelectionAll
+    }
+
+    let filesNoDataIndication = 'No file uploaded'
+    if (this.props.filesLoading) {
+      filesNoDataIndication = <WaitingDiv waiting={this.props.filesLoading} />
+    }
+
+    let datasetsNoDataIndication = 'No datasets'
+    if (this.props.datasetsLoading) {
+      datasetsNoDataIndication = <WaitingDiv waiting={this.props.datasetsLoading} />
+    }
 
     if (!this.props.waitForStart && !this.props.config.logged) {
       return <Redirect to="/login" />
@@ -416,15 +587,6 @@ export default class Admin extends Component {
           User {this.state.newUser.username} added. Password creation link send to {this.state.newUser.email}
         </Alert>
       )
-    }
-
-    let selectRow = {
-      mode: 'checkbox',
-      clickToSelect: false,
-      selected: this.state.selected,
-      onSelect: this.handleSelection,
-      onSelectAll: this.handleSelectionAll,
-      nonSelectable: [this.props.config.user.username]
     }
 
     return (
@@ -479,18 +641,60 @@ export default class Admin extends Component {
             bootstrap4
             keyField='username'
             data={this.state.users}
-            columns={columns}
-            defaultSorted={defaultSorted}
+            columns={usersColumns}
+            defaultSorted={usersDefaultSorted}
             pagination={paginationFactory()}
             cellEdit={ cellEditFactory({
               mode: 'click',
               autoSelectText: true,
               beforeSaveCell: (oldValue, newValue, row) => { this.updateQuota(oldValue, newValue, row) },
             })}
-            selectRow={ selectRow }
+            selectRow={ usersSelectRow }
           />
           <br />
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        </div>
+        
+        <hr />
+
+        <h4>Files</h4>
+        <div className="asko-table-height-div">
+            <BootstrapTable
+              classes="asko-table"
+              wrapperClasses="asko-table-wrapper"
+              tabIndexCell
+              bootstrap4
+              keyField='id'
+              data={this.props.files}
+              columns={filesColumns}
+              defaultSorted={filesDefaultSorted}
+              pagination={paginationFactory()}
+              noDataIndication={filesNoDataIndication}
+              selectRow={ filesSelectRow }
+              cellEdit={ cellEditFactory({
+                mode: 'click',
+                autoSelectText: true,
+                beforeSaveCell: (oldValue, newValue, row) => { this.editFileName(oldValue, newValue, row) },
+              })}
+            />
+        </div>
+        <hr />
+
+        <h4>Datasets</h4>
+        <div className="asko-table-height-div">
+          <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
+            tabIndexCell
+            bootstrap4
+            keyField='id'
+            data={this.props.datasets}
+            columns={datasetsColumns}
+            defaultSorted={datasetsDefaultSorted}
+            pagination={paginationFactory()}
+            noDataIndication={datasetsNoDataIndication}
+            selectRow={ datasetsSelectRow }
+          />
         </div>
       </div>
     )
