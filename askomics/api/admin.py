@@ -56,7 +56,7 @@ def get_datasets():
     """
     try:
         datasets_handler = DatasetsHandler(current_app, session)
-        datasets = datasets_handler.get_datasets(admin=True)
+        datasets = datasets_handler.get_all_datasets()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -89,7 +89,7 @@ def get_files():
         files_id = data['filesId']
     try:
         files_handler = FilesHandler(current_app, session)
-        files = files_handler.get_files_infos(files_id=files_id, admin=True)
+        files = files_handler.get_all_files_infos()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
+import {Badge, Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
@@ -31,7 +31,9 @@ export default class Admin extends Component {
       messageOpen: false,
       displayPassword: false,
       instanceUrl: "",
-      selected: []
+      usersSelected: [],
+      filesSelected: [],
+      datasetsSelected: []
     }
     this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
     this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
@@ -40,39 +42,101 @@ export default class Admin extends Component {
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
-    this.handleSelection = this.handleSelection.bind(this)
-    this.handleSelectionAll = this.handleSelectionAll.bind(this)
+    this.handleUserSelection = this.handleUserSelection.bind(this)
+    this.handleUserSelectionAll = this.handleUserSelectionAll.bind(this)
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
+    this.handleFileSelection = this.handleFileSelection.bind(this)
+    this.handleFileSelectionAll = this.handleFileSelectionAll.bind(this)
+    this.handleDatasetSelection = this.handleDatasetSelection.bind(this)
+    this.handleDatasetSelectionAll = this.handleDatasetSelectionAll.bind(this)
     this.cancelRequest
   }
 
-  handleSelection (row, isSelect) {
+  handleUserSelection (row, isSelect) {
     if (isSelect) {
       this.setState({
-        selected: [...this.state.selected, row.username]
+        usersSelected: [...this.state.usersSelected, row.username]
       })
     } else {
       this.setState({
-        selected: this.state.selected.filter(x => x !== row.username)
+        usersSelected: this.state.usersSelected.filter(x => x !== row.username)
       })
     }
   }
 
-  handleSelectionAll (isSelect, rows) {
+  handleUserSelectionAll (isSelect, rows) {
     const usernames = rows.map(r => r.username)
     if (isSelect) {
       this.setState({
-        selected: usernames
+        usersSelected: usernames
       })
     } else {
       this.setState({
-        selected: []
+        usersSelected: []
       })
     }
   }
 
-  isDisabled () {
-    return this.state.selected.length == 0
+  handleFileSelection (row, isSelect) {
+    if (isSelect) {
+      this.setState({
+        filesSelected: [...this.state.filesSelected, row.id]
+      })
+    } else {
+      this.setState({
+        filesSelected: this.state.filesSelected.filter(x => x !== row.id)
+      })
+    }
+  }
+
+  handleFileSelectionAll (isSelect, rows) {
+    const ids = rows.map(r => r.id)
+    if (isSelect) {
+      this.setState({
+        filesSelected: ids
+      })
+    } else {
+      this.setState({
+        filesSelected: []
+      })
+    }
+  }
+
+  handleDatasetSelection (row, isSelect) {
+    if (isSelect) {
+      this.setState({
+        datasetsSelected: [...this.state.datasetsSelected, row.id]
+      })
+    } else {
+      this.setState({
+        datasetsSelected: this.state.datasetsSelected.filter(x => x !== row.id)
+      })
+    }
+  }
+
+  handleDatasetSelectionAll (isSelect, rows) {
+    const ids = rows.map(r => r.id)
+    if (isSelect) {
+      this.setState({
+        datasetsSelected: ids
+      })
+    } else {
+      this.setState({
+        datasetsSelected: []
+      })
+    }
+  }
+
+  isUsersDisabled () {
+    return this.state.usersSelected.length == 0
+  }
+
+  isFilesDisabled () {
+    return this.state.filesSelected.length == 0
+  }
+
+  isDatasetsDisabled () {
+    return this.state.datasetsSelected.length == 0
   }
 
   deleteSelectedUsers () {
@@ -425,6 +489,10 @@ export default class Admin extends Component {
     }]
 
     let filesColumns = [{
+      dataField: 'user',
+      text: 'User',
+      sort: true
+    },{
       dataField: 'name',
       text: 'File name',
       sort: true
@@ -448,6 +516,10 @@ export default class Admin extends Component {
     }]
 
     let datasetsColumns = [{
+      dataField: 'user',
+      text: 'User',
+      sort: true
+    },{
       dataField: 'name',
       text: 'Dataset name',
       sort: true
@@ -523,23 +595,23 @@ export default class Admin extends Component {
       mode: 'checkbox',
       clickToSelect: false,
       selected: this.state.selected,
-      onSelect: this.handleSelection,
-      onSelectAll: this.handleSelectionAll,
+      onSelect: this.handleUserSelection,
+      onSelectAll: this.handleUserSelectionAll,
       nonSelectable: [this.props.config.user.username]
     }
 
     let filesSelectRow = {
       mode: 'checkbox',
       selected: this.props.selected,
-      onSelect: this.handleSelection,
-      onSelectAll: this.handleSelectionAll
+      onSelect: this.handleFileSelection,
+      onSelectAll: this.handleFileSelectionAll
     }
 
     let datasetsSelectRow = {
       mode: 'checkbox',
       selected: this.props.selected,
-      onSelect: this.handleSelection,
-      onSelectAll: this.handleSelectionAll
+      onSelect: this.handleDatasetSelection,
+      onSelectAll: this.handleDatasetSelectionAll
     }
 
     let filesNoDataIndication = 'No file uploaded'
@@ -652,9 +724,9 @@ export default class Admin extends Component {
             selectRow={ usersSelectRow }
           />
           <br />
-          <Button disabled={this.isDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+          <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
-        
+
         <hr />
 
         <h4>Files</h4>
@@ -665,7 +737,7 @@ export default class Admin extends Component {
               tabIndexCell
               bootstrap4
               keyField='id'
-              data={this.props.files}
+              data={this.state.files}
               columns={filesColumns}
               defaultSorted={filesDefaultSorted}
               pagination={paginationFactory()}
@@ -688,7 +760,7 @@ export default class Admin extends Component {
             tabIndexCell
             bootstrap4
             keyField='id'
-            data={this.props.datasets}
+            data={this.state.datasets}
             columns={datasetsColumns}
             defaultSorted={datasetsDefaultSorted}
             pagination={paginationFactory()}

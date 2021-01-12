@@ -68,7 +68,7 @@ class FilesHandler(FilesUtils):
             elif file['type'] == 'bed':
                 self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
 
-    def get_files_infos(self, files_id=None, return_path=False, admin=False):
+    def get_files_infos(self, files_id=None, return_path=False):
         """Get files info
 
         Parameters
@@ -85,10 +85,6 @@ class FilesHandler(FilesUtils):
         """
         database = Database(self.app, self.session)
 
-        user_id = self.session['user']['id']
-        if admin and self.session['user'].is_admin:
-            user_id = "user_id"
-
         if files_id:
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
@@ -99,7 +95,7 @@ class FilesHandler(FilesUtils):
             AND {}
             '''.format(subquery_str)
 
-            rows = database.execute_sql_query(query, (user_id, ) + tuple(files_id))
+            rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_id))
 
         else:
 
@@ -109,7 +105,7 @@ class FilesHandler(FilesUtils):
             WHERE user_id = ?
             '''
 
-            rows = database.execute_sql_query(query, (user_id, ))
+            rows = database.execute_sql_query(query, (self.session['user']['id'], ))
 
         files = []
         for row in rows:
@@ -122,6 +118,35 @@ class FilesHandler(FilesUtils):
             }
             if return_path:
                 file['path'] = row[4]
+            files.append(file)
+
+        return files
+
+    def get_all_files_infos(self):
+
+        if not self.session['user']['admin']:
+            return []
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT files.id, files.name, files.type, files.size, files.date, users.username
+        FROM files
+        INNER JOIN users ON files.user_id=users.user_id
+        '''
+
+        rows = database.execute_sql_query(query, ())
+
+        files = []
+        for row in rows:
+            file = {
+                'id': row[0],
+                'name': row[1],
+                'type': row[2],
+                'size': row[3],
+                'date': row[4],
+                'user': row[5]
+            }
             files.append(file)
 
         return files

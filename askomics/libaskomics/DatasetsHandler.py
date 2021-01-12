@@ -40,7 +40,7 @@ class DatasetsHandler(Params):
             dataset.set_info_from_db()
             self.datasets.append(dataset)
 
-    def get_datasets(self, admin=False):
+    def get_datasets(self):
         """Get info about the datasets
 
         Returns
@@ -50,17 +50,13 @@ class DatasetsHandler(Params):
         """
         database = Database(self.app, self.session)
 
-        user_id = self.session['user']['id']
-        if admin and self.session['user'].is_admin:
-            user_id = "user_id"
-
         query = '''
         SELECT id, name, public, status, start, end, ntriples, error_message, traceback, percent
         FROM datasets
         WHERE user_id = ?
         '''
 
-        rows = database.execute_sql_query(query, (user_id, ))
+        rows = database.execute_sql_query(query, (self.session['user']['id'], ))
 
         datasets = []
         for row in rows:
@@ -81,6 +77,53 @@ class DatasetsHandler(Params):
                 'error_message': row[7],
                 'traceback': row[8],
                 'percent': row[9]
+            }
+            datasets.append(dataset)
+
+        return datasets
+
+    def get_all_datasets(self):
+        """Get info about the datasets
+
+        Returns
+        -------
+        list of dict
+            Datasets informations
+        """
+        database = Database(self.app, self.session)
+
+        if not self.session['user']['admin']:
+            return []
+
+        query = '''
+        SELECT datasets.id, datasets.name, datasets.public, datasets.status, datasets.start, datasets.end, datasets.ntriples, datasets.error_message, datasets.traceback, datasets.percent, users.username
+        FROM datasets
+        INNER JOIN users ON datasets.user_id=users.user_id
+
+        '''
+
+        rows = database.execute_sql_query(query, ())
+
+        datasets = []
+        for row in rows:
+
+            exec_time = 0
+            if row[5] is not None and row[4] is not None:
+                exec_time = row[5] - row[4]
+
+            dataset = {
+                'id': row[0],
+                'name': row[1],
+                'public': True if int(row[2] == 1) else False,
+                'status': row[3],
+                'start': row[4],
+                'end': row[5],
+                'exec_time': exec_time,
+                'ntriples': row[6],
+                'error_message': row[7],
+                'traceback': row[8],
+                'percent': row[9],
+                'user': row[10]
             }
             datasets.append(dataset)
 
