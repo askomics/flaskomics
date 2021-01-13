@@ -46,18 +46,27 @@ class Dataset(Params):
         self.start = dataset_info["start"] if "start" in dataset_info else None
         self.end = dataset_info["end"] if "end" in dataset_info else None
 
-    def set_info_from_db(self):
+    def set_info_from_db(self, admin=False):
         """Set the info in from the database"""
         database = Database(self.app, self.session)
 
-        query = '''
-        SELECT celery_id, file_id, name, graph_name, public, start, end
-        FROM datasets
-        WHERE user_id = ?
-        AND id = ?
-        '''
+        if admin:
+            query = '''
+            SELECT celery_id, file_id, name, graph_name, public, start, end
+            FROM datasets
+            WHERE id = ?
+            '''
 
-        rows = database.execute_sql_query(query, (self.session['user']['id'], self.id))
+            rows = database.execute_sql_query(query, (self.id))
+        else:
+            query = '''
+            SELECT celery_id, file_id, name, graph_name, public, start, end
+            FROM datasets
+            WHERE user_id = ?
+            AND id = ?
+            '''
+
+            rows = database.execute_sql_query(query, (self.session['user']['id'], self.id))
 
         self.celery_id = rows[0][0]
         self.file_id = rows[0][1]
@@ -187,14 +196,22 @@ class Dataset(Params):
 
         database.execute_sql_query(query, tuple(variables))
 
-    def delete_from_db(self):
+    def delete_from_db(self, admin):
         """Delete a dataset from the database"""
         database = Database(self.app, self.session)
 
-        query = '''
-        DELETE FROM datasets
-        WHERE user_id = ?
-        AND id = ?
-        '''
+        if admin:
+            query = '''
+            DELETE FROM datasets
+            WHERE id = ?
+            '''
+            database.execute_sql_query(query, (self.id))
 
-        database.execute_sql_query(query, (self.session['user']['id'], self.id))
+        else:
+            query = '''
+            DELETE FROM datasets
+            WHERE user_id = ?
+            AND id = ?
+            '''
+
+            database.execute_sql_query(query, (self.session['user']['id'], self.id))

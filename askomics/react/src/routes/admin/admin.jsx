@@ -47,8 +47,10 @@ export default class Admin extends Component {
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
     this.handleFileSelection = this.handleFileSelection.bind(this)
     this.handleFileSelectionAll = this.handleFileSelectionAll.bind(this)
+    this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
     this.handleDatasetSelection = this.handleDatasetSelection.bind(this)
     this.handleDatasetSelectionAll = this.handleDatasetSelectionAll.bind(this)
+    this.deleteSelectedDatasets = this.deleteSelectedDatasets.bind(this)
     this.cancelRequest
   }
 
@@ -142,14 +144,46 @@ export default class Admin extends Component {
   deleteSelectedUsers () {
     let requestUrl = '/api/admin/delete_users'
     let data = {
-      usersToDelete: this.state.selected
+      usersToDelete: this.state.usersSelected
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           users: response.data.users,
-          selected: [],
+          usersSelected: [],
+          waiting: false
+        })
+      })
+  }
+
+  deleteSelectedFiles () {
+    let requestUrl = '/api/admin/delete_files'
+    let data = {
+      filesToDelete: this.state.filesSelected
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          files: response.data.files,
+          filesSelected: [],
+          waiting: false
+        })
+      })
+  }
+
+  deleteSelectedUsers () {
+    let requestUrl = '/api/admin/delete_datasets'
+    let data = {
+      datasetsToDelete: this.state.datasetsSelected
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          datasets: response.data.datasets,
+          datasetsSelected: [],
           waiting: false
         })
       })

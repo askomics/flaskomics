@@ -92,14 +92,10 @@ class DatasetsHandler(Params):
         """
         database = Database(self.app, self.session)
 
-        if not self.session['user']['admin']:
-            return []
-
         query = '''
         SELECT datasets.id, datasets.name, datasets.public, datasets.status, datasets.start, datasets.end, datasets.ntriples, datasets.error_message, datasets.traceback, datasets.percent, users.username
         FROM datasets
         INNER JOIN users ON datasets.user_id=users.user_id
-
         '''
 
         rows = database.execute_sql_query(query, ())
@@ -129,7 +125,7 @@ class DatasetsHandler(Params):
 
         return datasets
 
-    def update_status_in_db(self, status):
+    def update_status_in_db(self, status, admin=admin):
         """Update the status of a datasets in the database
 
         Parameters
@@ -158,7 +154,7 @@ class DatasetsHandler(Params):
 
         return self.get_datasets()
 
-    def delete_datasets(self):
+    def delete_datasets(self, admin=False):
         """delete the datasets from the database and the triplestore"""
         sparql = SparqlQueryLauncher(self.app, self.session)
         tse = TriplestoreExplorer(self.app, self.session)
@@ -168,7 +164,7 @@ class DatasetsHandler(Params):
             if dataset.graph_name:
                 Utils.redo_if_failure(self.log, 3, 1, sparql.drop_dataset, dataset.graph_name)
             # Delete from db
-            dataset.delete_from_db()
+            dataset.delete_from_db(admin=admin)
 
             # Uncache abstraction
             tse.uncache_abstraction(public=dataset.public)
