@@ -50,23 +50,21 @@ class Dataset(Params):
         """Set the info in from the database"""
         database = Database(self.app, self.session)
 
-        if admin:
-            query = '''
-            SELECT celery_id, file_id, name, graph_name, public, start, end
-            FROM datasets
-            WHERE id = ?
-            '''
-
-            rows = database.execute_sql_query(query, (self.id))
+        if admin and self.session['user']['admin']:
+            query_params = (self.id,)
+            where_query = ""
         else:
-            query = '''
-            SELECT celery_id, file_id, name, graph_name, public, start, end
-            FROM datasets
-            WHERE user_id = ?
-            AND id = ?
-            '''
+            query_params = (self.session['user']['id'], self.id)
+            where_query = "AND user_id = ?"
 
-            rows = database.execute_sql_query(query, (self.session['user']['id'], self.id))
+        query = '''
+        SELECT celery_id, file_id, name, graph_name, public, start, end
+        FROM datasets
+        WHERE id = ?
+        {}
+        '''.format(where_query)
+
+        rows = database.execute_sql_query(query, query_params)
 
         self.celery_id = rows[0][0]
         self.file_id = rows[0][1]
@@ -135,7 +133,7 @@ class Dataset(Params):
         # Uncache abstraction
         tse.uncache_abstraction()
 
-    def update_celery(self, celery_id):
+    def update_celery(self, celery_id, admin=False):
         """Update celery id of dataset in database
 
         Parameters
@@ -143,15 +141,23 @@ class Dataset(Params):
         celery_id : string
             DescriThe celery idption
         """
+
+        if admin and self.session['user']['admin']:
+            query_params = (celery_id, self.id)
+            where_query = ""
+        else:
+            query_params = (celery_id, self.id, self.session['user']['id'])
+            where_query = "AND user_id = ? "
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE datasets SET
         celery_id=?
-        WHERE user_id = ? AND id = ?
-        '''
+        WHERE id = ?
+        {}
+        '''.format(where_query)
 
-        database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
+        database.execute_sql_query(query, (celery_id, query_params)
 
     def update_in_db(self, status, update_celery=False, update_date=False, update_graph=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
@@ -196,22 +202,22 @@ class Dataset(Params):
 
         database.execute_sql_query(query, tuple(variables))
 
-    def delete_from_db(self, admin):
+    def delete_from_db(self, admin=False):
         """Delete a dataset from the database"""
         database = Database(self.app, self.session)
 
-        if admin:
-            query = '''
-            DELETE FROM datasets
-            WHERE id = ?
-            '''
+        if admin and self.session['user']['admin']:
+            query_params = (self.id,)
+            where_query = ""
             database.execute_sql_query(query, (self.id))
-
         else:
-            query = '''
-            DELETE FROM datasets
-            WHERE user_id = ?
-            AND id = ?
-            '''
+            query_params = (self.session['user']['id'], self.id)
+            where_query = "AND user_id = ?"
 
-            database.execute_sql_query(query, (self.session['user']['id'], self.id))
+        query = '''
+        DELETE FROM datasets
+        WHERE id = ?
+        {}
+        '''.format(where_query)
+
+        database.execute_sql_query(query, query_params)

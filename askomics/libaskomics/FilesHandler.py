@@ -124,6 +124,9 @@ class FilesHandler(FilesUtils):
 
     def get_all_files_infos(self):
 
+        if not self.session['user']['admin']:
+            return []
+
         database = Database(self.app, self.session)
 
         query = '''
@@ -334,7 +337,7 @@ class FilesHandler(FilesUtils):
             self.delete_file_from_fs(file_path)
             self.delete_file_from_db(fid, admin=admin)
 
-        if admin:
+        if admin and self.session['user']['admin']:
             return self.get_all_files_infos()
         else:
             return self.get_files_infos()
@@ -350,18 +353,21 @@ class FilesHandler(FilesUtils):
 
         database = Database(self.app, self.session)
 
-        if admin:
-            query = '''
-            DELETE FROM files
-            WHERE id=? AND user_id=?
-            '''
-            database.execute_sql_query(query, (file_id))
+        if admin and self.session['user']['admin']:
+            query_params = (file_id,)
+            where_query = ""
+
         else:
-            query = '''
-            DELETE FROM files
-            WHERE id=? AND user_id=?
-            '''
-            database.execute_sql_query(query, (file_id, self.session['user']['id']))
+            query_params = (file_id, self.session['user']['id'])
+            where_query = "AND user_id=?"
+
+        query = '''
+        DELETE FROM files
+        WHERE id=?
+        {}
+        '''.format(where_query)
+
+        database.execute_sql_query(query, query_params)
 
     def delete_file_from_fs(self, file_path):
         """Delete a file from filesystem

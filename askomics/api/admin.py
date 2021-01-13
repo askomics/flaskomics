@@ -300,3 +300,90 @@ def delete_users():
         'error': local_auth.get_error(),
         'errorMessage': local_auth.get_error_message()
     })
+
+@admin_bp.route("/api/admin/delete_files", methods=["POST"])
+@admin_required
+def delete_files():
+    """Delete files
+
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+
+    try:
+        files = FilesHandler(current_app, session)
+        remaining_files = files.delete_files(data['filesIdToDelete'], admin=True)
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': remaining_files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+@admin_bp.route("/api/admin/delete_datasets", methods=["POST"])
+@admin_required
+def delete_datasets():
+    """Delete some datasets (db and triplestore) with a celery task
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    datasets_info = []
+    for dataset_id in data['datasetsIdToDelete']:
+        datasets_info.append({'id': dataset_id})
+
+    session_dict = {'user': session['user']}
+
+    try:
+        # Change status to queued for all datasets
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets(admin=True)
+        datasets_handler.update_status_in_db('queued', admin=True)
+
+        # Launch a celery task for each datasets to delete
+        for dataset in datasets_handler.datasets:
+            dataset_info = [{
+                "id": dataset.id
+            }, ]
+            current_app.logger.debug(dataset_info)
+
+            # kill integration celery task
+            current_app.celery.control.revoke(dataset.celery_id, terminate=True)
+
+            # Trigger the celery task to delete the dataset
+            task = current_app.celery.send_task('delete_datasets', (session_dict, dataset_info, admin=True))
+
+            # replace the task id with the new
+            dataset.update_celery(task.id, admin=True)
+
+        datasets = datasets_handler.get_datasets()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })

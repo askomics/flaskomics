@@ -33,11 +33,11 @@ class DatasetsHandler(Params):
         self.datasets_info = datasets_info
         self.datasets = []
 
-    def handle_datasets(self):
+    def handle_datasets(self, admin=False):
         """Handle datasets"""
         for info in self.datasets_info:
             dataset = Dataset(self.app, self.session, dataset_info=info)
-            dataset.set_info_from_db()
+            dataset.set_info_from_db(admin=admin)
             self.datasets.append(dataset)
 
     def get_datasets(self):
@@ -90,6 +90,10 @@ class DatasetsHandler(Params):
         list of dict
             Datasets informations
         """
+
+        if not self.session['user']['admin']:
+            return []
+
         database = Database(self.app, self.session)
 
         query = '''
@@ -125,7 +129,7 @@ class DatasetsHandler(Params):
 
         return datasets
 
-    def update_status_in_db(self, status, admin=admin):
+    def update_status_in_db(self, status, admin=False):
         """Update the status of a datasets in the database
 
         Parameters
@@ -143,14 +147,23 @@ class DatasetsHandler(Params):
         where_str = '(' + ' OR '.join(['id = ?'] * len(self.datasets)) + ')'
         datasets_id = [dataset.id for dataset in self.datasets]
 
-        query = '''
-        UPDATE datasets SET
-        status=?
-        WHERE user_id=?
-        AND {}
-        '''.format(where_str)
+        if admin:
+            query_params = (status,)  + tuple(datasets_id)
+            query = '''
+            UPDATE datasets SET
+            status=?
+            WHERE {}
+            '''.format(where_str)
+        else:
+            query_params = (status, self.session['user']['id']) + tuple(datasets_id)
+            query = '''
+            UPDATE datasets SET
+            status=?
+            WHERE user_id=?
+            AND {}
+            '''.format(where_str)
 
-        database.execute_sql_query(query, (status, self.session['user']['id']) + tuple(datasets_id))
+        database.execute_sql_query(query, query_params)
 
         return self.get_datasets()
 

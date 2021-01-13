@@ -173,7 +173,7 @@ export default class Admin extends Component {
       })
   }
 
-  deleteSelectedUsers () {
+  deleteSelectedDatasets () {
     let requestUrl = '/api/admin/delete_datasets'
     let data = {
       datasetsToDelete: this.state.datasetsSelected
@@ -783,6 +783,8 @@ export default class Admin extends Component {
                 beforeSaveCell: (oldValue, newValue, row) => { this.editFileName(oldValue, newValue, row) },
               })}
             />
+            <br />
+            <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
         <hr />
 
@@ -802,6 +804,8 @@ export default class Admin extends Component {
             selectRow={ datasetsSelectRow }
           />
         </div>
+        <br />
+        <Button disabled={this.isDatasetsDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
       </div>
     )
   }
