@@ -54,7 +54,7 @@ class Dataset(Params):
             query_params = (self.id,)
             where_query = ""
         else:
-            query_params = (self.session['user']['id'], self.id)
+            query_params = (self.id, self.session['user']['id'])
             where_query = "AND user_id = ?"
 
         query = '''
@@ -157,7 +157,7 @@ class Dataset(Params):
         {}
         '''.format(where_query)
 
-        database.execute_sql_query(query, (celery_id, query_params)
+        database.execute_sql_query(query, query_params)
 
     def update_in_db(self, status, update_celery=False, update_date=False, update_graph=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
@@ -209,9 +209,8 @@ class Dataset(Params):
         if admin and self.session['user']['admin']:
             query_params = (self.id,)
             where_query = ""
-            database.execute_sql_query(query, (self.id))
         else:
-            query_params = (self.session['user']['id'], self.id)
+            query_params = (self.id, self.session['user']['id'])
             where_query = "AND user_id = ?"
 
         query = '''

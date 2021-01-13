@@ -367,7 +367,7 @@ def delete_datasets():
             current_app.celery.control.revoke(dataset.celery_id, terminate=True)
 
             # Trigger the celery task to delete the dataset
-            task = current_app.celery.send_task('delete_datasets', (session_dict, dataset_info, admin=True))
+            task = current_app.celery.send_task('delete_datasets', (session_dict, dataset_info, True))
 
             # replace the task id with the new
             dataset.update_celery(task.id, admin=True)

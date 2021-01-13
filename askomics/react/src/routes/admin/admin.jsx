@@ -160,7 +160,7 @@ export default class Admin extends Component {
   deleteSelectedFiles () {
     let requestUrl = '/api/admin/delete_files'
     let data = {
-      filesToDelete: this.state.filesSelected
+      filesIdToDelete: this.state.filesSelected
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -176,7 +176,7 @@ export default class Admin extends Component {
   deleteSelectedDatasets () {
     let requestUrl = '/api/admin/delete_datasets'
     let data = {
-      datasetsToDelete: this.state.datasetsSelected
+      datasetsIdToDelete: this.state.datasetsSelected
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -744,6 +744,7 @@ export default class Admin extends Component {
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"
+            tabIndexCell
             bootstrap4
             keyField='username'
             data={this.state.users}
@@ -757,10 +758,9 @@ export default class Admin extends Component {
             })}
             selectRow={ usersSelectRow }
           />
-          <br />
-          <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
-
+        <br />
+        <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <hr />
 
         <h4>Files</h4>
@@ -777,15 +777,10 @@ export default class Admin extends Component {
               pagination={paginationFactory()}
               noDataIndication={filesNoDataIndication}
               selectRow={ filesSelectRow }
-              cellEdit={ cellEditFactory({
-                mode: 'click',
-                autoSelectText: true,
-                beforeSaveCell: (oldValue, newValue, row) => { this.editFileName(oldValue, newValue, row) },
-              })}
             />
-            <br />
-            <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         </div>
+        <br />
+        <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <hr />
 
         <h4>Datasets</h4>
