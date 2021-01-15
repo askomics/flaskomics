@@ -106,7 +106,7 @@ class Dataset(Params):
             0
         ), get_id=True)
 
-    def toggle_public(self, new_status):
+    def toggle_public(self, new_status, admin=False):
         """Change public status of a dataset (triplestore and db)
 
         Parameters
@@ -117,18 +117,26 @@ class Dataset(Params):
         # Update in TS
         query = SparqlQuery(self.app, self.session)
         tse = TriplestoreExplorer(self.app, self.session)
-
         string_status = "true" if new_status else "false"
         query.toggle_public(self.graph_name, string_status)
+
+        if admin and self.session['user']['admin']
+            query_params = (new_status, self.id)
+            where_query = ""
+        else:
+            query_params = (new_status, self.id, self.session["user"]["id"])
+            where_query = "AND user_id = ?"
 
         # Update in DB
         database = Database(self.app, self.session)
         query = '''
         UPDATE datasets SET
         public=?
-        WHERE user_id = ? AND id = ?
-        '''
-        database.execute_sql_query(query, (new_status, self.session["user"]["id"], self.id))
+        WHERE id = ?
+        {}
+        '''.format(where_query)
+
+        database.execute_sql_query(query, query_params)
 
         # Uncache abstraction
         tse.uncache_abstraction()

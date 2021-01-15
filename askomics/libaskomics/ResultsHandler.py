@@ -118,3 +118,35 @@ class ResultsHandler(Params):
             })
 
         return queries
+
+def get_admin_public_queries(self):
+    """Get id description, and owner of published queries
+
+    Returns
+    -------
+    List
+        List of published queries (id and description)
+    """
+    database = Database(self.app, self.session)
+    sql_var = (True, )
+
+    query = '''
+    SELECT results.id, results.description, results.public, users.username
+    FROM results
+    INNER JOIN users ON results.user_id=users.user_id
+    WHERE results.public = ?
+    '''
+
+    rows = database.execute_sql_query(query, sql_var)
+
+    queries = []
+
+    for row in rows:
+        queries.append({
+            "id": row[0],
+            "description": row[1],
+            "public": row[2],
+            "user": row[3]
+        })
+
+    return queries

@@ -10,6 +10,7 @@ import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
 import WaitingDiv from '../../components/waiting'
 import ErrorDiv from '../error/error'
+import pretty from 'pretty-time'
 
 export default class Admin extends Component {
   constructor (props) {
@@ -18,11 +19,21 @@ export default class Admin extends Component {
     this.state = { usersLoading: true,
       datasetsLoading: true,
       filesLoading: true,
+      queriesLoading: true,
       error: false,
       errorMessage: '',
+      userError: false,
+      userErrorMessage: '',
+      fileError: false,
+      fileErrorMessage: '',
+      datasetError: false,
+      datasetErrorMessage: '',
+      queryError: false,
+      queryErrorMessage: '',
       users: [],
       datasets: [],
       files: [],
+      queries: [],
       fname: "",
       lname: "",
       username: "",
@@ -40,6 +51,8 @@ export default class Admin extends Component {
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
+    this.togglePublicDataset = this.togglePublicDataset.bind(this)
+    this.togglePublicQuery = this.togglePublicQuery.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
     this.handleUserSelection = this.handleUserSelection.bind(this)
@@ -287,8 +300,8 @@ export default class Admin extends Component {
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
+          userError: response.data.error,
+          userErrorMessage: response.data.errorMessage,
           success: !response.data.error,
           users: update(this.state.users, { [index]: { admin: { $set: newAdmin } } })
         })
@@ -296,9 +309,9 @@ export default class Admin extends Component {
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          userError: true,
+          userErrorMessage: error.response.data.errorMessage,
+          userStatus: error.response.status,
           success: !response.data.error
         })
       })
@@ -340,11 +353,57 @@ export default class Admin extends Component {
       })
   }
 
+  togglePublicDataset (event) {
+    let requestUrl = '/api/admin/publicize_dataset'
+    let data = {
+      datasetId: event.target.id,
+      newStatus: event.target.value == "true" ? false : true
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.setState({
+        datasets: response.data.datasets
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          datasetError: true,
+          datasetErrorMessage: error.response.data.errorMessage,
+          datasetStatus: error.response.status,
+        })
+      })
+    })
+  }
+
+  togglePublicQuery (event) {
+    let requestUrl = '/api/admin/publicize_query'
+    let data = {
+      queryId: event.target.id,
+      newStatus: event.target.value == "true" ? false : true
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      console.log(requestUrl, response.data)
+      this.setState({
+        queries: response.data.queries
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          queryError: true,
+          queryErrorMessage: error.response.data.errorMessage,
+          queryStatus: error.response.status,
+        })
+      })
+    })
+  }
   componentDidMount () {
     if (!this.props.waitForStart) {
       this.loadUsers()
       this.loadDataSets()
       this.loadFiles()
+      this.loadQueries()
     }
   }
 
@@ -361,9 +420,9 @@ export default class Admin extends Component {
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          datasetError: true,
+          datasetErrorMessage: error.response.data.errorMessage,
+          datasetStatus: error.response.status,
           success: !error.response.data.error
         })
       })
@@ -382,9 +441,9 @@ export default class Admin extends Component {
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          fileError: true,
+          fileErrorMessage: error.response.data.errorMessage,
+          fileStatus: error.response.status,
           success: !error.response.data.error
         })
       })
@@ -407,9 +466,30 @@ export default class Admin extends Component {
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          userError: true,
+          userErrorMessage: error.response.data.errorMessage,
+          userStatus: error.response.status,
+          success: !error.response.data.error
+        })
+      })
+  }
+
+  loadQueries() {
+    let requestUrl = '/api/admin/getqueries'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          queriesLoading: false,
+          queries: response.data.queries
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          queryError: true,
+          queryErrorMessage: error.response.data.errorMessage,
+          queryStatus: error.response.status,
           success: !error.response.data.error
         })
       })
@@ -577,7 +657,7 @@ export default class Admin extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={true} type="switch" id={row.id} checked={cell} value={cell} />
+              <CustomInput type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -610,6 +690,84 @@ export default class Admin extends Component {
       sort: true
     }]
 
+    let queriesColumns = [{
+      dataField: 'user',
+      text: 'User',
+      sort: true
+    }, {
+      dataField: 'description',
+      text: 'Description',
+      sort: true,
+      editable: false
+    }, {
+      dataField: 'start',
+      text: 'Creation date',
+      sort: true,
+      formatter: (cell, row) => { return this.utils.humanDate(cell) },
+      editable: false
+    },  {
+      dataField: 'execTime',
+      text: 'Exec time',
+      sort: true,
+      formatter: (cell, row) => { return row.status != "started" ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
+      editable: false
+    }, {
+      dataField: 'public',
+      text: 'Public',
+      sort: true,
+      formatter: (cell, row) => {
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
+      },
+      editable: false
+    }, {
+      dataField: 'status',
+      text: 'Status',
+      formatter: (cell, row) => {
+        if (cell == 'queued') {
+          return <Badge color="secondary">Queued</Badge>
+        }
+        if (cell == 'started') {
+          return <Badge color="info">Started</Badge>
+        }
+        if (cell == 'success') {
+          return <Badge color="success">Success</Badge>
+        }
+        if (cell == 'deleting') {
+          return <Badge color="warning">Deleting...</Badge>
+        }
+        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
+      },
+      sort: true,
+      editable: false
+    }, {
+      dataField: "nrows",
+      text: "Rows",
+      sort: true,
+      formatter: (cell, row) => {
+        if (row.status != "success") {
+          return ""
+        } else {
+          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
+          return formattedNrows
+        }
+      },
+      editable: false
+    }, {
+      dataField: "size",
+      text: "Size",
+      sort: true,
+      formatter: (cell, row) => {
+        return cell ? this.utils.humanFileSize(cell, true) : ''
+      },
+      editable: false
+    }]
+
     let usersDefaultSorted = [{
       dataField: 'fname',
       order: 'asc'
@@ -622,6 +780,11 @@ export default class Admin extends Component {
 
     let datasetsDefaultSorted = [{
       dataField: 'start',
+      order: 'desc'
+    }]
+
+    let queriesDefaultSorted = [{
+      dataField: 'data',
       order: 'desc'
     }]
 
@@ -656,6 +819,11 @@ export default class Admin extends Component {
     let datasetsNoDataIndication = 'No datasets'
     if (this.props.datasetsLoading) {
       datasetsNoDataIndication = <WaitingDiv waiting={this.props.datasetsLoading} />
+    }
+
+    let queriesNoDataIndication = 'No public queries'
+    if (this.props.datasetsLoading) {
+      queriessNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
     }
 
     if (!this.props.waitForStart && !this.props.config.logged) {
@@ -761,6 +929,7 @@ export default class Admin extends Component {
         </div>
         <br />
         <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.userStatus} error={this.state.userError} errorMessage={this.state.userErrorMessage} />
         <hr />
 
         <h4>Files</h4>
@@ -781,6 +950,7 @@ export default class Admin extends Component {
         </div>
         <br />
         <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.fileStatus} error={this.state.fileError} errorMessage={this.state.fileErrorMessage} />
         <hr />
 
         <h4>Datasets</h4>
@@ -801,6 +971,26 @@ export default class Admin extends Component {
         </div>
         <br />
         <Button disabled={this.isDatasetsDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.datasetStatus} error={this.state.datasetError} errorMessage={this.state.datasetErrorMessage} />
+        <hr />
+
+        <h4>Queries</h4>
+        <div className="asko-table-height-div">
+          <BootstrapTable
+            classes="asko-table"
+            wrapperClasses="asko-table-wrapper"
+            tabIndexCell
+            bootstrap4
+            keyField='id'
+            data={this.state.queries}
+            columns={queriesColumns}
+            defaultSorted={queriesDefaultSorted}
+            pagination={paginationFactory()}
+            noDataIndication={queriesNoDataIndication}
+          />
+        </div>
+        <br />
+        <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
       </div>
     )
   }

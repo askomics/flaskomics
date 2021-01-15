@@ -105,6 +105,36 @@ def get_files():
         'errorMessage': ''
     })
 
+@admin_bp.route('/api/admin/getqueries', methods=['GET'])
+@admin_required
+def get_queries():
+    """Get all public queries
+
+    Returns
+    -------
+    json
+        startpoint: list of public queries
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        results_handler = ResultsHandler(current_app, session)
+        public_queries = results_handler.get_admin_public_queries()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "publicQueries": [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        "publicQueries": public_queries,
+        'error': False,
+        'errorMessage': ''
+    })
+
 @admin_bp.route('/api/admin/setadmin', methods=['POST'])
 @admin_required
 def set_admin():
@@ -195,6 +225,79 @@ def set_blocked():
         'errorMessage': ''
     })
 
+@datasets_bp.route('/api/admin/publicize_dataset', methods=['POST'])
+@admin_required
+def toogle_public_dataset():
+    """Toggle public status of a dataset
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    datasets_info = [{'id': data["datasetId"]}]
+
+    try:
+        # Change status to queued for all datasets
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets(admin=True)
+
+        for dataset in datasets_handler.datasets:
+            current_app.logger.debug(data["newStatus"])
+            dataset.toggle_public(data["newStatus"], admin=True)
+
+        datasets = datasets_handler.get_all_datasets()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+@datasets_bp.route('/api/admin/publicize_query', methods=['POST'])
+@admin_required
+def toogle_public_query():
+    """Publish a query template from a result
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result_info = {"id": json["queryId"]}
+
+        result = Result(current_app, session, result_info)
+        result.publish_query(json["newStatus"], admin=True)
+
+        results_handler = ResultsHandler(current_app, session)
+        public_queries = results_handler.get_admin_public_queries()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'queries': [],
+            'error': True,
+            'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'queries': public_queries,
+        'error': False,
+        'errorMessage': ''
+    })
 
 @admin_bp.route("/api/admin/adduser", methods=["POST"])
 @admin_required
