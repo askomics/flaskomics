@@ -120,7 +120,7 @@ class Dataset(Params):
         string_status = "true" if new_status else "false"
         query.toggle_public(self.graph_name, string_status)
 
-        if admin and self.session['user']['admin']
+        if admin and self.session['user']['admin']:
             query_params = (new_status, self.id)
             where_query = ""
         else:

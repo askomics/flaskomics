@@ -119,34 +119,46 @@ class ResultsHandler(Params):
 
         return queries
 
-def get_admin_public_queries(self):
-    """Get id description, and owner of published queries
+    def get_admin_public_queries(self):
+        """Get id description, and owner of published queries
 
-    Returns
-    -------
-    List
-        List of published queries (id and description)
-    """
-    database = Database(self.app, self.session)
-    sql_var = (True, )
+        Returns
+        -------
+        List
+            List of published queries (id and description)
+        """
 
-    query = '''
-    SELECT results.id, results.description, results.public, users.username
-    FROM results
-    INNER JOIN users ON results.user_id=users.user_id
-    WHERE results.public = ?
-    '''
+        sql_var = (True, )
+        database = Database(self.app, self.session)
 
-    rows = database.execute_sql_query(query, sql_var)
+        query = '''
+        SELECT results.id, results.status, results.start, results.end, results.nrows, results.public, results.description, results.size, users.username
+        FROM results
+        INNER JOIN users ON results.user_id=users.user_id
+        WHERE results.public = ?
+        '''
 
-    queries = []
+        rows = database.execute_sql_query(query, sql_var)
 
-    for row in rows:
-        queries.append({
-            "id": row[0],
-            "description": row[1],
-            "public": row[2],
-            "user": row[3]
-        })
+        queries = []
 
-    return queries
+        for row in rows:
+
+            exec_time = 0
+            if row[3] is not None and row[2] is not None:
+                exec_time = row[3] - row[2]
+
+            queries.append({
+                'id': row[0],
+                'status': row[1],
+                'start': row[2],
+                'end': row[3],
+                'execTime': exec_time,
+                'nrows': row[4],
+                'public': row[5],
+                'description': row[6],
+                'size': row[7],
+                'user': row[8]
+            })
+        return queries
+

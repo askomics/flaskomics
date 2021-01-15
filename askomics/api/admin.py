@@ -7,6 +7,8 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
+from askomics.libaskomics.Result import Result
+from askomics.libaskomics.ResultsHandler import ResultsHandler
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
@@ -124,13 +126,13 @@ def get_queries():
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            "publicQueries": [],
+            "queries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
-        "publicQueries": public_queries,
+        "queries": public_queries,
         'error': False,
         'errorMessage': ''
     })
@@ -225,7 +227,7 @@ def set_blocked():
         'errorMessage': ''
     })
 
-@datasets_bp.route('/api/admin/publicize_dataset', methods=['POST'])
+@admin_bp.route('/api/admin/publicize_dataset', methods=['POST'])
 @admin_required
 def toogle_public_dataset():
     """Toggle public status of a dataset
@@ -264,9 +266,9 @@ def toogle_public_dataset():
         'errorMessage': ''
     })
 
-@datasets_bp.route('/api/admin/publicize_query', methods=['POST'])
+@admin_bp.route('/api/admin/publicize_query', methods=['POST'])
 @admin_required
-def toogle_public_query():
+def togle_public_query():
     """Publish a query template from a result
 
     Returns

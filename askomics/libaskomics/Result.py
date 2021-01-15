@@ -485,7 +485,7 @@ class Result(Params):
             where_query = "AND user_id=?"
         if public:
             sql_substr = 'template=?,'
-            sql_var = (public, public, self.id, self.session["user"]["id"])
+            sql_var = (public,) + sql_var
 
         query = '''
         UPDATE results SET

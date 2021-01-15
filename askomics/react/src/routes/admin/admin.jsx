@@ -365,13 +365,13 @@ export default class Admin extends Component {
       this.setState({
         datasets: response.data.datasets
       })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          datasetError: true,
-          datasetErrorMessage: error.response.data.errorMessage,
-          datasetStatus: error.response.status,
-        })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        datasetError: true,
+        datasetErrorMessage: error.response.data.errorMessage,
+        datasetStatus: error.response.status,
       })
     })
   }
@@ -388,13 +388,13 @@ export default class Admin extends Component {
       this.setState({
         queries: response.data.queries
       })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          queryError: true,
-          queryErrorMessage: error.response.data.errorMessage,
-          queryStatus: error.response.status,
-        })
+    })
+    .catch(error => {
+      console.log(error, error.response.data.errorMessage)
+      this.setState({
+        queryError: true,
+        queryErrorMessage: error.response.data.errorMessage,
+        queryStatus: error.response.status,
       })
     })
   }
@@ -719,7 +719,7 @@ export default class Admin extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={row.status == "success" ? false : true} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
