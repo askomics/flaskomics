@@ -44,6 +44,7 @@ def get_users():
         'errorMessage': ''
     })
 
+
 @admin_bp.route('/api/admin/getdatasets', methods=['GET'])
 @admin_required
 def get_datasets():
@@ -73,6 +74,7 @@ def get_datasets():
         'errorMessage': ''
     })
 
+
 @admin_bp.route('/api/admin/getfiles', methods=['GET'])
 @admin_required
 def get_files():
@@ -85,10 +87,6 @@ def get_files():
         errorMessage: the error message of error, else an empty string
     """
 
-    files_id = None
-    if request.method == 'POST':
-        data = request.get_json()
-        files_id = data['filesId']
     try:
         files_handler = FilesHandler(current_app, session)
         files = files_handler.get_all_files_infos()
@@ -106,6 +104,7 @@ def get_files():
         'error': False,
         'errorMessage': ''
     })
+
 
 @admin_bp.route('/api/admin/getqueries', methods=['GET'])
 @admin_required
@@ -136,6 +135,7 @@ def get_queries():
         'error': False,
         'errorMessage': ''
     })
+
 
 @admin_bp.route('/api/admin/setadmin', methods=['POST'])
 @admin_required
@@ -227,6 +227,7 @@ def set_blocked():
         'errorMessage': ''
     })
 
+
 @admin_bp.route('/api/admin/publicize_dataset', methods=['POST'])
 @admin_required
 def toogle_public_dataset():
@@ -266,6 +267,7 @@ def toogle_public_dataset():
         'errorMessage': ''
     })
 
+
 @admin_bp.route('/api/admin/publicize_query', methods=['POST'])
 @admin_required
 def togle_public_query():
@@ -300,6 +302,7 @@ def togle_public_query():
         'error': False,
         'errorMessage': ''
     })
+
 
 @admin_bp.route("/api/admin/adduser", methods=["POST"])
 @admin_required
@@ -406,6 +409,7 @@ def delete_users():
         'errorMessage': local_auth.get_error_message()
     })
 
+
 @admin_bp.route("/api/admin/delete_files", methods=["POST"])
 @admin_required
 def delete_files():
@@ -436,6 +440,7 @@ def delete_files():
         'error': False,
         'errorMessage': ''
     })
+
 
 @admin_bp.route("/api/admin/delete_datasets", methods=["POST"])
 @admin_required

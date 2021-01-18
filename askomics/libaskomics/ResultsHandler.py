@@ -161,4 +161,3 @@ class ResultsHandler(Params):
                 'user': row[8]
             })
         return queries
-

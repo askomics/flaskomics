@@ -148,7 +148,7 @@ class DatasetsHandler(Params):
         datasets_id = [dataset.id for dataset in self.datasets]
 
         if admin:
-            query_params = (status,)  + tuple(datasets_id)
+            query_params = (status,) + tuple(datasets_id)
             query = '''
             UPDATE datasets SET
             status=?
