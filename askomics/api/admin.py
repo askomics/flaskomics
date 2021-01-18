@@ -477,7 +477,7 @@ def delete_datasets():
             # replace the task id with the new
             dataset.update_celery(task.id, admin=True)
 
-        datasets = datasets_handler.get_datasets()
+        datasets = datasets_handler.get_all_datasets()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

@@ -224,14 +224,13 @@ export default class UsersTable extends Component {
     let usersSelectRow = {
       mode: 'checkbox',
       clickToSelect: false,
-      selected: this.state.selected,
+      selected: this.props.usersSelected,
       onSelect: this.handleUserSelection,
       onSelectAll: this.handleUserSelectionAll,
       nonSelectable: [this.props.config.user.username]
     }
 
     return (
-      <div className="container">
         <div className=".asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
