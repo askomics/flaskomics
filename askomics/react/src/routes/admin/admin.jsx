@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import {Badge, Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
-import BootstrapTable from 'react-bootstrap-table-next'
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import cellEditFactory from 'react-bootstrap-table2-editor'
-import update from 'react-addons-update'
+import {Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
 import PropTypes from 'prop-types'
+import DatasetsTable from './datasetstable'
+import FilesTable from './filestable'
+import QueriesTable from './queriestable'
+import UsersTable from './userstable'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
 import WaitingDiv from '../../components/waiting'
 import ErrorDiv from '../error/error'
-import pretty from 'pretty-time'
 
 export default class Admin extends Component {
   constructor (props) {
@@ -46,100 +45,15 @@ export default class Admin extends Component {
       filesSelected: [],
       datasetsSelected: []
     }
-    this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
-    this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
-    this.togglePublicDataset = this.togglePublicDataset.bind(this)
-    this.togglePublicQuery = this.togglePublicQuery.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
-    this.handleUserSelection = this.handleUserSelection.bind(this)
-    this.handleUserSelectionAll = this.handleUserSelectionAll.bind(this)
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
-    this.handleFileSelection = this.handleFileSelection.bind(this)
-    this.handleFileSelectionAll = this.handleFileSelectionAll.bind(this)
     this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
-    this.handleDatasetSelection = this.handleDatasetSelection.bind(this)
-    this.handleDatasetSelectionAll = this.handleDatasetSelectionAll.bind(this)
     this.deleteSelectedDatasets = this.deleteSelectedDatasets.bind(this)
     this.cancelRequest
-  }
-
-  handleUserSelection (row, isSelect) {
-    if (isSelect) {
-      this.setState({
-        usersSelected: [...this.state.usersSelected, row.username]
-      })
-    } else {
-      this.setState({
-        usersSelected: this.state.usersSelected.filter(x => x !== row.username)
-      })
-    }
-  }
-
-  handleUserSelectionAll (isSelect, rows) {
-    const usernames = rows.map(r => r.username)
-    if (isSelect) {
-      this.setState({
-        usersSelected: usernames
-      })
-    } else {
-      this.setState({
-        usersSelected: []
-      })
-    }
-  }
-
-  handleFileSelection (row, isSelect) {
-    if (isSelect) {
-      this.setState({
-        filesSelected: [...this.state.filesSelected, row.id]
-      })
-    } else {
-      this.setState({
-        filesSelected: this.state.filesSelected.filter(x => x !== row.id)
-      })
-    }
-  }
-
-  handleFileSelectionAll (isSelect, rows) {
-    const ids = rows.map(r => r.id)
-    if (isSelect) {
-      this.setState({
-        filesSelected: ids
-      })
-    } else {
-      this.setState({
-        filesSelected: []
-      })
-    }
-  }
-
-  handleDatasetSelection (row, isSelect) {
-    if (isSelect) {
-      this.setState({
-        datasetsSelected: [...this.state.datasetsSelected, row.id]
-      })
-    } else {
-      this.setState({
-        datasetsSelected: this.state.datasetsSelected.filter(x => x !== row.id)
-      })
-    }
-  }
-
-  handleDatasetSelectionAll (isSelect, rows) {
-    const ids = rows.map(r => r.id)
-    if (isSelect) {
-      this.setState({
-        datasetsSelected: ids
-      })
-    } else {
-      this.setState({
-        datasetsSelected: []
-      })
-    }
   }
 
   isUsersDisabled () {
@@ -165,7 +79,6 @@ export default class Admin extends Component {
         this.setState({
           users: response.data.users,
           usersSelected: [],
-          waiting: false
         })
       })
   }
@@ -181,7 +94,6 @@ export default class Admin extends Component {
         this.setState({
           files: response.data.files,
           filesSelected: [],
-          waiting: false
         })
       })
   }
@@ -197,7 +109,6 @@ export default class Admin extends Component {
         this.setState({
           datasets: response.data.datasets,
           datasetsSelected: [],
-          waiting: false
         })
       })
   }
@@ -281,123 +192,6 @@ export default class Admin extends Component {
     event.preventDefault()
   }
 
-  handleChangeAdmin (event) {
-    let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    let newAdmin = 0
-    if (event.target.value == 0) {
-      newAdmin = 1
-    }
-
-    let requestUrl = '/api/admin/setadmin'
-    let data = {
-      username: username,
-      newAdmin: newAdmin
-    }
-
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          userError: response.data.error,
-          userErrorMessage: response.data.errorMessage,
-          success: !response.data.error,
-          users: update(this.state.users, { [index]: { admin: { $set: newAdmin } } })
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          userError: true,
-          userErrorMessage: error.response.data.errorMessage,
-          userStatus: error.response.status,
-          success: !response.data.error
-        })
-      })
-  }
-
-  handleChangeBlocked (event) {
-    let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    let newBlocked = 0
-    if (event.target.value == 0) {
-      newBlocked = 1
-    }
-
-    let requestUrl = '/api/admin/setblocked'
-    let data = {
-      username: username,
-      newBlocked: newBlocked
-    }
-
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          success: !response.data.error,
-          users: update(this.state.users, { [index]: { blocked: { $set: newBlocked } } })
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          success: !error.response.data.error
-        })
-      })
-  }
-
-  togglePublicDataset (event) {
-    let requestUrl = '/api/admin/publicize_dataset'
-    let data = {
-      datasetId: event.target.id,
-      newStatus: event.target.value == "true" ? false : true
-    }
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        datasets: response.data.datasets
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        datasetError: true,
-        datasetErrorMessage: error.response.data.errorMessage,
-        datasetStatus: error.response.status,
-      })
-    })
-  }
-
-  togglePublicQuery (event) {
-    let requestUrl = '/api/admin/publicize_query'
-    let data = {
-      queryId: event.target.id,
-      newStatus: event.target.value == 1 ? false : true
-    }
-      axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        queries: response.data.queries
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        queryError: true,
-        queryErrorMessage: error.response.data.errorMessage,
-        queryStatus: error.response.status,
-      })
-    })
-  }
   componentDidMount () {
     if (!this.props.waitForStart) {
       this.loadUsers()
@@ -495,40 +289,6 @@ export default class Admin extends Component {
       })
   }
 
-  updateQuota(oldValue, newValue, row) {
-
-    if (newValue === oldValue) {return}
-
-    let username = row.username
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    console.log("index", index)
-
-    let requestUrl = '/api/admin/setquota'
-    let data = {
-      username: username,
-      quota: newValue
-    }
-    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          userLoading: false,
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          users: response.data.users
-        })
-      })
-    .catch(error => {
-          this.setState({
-            error: true,
-            errorMessage: error.response.data.errorMessage,
-            status: error.response.status,
-            success: !error.response.data.error
-          })
-    })
-  }
-
   componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
@@ -536,295 +296,6 @@ export default class Admin extends Component {
   }
 
   render () {
-    let usersColumns = [{
-      editable: false,
-      dataField: 'ldap',
-      text: 'Authentication type',
-      formatter: (cell, row) => { return cell ? 'Ldap' : 'Local' },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'fname',
-      text: 'Name',
-      formatter: (cell, row) => { return row.fname + ' ' + row.lname },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'username',
-      text: 'Username',
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'email',
-      text: 'Email',
-      formatter: (cell, row) => { return <a href={'mailto:' + cell}>{cell}</a> },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'admin',
-      text: 'Admin',
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" username={row.username} id={'set-admin-' + row.username} name="admin" onChange={this.handleChangeAdmin} label="Admin" checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'blocked',
-      text: 'Blocked',
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" username={row.username} id={'set-blocked-' + row.username} name="blocked" onChange={this.handleChangeBlocked} label="Blocked" checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      sort: true
-    }, {
-      dataField: 'quota',
-      text: 'Quota',
-      formatter: (cell, row) => {
-        return cell === 0 ? "Unlimited" : this.utils.humanFileSize(cell, true)
-      },
-      sort: true
-    }, {
-      dataField: 'last_action',
-      text: 'Last action',
-      formatter: (cell, row) => { return this.utils.humanDate(cell) },
-      editable: false,
-      sort: true
-    }]
-
-    let filesColumns = [{
-      dataField: 'user',
-      text: 'User',
-      sort: true
-    },{
-      dataField: 'name',
-      text: 'File name',
-      sort: true
-    }, {
-      dataField: 'date',
-      text: 'Date',
-      sort: true,
-      formatter: (cell, row) => { return this.utils.humanDate(cell) },
-      editable: false
-    }, {
-      dataField: 'type',
-      text: 'Type',
-      sort: true,
-      editable: false
-    }, {
-      dataField: 'size',
-      text: 'File size',
-      formatter: (cell, row) => { return this.utils.humanFileSize(cell, true) },
-      sort: true,
-      editable: false
-    }]
-
-    let datasetsColumns = [{
-      dataField: 'user',
-      text: 'User',
-      sort: true
-    },{
-      dataField: 'name',
-      text: 'Dataset name',
-      sort: true
-    }, {
-      dataField: 'start',
-      text: 'Creation date',
-      sort: true,
-      formatter: (cell, row) => { return this.utils.humanDate(cell) }
-    }, {
-      dataField: 'exec_time',
-      text: 'Exec time',
-      sort: true,
-      formatter: (cell, row) => { return ["started", "queued"].indexOf(row.status) == -1 ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
-      editable: false
-    }, {
-
-      dataField: 'public',
-      text: 'Public',
-      sort: true,
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      }
-    }, {
-      dataField: 'ntriples',
-      text: 'Triples',
-      sort: true,
-      formatter: (cell, row) => {
-        return cell == 0 ? '' : new Intl.NumberFormat('fr-FR').format(cell)
-      }
-    }, {
-      dataField: 'status',
-      text: 'Status',
-      formatter: (cell, row) => {
-        if (cell == 'queued') {
-          return <Badge color="secondary">Queued</Badge>
-        }
-        if (cell == 'started') {
-          return <Badge color="info">{row.percent ? "processing (" + Math.round(row.percent) + "%)" : "started"}</Badge>
-        }
-        if (cell == 'success') {
-          return <Badge color="success">Success</Badge>
-        }
-        if (cell == 'deleting') {
-          return <Badge color="warning">Deleting</Badge>
-        }
-        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
-      },
-      sort: true
-    }]
-
-    let queriesColumns = [{
-      dataField: 'user',
-      text: 'User',
-      sort: true
-    }, {
-      dataField: 'description',
-      text: 'Description',
-      sort: true,
-      editable: false
-    }, {
-      dataField: 'start',
-      text: 'Creation date',
-      sort: true,
-      formatter: (cell, row) => { return this.utils.humanDate(cell) },
-      editable: false
-    },  {
-      dataField: 'execTime',
-      text: 'Exec time',
-      sort: true,
-      formatter: (cell, row) => { return row.status != "started" ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
-      editable: false
-    }, {
-      dataField: "nrows",
-      text: "Rows",
-      sort: true,
-      formatter: (cell, row) => {
-        if (row.status != "success") {
-          return ""
-        } else {
-          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
-          return formattedNrows
-        }
-      },
-      editable: false
-    }, {
-      dataField: "size",
-      text: "Size",
-      sort: true,
-      formatter: (cell, row) => {
-        return cell ? this.utils.humanFileSize(cell, true) : ''
-      },
-      editable: false
-    },{
-      dataField: 'public',
-      text: 'Public',
-      sort: true,
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      editable: false
-    }, {
-      dataField: 'status',
-      text: 'Status',
-      formatter: (cell, row) => {
-        if (cell == 'queued') {
-          return <Badge color="secondary">Queued</Badge>
-        }
-        if (cell == 'started') {
-          return <Badge color="info">Started</Badge>
-        }
-        if (cell == 'success') {
-          return <Badge color="success">Success</Badge>
-        }
-        if (cell == 'deleting') {
-          return <Badge color="warning">Deleting...</Badge>
-        }
-        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
-      },
-      sort: true,
-      editable: false
-    }]
-
-    let usersDefaultSorted = [{
-      dataField: 'fname',
-      order: 'asc'
-    }]
-
-    let filesDefaultSorted = [{
-      dataField: 'date',
-      order: 'desc'
-    }]
-
-    let datasetsDefaultSorted = [{
-      dataField: 'start',
-      order: 'desc'
-    }]
-
-    let queriesDefaultSorted = [{
-      dataField: 'data',
-      order: 'desc'
-    }]
-
-    let usersSelectRow = {
-      mode: 'checkbox',
-      clickToSelect: false,
-      selected: this.state.selected,
-      onSelect: this.handleUserSelection,
-      onSelectAll: this.handleUserSelectionAll,
-      nonSelectable: [this.props.config.user.username]
-    }
-
-    let filesSelectRow = {
-      mode: 'checkbox',
-      selected: this.props.selected,
-      onSelect: this.handleFileSelection,
-      onSelectAll: this.handleFileSelectionAll
-    }
-
-    let datasetsSelectRow = {
-      mode: 'checkbox',
-      selected: this.props.selected,
-      onSelect: this.handleDatasetSelection,
-      onSelectAll: this.handleDatasetSelectionAll
-    }
-
-    let filesNoDataIndication = 'No file uploaded'
-    if (this.props.filesLoading) {
-      filesNoDataIndication = <WaitingDiv waiting={this.props.filesLoading} />
-    }
-
-    let datasetsNoDataIndication = 'No datasets'
-    if (this.props.datasetsLoading) {
-      datasetsNoDataIndication = <WaitingDiv waiting={this.props.datasetsLoading} />
-    }
-
-    let queriesNoDataIndication = 'No public queries'
-    if (this.props.datasetsLoading) {
-      queriessNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
-    }
 
     if (!this.props.waitForStart && !this.props.config.logged) {
       return <Redirect to="/login" />
@@ -900,95 +371,33 @@ export default class Admin extends Component {
         </Form>
         <br />
         </div>
-
         {newUserMessage}
-
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
-
         <hr />
 
         <h4>Users</h4>
-        <div className=".asko-table-height-div">
-          <BootstrapTable
-            classes="asko-table"
-            wrapperClasses="asko-table-wrapper"
-            tabIndexCell
-            bootstrap4
-            keyField='username'
-            data={this.state.users}
-            columns={usersColumns}
-            defaultSorted={usersDefaultSorted}
-            pagination={paginationFactory()}
-            cellEdit={ cellEditFactory({
-              mode: 'click',
-              autoSelectText: true,
-              beforeSaveCell: (oldValue, newValue, row) => { this.updateQuota(oldValue, newValue, row) },
-            })}
-            selectRow={ usersSelectRow }
-          />
-        </div>
+        <UsersTable config={this.props.config} users={this.state.users} setStateUsers={p => this.setState(p)} usersSelected={this.state.usersSelected} usersLoading={this.state.usersLoading} />
         <br />
         <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.userStatus} error={this.state.userError} errorMessage={this.state.userErrorMessage} />
         <hr />
 
         <h4>Files</h4>
-        <div className="asko-table-height-div">
-            <BootstrapTable
-              classes="asko-table"
-              wrapperClasses="asko-table-wrapper"
-              tabIndexCell
-              bootstrap4
-              keyField='id'
-              data={this.state.files}
-              columns={filesColumns}
-              defaultSorted={filesDefaultSorted}
-              pagination={paginationFactory()}
-              noDataIndication={filesNoDataIndication}
-              selectRow={ filesSelectRow }
-            />
-        </div>
+        <FilesTable config={this.props.config} files={this.state.files} setStateFiles={p => this.setState(p)} filesSelected={this.state.filesSelected} filesLoading={this.state.filesLoading} />
         <br />
         <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.fileStatus} error={this.state.fileError} errorMessage={this.state.fileErrorMessage} />
         <hr />
 
         <h4>Datasets</h4>
-        <div className="asko-table-height-div">
-          <BootstrapTable
-            classes="asko-table"
-            wrapperClasses="asko-table-wrapper"
-            tabIndexCell
-            bootstrap4
-            keyField='id'
-            data={this.state.datasets}
-            columns={datasetsColumns}
-            defaultSorted={datasetsDefaultSorted}
-            pagination={paginationFactory()}
-            noDataIndication={datasetsNoDataIndication}
-            selectRow={ datasetsSelectRow }
-          />
-        </div>
+        <DatasetsTable config={this.props.config} datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} datasetsSelected={this.state.datasetsSelected} datasetsLoading={this.state.datasetsLoading} />
         <br />
         <Button disabled={this.isDatasetsDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.datasetStatus} error={this.state.datasetError} errorMessage={this.state.datasetErrorMessage} />
         <hr />
 
         <h4>Queries</h4>
-        <div className="asko-table-height-div">
-          <BootstrapTable
-            classes="asko-table"
-            wrapperClasses="asko-table-wrapper"
-            tabIndexCell
-            bootstrap4
-            keyField='id'
-            data={this.state.queries}
-            columns={queriesColumns}
-            defaultSorted={queriesDefaultSorted}
-            pagination={paginationFactory()}
-            noDataIndication={queriesNoDataIndication}
-          />
-        </div>
+        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesLoading={this.state.queriesLoading} />
         <br />
         <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
       </div>
