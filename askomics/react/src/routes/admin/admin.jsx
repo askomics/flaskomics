@@ -380,9 +380,9 @@ export default class Admin extends Component {
     let requestUrl = '/api/admin/publicize_query'
     let data = {
       queryId: event.target.id,
-      newStatus: event.target.value == "true" ? false : true
+      newStatus: event.target.value == 1 ? false : true
     }
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
       console.log(requestUrl, response.data)
       this.setState({
@@ -712,6 +712,27 @@ export default class Admin extends Component {
       formatter: (cell, row) => { return row.status != "started" ? cell == 0 ? '<1s' : pretty([cell, 0], 's') : ""},
       editable: false
     }, {
+      dataField: "nrows",
+      text: "Rows",
+      sort: true,
+      formatter: (cell, row) => {
+        if (row.status != "success") {
+          return ""
+        } else {
+          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
+          return formattedNrows
+        }
+      },
+      editable: false
+    }, {
+      dataField: "size",
+      text: "Size",
+      sort: true,
+      formatter: (cell, row) => {
+        return cell ? this.utils.humanFileSize(cell, true) : ''
+      },
+      editable: false
+    },{
       dataField: 'public',
       text: 'Public',
       sort: true,
@@ -719,7 +740,7 @@ export default class Admin extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={row.status == "success" ? false : true} type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -744,27 +765,6 @@ export default class Admin extends Component {
         return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Failure</Badge>
       },
       sort: true,
-      editable: false
-    }, {
-      dataField: "nrows",
-      text: "Rows",
-      sort: true,
-      formatter: (cell, row) => {
-        if (row.status != "success") {
-          return ""
-        } else {
-          let formattedNrows = new Intl.NumberFormat('fr-FR').format(cell)
-          return formattedNrows
-        }
-      },
-      editable: false
-    }, {
-      dataField: "size",
-      text: "Size",
-      sort: true,
-      formatter: (cell, row) => {
-        return cell ? this.utils.humanFileSize(cell, true) : ''
-      },
       editable: false
     }]
 
