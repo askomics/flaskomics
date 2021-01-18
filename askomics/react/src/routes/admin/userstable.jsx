@@ -231,7 +231,7 @@ export default class UsersTable extends Component {
     }
 
     return (
-        <div className=".asko-table-height-div">
+        <div className="asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"
