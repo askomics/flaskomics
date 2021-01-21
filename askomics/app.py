@@ -10,6 +10,7 @@ import configparser
 
 from askomics.api.admin import admin_bp
 from askomics.api.auth import auth_bp
+from askomics.api.data import data_bp
 from askomics.api.datasets import datasets_bp
 from askomics.api.file import file_bp
 from askomics.api.sparql import sparql_bp
@@ -41,6 +42,7 @@ BLUEPRINTS = (
     auth_bp,
     admin_bp,
     file_bp,
+    data_bp,
     datasets_bp,
     query_bp,
     results_bp,

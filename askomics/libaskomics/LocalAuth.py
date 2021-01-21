@@ -1303,3 +1303,25 @@ class LocalAuth(Params):
         graphs = tse.get_graph_of_user(username)
         for graph in graphs:
             Utils.redo_if_failure(self.log, 3, 1, query_launcher.drop_dataset, graph)
+
+    def update_base_url(self, old_url, new_url):
+        """Update base url for all graphs
+
+        Parameters
+        ----------
+        old_url : string
+            Previous base url
+        new_url : string
+            New base url
+        """
+        tse = TriplestoreExplorer(self.app, self.session)
+        graphs = tse.get_all_graphs()
+
+        for graph in graphs:
+            tse.update_base_url(graph, old_url, new_url)
+
+    def clear_abstraction_cache(self):
+        """Clear cache for all users"""
+
+        tse = TriplestoreExplorer(self.app, self.session)
+        tse.uncache_abstraction(public=True, force=True)

@@ -6,6 +6,7 @@ import Ask from './routes/ask/ask'
 import About from './routes/about/about'
 import Upload from './routes/upload/upload'
 import Integration from './routes/integration/integration'
+import Data from './routes/data/data'
 import Datasets from './routes/datasets/datasets'
 import Signup from './routes/login/signup'
 import Login from './routes/login/login'
@@ -112,6 +113,7 @@ export default class Routes extends Component {
             <Route path="/query" exact component={Query} />
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
             <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
+            <Route path="/data/:uri" exact component={() => (<Data config={this.state.config} waitForStart={this.state.waiting} />)} />
             {integrationRoutes}
           </Switch>
           <br />
