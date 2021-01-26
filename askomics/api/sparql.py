@@ -53,6 +53,7 @@ def init():
         "diskSpace": disk_space
     })
 
+
 @admin_required
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
 def query():
@@ -121,6 +122,7 @@ def query():
         'header': header,
         'data': data
     })
+
 
 @admin_required
 @sparql_bp.route('/api/sparql/savequery', methods=["POST"])
