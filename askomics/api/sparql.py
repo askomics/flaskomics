@@ -1,6 +1,6 @@
 import traceback
 import sys
-from askomics.api.auth import login_required
+from askomics.api.auth import admin_required, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQuery import SparqlQuery
@@ -53,7 +53,7 @@ def init():
         "diskSpace": disk_space
     })
 
-
+@admin_required
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
 def query():
     """Perform a sparql query
@@ -122,7 +122,7 @@ def query():
         'data': data
     })
 
-
+@admin_required
 @sparql_bp.route('/api/sparql/savequery', methods=["POST"])
 @login_required
 def save_query():
