@@ -35,6 +35,8 @@ export default class Sparql extends Component {
       endpoints: {},
       exceededQuota: false,
       diskSpace: 0,
+      console_enabled: false,
+      
       // save query icons
       disableSave: false,
       saveIcon: "play",
@@ -260,8 +262,8 @@ export default class Sparql extends Component {
       warningDiskSpace = (
         <div>
           <Alert color="warning">
-              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
-              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space
+              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed).
               Please delete some before save queries or contact an admin to increase your quota
           </Alert>
         </div>
@@ -277,8 +279,8 @@ export default class Sparql extends Component {
     // launch buttons
     let previewButton
     let launchQueryButton
-    previewButton = <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
-    if (this.state.config.logged) {
+    if (this.state.console_enabled){
+      previewButton = <Button onClick={this.previewQuery} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
       launchQueryButton = <Button onClick={this.launchQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
     }
 
@@ -304,6 +306,7 @@ export default class Sparql extends Component {
             editorProps={{ $blockScrolling: true }}
             height={this.state.editorHeight}
             width={this.state.editorWidth}
+            readOnly={!this.state.console_enabled}
           />
         </div>
         <br />
