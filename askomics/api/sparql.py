@@ -12,7 +12,7 @@ sparql_bp = Blueprint('sparql', __name__, url_prefix='/')
 
 
 def can_access(user):
-    login_allowed = current_app.iniconfig.get('askomics', 'enable_sparql_console', fallback=False)
+    login_allowed = current_app.iniconfig.getboolean('askomics', 'enable_sparql_console', fallback=False)
     return login_allowed or user['admin']
 
 
@@ -26,8 +26,6 @@ def init():
     json
     """
     try:
-
-        raise Exception("admin: {}, login: {}, can access: {}".format(session['user']['admin'], current_app.iniconfig.get('askomics', 'enable_sparql_console', fallback=False), can_access(session['user'])))
         # Disk space
         files_utils = FilesUtils(current_app, session)
         disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None

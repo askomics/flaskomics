@@ -25,8 +25,6 @@ class TestApiSparql(AskomicsTestCase):
         content = content.replace("###SIZE###", str(client.get_size_occupied_by_user()))
         expected = json.loads(content)
 
-        print(response.json)
-
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
