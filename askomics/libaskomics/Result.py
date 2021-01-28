@@ -189,8 +189,17 @@ class Result(Params):
             graph state
         """
         if formated:
-            return self.format_graph_state(self.graph_state)
-        return self.graph_state
+            graph = self.format_graph_state(self.graph_state)
+        else:
+            graph = self.graph_state
+
+        # Retrocompatibility with < 4.1.0
+        if 'attr' in graph:
+            for val in graph['attr']:
+                if 'entityUri' in val and 'entityUris' not in val:
+                    val['entityUris'] = [val['entityUri']]
+
+        return graph
 
     def get_sparql_query(self):
         """Get the sparql query if exists
