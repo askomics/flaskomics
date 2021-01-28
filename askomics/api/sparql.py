@@ -1,6 +1,6 @@
 import traceback
 import sys
-from askomics.api.auth import admin_required, login_required
+from askomics.api.auth import login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQuery import SparqlQuery
