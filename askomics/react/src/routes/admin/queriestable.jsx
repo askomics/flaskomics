@@ -125,7 +125,7 @@ export default class QueriesTable extends Component {
     }]
 
     let queriesNoDataIndication = 'No public queries'
-    if (this.props.datasetsLoading) {
+    if (this.props.queriesLoading) {
       queriessNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
     }
 

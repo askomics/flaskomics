@@ -77,7 +77,7 @@ export default class FilesTable extends Component {
 
     let filesSelectRow = {
       mode: 'checkbox',
-      selected: this.props.fileSelected,
+      selected: this.props.filesSelected,
       onSelect: this.handleFileSelection,
       onSelectAll: this.handleFileSelectionAll
     }

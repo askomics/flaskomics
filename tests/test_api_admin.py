@@ -205,7 +205,7 @@ class TestApiAdmin(AskomicsTestCase):
 
         client.upload_and_integrate()
         result_info = client.create_result()
-        self.publicize_result(result_info["id"], True)
+        client.publicize_result(result_info["id"], True)
 
         client.log_user("jdoe")
 

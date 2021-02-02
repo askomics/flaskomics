@@ -22,7 +22,7 @@ export default class DatasetsTable extends Component {
   handleDatasetSelection (row, isSelect) {
     if (isSelect) {
       this.props.setStateDatasets({
-        datasetsSelected: [...this.props.datasetsSelected, row.id]
+        datasetSelected: [...this.props.datasetsSelected, row.id]
       })
     } else {
       this.props.setStateDatasets({
@@ -139,7 +139,7 @@ render () {
 
     let datasetsSelectRow = {
       mode: 'checkbox',
-      selected: this.props.selected,
+      selected: this.props.datasetsSelected,
       onSelect: this.handleDatasetSelection,
       onSelectAll: this.handleDatasetSelectionAll
     }
