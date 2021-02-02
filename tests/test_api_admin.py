@@ -1,3 +1,5 @@
+import json
+
 from . import AskomicsTestCase
 
 
@@ -7,6 +9,11 @@ class TestApiAdmin(AskomicsTestCase):
     def test_get_users(self, client):
         """test the /api/admin/getusers route"""
         client.create_two_users()
+
+        client.log_user("jsmith")
+        response = client.client.get('/api/admin/getusers')
+        assert response.status_code == 401
+
         client.log_user("jdoe")
         client.upload()
 
@@ -39,6 +46,181 @@ class TestApiAdmin(AskomicsTestCase):
             }]
         }
 
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_get_files(self, client):
+        """test the /api/admin/getfiles route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getfiles')
+        assert response.status_code == 401
+
+        info = client.upload()
+        client.log_user("jdoe")
+
+        response = client.client.get('/api/admin/getfiles')
+        expected = {
+            'error': False,
+            'errorMessage': '',
+            'files': [{
+                'date': info["transcripts"]["upload"]["file_date"],
+                'id': 1,
+                'name': 'transcripts.tsv',
+                'size': 1986,
+                'type': 'csv/tsv',
+                'user': 'jsmith'
+
+            }, {
+                'date': info["de"]["upload"]["file_date"],
+                'id': 2,
+                'name': 'de.tsv',
+                'size': 819,
+                'type': 'csv/tsv',
+                'user': 'jsmith'
+
+            }, {
+                'date': info["qtl"]["upload"]["file_date"],
+                'id': 3,
+                'name': 'qtl.tsv',
+                'size': 99,
+                'type': 'csv/tsv',
+                'user': 'jsmith'
+
+            }, {
+                'date': info["gene"]["upload"]["file_date"],
+                'id': 4,
+                'name': 'gene.gff3',
+                'size': 2267,
+                'type': 'gff/gff3',
+                'user': 'jsmith'
+
+            }, {
+                'date': info["bed"]["upload"]["file_date"],
+                'id': 5,
+                'name': 'gene.bed',
+                'size': 689,
+                'type': 'bed',
+                'user': 'jsmith'
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_get_datasets(self, client):
+        """test the /api/admin/getdatasets route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getdatasets')
+        assert response.status_code == 401
+
+        info = client.upload_and_integrate()
+        client.log_user("jdoe")
+
+        response = client.client.get('/api/admin/getdatasets')
+        expected = {
+            'datasets': [{
+                'end': info["transcripts"]["end"],
+                'error_message': '',
+                'id': 1,
+                'name': 'transcripts.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["transcripts"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
+                'user': 'jsmith'
+            }, {
+                'end': info["de"]["end"],
+                'error_message': '',
+                'id': 2,
+                'name': 'de.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["de"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["de"]["end"] - info["de"]["start"],
+                'user': 'jsmith'
+            }, {
+                'end': info["qtl"]["end"],
+                'error_message': '',
+                'id': 3,
+                'name': 'qtl.tsv',
+                'ntriples': 0,
+                'public': False,
+                'start': info["qtl"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
+                'user': 'jsmith'
+            }, {
+                'end': info["gff"]["end"],
+                'error_message': '',
+                'id': 4,
+                'name': 'gene.gff3',
+                'ntriples': 0,
+                'public': False,
+                'start': info["gff"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["gff"]["end"] - info["gff"]["start"],
+                'user': 'jsmith'
+            }, {
+                'end': info["bed"]["end"],
+                'error_message': '',
+                'id': 5,
+                'name': 'gene.bed',
+                'ntriples': 0,
+                'public': False,
+                'start': info["bed"]["start"],
+                'status': 'success',
+                'traceback': None,
+                'percent': 100.0,
+                'exec_time': info["bed"]["end"] - info["bed"]["start"],
+                'user': 'jsmith'
+            }],
+            'error': False,
+            'errorMessage': ''
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_get_queries(self, client):
+        """test the /api/admin/getqueries route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getqueries')
+        assert response.status_code == 401
+
+        client.upload_and_integrate()
+        result_info = client.create_result()
+        self.publicize_result(result_info["id"], True)
+
+        client.log_user("jdoe")
+
+        with open("tests/results/results_admin.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+        expected = json.loads(raw_results)
+
+        response = client.client.get('/api/admin/getqueries')
         assert response.status_code == 200
         assert response.json == expected
 

@@ -473,6 +473,13 @@ class Client(object):
             "size": file_size
         }
 
+    def publicize_result(self, result_id, public=True):
+        """Publicize a result"""
+
+        result_info = {"id": result_id}
+        result = Result(self.app, self.session, result_info)
+        result.publish_query(public)
+
     def delete_data_dir(self):
         """remove data directory"""
         shutil.rmtree(self.dir_path)
