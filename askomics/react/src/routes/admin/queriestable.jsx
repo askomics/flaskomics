@@ -20,7 +20,7 @@ export default class QueriesTable extends Component {
   togglePublicQuery (event) {
     let requestUrl = '/api/admin/publicize_query'
     let data = {
-      queryId: event.target.id,
+      queryId: parseInt(event.target.id.replace("query-", "")),
       newStatus: event.target.value == 1 ? false : true
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -91,7 +91,7 @@ export default class QueriesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" id={row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -126,7 +126,7 @@ export default class QueriesTable extends Component {
 
     let queriesNoDataIndication = 'No public queries'
     if (this.props.queriesLoading) {
-      queriessNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
+      queriesNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
     }
 
     return (

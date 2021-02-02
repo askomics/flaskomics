@@ -22,7 +22,7 @@ export default class DatasetsTable extends Component {
   handleDatasetSelection (row, isSelect) {
     if (isSelect) {
       this.props.setStateDatasets({
-        datasetSelected: [...this.props.datasetsSelected, row.id]
+        datasetsSelected: [...this.props.datasetsSelected, row.id]
       })
     } else {
       this.props.setStateDatasets({
@@ -47,7 +47,7 @@ export default class DatasetsTable extends Component {
   togglePublicDataset (event) {
     let requestUrl = '/api/admin/publicize_dataset'
     let data = {
-      datasetId: event.target.id,
+      datasetId: parseInt(event.target.id.replace("dataset-", "")),
       newStatus: event.target.value == "true" ? false : true
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -99,7 +99,7 @@ render () {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
+              <CustomInput type="switch" id={"dataset-" + row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
