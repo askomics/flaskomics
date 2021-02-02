@@ -247,7 +247,7 @@ class TestApiAdmin(AskomicsTestCase):
         response = client.client.post('/api/admin/publicize_dataset')
         assert response.status_code == 401
 
-        info = client.upload_and_integrate()
+        client.upload_and_integrate()
         client.log_user("jdoe")
 
         data = {"datasetId": 1, "newStatus": True}
@@ -257,7 +257,7 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert response.json["datasets"][0]["public"] == True
+        assert response.json["datasets"][0]["public"] is True
 
     def test_set_query_private(self, client):
         """test the /api/admin/publicize_query route"""
@@ -468,7 +468,7 @@ class TestApiAdmin(AskomicsTestCase):
         response = client.client.post('/api/admin/delete_datasets')
         assert response.status_code == 401
 
-        info = client.upload_and_integrate()
+        client.upload_and_integrate()
         client.log_user("jdoe")
 
         data = {
