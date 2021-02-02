@@ -252,81 +252,12 @@ class TestApiAdmin(AskomicsTestCase):
 
         data = {"datasetId": 1, "newStatus": True}
 
-        response = client.client.get('/api/admin/publicize_dataset', json=data)
-
-        expected = {
-            'datasets': [{
-                'end': info["transcripts"]["end"],
-                'error_message': '',
-                'id': 1,
-                'name': 'transcripts.tsv',
-                'ntriples': 0,
-                'public': True,
-                'start': info["transcripts"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
-                'user': 'jsmith'
-            }, {
-                'end': info["de"]["end"],
-                'error_message': '',
-                'id': 2,
-                'name': 'de.tsv',
-                'ntriples': 0,
-                'public': False,
-                'start': info["de"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["de"]["end"] - info["de"]["start"],
-                'user': 'jsmith'
-            }, {
-                'end': info["qtl"]["end"],
-                'error_message': '',
-                'id': 3,
-                'name': 'qtl.tsv',
-                'ntriples': 0,
-                'public': False,
-                'start': info["qtl"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
-                'user': 'jsmith'
-            }, {
-                'end': info["gff"]["end"],
-                'error_message': '',
-                'id': 4,
-                'name': 'gene.gff3',
-                'ntriples': 0,
-                'public': False,
-                'start': info["gff"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["gff"]["end"] - info["gff"]["start"],
-                'user': 'jsmith'
-            }, {
-                'end': info["bed"]["end"],
-                'error_message': '',
-                'id': 5,
-                'name': 'gene.bed',
-                'ntriples': 0,
-                'public': False,
-                'start': info["bed"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["bed"]["end"] - info["bed"]["start"],
-                'user': 'jsmith'
-            }],
-            'error': False,
-            'errorMessage': ''
-        }
+        response = client.client.post('/api/admin/publicize_dataset', json=data)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["datasets"][0]["public"] == True
 
     def test_set_query_private(self, client):
         """test the /api/admin/publicize_query route"""
@@ -343,7 +274,7 @@ class TestApiAdmin(AskomicsTestCase):
         client.log_user("jdoe")
 
         data = {"queryId": result_info["id"], "newStatus": False}
-        response = client.client.post('/api/admin/getqueries', json=data)
+        response = client.client.post('/api/admin/publicize_query', json=data)
 
         expected = {
             'error': False,
@@ -546,37 +477,9 @@ class TestApiAdmin(AskomicsTestCase):
 
         response = client.client.post('/api/admin/delete_datasets', json=data)
 
-        expected = {
-            'datasets': [{
-                'end': info["gff"]["end"],
-                'error_message': '',
-                'id': 4,
-                'name': 'gene.gff3',
-                'ntriples': 0,
-                'public': False,
-                'start': info["gff"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["gff"]["end"] - info["gff"]["start"],
-                'user': 'jsmith'
-            }, {
-                'end': info["bed"]["end"],
-                'error_message': '',
-                'id': 5,
-                'name': 'gene.bed',
-                'ntriples': 0,
-                'public': False,
-                'start': info["bed"]["start"],
-                'status': 'success',
-                'traceback': None,
-                'percent': 100.0,
-                'exec_time': info["bed"]["end"] - info["bed"]["start"],
-                'user': 'jsmith'
-            }],
-            'error': False,
-            'errorMessage': ''
-        }
-
         assert response.status_code == 200
-        assert response.json == expected
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["datasets"][0]["status"] == "queued"
+        assert response.json["datasets"][1]["status"] == "queued"
+        assert response.json["datasets"][2]["status"] == "queued"
