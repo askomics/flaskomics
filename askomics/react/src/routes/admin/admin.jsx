@@ -198,6 +198,9 @@ export default class Admin extends Component {
       this.loadDataSets()
       this.loadFiles()
       this.loadQueries()
+      this.interval = setInterval(() => {
+        this.loadDataSets()
+      }, 5000)
     }
   }
 
@@ -290,6 +293,7 @@ export default class Admin extends Component {
   }
 
   componentWillUnmount () {
+    clearInterval(this.interval)
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
