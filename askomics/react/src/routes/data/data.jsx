@@ -111,7 +111,8 @@ class Data extends Component {
 
 Data.propTypes = {
   waitForStart: PropTypes.bool,
-  config: PropTypes.object
+  config: PropTypes.object,
+  match: PropTypes.object
 }
 
 export default withRouter(Data)
