@@ -480,23 +480,29 @@ class Result(Params):
         except Exception:
             self.log.debug("Impossible to delete {}".format(self.file_path))
 
-    def publish_query(self, public):
+    def publish_query(self, public, admin=False):
         """Set public to True or False, and template to True if public is True"""
         database = Database(self.app, self.session)
 
         # If query is set to public, template have to be True
         sql_substr = ''
-        sql_var = (public, self.session["user"]["id"], self.id)
+        if admin and self.session['user']['admin']:
+            sql_var = (public, self.id)
+            where_query = ""
+        else:
+            sql_var = (public, self.id, self.session["user"]["id"])
+            where_query = "AND user_id=?"
         if public:
             sql_substr = 'template=?,'
-            sql_var = (public, public, self.session["user"]["id"], self.id)
+            sql_var = (public,) + sql_var
 
         query = '''
         UPDATE results SET
         {}
         public=?
-        WHERE user_id=? AND id=?
-        '''.format(sql_substr)
+        WHERE id=?
+        {}
+        '''.format(sql_substr, where_query)
 
         database.execute_sql_query(query, sql_var)
 

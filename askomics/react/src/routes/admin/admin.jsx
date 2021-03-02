@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
-import BootstrapTable from 'react-bootstrap-table-next'
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import cellEditFactory from 'react-bootstrap-table2-editor'
-import update from 'react-addons-update'
+import {Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
 import PropTypes from 'prop-types'
+import DatasetsTable from './datasetstable'
+import FilesTable from './filestable'
+import QueriesTable from './queriestable'
+import UsersTable from './userstable'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
 import WaitingDiv from '../../components/waiting'
@@ -15,10 +15,24 @@ export default class Admin extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.state = { isLoading: true,
+    this.state = { usersLoading: true,
+      datasetsLoading: true,
+      filesLoading: true,
+      queriesLoading: true,
       error: false,
       errorMessage: '',
+      userError: false,
+      userErrorMessage: '',
+      fileError: false,
+      fileErrorMessage: '',
+      datasetError: false,
+      datasetErrorMessage: '',
+      queryError: false,
+      queryErrorMessage: '',
       users: [],
+      datasets: [],
+      files: [],
+      queries: [],
       fname: "",
       lname: "",
       username: "",
@@ -27,62 +41,74 @@ export default class Admin extends Component {
       messageOpen: false,
       displayPassword: false,
       instanceUrl: "",
-      selected: []
+      usersSelected: [],
+      filesSelected: [],
+      datasetsSelected: []
     }
-    this.handleChangeAdmin = this.handleChangeAdmin.bind(this)
-    this.handleChangeBlocked = this.handleChangeBlocked.bind(this)
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
-    this.handleSelection = this.handleSelection.bind(this)
-    this.handleSelectionAll = this.handleSelectionAll.bind(this)
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
+    this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
+    this.deleteSelectedDatasets = this.deleteSelectedDatasets.bind(this)
     this.cancelRequest
   }
 
-  handleSelection (row, isSelect) {
-    if (isSelect) {
-      this.setState({
-        selected: [...this.state.selected, row.username]
-      })
-    } else {
-      this.setState({
-        selected: this.state.selected.filter(x => x !== row.username)
-      })
-    }
+  isUsersDisabled () {
+    return this.state.usersSelected.length == 0
   }
 
-  handleSelectionAll (isSelect, rows) {
-    const usernames = rows.map(r => r.username)
-    if (isSelect) {
-      this.setState({
-        selected: usernames
-      })
-    } else {
-      this.setState({
-        selected: []
-      })
-    }
+  isFilesDisabled () {
+    return this.state.filesSelected.length == 0
   }
 
-  isDisabled () {
-    return this.state.selected.length == 0
+  isDatasetsDisabled () {
+    return this.state.datasetsSelected.length == 0
   }
 
   deleteSelectedUsers () {
     let requestUrl = '/api/admin/delete_users'
     let data = {
-      usersToDelete: this.state.selected
+      usersToDelete: this.state.usersSelected
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           users: response.data.users,
-          selected: [],
-          waiting: false
+          usersSelected: [],
+        })
+      })
+  }
+
+  deleteSelectedFiles () {
+    let requestUrl = '/api/admin/delete_files'
+    let data = {
+      filesIdToDelete: this.state.filesSelected
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          files: response.data.files,
+          filesSelected: [],
+        })
+      })
+  }
+
+  deleteSelectedDatasets () {
+    let requestUrl = '/api/admin/delete_datasets'
+    let data = {
+      datasetsIdToDelete: this.state.datasetsSelected
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          datasets: response.data.datasets,
+          datasetsSelected: [],
         })
       })
   }
@@ -166,82 +192,58 @@ export default class Admin extends Component {
     event.preventDefault()
   }
 
-  handleChangeAdmin (event) {
-    let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    let newAdmin = 0
-    if (event.target.value == 0) {
-      newAdmin = 1
+  componentDidMount () {
+    if (!this.props.waitForStart) {
+      this.loadUsers()
+      this.loadDataSets()
+      this.loadFiles()
+      this.loadQueries()
+      this.interval = setInterval(() => {
+        this.loadDataSets()
+      }, 5000)
     }
-
-    let requestUrl = '/api/admin/setadmin'
-    let data = {
-      username: username,
-      newAdmin: newAdmin
-    }
-
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          success: !response.data.error,
-          users: update(this.state.users, { [index]: { admin: { $set: newAdmin } } })
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          success: !response.data.error
-        })
-      })
   }
 
-  handleChangeBlocked (event) {
-    let username = event.target.getAttribute('username')
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    let newBlocked = 0
-    if (event.target.value == 0) {
-      newBlocked = 1
-    }
-
-    let requestUrl = '/api/admin/setblocked'
-    let data = {
-      username: username,
-      newBlocked: newBlocked
-    }
-
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+  loadDataSets(){
+    let requestUrl = '/api/admin/getdatasets'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          success: !response.data.error,
-          users: update(this.state.users, { [index]: { blocked: { $set: newBlocked } } })
+          datasetsLoading: false,
+          datasets: response.data.datasets
         })
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          datasetError: true,
+          datasetErrorMessage: error.response.data.errorMessage,
+          datasetStatus: error.response.status,
           success: !error.response.data.error
         })
       })
   }
 
-  componentDidMount () {
-    if (!this.props.waitForStart) {
-      this.loadUsers()
-    }
+  loadFiles(){
+    let requestUrl = '/api/admin/getfiles'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          filesLoading: false,
+          files: response.data.files
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          fileError: true,
+          fileErrorMessage: error.response.data.errorMessage,
+          fileStatus: error.response.status,
+          success: !error.response.data.error
+        })
+      })
   }
 
   loadUsers() {
@@ -254,132 +256,50 @@ export default class Admin extends Component {
           lname: "",
           username: "",
           email: "",
-          isLoading: false,
+          usersLoading: false,
           users: response.data.users
         })
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
         this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
+          userError: true,
+          userErrorMessage: error.response.data.errorMessage,
+          userStatus: error.response.status,
           success: !error.response.data.error
         })
       })
   }
 
-  updateQuota(oldValue, newValue, row) {
-
-    if (newValue === oldValue) {return}
-
-    let username = row.username
-    let index = this.state.users.findIndex((user) => user.username == username)
-
-    console.log("index", index)
-
-    let requestUrl = '/api/admin/setquota'
-    let data = {
-      username: username,
-      quota: newValue
-    }
-    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+  loadQueries() {
+    let requestUrl = '/api/admin/getqueries'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
-          isLoading: false,
-          error: response.data.error,
-          errorMessage: response.data.errorMessage,
-          users: response.data.users
+          queriesLoading: false,
+          queries: response.data.queries
         })
       })
-    .catch(error => {
-          this.setState({
-            error: true,
-            errorMessage: error.response.data.errorMessage,
-            status: error.response.status,
-            success: !error.response.data.error
-          })
-    })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          queryError: true,
+          queryErrorMessage: error.response.data.errorMessage,
+          queryStatus: error.response.status,
+          success: !error.response.data.error
+        })
+      })
   }
 
   componentWillUnmount () {
+    clearInterval(this.interval)
     if (!this.props.waitForStart) {
       this.cancelRequest()
     }
   }
 
   render () {
-    let columns = [{
-      editable: false,
-      dataField: 'ldap',
-      text: 'Authentication type',
-      formatter: (cell, row) => { return cell ? 'Ldap' : 'Local' },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'fname',
-      text: 'Name',
-      formatter: (cell, row) => { return row.fname + ' ' + row.lname },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'username',
-      text: 'Username',
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'email',
-      text: 'Email',
-      formatter: (cell, row) => { return <a href={'mailto:' + cell}>{cell}</a> },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'admin',
-      text: 'Admin',
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" username={row.username} id={'set-admin-' + row.username} name="admin" onChange={this.handleChangeAdmin} label="Admin" checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      sort: true
-    }, {
-      editable: false,
-      dataField: 'blocked',
-      text: 'Blocked',
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" username={row.username} id={'set-blocked-' + row.username} name="blocked" onChange={this.handleChangeBlocked} label="Blocked" checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      sort: true
-    }, {
-      dataField: 'quota',
-      text: 'Quota',
-      formatter: (cell, row) => {
-        return cell === 0 ? "Unlimited" : this.utils.humanFileSize(cell, true)
-      },
-      sort: true
-    }, {
-      dataField: 'last_action',
-      text: 'Last action',
-      formatter: (cell, row) => { return this.utils.humanDate(cell) },
-      editable: false,
-      sort: true
-    }]
-
-    let defaultSorted = [{
-      dataField: 'fname',
-      order: 'asc'
-    }]
 
     if (!this.props.waitForStart && !this.props.config.logged) {
       return <Redirect to="/login" />
@@ -416,15 +336,6 @@ export default class Admin extends Component {
           User {this.state.newUser.username} added. Password creation link send to {this.state.newUser.email}
         </Alert>
       )
-    }
-
-    let selectRow = {
-      mode: 'checkbox',
-      clickToSelect: false,
-      selected: this.state.selected,
-      onSelect: this.handleSelection,
-      onSelectAll: this.handleSelectionAll,
-      nonSelectable: [this.props.config.user.username]
     }
 
     return (
@@ -464,34 +375,35 @@ export default class Admin extends Component {
         </Form>
         <br />
         </div>
-
         {newUserMessage}
-
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
-
         <hr />
 
         <h4>Users</h4>
-        <div className=".asko-table-height-div">
-          <BootstrapTable
-            classes="asko-table"
-            wrapperClasses="asko-table-wrapper"
-            bootstrap4
-            keyField='username'
-            data={this.state.users}
-            columns={columns}
-            defaultSorted={defaultSorted}
-            pagination={paginationFactory()}
-            cellEdit={ cellEditFactory({
-              mode: 'click',
-              autoSelectText: true,
-              beforeSaveCell: (oldValue, newValue, row) => { this.updateQuota(oldValue, newValue, row) },
-            })}
-            selectRow={ selectRow }
-          />
-          <br />
-          <Button disabled={this.isDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
-        </div>
+        <UsersTable config={this.props.config} users={this.state.users} setStateUsers={p => this.setState(p)} usersSelected={this.state.usersSelected} usersLoading={this.state.usersLoading} />
+        <br />
+        <Button disabled={this.isUsersDisabled()} onClick={this.deleteSelectedUsers} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.userStatus} error={this.state.userError} errorMessage={this.state.userErrorMessage} />
+        <hr />
+
+        <h4>Files</h4>
+        <FilesTable config={this.props.config} files={this.state.files} setStateFiles={p => this.setState(p)} filesSelected={this.state.filesSelected} filesLoading={this.state.filesLoading} />
+        <br />
+        <Button disabled={this.isFilesDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.fileStatus} error={this.state.fileError} errorMessage={this.state.fileErrorMessage} />
+        <hr />
+
+        <h4>Datasets</h4>
+        <DatasetsTable config={this.props.config} datasets={this.state.datasets} setStateDatasets={p => this.setState(p)} datasetsSelected={this.state.datasetsSelected} datasetsLoading={this.state.datasetsLoading} />
+        <br />
+        <Button disabled={this.isDatasetsDisabled()} onClick={this.deleteSelectedDatasets} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
+        <ErrorDiv status={this.state.datasetStatus} error={this.state.datasetError} errorMessage={this.state.datasetErrorMessage} />
+        <hr />
+
+        <h4>Queries</h4>
+        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesLoading={this.state.queriesLoading} />
+        <br />
+        <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
       </div>
     )
   }

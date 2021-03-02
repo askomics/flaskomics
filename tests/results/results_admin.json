@@ -1,0 +1,18 @@
+{
+  "error": false,
+  "errorMessage": "",
+  "queries": [
+    {
+      "description": "###DESC###",
+      "end": ###END###,
+      "execTime": ###EXECTIME###,
+      "id": ###ID###,
+      "nrows": 11,
+      "public": ###PUBLIC###,
+      "size": ###SIZE###,
+      "start": ###START###,
+      "status": "success",
+      "user": "jsmith"
+    }
+  ]
+}

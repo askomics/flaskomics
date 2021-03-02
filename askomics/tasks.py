@@ -94,7 +94,7 @@ def integrate(self, session, data, host_url):
 
 
 @celery.task(bind=True, name='delete_datasets')
-def delete_datasets(self, session, datasets_info):
+def delete_datasets(self, session, datasets_info, admin=False):
     """Delete datasets from database and triplestore
 
     Parameters
@@ -112,9 +112,9 @@ def delete_datasets(self, session, datasets_info):
     """
     try:
         datasets_handler = DatasetsHandler(app, session, datasets_info=datasets_info)
-        datasets_handler.handle_datasets()
-        datasets_handler.update_status_in_db("deleting")
-        datasets_handler.delete_datasets()
+        datasets_handler.handle_datasets(admin=admin)
+        datasets_handler.update_status_in_db("deleting", admin=admin)
+        datasets_handler.delete_datasets(admin=admin)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
