@@ -29,6 +29,7 @@ nav:
   - Admin :
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
+    - Manage: manage.md
   - Developer guide:
     - Dev deployment: dev-deployment.md
     - Contribute: contribute.md

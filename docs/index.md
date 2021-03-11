@@ -12,6 +12,7 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
 - Administration
     - [Deploy an instance](production-deployment.md): Deploy an AskOmics instance on your server
     - [Configuration](configure.md): Configure your instance
+    - [Manage](manage.md): Manage your instance
 <br /><br />
 
 - Developer documentation
