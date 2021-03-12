@@ -13,6 +13,11 @@ from flask import (Blueprint, current_app, jsonify, session, request, send_from_
 results_bp = Blueprint('results', __name__, url_prefix='/')
 
 
+def can_access(user):
+    login_allowed = current_app.iniconfig.getboolean('askomics', 'enable_sparql_console', fallback=False)
+    return login_allowed or user['admin']
+
+
 @results_bp.route('/api/results', methods=['GET'])
 @login_required
 def get_results():
@@ -258,6 +263,8 @@ def get_sparql_query():
         # Get all graphs and endpoint, and mark as selected the used one
         graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
 
+        console_enabled = can_access(session['user'])
+
         # Build sparql query from json if needed
         if sparql is None:
             query.json = result.get_graph_state()
@@ -280,6 +287,7 @@ def get_sparql_query():
         'graphs': graphs,
         'endpoints': endpoints,
         'diskSpace': disk_space,
+        'console_enabled': console_enabled,
         'error': False,
         'errorMessage': ''
     })
