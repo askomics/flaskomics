@@ -36,7 +36,7 @@ export default class Sparql extends Component {
       exceededQuota: false,
       diskSpace: 0,
       console_enabled: false,
-      
+
       // save query icons
       disableSave: false,
       saveIcon: "play",
@@ -67,6 +67,7 @@ export default class Sparql extends Component {
         endpoints: this.props.location.state.endpoints,
         diskSpace: this.props.location.state.diskSpace,
         config: this.props.location.state.config,
+        console_enabled: this.console_enabled,
         waiting: false,
       })
     } else {
@@ -83,7 +84,8 @@ export default class Sparql extends Component {
             error: response.data.error,
             errorMessage: response.data.errorMessage,
             config: this.props.config,
-            status: response.status
+            status: response.status,
+            console_enabled: response.console_enabled
           })
         })
         .catch(error => {
