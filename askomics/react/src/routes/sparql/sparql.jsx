@@ -67,7 +67,7 @@ export default class Sparql extends Component {
         endpoints: this.props.location.state.endpoints,
         diskSpace: this.props.location.state.diskSpace,
         config: this.props.location.state.config,
-        console_enabled: this.console_enabled,
+        console_enabled: this.props.location.console_enabled,
         waiting: false,
       })
     } else {
@@ -85,7 +85,7 @@ export default class Sparql extends Component {
             errorMessage: response.data.errorMessage,
             config: this.props.config,
             status: response.status,
-            console_enabled: response.console_enabled
+            console_enabled: response.data.console_enabled
           })
         })
         .catch(error => {

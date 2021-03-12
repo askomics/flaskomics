@@ -148,7 +148,7 @@ export default class ResultsFilesTable extends Component {
         graphs: response.data.graphs,
         endpoints: response.data.endpoints,
         diskSpace: response.data.diskSpace,
-        console_enabled: response.console_enabled,
+        console_enabled: response.data.console_enabled,
       })
     })
     .catch(error => {
@@ -304,6 +304,7 @@ export default class ResultsFilesTable extends Component {
           sparqlQuery: this.state.sparqlQuery,
           graphs: this.state.graphs,
           endpoints: this.state.endpoints,
+          console_enabled: this.state.console_enabled,
           config: this.props.config
         }
       }} />
