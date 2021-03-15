@@ -55,6 +55,8 @@ help:
 	@echo '    make serve [MODE=dev] [HOST=0.0.0.0] [PORT=5000] [NTASKS=1]        Serve AskOmics at $(HOST):$(PORT)'
 	@echo '    make test                                                          Lint and test javascript and python code'
 	@echo '    make serve-doc [DOCPORT=8000]                                      Serve documentation at localhost:$(DOCPORT)'
+	@echo '    make update-base-url                                               Update all graphs from an old base_url to a new base_url'
+	@echo '    make clear-cache                                                   Clear abstraction cache'
 	@echo ''
 	@echo 'Examples:'
 	@echo '    make clean install build serve NTASKS=10                           Clean install and serve AskOmics in production mode, 10 celery tasks in parallel'
@@ -131,6 +133,18 @@ create-user:
 	@echo -n 'Creating first user...                                       '
 	. $(ACTIVATE)
 	bash cli/set_user.sh
+	@echo 'Done'
+
+update-base-url: check-venv
+	@echo 'Updating base url...'
+	. $(ACTIVATE)
+	bash cli/update_base_url.sh
+	@echo 'Done'
+
+clear-cache: check-venv
+	@echo 'Clearing abstraction cache...'
+	. $(ACTIVATE)
+	bash cli/clear_cache.sh
 	@echo 'Done'
 
 build: build-js

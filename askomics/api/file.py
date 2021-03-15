@@ -1,6 +1,7 @@
 """Api routes"""
 import sys
 import traceback
+import urllib
 
 from askomics.api.auth import login_required
 from askomics.libaskomics.FilesHandler import FilesHandler
@@ -315,6 +316,9 @@ def serve_file(path, user_id, username):
     file
         the file
     """
+    # Re-encode the path because we stored the encoded file name
+    path = urllib.parse.quote(path)
+
     dir_path = "{}/{}_{}/ttl".format(
         current_app.iniconfig.get('askomics', 'data_directory'),
         user_id,

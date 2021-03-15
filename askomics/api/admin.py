@@ -3,8 +3,12 @@ import sys
 import traceback
 
 from askomics.api.auth import admin_required
+from askomics.libaskomics.DatasetsHandler import DatasetsHandler
+from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
+from askomics.libaskomics.Result import Result
+from askomics.libaskomics.ResultsHandler import ResultsHandler
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
@@ -36,6 +40,98 @@ def get_users():
 
     return jsonify({
         'users': all_users,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/getdatasets', methods=['GET'])
+@admin_required
+def get_datasets():
+    """Get all datasets
+
+    Returns
+    -------
+    json
+        users: list of all datasets
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        datasets_handler = DatasetsHandler(current_app, session)
+        datasets = datasets_handler.get_all_datasets()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/getfiles', methods=['GET'])
+@admin_required
+def get_files():
+    """Get all files info
+    Returns
+    -------
+    json
+        files: list of all files
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    try:
+        files_handler = FilesHandler(current_app, session)
+        files = files_handler.get_all_files_infos()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/getqueries', methods=['GET'])
+@admin_required
+def get_queries():
+    """Get all public queries
+
+    Returns
+    -------
+    json
+        startpoint: list of public queries
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        results_handler = ResultsHandler(current_app, session)
+        public_queries = results_handler.get_admin_public_queries()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            "queries": [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        "queries": public_queries,
         'error': False,
         'errorMessage': ''
     })
@@ -127,6 +223,82 @@ def set_blocked():
         }), 500
 
     return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/publicize_dataset', methods=['POST'])
+@admin_required
+def toogle_public_dataset():
+    """Toggle public status of a dataset
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    datasets_info = [{'id': data["datasetId"]}]
+
+    try:
+        # Change status to queued for all datasets
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets(admin=True)
+
+        for dataset in datasets_handler.datasets:
+            current_app.logger.debug(data["newStatus"])
+            dataset.toggle_public(data["newStatus"], admin=True)
+
+        datasets = datasets_handler.get_all_datasets()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route('/api/admin/publicize_query', methods=['POST'])
+@admin_required
+def togle_public_query():
+    """Publish a query template from a result
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        json = request.get_json()
+        result_info = {"id": json["queryId"]}
+
+        result = Result(current_app, session, result_info)
+        result.publish_query(json["newStatus"], admin=True)
+
+        results_handler = ResultsHandler(current_app, session)
+        public_queries = results_handler.get_admin_public_queries()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'queries': [],
+            'error': True,
+            'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'queries': public_queries,
         'error': False,
         'errorMessage': ''
     })
@@ -235,4 +407,93 @@ def delete_users():
         'users': users,
         'error': local_auth.get_error(),
         'errorMessage': local_auth.get_error_message()
+    })
+
+
+@admin_bp.route("/api/admin/delete_files", methods=["POST"])
+@admin_required
+def delete_files():
+    """Delete files
+
+    Returns
+    -------
+    json
+        files: list of all files of current user
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+
+    try:
+        files = FilesHandler(current_app, session)
+        remaining_files = files.delete_files(data['filesIdToDelete'], admin=True)
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': remaining_files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/delete_datasets", methods=["POST"])
+@admin_required
+def delete_datasets():
+    """Delete some datasets (db and triplestore) with a celery task
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    datasets_info = []
+    for dataset_id in data['datasetsIdToDelete']:
+        datasets_info.append({'id': dataset_id})
+
+    session_dict = {'user': session['user']}
+
+    try:
+        # Change status to queued for all datasets
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets(admin=True)
+        datasets_handler.update_status_in_db('queued', admin=True)
+
+        # Launch a celery task for each datasets to delete
+        for dataset in datasets_handler.datasets:
+            dataset_info = [{
+                "id": dataset.id
+            }, ]
+            current_app.logger.debug(dataset_info)
+
+            # kill integration celery task
+            current_app.celery.control.revoke(dataset.celery_id, terminate=True)
+
+            # Trigger the celery task to delete the dataset
+            task = current_app.celery.send_task('delete_datasets', (session_dict, dataset_info, True))
+
+            # replace the task id with the new
+            dataset.update_celery(task.id, admin=True)
+
+        datasets = datasets_handler.get_all_datasets()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
     })

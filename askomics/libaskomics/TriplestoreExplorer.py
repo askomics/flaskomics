@@ -53,6 +53,71 @@ class TriplestoreExplorer(Params):
             graphs.append(result["graph"])
         return graphs
 
+    def get_all_graphs(self):
+        """get all graph of a user
+
+        Returns
+        -------
+        list
+            List of graphs
+        """
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
+
+        query = """
+        SELECT DISTINCT ?graph
+        WHERE {{
+            ?graph dc:creator ?user .
+        }}
+        """
+
+        header, data = query_launcher.process_query(query_builder.prefix_query(query))
+
+        graphs = []
+        for result in data:
+            graphs.append(result["graph"])
+        return graphs
+
+    def update_base_url(self, graph, old_url, new_url):
+        """Update base url for a graph
+        Parameters
+        ----------
+        graph : string
+            Graph to update
+        old_url : string
+            Old base_url
+        new_url : string
+            New base_url
+
+        Returns
+        -------
+        list
+            List of graphs
+        """
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session)
+
+        query = """
+        WITH <{0}>
+        DELETE{{
+            ?s ?p ?o
+        }}
+        INSERT{{
+            ?s2 ?p2 ?o2
+        }}
+        WHERE {{
+            ?s ?p ?o
+            FILTER(REGEX(?s, '{1}', 'i') || REGEX(?p, '{1}', 'i') || REGEX(?o, '{1}', 'i')) .
+            BIND(IF (isURI(?o), URI(REPLACE(STR(?o), '{1}', '{2}')), ?o) AS ?o2) .
+            BIND(IF (isURI(?s), URI(REPLACE(STR(?s), '{1}', '{2}')), ?s) AS ?s2) .
+            BIND(IF (isURI(?p), URI(REPLACE(STR(?p), '{1}', '{2}')), ?p) AS ?p2) .
+        }}
+        """.format(graph, old_url, new_url)
+
+        header, data = query_launcher.process_query(query_builder.prefix_query(query))
+
     def get_startpoints(self):
         """Get public and user startpoints
 
@@ -215,7 +280,7 @@ class TriplestoreExplorer(Params):
             """
             database.execute_sql_query(query, (json.dumps(abstraction), self.session["user"]["id"]))
 
-    def uncache_abstraction(self, public=True):
+    def uncache_abstraction(self, public=True, force=False):
         """Remove cached abstraction from database
 
         Parameters
@@ -223,7 +288,10 @@ class TriplestoreExplorer(Params):
         public : bool, optional
             Remove for all users if True, else, for logged user only
         """
-        if "user" in self.session:
+        if force:
+            public = True
+
+        if "user" in self.session or force:
             database = Database(self.app, self.session)
 
             sub_query = "WHERE user_id=?" if not public else ""

@@ -8,8 +8,12 @@ from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, request, session)
 
-
 sparql_bp = Blueprint('sparql', __name__, url_prefix='/')
+
+
+def can_access(user):
+    login_allowed = current_app.iniconfig.getboolean('askomics', 'enable_sparql_console', fallback=False)
+    return login_allowed or user['admin']
 
 
 @sparql_bp.route("/api/sparql/init", methods=["GET"])
@@ -33,6 +37,8 @@ def init():
         # Default query
         default_query = query.prefix_query(query.get_default_query())
 
+        console_enabled = can_access(session['user'])
+
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -41,7 +47,8 @@ def init():
             "defaultQuery": "",
             "graphs": {},
             "endpoints": {},
-            "diskSpace": None
+            "diskSpace": None,
+            "console_enabled": False
         }), 500
 
     return jsonify({
@@ -50,11 +57,13 @@ def init():
         "defaultQuery": default_query,
         "graphs": graphs,
         "endpoints": endpoints,
-        "diskSpace": disk_space
+        "diskSpace": disk_space,
+        "console_enabled": console_enabled
     })
 
 
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
+@login_required
 def query():
     """Perform a sparql query
 
@@ -63,6 +72,10 @@ def query():
     json
         query results
     """
+
+    if not can_access(session['user']):
+        return jsonify({"error": True, "errorMessage": "Admin required"}), 401
+
     q = request.get_json()['query']
     graphs = request.get_json()['graphs']
     endpoints = request.get_json()['endpoints']
@@ -133,6 +146,10 @@ def save_query():
     json
         query results
     """
+
+    if not can_access(session['user']):
+        return jsonify({"error": True, "errorMessage": "Admin required"}), 401
+
     q = request.get_json()['query']
     graphs = request.get_json()['graphs']
     endpoints = request.get_json()['endpoints']

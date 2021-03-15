@@ -122,6 +122,35 @@ class FilesHandler(FilesUtils):
 
         return files
 
+    def get_all_files_infos(self):
+
+        if not self.session['user']['admin']:
+            return []
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT files.id, files.name, files.type, files.size, files.date, users.username
+        FROM files
+        INNER JOIN users ON files.user_id=users.user_id
+        '''
+
+        rows = database.execute_sql_query(query, ())
+
+        files = []
+        for row in rows:
+            file = {
+                'id': row[0],
+                'name': row[1],
+                'type': row[2],
+                'size': row[3],
+                'date': row[4],
+                'user': row[5]
+            }
+            files.append(file)
+
+        return files
+
     def get_file_name(self):
         """Get a random file name
 
@@ -290,7 +319,7 @@ class FilesHandler(FilesUtils):
         # Default is csv
         return 'csv/tsv'
 
-    def delete_files(self, files_id):
+    def delete_files(self, files_id, admin=False):
         """Delete files from database and filesystem
 
         Parameters
@@ -306,11 +335,14 @@ class FilesHandler(FilesUtils):
         for fid in files_id:
             file_path = self.get_file_path(fid)
             self.delete_file_from_fs(file_path)
-            self.delete_file_from_db(fid)
+            self.delete_file_from_db(fid, admin=admin)
 
-        return self.get_files_infos()
+        if admin and self.session['user']['admin']:
+            return self.get_all_files_infos()
+        else:
+            return self.get_files_infos()
 
-    def delete_file_from_db(self, file_id):
+    def delete_file_from_db(self, file_id, admin=False):
         """remove a file for the database
 
         Parameters
@@ -318,14 +350,24 @@ class FilesHandler(FilesUtils):
         file_id : int
             the file id to remove
         """
+
         database = Database(self.app, self.session)
+
+        if admin and self.session['user']['admin']:
+            query_params = (file_id,)
+            where_query = ""
+
+        else:
+            query_params = (file_id, self.session['user']['id'])
+            where_query = "AND user_id=?"
 
         query = '''
         DELETE FROM files
-        WHERE id=? AND user_id=?
-        '''
+        WHERE id=?
+        {}
+        '''.format(where_query)
 
-        database.execute_sql_query(query, (file_id, self.session['user']['id']))
+        database.execute_sql_query(query, query_params)
 
     def delete_file_from_fs(self, file_path):
         """Delete a file from filesystem

@@ -46,18 +46,25 @@ class Dataset(Params):
         self.start = dataset_info["start"] if "start" in dataset_info else None
         self.end = dataset_info["end"] if "end" in dataset_info else None
 
-    def set_info_from_db(self):
+    def set_info_from_db(self, admin=False):
         """Set the info in from the database"""
         database = Database(self.app, self.session)
+
+        if admin and self.session['user']['admin']:
+            query_params = (self.id,)
+            where_query = ""
+        else:
+            query_params = (self.id, self.session['user']['id'])
+            where_query = "AND user_id = ?"
 
         query = '''
         SELECT celery_id, file_id, name, graph_name, public, start, end
         FROM datasets
-        WHERE user_id = ?
-        AND id = ?
-        '''
+        WHERE id = ?
+        {}
+        '''.format(where_query)
 
-        rows = database.execute_sql_query(query, (self.session['user']['id'], self.id))
+        rows = database.execute_sql_query(query, query_params)
 
         self.celery_id = rows[0][0]
         self.file_id = rows[0][1]
@@ -99,7 +106,7 @@ class Dataset(Params):
             0
         ), get_id=True)
 
-    def toggle_public(self, new_status):
+    def toggle_public(self, new_status, admin=False):
         """Change public status of a dataset (triplestore and db)
 
         Parameters
@@ -110,23 +117,31 @@ class Dataset(Params):
         # Update in TS
         query = SparqlQuery(self.app, self.session)
         tse = TriplestoreExplorer(self.app, self.session)
-
         string_status = "true" if new_status else "false"
         query.toggle_public(self.graph_name, string_status)
+
+        if admin and self.session['user']['admin']:
+            query_params = (new_status, self.id)
+            where_query = ""
+        else:
+            query_params = (new_status, self.id, self.session["user"]["id"])
+            where_query = "AND user_id = ?"
 
         # Update in DB
         database = Database(self.app, self.session)
         query = '''
         UPDATE datasets SET
         public=?
-        WHERE user_id = ? AND id = ?
-        '''
-        database.execute_sql_query(query, (new_status, self.session["user"]["id"], self.id))
+        WHERE id = ?
+        {}
+        '''.format(where_query)
+
+        database.execute_sql_query(query, query_params)
 
         # Uncache abstraction
         tse.uncache_abstraction()
 
-    def update_celery(self, celery_id):
+    def update_celery(self, celery_id, admin=False):
         """Update celery id of dataset in database
 
         Parameters
@@ -134,15 +149,23 @@ class Dataset(Params):
         celery_id : string
             DescriThe celery idption
         """
+
+        if admin and self.session['user']['admin']:
+            query_params = (celery_id, self.id)
+            where_query = ""
+        else:
+            query_params = (celery_id, self.id, self.session['user']['id'])
+            where_query = "AND user_id = ? "
         database = Database(self.app, self.session)
 
         query = '''
         UPDATE datasets SET
         celery_id=?
-        WHERE user_id = ? AND id = ?
-        '''
+        WHERE id = ?
+        {}
+        '''.format(where_query)
 
-        database.execute_sql_query(query, (celery_id, self.session['user']['id'], self.id))
+        database.execute_sql_query(query, query_params)
 
     def update_in_db(self, status, update_celery=False, update_date=False, update_graph=False, error=False, error_message=None, ntriples=0, traceback=None):
         """Update the dataset when integration is done
@@ -187,14 +210,21 @@ class Dataset(Params):
 
         database.execute_sql_query(query, tuple(variables))
 
-    def delete_from_db(self):
+    def delete_from_db(self, admin=False):
         """Delete a dataset from the database"""
         database = Database(self.app, self.session)
 
+        if admin and self.session['user']['admin']:
+            query_params = (self.id,)
+            where_query = ""
+        else:
+            query_params = (self.id, self.session['user']['id'])
+            where_query = "AND user_id = ?"
+
         query = '''
         DELETE FROM datasets
-        WHERE user_id = ?
-        AND id = ?
-        '''
+        WHERE id = ?
+        {}
+        '''.format(where_query)
 
-        database.execute_sql_query(query, (self.session['user']['id'], self.id))
+        database.execute_sql_query(query, query_params)

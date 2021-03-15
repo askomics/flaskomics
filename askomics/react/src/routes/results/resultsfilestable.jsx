@@ -147,7 +147,8 @@ export default class ResultsFilesTable extends Component {
         sparqlQuery: response.data.query,
         graphs: response.data.graphs,
         endpoints: response.data.endpoints,
-        diskSpace: response.data.diskSpace
+        diskSpace: response.data.diskSpace,
+        console_enabled: response.data.console_enabled,
       })
     })
     .catch(error => {
@@ -156,7 +157,8 @@ export default class ResultsFilesTable extends Component {
         error: true,
         errorMessage: error.response.data.errorMessage,
         status: error.response.status,
-        waiting: false
+        waiting: false,
+        console_enabled: false
       })
     })
   }
@@ -302,6 +304,7 @@ export default class ResultsFilesTable extends Component {
           sparqlQuery: this.state.sparqlQuery,
           graphs: this.state.graphs,
           endpoints: this.state.endpoints,
+          console_enabled: this.state.console_enabled,
           config: this.props.config
         }
       }} />
