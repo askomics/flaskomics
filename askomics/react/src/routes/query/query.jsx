@@ -185,7 +185,7 @@ export default class Query extends Component {
     if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
       return "boolean"
     }
-    if (typeUri == "http://www.w3.org/2001/XMLSchema#dateType") {
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#dateTime") {
       return "date"
     }
   }
@@ -1077,7 +1077,7 @@ export default class Query extends Component {
     }
   }
 
-  handleFilterDate (event) {
+  handleDateFilter (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filters.map((filter, index) => {
@@ -1102,13 +1102,13 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  handleFilterDateValue (date, id, index) {
-    if (!isNaN(date)) {
+  handleFilterDateValue (event) {
+    if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
-        if (attr.id == id) {
+        if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
-            if (index == index) {
-              filter.filterValue = date
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
             }
           })
         }
@@ -1427,6 +1427,9 @@ export default class Query extends Component {
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
                 toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
                 toggleAddNumFilter={p => this.toggleAddNumFilter(p)}
+                toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
+                handleFilterDateValue={p => this.handleFilterDateValue(p)}
+                handleDateFilter={p => this.handleDateFilter(p)}
               />
             )
           }

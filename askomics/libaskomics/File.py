@@ -432,10 +432,6 @@ class File(Params):
         string/float/int
             the converted value
         """
-            try:
-                return parser.parse(value, dayfirst=True)
-            except parser.ParserError:
-                return value
         try:
             return int(value)
         except ValueError:

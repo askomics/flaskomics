@@ -24,12 +24,12 @@ export default class AttributeBox extends Component {
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
     this.handleFilterNumericSign = this.props.handleFilterNumericSign.bind(this)
     this.handleFilterNumericValue = this.props.handleFilterNumericValue.bind(this)
-    this.handleFilterDate = this.props.handleFilterDate.bind(this)
     this.handleFilterDateValue = this.props.handleFilterDateValue.bind(this)
     this.toggleLinkAttribute = this.props.toggleLinkAttribute.bind(this)
     this.handleChangeLink = this.props.handleChangeLink.bind(this)
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
+    this.handleDateFilter = this.props.handleDateFilter.bind(this)
   }
 
   subNums (id) {
@@ -384,7 +384,7 @@ export default class AttributeBox extends Component {
 
     let sign_display = {
       '=': '=',
-      '>': '<',
+      '>': '>',
       '<': '<',
     }
 
@@ -400,7 +400,7 @@ export default class AttributeBox extends Component {
           return (
             <tr key={index}>
               <td key={index}>
-                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterDate}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleDateFilter}>
                   {Object.keys(sign_display).map(sign => {
                     return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
                   })}
@@ -408,7 +408,11 @@ export default class AttributeBox extends Component {
               </td>
                 <td>
                   <div className="input-with-icon">
-                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} selected={filter.filterValue} onChange={(date) => {this.handleFilterDateValue(data, this.props.attribute.id, index)}} />
+                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} selected={filter.filterValue} 
+                    onChange={(date, event) => {
+                        event.target = {value:date, id: this.props.attribute.id, dataset:{index: index}};
+                        this.handleFilterDateValue(event)
+                    }} />
                     {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddDateFilter}></i></button> : <></>}
                   </div>
                 </td>
@@ -466,9 +470,9 @@ AttributeBox.propTypes = {
   handleFilterNumericValue: PropTypes.func,
   toggleLinkAttribute: PropTypes.func,
   handleChangeLink: PropTypes.func,
+  toggleAddDateFilter: PropTypes.func,
+  handleFilterDateValue: PropTypes.func,
+  handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
-  handleFilterDate: PropTypes.func,
-  toggleAddDateFilter: PropTypes.func,
-  handleFilterDateValue: PropTypes.func
 }
