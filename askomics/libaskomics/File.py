@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+from dateutil import parser
 from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
@@ -410,12 +411,16 @@ class File(Params):
                 float(value)
                 return rdflib.XSD.decimal
             except ValueError:
-                return rdflib.XSD.string
+                try:
+                    parser.parse(value, dayfirst=True)
+                    return rdflib.XSD.dateTime
+                except parser.ParserError:
+                    return rdflib.XSD.string
 
         return rdflib.XSD.string
 
     def convert_type(self, value):
-        """Convert a value to a int or float or text
+        """Convert a value to a date, an int or float or text
 
         Parameters
         ----------
@@ -427,12 +432,19 @@ class File(Params):
         string/float/int
             the converted value
         """
+            try:
+                return parser.parse(value, dayfirst=True)
+            except parser.ParserError:
+                return value
         try:
             return int(value)
         except ValueError:
             try:
                 return float(value)
             except ValueError:
-                return value
+                try:
+                    return parser.parse(value, dayfirst=True)
+                except parser.ParserError:
+                    return value
 
         return value

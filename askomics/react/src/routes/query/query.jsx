@@ -185,6 +185,9 @@ export default class Query extends Component {
     if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
       return "boolean"
     }
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#dateType") {
+      return "date"
+    }
   }
 
   attributeExistInAbstraction (attrUri, entityUri) {
@@ -333,6 +336,15 @@ export default class Query extends Component {
         if (attributeType == 'boolean') {
           nodeAttribute.filterValues = ["true", "false"]
           nodeAttribute.filterSelectedValues = []
+        }
+
+        if (attributeType == 'date') {
+          nodeAttribute.filters = [
+            {
+              filterValue: new Date(),
+              filterSign: "="
+            }
+          ]
         }
 
         return nodeAttribute
@@ -1065,6 +1077,46 @@ export default class Query extends Component {
     }
   }
 
+  handleFilterDate (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddDateFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: new Date(),
+          filterSign: "="
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterDateValue (date, id, index) {
+    if (!isNaN(date)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == id) {
+          attr.filters.map((filter, index) => {
+            if (index == index) {
+              filter.filterValue = date
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
   toggleLinkAttribute (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1338,8 +1390,8 @@ export default class Query extends Component {
       warningDiskSpace = (
         <div>
           <Alert color="warning">
-              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
-              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space
+              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed).
               Please delete some before save queries or contact an admin to increase your quota
           </Alert>
         </div>

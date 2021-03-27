@@ -1171,6 +1171,35 @@ class SparqlQuery(Params):
                     ))
                     var_to_replace.append((obj, var_2))
 
+            if attribute["type"] == "date":
+                if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in linked_attributes:
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    self.store_triple({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    }, block_id, sblock_id, pblock_ids)
+                    if attribute["visible"]:
+                        self.selects.append(obj)
+                # filters
+                for filtr in attribute["filters"]:
+                    if filtr["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
+                        if filtr['filterSign'] == "=":
+                            self.store_value("VALUES {} {{ {} }} .".format(obj, filtr["filterValue"]), block_id, sblock_id, pblock_ids)
+                        else:
+                            filter_string = "FILTER ( {} {} {} ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
+                if attribute["linked"]:
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
+
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
