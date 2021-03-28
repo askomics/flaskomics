@@ -185,7 +185,7 @@ export default class Query extends Component {
     if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
       return "boolean"
     }
-    if (typeUri == "http://www.w3.org/2001/XMLSchema#dateTime") {
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#date") {
       return "date"
     }
   }
