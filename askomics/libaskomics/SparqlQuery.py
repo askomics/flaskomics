@@ -1,4 +1,3 @@
-import datetime
 import re
 import textwrap
 
@@ -1191,7 +1190,7 @@ class SparqlQuery(Params):
                         if filtr['filterSign'] == "=":
                             self.store_value("VALUES {} {{ '{}' }} .".format(obj, filtr["filterValue"]), block_id, sblock_id, pblock_ids)
                         else:
-                            filter_string = "FILTER ( {} {} '{}'^^xsd:dateTime ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
+                            filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(

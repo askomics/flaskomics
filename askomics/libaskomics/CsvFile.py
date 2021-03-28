@@ -412,7 +412,7 @@ class CsvFile(File):
             elif self.columns_type[index] == "date":
                 attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
-                rdf_range = rdflib.XSD.dateTime
+                rdf_range = rdflib.XSD.date
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             # Text (default)

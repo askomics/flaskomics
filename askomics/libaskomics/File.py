@@ -412,8 +412,8 @@ class File(Params):
                 return rdflib.XSD.decimal
             except ValueError:
                 try:
-                    parser.parse(value, dayfirst=True)
-                    return rdflib.XSD.dateTime
+                    parser.parse(value, dayfirst=True).date()
+                    return rdflib.XSD.date
                 except parser.ParserError:
                     return rdflib.XSD.string
 
@@ -439,7 +439,7 @@ class File(Params):
                 return float(value)
             except ValueError:
                 try:
-                    return parser.parse(value, dayfirst=True)
+                    return parser.parse(value, dayfirst=True).date()
                 except parser.ParserError:
                     return value
 
