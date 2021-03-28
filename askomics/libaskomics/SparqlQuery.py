@@ -1187,7 +1187,7 @@ class SparqlQuery(Params):
                         self.selects.append(obj)
                 # filters
                 for filtr in attribute["filters"]:
-                    if filtr["filterValue"] != "" and not attribute["optional"] and not attribute["linked"]:
+                    if filtr["filterValue"] and not attribute["optional"] and not attribute["linked"]:
                         if filtr['filterSign'] == "=":
                             self.store_value("VALUES {} {{ '{}' }} .".format(obj, filtr["filterValue"]), block_id, sblock_id, pblock_ids)
                         else:

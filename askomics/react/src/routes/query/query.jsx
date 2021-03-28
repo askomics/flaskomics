@@ -341,7 +341,7 @@ export default class Query extends Component {
         if (attributeType == 'date') {
           nodeAttribute.filters = [
             {
-              filterValue: new Date(),
+              filterValue: null,
               filterSign: "="
             }
           ]
@@ -1094,7 +1094,7 @@ export default class Query extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filters.push({
-          filterValue: new Date(),
+          filterValue: null,
           filterSign: "="
         })
       }
@@ -1103,6 +1103,8 @@ export default class Query extends Component {
   }
 
   handleFilterDateValue (event) {
+    console.log(event.target.value)
+    console.log(isNaN(event.target.value))
     if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {

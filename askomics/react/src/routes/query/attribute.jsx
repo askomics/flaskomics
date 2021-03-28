@@ -408,7 +408,9 @@ export default class AttributeBox extends Component {
               </td>
                 <td>
                   <div className="input-with-icon">
-                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} selected={filter.filterValue} 
+                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} selected={filter.filterValue} isClearable showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
                     onChange={(date, event) => {
                         event.target = {value:date, id: this.props.attribute.id, dataset:{index: index}};
                         this.handleFilterDateValue(event)
