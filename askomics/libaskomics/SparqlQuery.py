@@ -1187,10 +1187,12 @@ class SparqlQuery(Params):
                 # filters
                 for filtr in attribute["filters"]:
                     if filtr["filterValue"] and not attribute["optional"] and not attribute["linked"]:
+                        # COnvert datetime to date
+                        val = filtr["filterValue"].split("T")[0]
                         if filtr['filterSign'] == "=":
-                            self.store_value("VALUES {} {{ '{}' }} .".format(obj, filtr["filterValue"]), block_id, sblock_id, pblock_ids)
+                            self.store_value("VALUES {} {{ '{}'^^xsd:date }} .".format(obj, val), block_id, sblock_id, pblock_ids)
                         else:
-                            filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
+                            filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], val)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(

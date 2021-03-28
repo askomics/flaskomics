@@ -1102,15 +1102,22 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // This is a pain, but JS will auto convert time to UTC
+  // And datepicker use the local timezone
+  // So without this, the day sent will be wrong
+  fixTimezoneOffset (date){
+    if(!date){return null};
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+  }
+
+
   handleFilterDateValue (event) {
-    console.log(event.target.value)
-    console.log(isNaN(event.target.value))
     if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
             if (index == event.target.dataset.index) {
-              filter.filterValue = event.target.value
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
             }
           })
         }
@@ -1343,6 +1350,7 @@ export default class Query extends Component {
           })
         }).then(response => {
           if (this.props.location.state.redo) {
+            console.log(this.props.location.state.graphState)
             // redo a query
             this.graphState = this.props.location.state.graphState
             this.initId()

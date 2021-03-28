@@ -391,6 +391,8 @@ export default class AttributeBox extends Component {
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
 
+    
+
     if (this.props.attribute.linked) {
       form = this.renderLinker()
     } else {
@@ -408,7 +410,10 @@ export default class AttributeBox extends Component {
               </td>
                 <td>
                   <div className="input-with-icon">
-                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} selected={filter.filterValue} isClearable showMonthDropdown
+                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} 
+                    selected={typeof filter.filterValue === 'string' ? Date.parse(filter.filterValue) : filter.filterValue} 
+                    isClearable 
+                    showMonthDropdown
                     showYearDropdown
                     dropdownMode="select"
                     onChange={(date, event) => {
