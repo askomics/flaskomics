@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+## [4.2.1] - 2021-03-29
+
+### Fixed
+
+- Fixed issues with lock files
+
 ## [4.2.0] - 2021-03-15
 
 ### Added
