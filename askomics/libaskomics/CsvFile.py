@@ -3,6 +3,7 @@ import re
 import rdflib
 import sys
 import traceback
+from dateutil import parser
 
 from rdflib import BNode
 
@@ -196,27 +197,25 @@ class CsvFile(File):
             'date': ('date', 'time', 'birthday', 'day')
         }
 
-        date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}')
-
         # First, detect boolean values
         if self.are_boolean(values):
             return "boolean"
 
         # Then, detect special type with header
         for stype, expressions in special_types.items():
-            for expression in expressions:
-                epression_regexp = ".*{}.*".format(expression.lower())
-                if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if start and end are numerical
-                    if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
-                        break
-                    # test if strand is a category with 2 elements max
-                    if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
-                        break
-                    # Test if date respect a date format
-                    if stype == 'date' and all(date_regex.match(val) for val in values):
-                        break
-                    return stype
+            # Need to check once if it match any subtype
+            expression_regexp = "|".join([".*{}.*".format(expression.lower()) for expression in expressions])
+            if re.match(expression_regexp, self.header[header_index].lower(), re.IGNORECASE) is not None:
+                # Test if start and end are numerical
+                if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
+                    break
+                # test if strand is a category with 2 elements max
+                if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
+                    break
+                # Test if date respect a date format
+                if stype == 'date' and not all(self.is_date(val) for val in values):
+                    break
+                return stype
 
         # Then, check goterm
         # if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
@@ -274,6 +273,28 @@ class CsvFile(File):
                 return True
             except ValueError:
                 return False
+
+    @staticmethod
+    def is_date(value):
+        """Guess if a variable if a date
+
+        Parameters
+        ----------
+        value :
+            The var to test
+
+        Returns
+        -------
+        boolean
+            True if it's a date
+        """
+        if value == "":
+            return True
+        try:
+            parser.parse(value, dayfirst=True).date()
+            return True
+        except parser.ParserError:
+            return False
 
     @property
     def transposed_preview(self):
