@@ -43,6 +43,10 @@
         {
             "object": "http://askomics.org/test/data/At3_327",
             "predicat": "http://askomics.org/test/internal/includeInReference"
+        },
+        {
+            "object": "2000-01-01",
+            "predicat": "http://askomics.org/test/data/date"
         }
     ],
     "error": false,
