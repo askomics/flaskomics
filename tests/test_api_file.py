@@ -25,7 +25,7 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 1986,
+                'size': 2102,
                 'type': 'csv/tsv'
             }, {
                 'date': info["de"]["upload"]["file_date"],
@@ -105,7 +105,7 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'new name.tsv',
-                'size': 1986,
+                'size': 2102,
                 'type': 'csv/tsv'
             }, {
                 'date': info["de"]["upload"]["file_date"],
