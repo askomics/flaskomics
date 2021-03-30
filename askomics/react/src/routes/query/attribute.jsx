@@ -384,10 +384,12 @@ export default class AttributeBox extends Component {
 
     let sign_display = {
       '=': '=',
-      '>': '>',
       '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
     }
-
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
 
