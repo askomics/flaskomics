@@ -203,7 +203,7 @@ class CsvFile(File):
 
         # Then, detect special type with header
         for stype, expressions in special_types.items():
-            # Need to check once if it match any subtype
+            # Need to check once if it matches any subtype
             expression_regexp = "|".join([".*{}.*".format(expression.lower()) for expression in expressions])
             if re.match(expression_regexp, self.header[header_index].lower(), re.IGNORECASE) is not None:
                 # Test if start and end are numerical
