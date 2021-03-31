@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component} from 'react'
 import axios from 'axios'
 import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
+import DatePicker from "react-datepicker";
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
@@ -23,9 +24,12 @@ export default class AttributeBox extends Component {
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
     this.handleFilterNumericSign = this.props.handleFilterNumericSign.bind(this)
     this.handleFilterNumericValue = this.props.handleFilterNumericValue.bind(this)
+    this.handleFilterDateValue = this.props.handleFilterDateValue.bind(this)
     this.toggleLinkAttribute = this.props.toggleLinkAttribute.bind(this)
     this.handleChangeLink = this.props.handleChangeLink.bind(this)
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
+    this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
+    this.handleDateFilter = this.props.handleDateFilter.bind(this)
   }
 
   subNums (id) {
@@ -362,6 +366,86 @@ export default class AttributeBox extends Component {
     )
   }
 
+  renderDate () {
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    if (this.props.attribute.visible) {
+      eyeIcon = 'attr-icon fas fa-eye'
+    }
+
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    if (this.props.attribute.optional) {
+      optionalIcon = 'attr-icon fas fa-question-circle'
+    }
+
+    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    if (this.props.attribute.linked) {
+      linkIcon = 'attr-icon fas fa-link'
+    }
+
+    let sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+    let form
+    let numberOfFilters = this.props.attribute.filters.length - 1
+
+    
+
+    if (this.props.attribute.linked) {
+      form = this.renderLinker()
+    } else {
+      form = (
+        <table style={{ width: '100%' }}>
+        {this.props.attribute.filters.map((filter, index) => {
+          return (
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleDateFilter}>
+                  {Object.keys(sign_display).map(sign => {
+                    return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
+                  })}
+                </CustomInput>
+              </td>
+                <td>
+                  <div className="input-with-icon">
+                    <DatePicker dateFormat="yyyy/MM/dd" disabled={this.props.attribute.optional} id={this.props.attribute.id} 
+                    selected={typeof filter.filterValue === 'string' ? Date.parse(filter.filterValue) : filter.filterValue} 
+                    isClearable 
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    onChange={(date, event) => {
+                        event.target = {value:date, id: this.props.attribute.id, dataset:{index: index}};
+                        this.handleFilterDateValue(event)
+                    }} />
+                    {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddDateFilter}></i></button> : <></>}
+                  </div>
+                </td>
+            </tr>
+          )
+        })}
+        </table>
+      )
+    }
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        <div className="attr-icons">
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+        </div>
+        {form}
+      </div>
+    )
+  }
+
+
   render () {
     let box = null
     if (this.props.attribute.type == 'text' || this.props.attribute.type == 'uri') {
@@ -375,6 +459,9 @@ export default class AttributeBox extends Component {
     }
     if (this.props.attribute.type == 'boolean') {
       box = this.renderBoolean()
+    }
+    if (this.props.attribute.type == 'date') {
+      box = this.renderDate()
     }
     return box
   }
@@ -392,6 +479,9 @@ AttributeBox.propTypes = {
   handleFilterNumericValue: PropTypes.func,
   toggleLinkAttribute: PropTypes.func,
   handleChangeLink: PropTypes.func,
+  toggleAddDateFilter: PropTypes.func,
+  handleFilterDateValue: PropTypes.func,
+  handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
-  graph: PropTypes.object
+  graph: PropTypes.object,
 }
