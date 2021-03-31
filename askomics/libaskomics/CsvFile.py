@@ -276,7 +276,7 @@ class CsvFile(File):
 
     @staticmethod
     def is_date(value):
-        """Guess if a variable if a date
+        """Guess if a variable is a date
 
         Parameters
         ----------
