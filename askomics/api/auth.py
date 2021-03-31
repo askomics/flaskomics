@@ -25,6 +25,19 @@ def login_required(f):
 
     return decorated_function
 
+def api_auth(f):
+    """Get info from token"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Login required decorator"""
+        if request.headers.get("X-API-KEY"):
+            local_auth = LocalAuth(current_app, session)
+            authentication = local_auth.authenticate_user_with_apikey(key)
+            if not authentication["error"]:
+                session["user"] = authentication["user"]
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 def admin_required(f):
     """Login required function"""
