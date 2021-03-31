@@ -212,7 +212,7 @@ class CsvFile(File):
                 # test if strand is a category with 2 elements max
                 if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
                     break
-                # Test if date respect a date format
+                # Test if date respects a date format
                 if stype == 'date' and not all(self.is_date(val) for val in values):
                     break
                 return stype
