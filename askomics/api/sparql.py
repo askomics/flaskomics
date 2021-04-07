@@ -76,9 +76,18 @@ def query():
     if not can_access(session['user']):
         return jsonify({"error": True, "errorMessage": "Admin required"}), 401
 
-    q = request.get_json()['query']
-    graphs = request.get_json()['graphs']
-    endpoints = request.get_json()['endpoints']
+    data = request.get_json()
+    if not (data and data.get("query")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing query parameter",
+            'header': [],
+            'data': []
+        }), 400
+
+    q = data['query']
+    graphs = data.get('graphs', [])
+    endpoints = data.get('endpoints', [])
 
     local_endpoint_f = current_app.iniconfig.get('triplestore', 'endpoint')
     try:
@@ -93,7 +102,7 @@ def query():
             'errorMessage': "No graph selected in local triplestore",
             'header': [],
             'data': []
-        }), 500
+        }), 400
 
     # No endpoint selected
     if not endpoints:
@@ -102,7 +111,7 @@ def query():
             'errorMessage': "No endpoint selected",
             'header': [],
             'data': []
-        }), 500
+        }), 400
 
     try:
         query = SparqlQuery(current_app, session)
@@ -150,9 +159,18 @@ def save_query():
     if not can_access(session['user']):
         return jsonify({"error": True, "errorMessage": "Admin required"}), 401
 
-    q = request.get_json()['query']
-    graphs = request.get_json()['graphs']
-    endpoints = request.get_json()['endpoints']
+    data = request.get_json()
+    if not (data and data.get("query")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing query parameter",
+            'header': [],
+            'data': []
+        }), 400
+
+    q = data['query']
+    graphs = data.get('graphs', [])
+    endpoints = data.get('endpoints', [])
 
     local_endpoint_f = current_app.iniconfig.get('triplestore', 'endpoint')
     try:
@@ -166,7 +184,7 @@ def save_query():
             'error': True,
             'errorMessage': "No graph selected in local triplestore",
             'task_id': None
-        }), 500
+        }), 400
 
     # No endpoint selected
     if not endpoints:
@@ -174,7 +192,7 @@ def save_query():
             'error': True,
             'errorMessage': "No endpoint selected",
             'task_id': None
-        }), 500
+        }), 400
 
     try:
         files_utils = FilesUtils(current_app, session)
@@ -185,7 +203,7 @@ def save_query():
                 'error': True,
                 'errorMessage': "Exceeded quota",
                 'task_id': None
-            }), 500
+            }), 400
 
         # Is query federated?
         query = SparqlQuery(current_app, session)

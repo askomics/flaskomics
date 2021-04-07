@@ -2,7 +2,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import login_required, admin_required
+from askomics.api.auth import login_required, admin_required, api_auth
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 
 from flask import (Blueprint, current_app, jsonify, request, session)
@@ -12,6 +12,7 @@ datasets_bp = Blueprint('datasets', __name__, url_prefix='/')
 
 
 @datasets_bp.route('/api/datasets', methods=['GET'])
+@api_auth
 @login_required
 def get_datasets():
     """Get datasets information
@@ -42,6 +43,7 @@ def get_datasets():
 
 
 @datasets_bp.route('/api/datasets/delete', methods=['POST'])
+@api_auth
 @login_required
 def delete_datasets():
     """Delete some datasets (db and triplestore) with a celery task
@@ -53,6 +55,13 @@ def delete_datasets():
         errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
+    if not (data and data.get("datasetsIdToDelete")):
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': "Missing datasetsIdToDelete parameter"
+        }), 400
+
     datasets_info = []
     for dataset_id in data['datasetsIdToDelete']:
         datasets_info.append({'id': dataset_id})
@@ -99,6 +108,7 @@ def delete_datasets():
 
 
 @datasets_bp.route('/api/datasets/public', methods=['POST'])
+@api_auth
 @admin_required
 def toogle_public():
     """Toggle public status of a dataset
@@ -110,6 +120,13 @@ def toogle_public():
         errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
+    if not (data and data.get("id")):
+        return jsonify({
+            'datasets': [],
+            'error': True,
+            'errorMessage': "Missing id parameter"
+        }), 400
+
     datasets_info = [{'id': data["id"]}]
 
     try:
@@ -118,8 +135,8 @@ def toogle_public():
         datasets_handler.handle_datasets()
 
         for dataset in datasets_handler.datasets:
-            current_app.logger.debug(data["newStatus"])
-            dataset.toggle_public(data["newStatus"])
+            current_app.logger.debug(data.get("newStatus", False))
+            dataset.toggle_public(data.get("newStatus", False))
 
         datasets = datasets_handler.get_datasets()
 

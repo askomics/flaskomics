@@ -69,7 +69,17 @@ def get_preview():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        file_id = request.get_json()["fileId"]
+        data = request.get_json()
+        if not (data and data.get("fileId")):
+            return jsonify({
+                'preview': [],
+                'header': [],
+                'id': None,
+                'error': True,
+                'errorMessage': "Missing file Id"
+            }), 400
+
+        file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
         headers, preview = result.get_file_preview()
@@ -104,7 +114,19 @@ def get_graph_and_sparql_query():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        file_id = request.get_json()["fileId"]
+        data = request.get_json()
+        if not (data and data.get("fileId")):
+            return jsonify({
+                'graphState': {},
+                'sparqlQuery': "",
+                'graphs': [],
+                'endpoints': [],
+                'diskSpace': 0,
+                'error': True,
+                'errorMessage': "Missing fileId parameter"
+            }), 400
+
+        file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
 
@@ -159,7 +181,16 @@ def get_graph_state():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        file_id = request.get_json()["fileId"]
+        data = request.get_json()
+        if not (data and data.get("fileId")):
+            return jsonify({
+                'graphState': {},
+                'id': None,
+                'error': True,
+                'errorMessage': "Missing fileId parameter"
+            }), 400
+
+        file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
         graph_state = result.get_graph_state(formated=True)
@@ -186,7 +217,14 @@ def get_graph_state():
 def download_result():
     """Download result file"""
     try:
-        file_id = request.get_json()["fileId"]
+        data = request.get_json()
+        if not (data and data.get("fileId")):
+            return jsonify({
+                'error': True,
+                'errorMessage': "Missing fileId parameter"
+            }), 400
+
+        file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
         dir_path = result.get_dir_path()
@@ -215,7 +253,15 @@ def delete_result():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        files_id = request.get_json()["filesIdToDelete"]
+        data = request.get_json()
+        if not (data and data.get("filesIdToDelete")):
+            return jsonify({
+                'remainingFiles': {},
+                'error': True,
+                'errorMessage': "Missing filesIdToDelete parameter"
+            }), 400
+
+        files_id = data["filesIdToDelete"]
         results_handler = ResultsHandler(current_app, session)
         remaining_files = results_handler.delete_results(files_id)
     except Exception as e:
@@ -249,7 +295,18 @@ def get_sparql_query():
         files_utils = FilesUtils(current_app, session)
         disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
 
-        file_id = request.get_json()["fileId"]
+        data = request.get_json()
+        if not (data and data.get("fileId")):
+            return jsonify({
+                'query': {},
+                'graphs': [],
+                'endpoints': [],
+                'diskSpace': 0,
+                'error': True,
+                'errorMessage': "Missing fileId parameter"
+            }), 400
+
+        file_id = data["fileId"]
         result_info = {"id": file_id}
 
         result = Result(current_app, session, result_info)
@@ -306,9 +363,16 @@ def set_description():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        json = request.get_json()
-        result_info = {"id": json["id"]}
-        new_desc = json["newDesc"]
+        data = request.get_json()
+        if not (data and data.get("id") and data.get("newDesc")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing parameters"
+            }), 400
+
+        result_info = {"id": data["id"]}
+        new_desc = data["newDesc"]
 
         result = Result(current_app, session, result_info)
         result.update_description(new_desc)
@@ -343,11 +407,18 @@ def publish_query():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        json = request.get_json()
-        result_info = {"id": json["id"]}
+        data = request.get_json()
+        if not (data and data.get("id")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing id parameter"
+            }), 400
+
+        result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
-        result.publish_query(json["public"])
+        result.publish_query(data.get("public", False))
 
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()
@@ -379,11 +450,18 @@ def template_query():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        json = request.get_json()
-        result_info = {"id": json["id"]}
+        data = request.get_json()
+        if not (data and data.get("id")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing id parameter"
+            }), 400
+
+        result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
-        result.template_query(json["template"])
+        result.template_query(data.get("template", False))
 
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()
@@ -415,10 +493,16 @@ def send2galaxy():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        json = request.get_json()
-        result_info = {"id": json["fileId"]}
+        data = request.get_json()
+        if not (data and data.get("id") and data.get("fileToSend")):
+            return jsonify({
+                'error': True,
+                'errorMessage': "Missing parameters"
+            }), 400
+
+        result_info = {"id": data["fileId"]}
         result = Result(current_app, session, result_info)
-        result.send2galaxy(json["fileToSend"])
+        result.send2galaxy(data["fileToSend"])
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({

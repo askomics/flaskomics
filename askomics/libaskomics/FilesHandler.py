@@ -68,7 +68,7 @@ class FilesHandler(FilesUtils):
             elif file['type'] == 'bed':
                 self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
 
-    def get_files_infos(self, files_id=None, return_path=False):
+    def get_files_infos(self, files_id=None, files_path=None, return_path=False):
         """Get files info
 
         Parameters
@@ -86,7 +86,7 @@ class FilesHandler(FilesUtils):
         database = Database(self.app, self.session)
 
         if files_id:
-            subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
+            subquery_str = 'AND (' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
             SELECT id, name, type, size, path, date
@@ -96,6 +96,18 @@ class FilesHandler(FilesUtils):
             '''.format(subquery_str)
 
             rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_id))
+
+        elif files_path:
+            subquery_str = 'AND (' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
+
+            query = '''
+            SELECT id, name, type, size, path, date
+            FROM files
+            WHERE user_id = ?
+            AND {}
+            '''.format(subquery_str)
+
+            rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_path))
 
         else:
 
@@ -159,9 +171,16 @@ class FilesHandler(FilesUtils):
         string
             file name
         """
-        return Utils.get_random_string(10)
+        name = Utils.get_random_string(20)
+        file_path = "{}/{}".format(self.upload_path, name)
+        # Make sure it is not in use already
+        while os.path.isfile(file_path):
+            name = Utils.get_random_string(20)
+            file_path = "{}/{}".format(self.upload_path, name)
 
-    def write_data_into_file(self, data, file_name, mode):
+        return name
+
+    def write_data_into_file(self, data, file_name, mode, should_exist=False):
         """Write data into a file
 
         Parameters
@@ -174,6 +193,13 @@ class FilesHandler(FilesUtils):
             open mode (w or a)
         """
         file_path = "{}/{}".format(self.upload_path, file_name)
+        if mode == "a":
+            if not os.path.isfile(file_path):
+                raise Exception("No file exists at this path")
+            # Check this path does not already exists in database (meaning, already uploaded)
+            if len(self.get_files_infos(files_path=[file_path])) > 0:
+                raise Exception("A file with this path already exists in database")
+
         with open(file_path, mode) as file:
             file.write(data)
 
@@ -263,7 +289,10 @@ class FilesHandler(FilesUtils):
         except Exception as e:
             # Rollback
             try:
-                self.delete_file_from_fs("{}/{}".format(self.upload_path, file_name))
+                file_path = "{}/{}".format(self.upload_path, file_name)
+                # Delete if it does not exists in DB
+                if len(self.get_files_infos(files_path=[file_path])) == 0:
+                    self.delete_file_from_fs(file_path)
             except Exception:
                 pass
             raise(e)
@@ -334,7 +363,8 @@ class FilesHandler(FilesUtils):
         """
         for fid in files_id:
             file_path = self.get_file_path(fid)
-            self.delete_file_from_fs(file_path)
+            if os.path.isfile(file_path):
+                self.delete_file_from_fs(file_path)
             self.delete_file_from_db(fid, admin=admin)
 
         if admin and self.session['user']['admin']:

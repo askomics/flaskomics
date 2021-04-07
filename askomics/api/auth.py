@@ -25,12 +25,14 @@ def login_required(f):
 
     return decorated_function
 
+
 def api_auth(f):
     """Get info from token"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         """Login required decorator"""
         if request.headers.get("X-API-KEY"):
+            key = request.headers.get("X-API-KEY")
             local_auth = LocalAuth(current_app, session)
             authentication = local_auth.authenticate_user_with_apikey(key)
             if not authentication["error"]:
@@ -38,6 +40,7 @@ def api_auth(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
 
 def admin_required(f):
     """Login required function"""
@@ -82,11 +85,17 @@ def signup():
             'error': True,
             'errorMessage': "Account creation is disabled",
             'user': {}
-        }), 500
+        }), 400
 
     user = {}
 
     data = request.get_json()
+    if not data:
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing parameters",
+            'user': {}
+        }), 400
 
     local_auth = LocalAuth(current_app, session)
     local_auth.check_inputs(data)
@@ -113,6 +122,12 @@ def login():
         Information about the logged user
     """
     data = request.get_json()
+    if not (data and data.get("login") and data.get("password")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing login or password",
+            'user': None
+        }), 400
 
     local_auth = LocalAuth(current_app, session)
     authentication = local_auth.authenticate_user(data["login"], data["password"])
@@ -184,6 +199,11 @@ def update_profile():
         The updated user
     """
     data = request.get_json()
+    if not (data and any([key in data for key in ["newFname", "newLname", "newEmail"]])):
+        return jsonify({
+            "error": True,
+            "errorMessage": "Missing parameters"
+        }), 400
 
     local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_profile(data, session['user'])
@@ -208,6 +228,11 @@ def update_password():
         The user
     """
     data = request.get_json()
+    if not (data and all([key in data for key in ["oldPassword", "newPassword", "confPassword"]])):
+        return jsonify({
+            "error": True,
+            "errorMessage": "Missing parameters"
+        }), 400
 
     local_auth = LocalAuth(current_app, session)
     updated_user = local_auth.update_password(data, session['user'])
@@ -251,6 +276,12 @@ def update_galaxy():
         The user with his new apikey
     """
     data = request.get_json()
+    if not (data and data.get("gurl") and data.get("gkey")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing parameters",
+            'user': session["user"]
+        }), 400
 
     local_auth = LocalAuth(current_app, session)
     if session["user"]["galaxy"]:
@@ -287,6 +318,11 @@ def logout():
 def reset_password():
     """Reset password route"""
     data = request.get_json()
+    if not data:
+        return jsonify({
+            "error": True,
+            "errorMessage": "Missing parameters"
+        }), 400
 
     # Send a reset link
     if "login" in data:
@@ -331,7 +367,7 @@ def reset_password():
         })
 
     # Update password
-    else:
+    elif all([key in data for key in ["token", "password", "passwordConf"]]):
         try:
             local_auth = LocalAuth(current_app, session)
             result = local_auth.reset_password_with_token(data["token"], data["password"], data["passwordConf"])
@@ -346,6 +382,11 @@ def reset_password():
             "error": result["error"],
             "errorMessage": result["message"]
         })
+    else:
+        return jsonify({
+            "error": True,
+            "errorMessage": "Missing parameters"
+        }), 400
 
 
 @auth_bp.route("/api/auth/delete_account", methods=["GET"])

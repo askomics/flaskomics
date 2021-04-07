@@ -66,7 +66,7 @@ class BedFile(File):
             "entity_name": self.entity_name
         }
 
-    def integrate(self, dataset_id, entity_name, public=True):
+    def integrate(self, dataset_id, entity_name="", public=True):
         """Integrate BED file
 
         Parameters
@@ -77,7 +77,10 @@ class BedFile(File):
             Insert in public dataset
         """
         self.public = public
-        self.entity_name = entity_name
+        if entity_name:
+            self.entity_name = entity_name
+        else:
+            self.entity_name = self.human_name
 
         File.integrate(self, dataset_id=dataset_id)
 

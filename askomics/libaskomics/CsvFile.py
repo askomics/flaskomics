@@ -306,7 +306,7 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-    def integrate(self, dataset_id, forced_columns_type, forced_header_names=None, public=False):
+    def integrate(self, dataset_id, forced_columns_type=None, forced_header_names=None, public=False):
         """Integrate the file
 
         Parameters
@@ -318,7 +318,10 @@ class CsvFile(File):
         """
         self.public = public
         self.set_preview_and_header()
-        self.force_columns_type(forced_columns_type)
+        if forced_columns_type:
+            self.force_columns_type(forced_columns_type)
+        else:
+            self.set_columns_type()
         if forced_header_names:
             self.force_header_names(forced_header_names)
         File.integrate(self, dataset_id=dataset_id)

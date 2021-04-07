@@ -12,7 +12,6 @@ from askomics.api.admin import admin_bp
 from askomics.api.auth import auth_bp
 from askomics.api.data import data_bp
 from askomics.api.datasets import datasets_bp
-from askomics.api.external import external_bp
 from askomics.api.file import file_bp
 from askomics.api.sparql import sparql_bp
 from askomics.api.start import start_bp
@@ -47,8 +46,7 @@ BLUEPRINTS = (
     datasets_bp,
     query_bp,
     results_bp,
-    galaxy_bp,
-    external_bp
+    galaxy_bp
 )
 
 

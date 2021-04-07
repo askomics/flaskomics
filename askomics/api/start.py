@@ -2,6 +2,7 @@ import git
 import sys
 import traceback
 
+from askomics.api.auth import api_auth
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Start import Start
 
@@ -14,6 +15,7 @@ start_bp = Blueprint('start', __name__, url_prefix='/')
 
 
 @start_bp.route('/api/start', methods=['GET'])
+@api_auth
 def start():
     """Starting route
 

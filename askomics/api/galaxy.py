@@ -27,7 +27,8 @@ def get_datasets():
     """
     history_id = None
     if request.method == 'POST':
-        history_id = request.get_json()["history_id"]
+        if request.get_json():
+            history_id = request.get_json().get("history_id")
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -63,7 +64,8 @@ def get_queries():
     """
     history_id = None
     if request.method == 'POST':
-        history_id = request.get_json()["history_id"]
+        if request.get_json():
+            history_id = request.get_json().get("history_id")
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -104,9 +106,16 @@ def upload_datasets():
         return jsonify({
             'errorMessage': "Exceeded quota",
             "error": True
-        }), 500
+        }), 400
 
-    datasets_id = request.get_json()["datasets_id"]
+    data = request.get_json()
+    if not (data and data.get("datasets_id")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing datasets_id parameter"
+        }), 400
+
+    datasets_id = data["datasets_id"]
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -136,7 +145,15 @@ def get_dataset_content():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    dataset_id = request.get_json()["dataset_id"]
+
+    data = request.get_json()
+    if not (data and data.get("dataset_id")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing dataset_id parameter"
+        }), 400
+
+    dataset_id = data["dataset_id"]
 
     try:
         galaxy = Galaxy(current_app, session)
