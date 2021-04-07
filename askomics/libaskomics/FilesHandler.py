@@ -86,7 +86,7 @@ class FilesHandler(FilesUtils):
         database = Database(self.app, self.session)
 
         if files_id:
-            subquery_str = 'AND (' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
+            subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
             SELECT id, name, type, size, path, date
@@ -98,7 +98,7 @@ class FilesHandler(FilesUtils):
             rows = database.execute_sql_query(query, (self.session['user']['id'], ) + tuple(files_id))
 
         elif files_path:
-            subquery_str = 'AND (' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
+            subquery_str = '(' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
 
             query = '''
             SELECT id, name, type, size, path, date
