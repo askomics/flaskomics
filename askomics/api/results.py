@@ -494,7 +494,7 @@ def send2galaxy():
     """
     try:
         data = request.get_json()
-        if not (data and data.get("id") and data.get("fileToSend")):
+        if not (data and data.get("fileId") and data.get("fileToSend")):
             return jsonify({
                 'error': True,
                 'errorMessage': "Missing parameters"

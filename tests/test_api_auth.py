@@ -134,7 +134,7 @@ class TestApiAuth(AskomicsTestCase):
         # Account creation disabled in config file
         client.set_config("askomics", "disable_account_creation", "true")
         response = client.client.post("/api/auth/signup", json=ok_data)
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert response.json == {
             "error": True,
             "errorMessage": "Account creation is disabled",

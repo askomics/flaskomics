@@ -70,7 +70,7 @@ class TestApiSparql(AskomicsTestCase):
             'header': [],
             'data': []
         }
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert self.equal_objects(response.json, expected)
 
         response = client.client.post("/api/sparql/previewquery", json=no_graph_data)
@@ -80,7 +80,7 @@ class TestApiSparql(AskomicsTestCase):
             'header': [],
             'data': []
         }
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert self.equal_objects(response.json, expected)
 
     def test_query(self, client):
@@ -120,7 +120,7 @@ class TestApiSparql(AskomicsTestCase):
             'header': [],
             'data': []
         }
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert self.equal_objects(response.json, expected)
 
         response = client.client.post("/api/sparql/previewquery", json=no_graph_data)
@@ -130,5 +130,5 @@ class TestApiSparql(AskomicsTestCase):
             'header': [],
             'data': []
         }
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert self.equal_objects(response.json, expected)

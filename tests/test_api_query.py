@@ -247,7 +247,7 @@ class TestApiStartpoints(AskomicsTestCase):
         print(client.session)
 
         response = client.client.post('/api/query/save_result', json=data)
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert response.json == {
             "error": True,
             "errorMessage": "Exceeded quota",

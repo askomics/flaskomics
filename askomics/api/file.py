@@ -127,11 +127,18 @@ def upload_chunk():
         }), 400
 
     data = request.get_json()
-    if not (data and all([key in data for key in ["first", "last", "size", "name", "type", "path", "size"]])):
+    if not (data and all([key in data for key in ["first", "last", "size", "name", "type", "size", "chunk"]])):
         return jsonify({
             "path": '',
             "error": True,
             "errorMessage": "Missing parameters"
+        }), 400
+
+    if not (data["first"] or data.get("path")):
+        return jsonify({
+            "path": '',
+            "error": True,
+            "errorMessage": "Missing path parameter"
         }), 400
 
     try:
