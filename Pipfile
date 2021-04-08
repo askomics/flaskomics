@@ -28,6 +28,7 @@ configparser = "*"
 tld = "*"
 argh = "*"
 python-ldap = "*"
+python-dateutil = "*"
 
 [dev-packages]
 pytest = "*"

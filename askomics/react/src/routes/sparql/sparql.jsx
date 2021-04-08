@@ -67,7 +67,7 @@ export default class Sparql extends Component {
         endpoints: this.props.location.state.endpoints,
         diskSpace: this.props.location.state.diskSpace,
         config: this.props.location.state.config,
-        console_enabled: this.props.location.console_enabled,
+        console_enabled: this.props.location.state.console_enabled,
         waiting: false,
       })
     } else {
