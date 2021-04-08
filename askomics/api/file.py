@@ -378,3 +378,20 @@ def serve_file(path, user_id, username):
     )
 
     return(send_from_directory(dir_path, path))
+
+
+@file_bp.route('/api/files/columns', methods=['GET'])
+def get_column_types():
+    """Give the list of available column types
+
+    Returns
+    -------
+    json
+        types: list of available column types
+    """
+
+    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation"]
+
+    return jsonify({
+        "types": data
+    })
