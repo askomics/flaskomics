@@ -171,11 +171,11 @@ class FilesHandler(FilesUtils):
         string
             file name
         """
-        name = Utils.get_random_string(20)
+        name = Utils.get_random_string(10)
         file_path = "{}/{}".format(self.upload_path, name)
         # Make sure it is not in use already
         while os.path.isfile(file_path):
-            name = Utils.get_random_string(20)
+            name = Utils.get_random_string(10)
             file_path = "{}/{}".format(self.upload_path, name)
 
         return name
