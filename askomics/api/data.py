@@ -1,4 +1,5 @@
 """Api routes"""
+import urllib.parse
 import sys
 import traceback
 
@@ -33,10 +34,11 @@ def get_data(uri):
         # If the user do not have access to any endpoint (no viewable graph), skip
         if endpoints:
 
+            uri = urllib.parse.quote(uri)
             base_uri = current_app.iniconfig.get('triplestore', 'namespace_data')
             full_uri = "<%s%s>" % (base_uri, uri)
 
-            raw_query = "SELECT DISTINCT ?predicat ?object\nWHERE {\n%s ?predicat ?object\n}" % (full_uri)
+            raw_query = "SELECT DISTINCT ?predicat ?object\nWHERE {\n?URI ?predicat ?object\nVALUES ?URI {%s}}\n" % (full_uri)
             federated = query.is_federated()
             replace_froms = query.replace_froms()
 
