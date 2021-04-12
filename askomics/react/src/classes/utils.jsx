@@ -17,8 +17,7 @@ export default class Utils {
     let splitList = url.split('/')
     // take last elem
     let last = splitList[splitList.length - 1]
-    let splitList2 = last.split('#')
-    
+    let splitList2 = last.split('#')    
     return decodeURI(splitList2[splitList2.length - 1])
   }
 
