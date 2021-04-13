@@ -46,7 +46,7 @@
           {
             "label": ".",
             "uri": "http://askomics.org/test/data/."
-          },
+          }
         ],
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": "http://askomics.org/test/internal/faldoStrand",
