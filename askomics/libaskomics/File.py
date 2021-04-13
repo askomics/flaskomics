@@ -389,7 +389,6 @@ class File(Params):
 
         return self.faldo.BothStrandPosition
 
-
     def get_rdf_type(self, value):
         """get xsd type of a value
 
