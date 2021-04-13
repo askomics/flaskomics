@@ -506,7 +506,7 @@ class CsvFile(File):
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
                         if not cell:
-                            cell = "unknown"
+                            cell = "unknown/both"
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }

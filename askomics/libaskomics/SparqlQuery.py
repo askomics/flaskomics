@@ -1224,7 +1224,7 @@ class SparqlQuery(Params):
                                 "object": category_label,
                                 "optional": False
                             }, block_id, sblock_id, pblock_ids)
-                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition faldo:BothStrandPosition faldo:StrandPosition}} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
+                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition faldo:BothStrandPosition}} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
                     else:
                         category_name = "<{}>".format(attribute["uri"])
                         self.store_triple({
