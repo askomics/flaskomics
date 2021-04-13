@@ -387,7 +387,10 @@ class File(Params):
         if raw_strand in ("-", "minus", "moins", "-1"):
             return self.faldo.ReverseStrandPosition
 
-        return self.faldo.BothStrandPosition
+        if raw_strand == "both":
+            return self.faldo.BothStrandPosition
+
+        return self.faldo.StrandPosition
 
     def get_rdf_type(self, value):
         """get xsd type of a value

@@ -492,7 +492,7 @@ class CsvFile(File):
                     symetric_relation = False
 
                     # Skip entity and blank cells
-                    if column_number == 0 or not cell:
+                    if column_number == 0 or (not cell and not current_type == "strand"):
                         continue
 
                     # Relation
@@ -505,6 +505,8 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
+                        if not cell:
+                            cell = "unknown"
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
