@@ -108,6 +108,8 @@ class CsvFile(File):
                 # Store header
                 header = next(reader)
                 self.header = [h.strip() for h in header]
+                if not all(self.header):
+                    raise Exception("Empty column in header")
 
                 # Loop on lines
                 preview = []
