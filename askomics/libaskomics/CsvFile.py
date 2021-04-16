@@ -203,19 +203,19 @@ class CsvFile(File):
 
         # Then, detect special type with header
         for stype, expressions in special_types.items():
-            for expression in expressions:
-                epression_regexp = ".*{}.*".format(expression.lower())
-                if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if start and end are numerical
-                    if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
-                        break
-                    # test if strand is a category with 3 elements max
-                    if stype == 'strand' and len(set(list(filter(None, values)))) > 3:
-                        break
-                    # Test if date respect a date format
-                    if stype == 'datetime' and all(date_regex.match(val) for val in values):
-                        break
-                    return stype
+            # Need to check once if it matches any subtype
+            expression_regexp = "|".join([".*{}.*".format(expression.lower()) for expression in expressions])
+            if re.match(expression_regexp, self.header[header_index].lower(), re.IGNORECASE) is not None:
+                # Test if start and end are numerical
+                if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
+                    break
+                # test if strand is a category with 3 elements max
+                if stype == 'strand' and len(set(list(filter(None, values)))) > 3:
+                    break
+                # Test if date respects a date format
+                if stype == 'date' and not all(self.is_date(val) for val in values):
+                    break
+                return stype
 
         # Then, check goterm
         # if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
