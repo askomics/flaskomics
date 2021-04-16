@@ -537,6 +537,17 @@
         "label": "score",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
         "uri": "http://askomics.org/test/data/score"
+      },
+      {
+        "categories": [],
+        "entityUri": "http://askomics.org/test/data/transcript",
+        "faldo": null,
+        "graphs": [
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
+        ],
+        "label": "date",
+        "type": "http://www.w3.org/2001/XMLSchema#date",
+        "uri": "http://askomics.org/test/data/date"
       }
     ],
     "entities": [

@@ -3,6 +3,7 @@ import re
 import rdflib
 import sys
 import traceback
+from dateutil import parser
 
 from rdflib import BNode
 
@@ -193,10 +194,8 @@ class CsvFile(File):
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
-            'datetime': ('date', 'time', 'birthday', 'day')
+            'date': ('date', 'time', 'birthday', 'day')
         }
-
-        date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}')
 
         # First, detect boolean values
         if self.are_boolean(values):
@@ -274,6 +273,28 @@ class CsvFile(File):
                 return True
             except ValueError:
                 return False
+
+    @staticmethod
+    def is_date(value):
+        """Guess if a variable is a date
+
+        Parameters
+        ----------
+        value :
+            The var to test
+
+        Returns
+        -------
+        boolean
+            True if it's a date
+        """
+        if value == "":
+            return True
+        try:
+            parser.parse(value, dayfirst=True).date()
+            return True
+        except parser.ParserError:
+            return False
 
     @property
     def transposed_preview(self):
@@ -406,6 +427,13 @@ class CsvFile(File):
                 attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.boolean
+                rdf_type = rdflib.OWL.DatatypeProperty
+
+            # Date
+            elif self.columns_type[index] == "date":
+                attribute = self.rdfize(attribute_name)
+                label = rdflib.Literal(attribute_name)
+                rdf_range = rdflib.XSD.date
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             # Text (default)
@@ -546,6 +574,10 @@ class CsvFile(File):
                             attribute = rdflib.Literal("true", datatype=rdflib.XSD.boolean)
                         else:
                             attribute = rdflib.Literal("false", datatype=rdflib.XSD.boolean)
+
+                    elif current_type == "date":
+                        relation = self.rdfize(current_header)
+                        attribute = rdflib.Literal(self.convert_type(cell))
 
                     # default is text
                     else:

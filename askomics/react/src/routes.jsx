@@ -22,6 +22,7 @@ import AskoFooter from './footer'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'react-datepicker/dist/react-datepicker.css'
 
 export default class Routes extends Component {
 

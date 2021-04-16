@@ -185,6 +185,9 @@ export default class Query extends Component {
     if (typeUri == "http://www.w3.org/2001/XMLSchema#boolean") {
       return "boolean"
     }
+    if (typeUri == "http://www.w3.org/2001/XMLSchema#date") {
+      return "date"
+    }
   }
 
   attributeExistInAbstraction (attrUri, entityUri) {
@@ -333,6 +336,15 @@ export default class Query extends Component {
         if (attributeType == 'boolean') {
           nodeAttribute.filterValues = ["true", "false"]
           nodeAttribute.filterSelectedValues = []
+        }
+
+        if (attributeType == 'date') {
+          nodeAttribute.filters = [
+            {
+              filterValue: null,
+              filterSign: "="
+            }
+          ]
         }
 
         return nodeAttribute
@@ -1065,6 +1077,55 @@ export default class Query extends Component {
     }
   }
 
+  handleDateFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddDateFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: null,
+          filterSign: "="
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  // This is a pain, but JS will auto convert time to UTC
+  // And datepicker use the local timezone
+  // So without this, the day sent will be wrong
+  fixTimezoneOffset (date){
+    if(!date){return null};
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+  }
+
+
+  handleFilterDateValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
   toggleLinkAttribute (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1289,6 +1350,7 @@ export default class Query extends Component {
           })
         }).then(response => {
           if (this.props.location.state.redo) {
+            console.log(this.props.location.state.graphState)
             // redo a query
             this.graphState = this.props.location.state.graphState
             this.initId()
@@ -1338,8 +1400,8 @@ export default class Query extends Component {
       warningDiskSpace = (
         <div>
           <Alert color="warning">
-              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space 
-              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed). 
+              Your files (uploaded files and results) take {this.utils.humanFileSize(this.state.diskSpace, true)} of space
+              (you have {this.utils.humanFileSize(this.state.config.user.quota, true)} allowed).
               Please delete some before save queries or contact an admin to increase your quota
           </Alert>
         </div>
@@ -1375,6 +1437,9 @@ export default class Query extends Component {
                 handleFilterNumericValue={p => this.handleFilterNumericValue(p)}
                 toggleLinkAttribute={p => this.toggleLinkAttribute(p)}
                 toggleAddNumFilter={p => this.toggleAddNumFilter(p)}
+                toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
+                handleFilterDateValue={p => this.handleFilterDateValue(p)}
+                handleDateFilter={p => this.handleDateFilter(p)}
               />
             )
           }

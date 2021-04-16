@@ -393,7 +393,8 @@ class TriplestoreExplorer(Params):
         litterals = (
             "http://www.w3.org/2001/XMLSchema#string",
             "http://www.w3.org/2001/XMLSchema#decimal",
-            "http://www.w3.org/2001/XMLSchema#boolean"
+            "http://www.w3.org/2001/XMLSchema#boolean",
+            "http://www.w3.org/2001/XMLSchema#date"
         )
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
