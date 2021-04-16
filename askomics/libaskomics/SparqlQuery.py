@@ -554,7 +554,7 @@ class SparqlQuery(Params):
                 triple = "OPTIONAL {{{}}}".format(triple)
         # Close the }} if end of the nest
         if triple_dict.get("nested_end"):
-            triple = "    " + triple + "}}"
+            triple = "    " + triple + "}"
         elif triple_dict.get("nested"):
             triple = "    " + triple
 
@@ -1224,7 +1224,7 @@ class SparqlQuery(Params):
                             "predicate": category_name,
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False,
-                            "nested_start": True if attribute["optional"] else False
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
                             self.store_triple({
@@ -1263,9 +1263,9 @@ class SparqlQuery(Params):
                             "predicate": category_name,
                             "object": category_value_uri,
                             "optional": True if attribute["optional"] else False,
-                            "nested_start": True if attribute["optional"] else False
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
-                        if attribute["visible"] and not attribute["optional"]:
+                        if attribute["visible"]:
                             self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
