@@ -331,6 +331,8 @@ class TestApiFile(AskomicsTestCase):
         client.log_user("jdoe")
         client.upload()
 
+        client.upload_file("test-data/malformed.tsv")
+
         csv_data = {
             "filesId": [1, ]
         }
@@ -343,8 +345,15 @@ class TestApiFile(AskomicsTestCase):
             "filesId": [42, ]
         }
 
+        malformed_data = {
+            "filesId": [6, ]
+        }
+
         with open("tests/results/preview_files.json") as file:
             csv_expected = json.loads(file.read())
+
+        with open("tests/results/preview_malformed_files.json") as file:
+            csv_malformed = json.loads(file.read())
 
         response = client.client.post('/api/files/preview', json=fake_data)
         assert response.status_code == 200
@@ -353,6 +362,10 @@ class TestApiFile(AskomicsTestCase):
             'errorMessage': '',
             'previewFiles': []
         }
+
+        response = client.client.post('/api/files/preview', json=malformed_data)
+        assert response.status_code == 200
+        assert response.json == csv_malformed
 
         response = client.client.post('/api/files/preview', json=csv_data)
         assert response.status_code == 200
