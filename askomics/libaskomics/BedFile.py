@@ -231,6 +231,14 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
+            else:
+                self.category_values["strand"] = {".", }
+                relation = self.namespace_data[self.format_uri("strand")]
+                attribute = self.namespace_data[self.format_uri(".")]
+                faldo_strand = self.get_faldo_strand(".")
+                self.faldo_abstraction["strand"] = relation
+                self.graph_chunk.add((entity, relation, attribute))
+                strand = True
 
             if strand:
                 if "strand" not in attribute_list:
@@ -241,7 +249,7 @@ class BedFile(File):
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-"]
+                        "values": ["+", "-", "."]
                     })
 
             # Score

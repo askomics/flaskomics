@@ -209,8 +209,8 @@ class CsvFile(File):
                 # Test if start and end are numerical
                 if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
                     break
-                # test if strand is a category with 2 elements max
-                if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
+                # test if strand is a category with 3 elements max
+                if stype == 'strand' and len(set(list(filter(None, values)))) > 3:
                     break
                 # Test if date respects a date format
                 if stype == 'date' and not all(self.is_date(val) for val in values):
@@ -520,7 +520,7 @@ class CsvFile(File):
                     symetric_relation = False
 
                     # Skip entity and blank cells
-                    if column_number == 0 or not cell:
+                    if column_number == 0 or (not cell and not current_type == "strand"):
                         continue
 
                     # Relation
@@ -533,6 +533,8 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
+                        if not cell:
+                            cell = "unknown/both"
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }

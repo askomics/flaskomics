@@ -548,7 +548,15 @@ class SparqlQuery(Params):
         """
         triple = "{} {} {} .".format(triple_dict["subject"], triple_dict["predicate"], triple_dict["object"])
         if triple_dict["optional"]:
-            triple = "OPTIONAL {{{}}}".format(triple)
+            if triple_dict.get("nested_start"):
+                triple = "OPTIONAL {{{}".format(triple)
+            else:
+                triple = "OPTIONAL {{{}}}".format(triple)
+        # Close the }} if end of the nest
+        if triple_dict.get("nested_end"):
+            triple = "    " + triple + "}"
+        elif triple_dict.get("nested"):
+            triple = "    " + triple
 
         return triple
 
@@ -1215,14 +1223,16 @@ class SparqlQuery(Params):
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
+                            "optional": True if attribute["optional"] else False,
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
                             self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
-                                "optional": True if attribute["optional"] else False
+                                "optional": True if attribute["optional"] else False,
+                                "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
@@ -1245,21 +1255,23 @@ class SparqlQuery(Params):
                                 "object": category_label,
                                 "optional": False
                             }, block_id, sblock_id, pblock_ids)
-                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
+                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition faldo:BothStrandPosition}} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
                     else:
                         category_name = "<{}>".format(attribute["uri"])
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
+                            "optional": True if attribute["optional"] else False,
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
                             self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
-                                "optional": True if attribute["optional"] else False
+                                "optional": True if attribute["optional"] else False,
+                                "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids)
 
                     if attribute["visible"]:
