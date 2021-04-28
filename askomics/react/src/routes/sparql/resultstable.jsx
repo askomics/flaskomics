@@ -5,24 +5,28 @@ import WaitingDiv from '../../components/waiting'
 import { Badge } from 'reactstrap'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import update from 'immutability-helper';
 
 export default class ResultsTable extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+        filter_columns: {}
+    }
     this.utils = new Utils()
     this.custom_compare = this.custom_compare.bind(this)
   }
 
   custom_compare(a, b, column_name){
+    console.log(this.state)
     let result, num_a, num_b;
     if (typeof b === 'string') {
-      if (this.state[column_name] === true){
+      if (this.state.filter_columns[column_name] === true){
         num_a = Number(a)
         num_b = Number(b)
         if (Number.isNaN(num_a) || Number.isNaN(num_b)){
           this.setState({
-            [column_name]: false
+            filter_columns: update(this.state.filter_columns, {[column_name]: {$set: false}})
           })
           result = b.localeCompare(a);
         } else {
@@ -38,10 +42,12 @@ export default class ResultsTable extends Component {
   }
 
   componentDidMount () {
-    let columns = this.props.header.map((colName, index) => {
-      this.setState({
-        [colName]: true
-      })
+    let filter_columns = {}
+    this.props.header.map((colName, index) => {
+      filter_columns[colName] = true;
+    })
+    this.setState({
+      filter_columns: filter_columns
     })
   }
 
