@@ -18,7 +18,6 @@ export default class ResultsTable extends Component {
   }
 
   custom_compare(a, b, column_name){
-    console.log(this.state)
     let result, num_a, num_b;
     if (typeof b === 'string') {
       if (this.state.filter_columns[column_name] === true){
