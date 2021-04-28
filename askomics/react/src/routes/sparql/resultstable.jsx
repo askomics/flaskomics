@@ -9,9 +9,7 @@ import Utils from '../../classes/utils'
 export default class ResultsTable extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-        filter_columns: {}
-    }
+    this.state = {}
     this.utils = new Utils()
     this.custom_compare = this.custom_compare.bind(this)
   }
@@ -19,11 +17,13 @@ export default class ResultsTable extends Component {
   custom_compare(a, b, column_name){
     let result, num_a, num_b;
     if (typeof b === 'string') {
-      if (this.state.filter_columns[column_name]){
+      if (this.state[column_name] === true){
         num_a = Number(a)
         num_b = Number(b)
         if (Number.isNaN(num_a) || Number.isNaN(num_b)){
-          this.state.filter_columns[column_name] = false
+          this.setState({
+            [column_name]: false
+          })
           result = b.localeCompare(a);
         } else {
           result = num_a > num_b ? -1 : ((num_a < num_b) ? 1 : 0);
@@ -37,9 +37,16 @@ export default class ResultsTable extends Component {
     return result;
   }
 
+  componentDidMount () {
+    let columns = this.props.header.map((colName, index) => {
+      this.setState({
+        [colName]: true
+      })
+    })
+  }
+
   render () {
     let columns = this.props.header.map((colName, index) => {
-      this.state.filter_columns[colName] = true;
       return ({
         dataField: colName,
         text: colName,
