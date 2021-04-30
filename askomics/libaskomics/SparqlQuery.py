@@ -1381,7 +1381,7 @@ WHERE {{
             """.format(
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks='\n    '.join(self.triple_blocks_to_string()),
+                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 
