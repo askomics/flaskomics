@@ -5,11 +5,49 @@ import WaitingDiv from '../../components/waiting'
 import { Badge } from 'reactstrap'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import update from 'immutability-helper';
 
 export default class ResultsTable extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+        filter_columns: {}
+    }
     this.utils = new Utils()
+    this.custom_compare = this.custom_compare.bind(this)
+  }
+
+  custom_compare(a, b, column_name){
+    let result, num_a, num_b;
+    if (typeof b === 'string') {
+      if (this.state.filter_columns[column_name] === true){
+        num_a = Number(a)
+        num_b = Number(b)
+        if (Number.isNaN(num_a) || Number.isNaN(num_b)){
+          this.setState({
+            filter_columns: update(this.state.filter_columns, {[column_name]: {$set: false}})
+          })
+          result = b.localeCompare(a);
+        } else {
+          result = num_a > num_b ? -1 : ((num_a < num_b) ? 1 : 0);
+        }
+      } else {
+        result = b.localeCompare(a);
+      }
+    } else {
+      result = a > b ? -1 : ((a < b) ? 1 : 0);
+    }
+    return result;
+  }
+
+  componentDidMount () {
+    let filter_columns = {}
+    this.props.header.map((colName, index) => {
+      filter_columns[colName] = true;
+    })
+    this.setState({
+      filter_columns: filter_columns
+    })
   }
 
   render () {
@@ -24,6 +62,12 @@ export default class ResultsTable extends Component {
             return <a href={cell}>{this.utils.splitUrl(cell)}</a>
           }
           return cell
+        },
+        sortFunc: (a, b, order, dataField, rowA, rowB) => {
+          if (order === 'asc') {
+            return this.custom_compare(a,b, dataField);
+          }
+          return this.custom_compare(b,a, dataField); // desc
         }
       })
     })
