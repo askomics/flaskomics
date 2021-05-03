@@ -695,10 +695,11 @@ export default class Query extends Component {
     this.graphState.nodes.map(inode => {
       if (node.id == inode.id) {
         inode.suggested = false
+        inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
     // get attributes (only for nodes)
-    if (node.type =="node") {
+    if (node.type == "node") {
       this.setNodeAttributes(node.uri, node.id)
     }
   }
