@@ -329,6 +329,7 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'category') {
+          nodeAttribute.exclude = false
           nodeAttribute.filterValues = attr.categories
           nodeAttribute.filterSelectedValues = []
         }
@@ -989,6 +990,18 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  toggleExclude (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.exclude = !attr.exclude
+        if (attr.exclude) {
+          attr.visible = true
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
   toggleOptional (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1428,6 +1441,7 @@ export default class Query extends Component {
                 graph={this.state.graphState}
                 handleChangeLink={p => this.handleChangeLink(p)}
                 toggleVisibility={p => this.toggleVisibility(p)}
+                toggleExclude={p => this.toggleExclude(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
                 handleFilterType={p => this.handleFilterType(p)}
