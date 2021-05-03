@@ -511,25 +511,26 @@ class SparqlQuery(Params):
         str
             Corresponding SPARQL
         """
-        # if triple_block["type"] == "UNION":
         if triple_block["type"] in ("UNION", "MINUS"):
 
-            block_string = ""
-            length = len(triple_block) - 1
-            i = 1
+            block_string = "{\n"
+            i = 0
+            current_spacing = "    "
 
             for sblock in triple_block["sblocks"]:
                 sblock_string = "{"
-                triples_string = '\n'.join([self.triple_dict_to_string(triple_dict) for triple_dict in sblock["triples"]])
-                triples_string += '\n'
-                triples_string += '\n'.join([filtr for filtr in sblock["filters"]])
-                triples_string += '\n'
-                triples_string += '\n'.join([value for value in sblock["values"]])
-                sblock_string += "\n    {}\n}}".format(triples_string)
+                triples_string = '\n{}'.format(current_spacing * 2).join([self.triple_dict_to_string(triple_dict) for triple_dict in sblock["triples"]])
+                triples_string += '\n{}'.format(current_spacing * 2)
+                triples_string += '\n{}'.format(current_spacing * 2).join([filtr for filtr in sblock["filters"]])
+                triples_string += '\n{}'.format(current_spacing * 2)
+                triples_string += '\n{}'.format(current_spacing * 2).join([value for value in sblock["values"]])
+                sblock_string += "\n{}{}\n{}}}".format(current_spacing * 2, triples_string, current_spacing * 2)
 
-                block_string += triple_block["type"] if i == length else ""
-                i += 1
+                block_string += "{}{} ".format(current_spacing * 2, triple_block["type"]) if (triple_block["type"] == "MINUS" or i > 0) else current_spacing * 2
                 block_string += sblock_string + "\n"
+                i += 1
+
+            block_string += current_spacing + "}\n"
 
         return block_string
 
@@ -803,7 +804,7 @@ class SparqlQuery(Params):
             var_target = tpl_var[1]
             for i, triple_dict in enumerate(self.triples):
                 for key, value in triple_dict.items():
-                    if key != "optional":
+                    if key not in ["optional", "nested", "nested_start", "nested_end"]:
                         self.triples[i][key] = value.replace(var_source, var_target)
             for i, select in enumerate(self.selects):
                 self.selects[i] = select.replace(var_source, var_target)
@@ -830,7 +831,7 @@ class SparqlQuery(Params):
                     # Iterate over triples
                     for ntriple, triple_dict in enumerate(sblock["triples"]):
                         for key, value in triple_dict.items():
-                            if key != "optional":
+                            if key not in ["optional", "nested", "nested_start", "nested_end"]:
                                 self.triples_blocks[nblock]["sblocks"][nsblock]["triples"][ntriple][key] = value.replace(var_source, var_target)
 
                     for i, filtr in enumerate(sblock["filters"]):
