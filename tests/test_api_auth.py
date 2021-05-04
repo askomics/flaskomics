@@ -1074,3 +1074,25 @@ class TestApiAuth(AskomicsTestCase):
             "error": True,
             "errorMessage": "Local user required"
         }
+
+    def test_api_auth(self, client):
+        """test api_auth decorator"""
+        client.create_two_users()
+        response = client.client.get("/api/start")
+
+        assert response.status_code == 200
+        assert not response.json['config'].get("logged")
+
+        # Log jdoe
+        response = client.client.post("/api/auth/profile", headers={'X-API-KEY': '0000000001'})
+
+        assert response.status_code == 200
+        assert response.json['config'].get("logged")
+        assert response.json['user']['username'] == 'jdoe'
+
+        # Log jsmith
+        response = client.client.post("/api/auth/profile", headers={'X-API-KEY': '0000000002'})
+
+        assert response.status_code == 200
+        assert response.json['config'].get("logged")
+        assert response.json['user']['username'] == 'jsmith'
