@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -16,6 +16,7 @@ query_bp = Blueprint('query', __name__, url_prefix='/')
 
 
 @query_bp.route('/api/query/startpoints', methods=['GET'])
+@api_auth
 def query():
     """Get start points
 
@@ -55,6 +56,7 @@ def query():
 
 
 @query_bp.route('/api/query/abstraction', methods=['GET'])
+@api_auth
 def get_abstraction():
     """Get abstraction
 
@@ -92,6 +94,7 @@ def get_abstraction():
 
 
 @query_bp.route('/api/query/preview', methods=['POST'])
+@api_auth
 def get_preview():
     """Get a preview of query
 
@@ -110,6 +113,13 @@ def get_preview():
             header = []
         else:
             data = request.get_json()
+            if not (data and data.get("graphState")):
+                return jsonify({
+                    'resultsPreview': [],
+                    'headerPreview': [],
+                    'error': True,
+                    'errorMessage': "Missing graphState parameter"
+                }), 400
 
             query = SparqlQuery(current_app, session, data["graphState"])
             query.build_query_from_json(preview=True, for_editor=False)
@@ -140,6 +150,7 @@ def get_preview():
 
 
 @query_bp.route('/api/query/save_result', methods=['POST'])
+@api_auth
 @login_required
 def save_result():
     """Save a query in filesystem and db, using a celery task
@@ -160,10 +171,18 @@ def save_result():
                 'error': True,
                 'errorMessage': "Exceeded quota",
                 'task_id': None
-            }), 500
+            }), 400
 
         # Get query and endpoints and graphs of the query
-        query = SparqlQuery(current_app, session, request.get_json()["graphState"])
+        data = request.get_json()
+        if not (data and data.get("graphState")):
+            return jsonify({
+                'task_id': None,
+                'error': True,
+                'errorMessage': "Missing graphState parameter"
+            }), 400
+
+        query = SparqlQuery(current_app, session, data["graphState"])
         query.build_query_from_json(preview=False, for_editor=False)
 
         info = {

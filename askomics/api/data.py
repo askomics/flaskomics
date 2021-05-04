@@ -3,6 +3,7 @@ import urllib.parse
 import sys
 import traceback
 
+from askomics.api.auth import api_auth
 from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
@@ -13,6 +14,7 @@ data_bp = Blueprint('data', __name__, url_prefix='/')
 
 
 @data_bp.route('/api/data/<string:uri>', methods=['GET'])
+@api_auth
 def get_data(uri):
     """Get information about uri
 

@@ -47,7 +47,7 @@ def integrate(self, session, data, host_url):
     files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
     files_handler.handle_files([data["fileId"], ])
 
-    public = data["public"] if session["user"]["admin"] else False
+    public = data.get("public", False) if session["user"]["admin"] else False
 
     for file in files_handler.files:
 
@@ -66,13 +66,13 @@ def integrate(self, session, data, host_url):
             dataset.update_in_db("started", update_date=True, update_graph=True)
 
             if file.type == "csv/tsv":
-                file.integrate(data["dataset_id"], data['columns_type'], data['header_names'], public=public)
+                file.integrate(data["dataset_id"], data.get('columns_type'), data.get('header_names'), public=public)
             elif file.type == "gff/gff3":
-                file.integrate(data["dataset_id"], data["entities"], public=public)
+                file.integrate(data["dataset_id"], data.get("entities"), public=public)
             elif file.type in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
                 file.integrate(public=public)
             elif file.type == "bed":
-                file.integrate(data["dataset_id"], data["entity_name"], public=public)
+                file.integrate(data["dataset_id"], data.get("entity_name"), public=public)
             # done
             dataset.update_in_db("success", ntriples=file.ntriples)
         except Exception as e:

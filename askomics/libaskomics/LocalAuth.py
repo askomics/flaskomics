@@ -46,36 +46,36 @@ class LocalAuth(Params):
             User inputs
 
         """
-        if not inputs['fname']:
+        if not inputs.get('fname'):
             self.error = True
             self.error_message.append('First name empty')
 
-        if not inputs['lname']:
+        if not inputs.get('lname'):
             self.error = True
             self.error_message.append('Last name empty')
 
-        if not inputs['username']:
+        if not inputs.get('username'):
             self.error = True
             self.error_message.append('Username name empty')
 
-        if not validate_email(inputs['email']):
+        if not validate_email(inputs.get('email')):
             self.error = True
             self.error_message.append('Not a valid email')
 
         if not admin_add:
-            if not inputs['password']:
+            if not inputs.get('password'):
                 self.error = True
                 self.error_message.append('Password empty')
 
-            if inputs['password'] != inputs['passwordconf']:
+            if inputs.get('password') != inputs.get('passwordconf'):
                 self.error = True
                 self.error_message.append("Passwords doesn't match")
 
-        if self.is_username_in_db(inputs['username']):
+        if self.is_username_in_db(inputs.get('username')):
             self.error = True
             self.error_message.append('Username already registered')
 
-        if self.is_email_in_db(inputs['email']):
+        if self.is_email_in_db(inputs.get('email')):
             self.error = True
             self.error_message.append('Email already registered')
 

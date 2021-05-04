@@ -134,7 +134,7 @@ class TestApiAuth(AskomicsTestCase):
         # Account creation disabled in config file
         client.set_config("askomics", "disable_account_creation", "true")
         response = client.client.post("/api/auth/signup", json=ok_data)
-        assert response.status_code == 500
+        assert response.status_code == 400
         assert response.json == {
             "error": True,
             "errorMessage": "Account creation is disabled",
@@ -1074,3 +1074,25 @@ class TestApiAuth(AskomicsTestCase):
             "error": True,
             "errorMessage": "Local user required"
         }
+
+    def test_api_auth(self, client):
+        """test api_auth decorator"""
+        client.create_two_users()
+        response = client.client.get("/api/start")
+
+        assert response.status_code == 200
+        assert not response.json['config'].get("logged")
+
+        # Log jdoe
+        response = client.client.get("/api/start", headers={'X-API-KEY': '0000000001'})
+
+        assert response.status_code == 200
+        assert response.json['config'].get("logged")
+        assert response.json['config']['user']['username'] == 'jdoe'
+
+        # Log jsmith
+        response = client.client.get("/api/start", headers={'X-API-KEY': '0000000002'})
+
+        assert response.status_code == 200
+        assert response.json['config'].get("logged")
+        assert response.json['config']['user']['username'] == 'jsmith'

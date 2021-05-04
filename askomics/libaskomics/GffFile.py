@@ -79,7 +79,7 @@ class GffFile(File):
             }
         }
 
-    def integrate(self, dataset_id, entities, public=True):
+    def integrate(self, dataset_id, entities=[], public=True):
         """Integrate GFF file
 
         Parameters
@@ -90,7 +90,11 @@ class GffFile(File):
             Insert in public dataset
         """
         self.public = public
-        self.entities_to_integrate = entities
+        if entities:
+            self.entities_to_integrate = entities
+        else:
+            self.set_preview()
+            self.entities_to_integrate = self.entities
 
         File.integrate(self, dataset_id=dataset_id)
 

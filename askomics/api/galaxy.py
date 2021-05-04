@@ -4,7 +4,7 @@ import traceback
 
 import json
 
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Galaxy import Galaxy
 
@@ -14,6 +14,7 @@ galaxy_bp = Blueprint('galaxy', __name__, url_prefix='/')
 
 
 @galaxy_bp.route('/api/galaxy/datasets', methods=['GET', 'POST'])
+@api_auth
 @login_required
 def get_datasets():
     """Get galaxy datasets and histories of a user
@@ -27,7 +28,8 @@ def get_datasets():
     """
     history_id = None
     if request.method == 'POST':
-        history_id = request.get_json()["history_id"]
+        if request.get_json():
+            history_id = request.get_json().get("history_id")
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -50,6 +52,7 @@ def get_datasets():
 
 
 @galaxy_bp.route('/api/galaxy/queries', methods=['GET', 'POST'])
+@api_auth
 @login_required
 def get_queries():
     """Get galaxy queries (json datasets)
@@ -63,7 +66,8 @@ def get_queries():
     """
     history_id = None
     if request.method == 'POST':
-        history_id = request.get_json()["history_id"]
+        if request.get_json():
+            history_id = request.get_json().get("history_id")
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -86,6 +90,7 @@ def get_queries():
 
 
 @galaxy_bp.route('/api/galaxy/upload_datasets', methods=['POST'])
+@api_auth
 @login_required
 def upload_datasets():
     """Download a galaxy datasets into AskOmics
@@ -104,9 +109,16 @@ def upload_datasets():
         return jsonify({
             'errorMessage': "Exceeded quota",
             "error": True
-        }), 500
+        }), 400
 
-    datasets_id = request.get_json()["datasets_id"]
+    data = request.get_json()
+    if not (data and data.get("datasets_id")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing datasets_id parameter"
+        }), 400
+
+    datasets_id = data["datasets_id"]
 
     try:
         galaxy = Galaxy(current_app, session)
@@ -125,6 +137,7 @@ def upload_datasets():
 
 
 @galaxy_bp.route('/api/galaxy/getdatasetcontent', methods=['POST'])
+@api_auth
 @login_required
 def get_dataset_content():
     """Download a galaxy datasets into AskOmics
@@ -136,7 +149,15 @@ def get_dataset_content():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    dataset_id = request.get_json()["dataset_id"]
+
+    data = request.get_json()
+    if not (data and data.get("dataset_id")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing dataset_id parameter"
+        }), 400
+
+    dataset_id = data["dataset_id"]
 
     try:
         galaxy = Galaxy(current_app, session)
