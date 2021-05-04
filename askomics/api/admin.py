@@ -2,7 +2,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import admin_required
+from askomics.api.auth import api_auth, admin_required
 from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
@@ -16,6 +16,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/')
 
 
 @admin_bp.route('/api/admin/getusers', methods=['GET'])
+@api_auth
 @admin_required
 def get_users():
     """Get all users
@@ -46,6 +47,7 @@ def get_users():
 
 
 @admin_bp.route('/api/admin/getdatasets', methods=['GET'])
+@api_auth
 @admin_required
 def get_datasets():
     """Get all datasets
@@ -76,6 +78,7 @@ def get_datasets():
 
 
 @admin_bp.route('/api/admin/getfiles', methods=['GET'])
+@api_auth
 @admin_required
 def get_files():
     """Get all files info
@@ -107,6 +110,7 @@ def get_files():
 
 
 @admin_bp.route('/api/admin/getqueries', methods=['GET'])
+@api_auth
 @admin_required
 def get_queries():
     """Get all public queries
@@ -138,6 +142,7 @@ def get_queries():
 
 
 @admin_bp.route('/api/admin/setadmin', methods=['POST'])
+@api_auth
 @admin_required
 def set_admin():
     """change admin status of a user
@@ -167,6 +172,7 @@ def set_admin():
 
 
 @admin_bp.route('/api/admin/setquota', methods=["POST"])
+@api_auth
 @admin_required
 def set_quota():
     """Change quota of a user
@@ -200,6 +206,7 @@ def set_quota():
 
 
 @admin_bp.route('/api/admin/setblocked', methods=['POST'])
+@api_auth
 @admin_required
 def set_blocked():
     """Change blocked status of a user
@@ -229,6 +236,7 @@ def set_blocked():
 
 
 @admin_bp.route('/api/admin/publicize_dataset', methods=['POST'])
+@api_auth
 @admin_required
 def toogle_public_dataset():
     """Toggle public status of a dataset
@@ -269,6 +277,7 @@ def toogle_public_dataset():
 
 
 @admin_bp.route('/api/admin/publicize_query', methods=['POST'])
+@api_auth
 @admin_required
 def togle_public_query():
     """Publish a query template from a result
@@ -305,6 +314,7 @@ def togle_public_query():
 
 
 @admin_bp.route("/api/admin/adduser", methods=["POST"])
+@api_auth
 @admin_required
 def add_user():
     """Change blocked status of a user
@@ -360,6 +370,7 @@ def add_user():
 
 
 @admin_bp.route("/api/admin/delete_users", methods=["POST"])
+@api_auth
 @admin_required
 def delete_users():
     """Delete users data
@@ -411,6 +422,7 @@ def delete_users():
 
 
 @admin_bp.route("/api/admin/delete_files", methods=["POST"])
+@api_auth
 @admin_required
 def delete_files():
     """Delete files
@@ -443,6 +455,7 @@ def delete_files():
 
 
 @admin_bp.route("/api/admin/delete_datasets", methods=["POST"])
+@api_auth
 @admin_required
 def delete_datasets():
     """Delete some datasets (db and triplestore) with a celery task

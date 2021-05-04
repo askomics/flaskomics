@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -16,6 +16,7 @@ query_bp = Blueprint('query', __name__, url_prefix='/')
 
 
 @query_bp.route('/api/query/startpoints', methods=['GET'])
+@api_auth
 def query():
     """Get start points
 
@@ -55,6 +56,7 @@ def query():
 
 
 @query_bp.route('/api/query/abstraction', methods=['GET'])
+@api_auth
 def get_abstraction():
     """Get abstraction
 
@@ -92,6 +94,7 @@ def get_abstraction():
 
 
 @query_bp.route('/api/query/preview', methods=['POST'])
+@api_auth
 def get_preview():
     """Get a preview of query
 
@@ -147,6 +150,7 @@ def get_preview():
 
 
 @query_bp.route('/api/query/save_result', methods=['POST'])
+@api_auth
 @login_required
 def save_result():
     """Save a query in filesystem and db, using a celery task

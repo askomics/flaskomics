@@ -1,6 +1,6 @@
 import traceback
 import sys
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.SparqlQuery import SparqlQuery
@@ -17,6 +17,7 @@ def can_access(user):
 
 
 @sparql_bp.route("/api/sparql/init", methods=["GET"])
+@api_auth
 @login_required
 def init():
     """Get the default sparql query
@@ -63,6 +64,7 @@ def init():
 
 
 @sparql_bp.route('/api/sparql/previewquery', methods=['POST'])
+@api_auth
 @login_required
 def query():
     """Perform a sparql query
@@ -146,6 +148,7 @@ def query():
 
 
 @sparql_bp.route('/api/sparql/savequery', methods=["POST"])
+@api_auth
 @login_required
 def save_query():
     """Perform a sparql query

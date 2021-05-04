@@ -4,7 +4,7 @@ import traceback
 
 import json
 
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Galaxy import Galaxy
 
@@ -14,6 +14,7 @@ galaxy_bp = Blueprint('galaxy', __name__, url_prefix='/')
 
 
 @galaxy_bp.route('/api/galaxy/datasets', methods=['GET', 'POST'])
+@api_auth
 @login_required
 def get_datasets():
     """Get galaxy datasets and histories of a user
@@ -51,6 +52,7 @@ def get_datasets():
 
 
 @galaxy_bp.route('/api/galaxy/queries', methods=['GET', 'POST'])
+@api_auth
 @login_required
 def get_queries():
     """Get galaxy queries (json datasets)
@@ -88,6 +90,7 @@ def get_queries():
 
 
 @galaxy_bp.route('/api/galaxy/upload_datasets', methods=['POST'])
+@api_auth
 @login_required
 def upload_datasets():
     """Download a galaxy datasets into AskOmics
@@ -134,6 +137,7 @@ def upload_datasets():
 
 
 @galaxy_bp.route('/api/galaxy/getdatasetcontent', methods=['POST'])
+@api_auth
 @login_required
 def get_dataset_content():
     """Download a galaxy datasets into AskOmics

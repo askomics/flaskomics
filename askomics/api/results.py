@@ -1,7 +1,7 @@
 import traceback
 import sys
 
-from askomics.api.auth import login_required, admin_required
+from askomics.api.auth import api_auth, login_required, admin_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -19,6 +19,7 @@ def can_access(user):
 
 
 @results_bp.route('/api/results', methods=['GET'])
+@api_auth
 @login_required
 def get_results():
     """Get ...
@@ -56,6 +57,7 @@ def get_results():
 
 
 @results_bp.route('/api/results/preview', methods=['POST'])
+@api_auth
 @login_required
 def get_preview():
     """Summary
@@ -104,6 +106,7 @@ def get_preview():
 
 
 @results_bp.route('/api/results/getquery', methods=["POST"])
+@api_auth
 def get_graph_and_sparql_query():
     """Get query (graphState or Sparql)
 
@@ -169,6 +172,7 @@ def get_graph_and_sparql_query():
 
 
 @results_bp.route('/api/results/graphstate', methods=['POST'])
+@api_auth
 def get_graph_state():
     """Summary
 
@@ -213,6 +217,7 @@ def get_graph_state():
 
 
 @results_bp.route('/api/results/download', methods=['POST'])
+@api_auth
 @login_required
 def download_result():
     """Download result file"""
@@ -241,6 +246,7 @@ def download_result():
 
 
 @results_bp.route('/api/results/delete', methods=['POST'])
+@api_auth
 @login_required
 def delete_result():
     """Summary
@@ -280,6 +286,7 @@ def delete_result():
 
 
 @results_bp.route('/api/results/sparqlquery', methods=['POST'])
+@api_auth
 @login_required
 def get_sparql_query():
     """Get sparql query of result for the query editor
@@ -351,6 +358,7 @@ def get_sparql_query():
 
 
 @results_bp.route('/api/results/description', methods=['POST'])
+@api_auth
 @login_required
 def set_description():
     """Update a result description
@@ -396,6 +404,7 @@ def set_description():
 
 
 @results_bp.route('/api/results/publish', methods=['POST'])
+@api_auth
 @admin_required
 def publish_query():
     """Publish a query template from a result
@@ -439,6 +448,7 @@ def publish_query():
 
 
 @results_bp.route('/api/results/template', methods=['POST'])
+@api_auth
 @login_required
 def template_query():
     """Template a query from a result
@@ -482,6 +492,7 @@ def template_query():
 
 
 @results_bp.route('/api/results/send2galaxy', methods=['POST'])
+@api_auth
 @login_required
 def send2galaxy():
     """Send a result file into Galaxy

@@ -54,6 +54,7 @@ def get_files():
 
 
 @file_bp.route('/api/files/editname', methods=['POST'])
+@api_auth
 @login_required
 def edit_file():
     """Edit file name
@@ -351,6 +352,7 @@ def integrate():
 
 
 @file_bp.route('/api/files/ttl/<path:user_id>/<path:username>/<path:path>', methods=['GET'])
+@api_auth
 def serve_file(path, user_id, username):
     """Serve a static ttl file of a user
 
