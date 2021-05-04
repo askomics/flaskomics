@@ -329,6 +329,7 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'category') {
+          nodeAttribute.exclude = false
           nodeAttribute.filterValues = attr.categories
           nodeAttribute.filterSelectedValues = []
         }
@@ -694,10 +695,11 @@ export default class Query extends Component {
     this.graphState.nodes.map(inode => {
       if (node.id == inode.id) {
         inode.suggested = false
+        inode.humanId = inode.humanId ? inode.humanId : this.getHumanNodeId(inode.uri)
       }
     })
     // get attributes (only for nodes)
-    if (node.type =="node") {
+    if (node.type == "node") {
       this.setNodeAttributes(node.uri, node.id)
     }
   }
@@ -983,6 +985,18 @@ export default class Query extends Component {
         attr.visible = !attr.visible
         if (!attr.visible) {
           attr.optional = false
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleExclude (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.exclude = !attr.exclude
+        if (attr.exclude) {
+          attr.visible = true
         }
       }
     })
@@ -1428,6 +1442,7 @@ export default class Query extends Component {
                 graph={this.state.graphState}
                 handleChangeLink={p => this.handleChangeLink(p)}
                 toggleVisibility={p => this.toggleVisibility(p)}
+                toggleExclude={p => this.toggleExclude(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
                 handleFilterType={p => this.handleFilterType(p)}

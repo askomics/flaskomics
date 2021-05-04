@@ -19,6 +19,7 @@ export default class AttributeBox extends Component {
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.handleNegative = this.props.handleNegative.bind(this)
     this.toggleOptional = this.props.toggleOptional.bind(this)
+    this.toggleExclude = this.props.toggleExclude.bind(this)
     this.handleFilterType = this.props.handleFilterType.bind(this)
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.handleFilterCategory = this.props.handleFilterCategory.bind(this)
@@ -292,6 +293,11 @@ export default class AttributeBox extends Component {
       linkIcon = 'attr-icon fas fa-link'
     }
 
+    let excludeIcon = 'attr-icon fas fa-ban inactive'
+    if (this.props.attribute.exclude) {
+      excludeIcon = 'attr-icon fas fa-ban'
+    }
+
     let form
 
     if (this.props.attribute.linked) {
@@ -315,6 +321,7 @@ export default class AttributeBox extends Component {
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
@@ -471,6 +478,7 @@ AttributeBox.propTypes = {
   handleNegative: PropTypes.func,
   toggleVisibility: PropTypes.func,
   toggleOptional: PropTypes.func,
+  toggleExclude: PropTypes.func,
   toggleAddNumFilter: PropTypes.func,
   handleFilterType: PropTypes.func,
   handleFilterValue: PropTypes.func,

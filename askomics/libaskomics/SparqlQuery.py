@@ -1288,8 +1288,12 @@ class SparqlQuery(Params):
                             value_var = category_value_uri
                             uri_val_list.append("<{}>".format(value))
 
-                    if uri_val_list:
-                        self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
+                        if uri_val_list:
+                            if attribute["exclude"]:
+                                filter_string = "FILTER ( {} NOT IN ( {} ) ) .".format(value_var, " ,".join(uri_val_list))
+                                self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
+                            else:
+                                self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
 
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}Category".format(
