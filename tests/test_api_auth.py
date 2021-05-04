@@ -1088,11 +1088,11 @@ class TestApiAuth(AskomicsTestCase):
 
         assert response.status_code == 200
         assert response.json['config'].get("logged")
-        assert response.json['user']['username'] == 'jdoe'
+        assert response.json['config']['user']['username'] == 'jdoe'
 
         # Log jsmith
         response = client.client.get("/api/start", headers={'X-API-KEY': '0000000002'})
 
         assert response.status_code == 200
         assert response.json['config'].get("logged")
-        assert response.json['user']['username'] == 'jsmith'
+        assert response.json['config']['user']['username'] == 'jsmith'
