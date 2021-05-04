@@ -1084,14 +1084,14 @@ class TestApiAuth(AskomicsTestCase):
         assert not response.json['config'].get("logged")
 
         # Log jdoe
-        response = client.client.post("/api/auth/profile", headers={'X-API-KEY': '0000000001'})
+        response = client.client.get("/api/start", headers={'X-API-KEY': '0000000001'})
 
         assert response.status_code == 200
         assert response.json['config'].get("logged")
         assert response.json['user']['username'] == 'jdoe'
 
         # Log jsmith
-        response = client.client.post("/api/auth/profile", headers={'X-API-KEY': '0000000002'})
+        response = client.client.get("/api/start", headers={'X-API-KEY': '0000000002'})
 
         assert response.status_code == 200
         assert response.json['config'].get("logged")
