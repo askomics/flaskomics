@@ -804,7 +804,7 @@ class SparqlQuery(Params):
             var_target = tpl_var[1]
             for i, triple_dict in enumerate(self.triples):
                 for key, value in triple_dict.items():
-                    if key not in ["optional", "nested", "nested_start", "nested_end"]:
+                    if key not in ["optional", "nested", "nested_start", "nested_end", "simple"]:
                         self.triples[i][key] = value.replace(var_source, var_target)
             for i, select in enumerate(self.selects):
                 self.selects[i] = select.replace(var_source, var_target)
@@ -831,7 +831,7 @@ class SparqlQuery(Params):
                     # Iterate over triples
                     for ntriple, triple_dict in enumerate(sblock["triples"]):
                         for key, value in triple_dict.items():
-                            if key not in ["optional", "nested", "nested_start", "nested_end"]:
+                            if key not in ["optional", "nested", "nested_start", "nested_end", "simple"]:
                                 self.triples_blocks[nblock]["sblocks"][nsblock]["triples"][ntriple][key] = value.replace(var_source, var_target)
 
                     for i, filtr in enumerate(sblock["filters"]):

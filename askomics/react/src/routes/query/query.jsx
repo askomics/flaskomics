@@ -1015,6 +1015,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  toggleSimpleAttribute (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.simple = !attr.simple
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleNegative (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1445,6 +1454,7 @@ export default class Query extends Component {
                 toggleExclude={p => this.toggleExclude(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
+                toggleSimpleAttribute={p => this.toggleSimpleAttribute(p)}
                 handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}
