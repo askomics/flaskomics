@@ -355,6 +355,7 @@ class Result(Params):
             ?,
             NULL,
             ?,
+            ?,
             ?
         )
         '''
@@ -368,7 +369,8 @@ class Result(Params):
             "Query",
             self.sparql_query,
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
-            False
+            False,
+            any(attrib.get("simple") for attrib in self.graph_state["attr"]) if self.graph_state.get("attr") else False
         ), get_id=True)
 
         return self.id

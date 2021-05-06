@@ -233,6 +233,7 @@ class Database(Params):
             traceback text,
             graphs_and_endpoints text,
             template boolean,
+            is_simple boolean,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
@@ -288,6 +289,17 @@ class Database(Params):
         query = '''
         ALTER TABLE results
         ADD template boolean NULL
+        DEFAULT(0)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE results
+        ADD is_simple boolean NULL
         DEFAULT(0)
         '''
 

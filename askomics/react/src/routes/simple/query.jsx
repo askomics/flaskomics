@@ -11,7 +11,7 @@ import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 
-export default class Query extends Component {
+export default class SimpleQuery extends Component {
 
   constructor (props) {
     super(props)
@@ -343,7 +343,7 @@ export default class Query extends Component {
   }
 }
 
-Query.propTypes = {
+SimpleQuery.propTypes = {
   location: PropTypes.object,
   waitForStart: PropTypes.bool
 }

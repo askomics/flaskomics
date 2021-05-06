@@ -19,6 +19,7 @@ export default class ResultsFilesTable extends Component {
     super(props)
     this.state = {
       redirectQueryBuilder: false,
+      redirectSimpleBuilder: false,
       graphState: [],
       modal: false,
       idToPublish: null,
@@ -35,6 +36,7 @@ export default class ResultsFilesTable extends Component {
     this.handlePreview = this.handlePreview.bind(this)
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
+    this.handleSimple = this.handleSimple.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
@@ -122,6 +124,30 @@ export default class ResultsFilesTable extends Component {
         // set state of resultsPreview
         this.setState({
           redirectQueryBuilder: true,
+          graphState: response.data.graphState
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
+  handleSimple (event) {
+    // request api to get a preview of file
+    let requestUrl = '/api/results/graphstate'
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          redirectSimpleBuilder: true,
           graphState: response.data.graphState
         })
       })
@@ -322,6 +348,19 @@ export default class ResultsFilesTable extends Component {
       }} />
     }
 
+    let redirectSimpleBuilder
+    if (this.state.redirectSimpleBuilder) {
+      redirectSimpleBuilder = <Redirect to={{
+        pathname: '/simple',
+        state: {
+          redo: true,
+          config: this.props.config,
+          graphState: this.state.graphState
+        }
+      }} />
+    }
+
+
     let columns = [{
       dataField: 'id',
       text: 'Id',
@@ -430,6 +469,7 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
+            <Button disabled={(row.sparqlQuery == null && row.is_simple) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleSimple}>Simple</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
             {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != null ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}

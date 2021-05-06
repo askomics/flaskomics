@@ -262,6 +262,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
+        simple: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -284,6 +285,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
+        simple: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -307,6 +309,7 @@ export default class Query extends Component {
           type: attributeType,
           faldo: attr.faldo,
           optional: false,
+          simple: false,
           negative: false,
           linked: false,
           linkedWith: null
