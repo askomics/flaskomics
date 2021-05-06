@@ -6,7 +6,6 @@ import DatePicker from "react-datepicker";
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 

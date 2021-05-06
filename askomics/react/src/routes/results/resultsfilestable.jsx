@@ -141,7 +141,7 @@ export default class ResultsFilesTable extends Component {
   handleSimple (event) {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
-    let data = { fileId: event.target.id }
+    let data = { fileId: event.target.id, formated: false }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -353,7 +353,6 @@ export default class ResultsFilesTable extends Component {
       redirectSimpleBuilder = <Redirect to={{
         pathname: '/simple',
         state: {
-          redo: true,
           config: this.props.config,
           graphState: this.state.graphState
         }
@@ -469,7 +468,7 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button disabled={(row.sparqlQuery == null && row.is_simple) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleSimple}>Simple</Button>
+            <Button disabled={(row.sparqlQuery != null || row.is_simple == null || row.is_simple == false) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleSimple}>Simple</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
             {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != null ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}
@@ -499,7 +498,7 @@ export default class ResultsFilesTable extends Component {
     return (
       <div>
         <div className="asko-table-height-div">
-          {redirectQueryBuilder}{redirectSparqlEditor}
+          {redirectQueryBuilder}{redirectSparqlEditor}{redirectSimpleBuilder}
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"

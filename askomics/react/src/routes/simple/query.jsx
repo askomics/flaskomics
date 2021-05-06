@@ -47,8 +47,6 @@ export default class SimpleQuery extends Component {
       attr: []
     }
 
-    this.divHeight = 650
-
     this.idNumber = 0
     this.specialNodeIdNumber = 0
     this.previousSelected = null
@@ -57,6 +55,183 @@ export default class SimpleQuery extends Component {
 
     this.handlePreview = this.handlePreview.bind(this)
     this.handleQuery = this.handleQuery.bind(this)
+    
+  }
+
+    toggleVisibility (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.visible = !attr.visible
+        if (!attr.visible) {
+          attr.optional = false
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleExclude (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.exclude = !attr.exclude
+        if (attr.exclude) {
+          attr.visible = true
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleOptional (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.optional = !attr.optional
+        if (attr.optional) {
+          attr.visible = true
+        }
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleSimpleAttribute (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.simple = !attr.simple
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.negative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterType (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterType = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterCategory (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filterSelectedValues = [...event.target.selectedOptions].map(o => o.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: "",
+          filterSign: "="
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFilterNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleDateFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddDateFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.filters.push({
+          filterValue: null,
+          filterSign: "="
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  // This is a pain, but JS will auto convert time to UTC
+  // And datepicker use the local timezone
+  // So without this, the day sent will be wrong
+  fixTimezoneOffset (date){
+    if(!date){return null};
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+  }
+
+
+  handleFilterDateValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  count_displayed_attributes() {
+    return this.graphState.attr.map(attr => {
+      return attr.visible ? 1 : 0
+    }).reduce((a, b) => a + b)
   }
 
   getAttributeType (typeUri) {
@@ -197,6 +372,7 @@ export default class SimpleQuery extends Component {
           })
         }).then(response => {
           this.graphState = this.props.location.state.graphState
+          console.log(this.props.location.state.graphState)
           this.updateGraphState()
           this.setState({ waiting: false })
         })
@@ -323,7 +499,7 @@ export default class SimpleQuery extends Component {
         <br />
         <Row>
           <Col xs="12">
-            <div style={{ display: 'block', height: this.divHeight + 'px', 'overflow-y': 'auto' }}>
+            <div style={{ display: 'block', 'overflow-y': 'auto' }}>
               {Entities}
             </div>
           </Col>

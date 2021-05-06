@@ -195,9 +195,11 @@ def get_graph_state():
             }), 400
 
         file_id = data["fileId"]
+        formated = data.get("formated", True)
+
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
-        graph_state = result.get_graph_state(formated=True)
+        graph_state = result.get_graph_state(formated=formated)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

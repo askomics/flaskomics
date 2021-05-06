@@ -18,7 +18,7 @@ export default class AttributeBox extends Component {
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.handleNegative = this.props.handleNegative.bind(this)
-    this.toggleSimpleAttribute = this.props.SimpleAttribute.bind(this)
+    this.toggleSimpleAttribute = this.props.toggleSimpleAttribute.bind(this)
     this.toggleOptional = this.props.toggleOptional.bind(this)
     this.toggleExclude = this.props.toggleExclude.bind(this)
     this.handleFilterType = this.props.handleFilterType.bind(this)
