@@ -248,7 +248,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_simple_attr
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_simple_attr, template, simple_template
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
