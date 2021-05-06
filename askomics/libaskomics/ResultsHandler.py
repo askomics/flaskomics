@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback, has_simple_attr
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback, has_simple_attr, simple_template
         FROM results
         WHERE user_id = ?
         '''
@@ -80,7 +80,8 @@ class ResultsHandler(Params):
                 'size': row[11],
                 'sparqlQuery': row[12],
                 'traceback': row[13],
-                'has_simple_attr': row[14]
+                'has_simple_attr': row[14],
+                'simple_template': row[15]
             })
 
         return files
