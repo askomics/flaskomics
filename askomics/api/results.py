@@ -429,13 +429,6 @@ def publish_query():
         result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
-        if not(result.template or result.simple_template):
-            return jsonify({
-                'files': [],
-                'error': True,
-                'errorMessage': "Failed to publish query: \nMust enable template or simple template to publicize result"
-            }), 400
-
         result.publish_query(data.get("public", False))
 
         results_handler = ResultsHandler(current_app, session)

@@ -494,19 +494,29 @@ class Result(Params):
         """Set public to True or False, and template to True if public is True"""
         database = Database(self.app, self.session)
 
+        # If query is set to public, template or simple_template (if available) have to be True
+        sql_substr = ''
         if admin and self.session['user']['admin']:
             sql_var = (public, self.id)
             where_query = ""
+        # Should not happen
         else:
             sql_var = (public, self.id, self.session["user"]["id"])
             where_query = "AND user_id=?"
+        if public:
+            if self.simple_template:
+                sql_substr = 'simple_template=?,'
+            else:
+                sql_substr = 'template=?,'
+            sql_var = (public,) + sql_var
 
         query = '''
         UPDATE results SET
+        {}
         public=?
         WHERE id=?
         {}
-        '''.format(where_query)
+        '''.format(sql_substr, where_query)
 
         database.execute_sql_query(query, sql_var)
 
@@ -514,7 +524,6 @@ class Result(Params):
         """Set template to True or False, and public to False if template and simple_template are False"""
         database = Database(self.app, self.session)
 
-        # If query is set to public, template have to be True
         sql_substr = ''
         sql_var = (template, self.session["user"]["id"], self.id)
         if not (template or self.simple_template):
@@ -536,7 +545,6 @@ class Result(Params):
         if not self.has_simple_attr:
             raise Exception("This query does not has any simple template attribute")
 
-        # If query is set to public, template have to be True
         sql_substr = ''
         sql_var = (simple_template, self.session["user"]["id"], self.id)
         if not (simple_template or self.template):
