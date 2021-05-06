@@ -429,6 +429,13 @@ def publish_query():
         result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
+        if not(result.template or result.simple_template):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Failed to publish query: \nMust enable template or simple template to publicize result"
+            }), 400
+
         result.publish_query(data.get("public", False))
 
         results_handler = ResultsHandler(current_app, session)
@@ -484,6 +491,50 @@ def template_query():
             'files': [],
             'error': True,
             'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@results_bp.route('/api/results/simple_template', methods=['POST'])
+@api_auth
+@login_required
+def simple_template_query():
+    """Simple Template a query from a result
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        data = request.get_json()
+        if not (data and data.get("id")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing id parameter"
+            }), 400
+
+        result_info = {"id": data["id"]}
+
+        result = Result(current_app, session, result_info)
+        result.simple_template_query(data.get("template", False))
+
+        results_handler = ResultsHandler(current_app, session)
+        files = results_handler.get_files_info()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': 'Failed to create simple template query: \n{}'.format(str(e))
         }), 500
 
     return jsonify({

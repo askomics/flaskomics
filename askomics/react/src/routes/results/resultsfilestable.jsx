@@ -221,6 +221,16 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
+  toggleSimpleTemplateQuery(event) {
+    // Unpublish
+    this.setState({
+      idToSimpleTemplate: parseInt(event.target.id.replace("simple-template-", "")),
+      newSimpleTemplateStatus: event.target.value == 1 ? false : true
+    }, () => {
+      this.simple_template()
+    })
+  }
+
   publish() {
     let requestUrl = '/api/results/publish'
     let data = {
@@ -253,6 +263,32 @@ export default class ResultsFilesTable extends Component {
     let data = {
       id: this.state.idToTemplate,
       template: this.state.newTemplateStatus
+    }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.setState({
+        idToPublish: null
+      })
+      this.props.setStateResults({
+        results: response.data.files,
+        waiting: false
+      })
+    })
+    .catch(error => {
+      this.setState({
+        error: true,
+        errorMessage: error.response.data.errorMessage,
+        status: error.response.status,
+        waiting: false
+      })
+    })
+  }
+
+  simple_template() {
+    let requestUrl = '/api/results/simple_template'
+    let data = {
+      id: this.state.idToSimpleTemplate,
+      template: this.state.newSimpleTemplateStatus
     }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
@@ -397,6 +433,20 @@ export default class ResultsFilesTable extends Component {
       },
       editable: false
     }, {
+      dataField: 'simple_template',
+      text: 'Simplified Template',
+      sort: true,
+      formatter: (cell, row) => {
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={(row.status != "success" ? || row.sparqlQuery != null || row.has_simple_attr == null || row.has_simple_attr == false) ? true : false} type="switch" simple-template-id={row.id} id={"simple-template-" + row.id} onChange={this.toggleSimpleTemplateQuery} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
+      },
+      editable: false
+    }, {
       dataField: 'public',
       text: 'Public',
       sort: true,
@@ -405,7 +455,7 @@ export default class ResultsFilesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={row.status == "success" ? false : true} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput disabled={(row.status != "success" || ! (row.template || row.simple_template)) ? true : false} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -468,7 +518,6 @@ export default class ResultsFilesTable extends Component {
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
-            <Button disabled={(row.sparqlQuery != null || row.is_simple == null || row.is_simple == false) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleSimple}>Simple</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
             {this.props.config.user.galaxy ? <Button disabled={row.sparqlQuery != null ? true : false} name="query" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send query to Galaxy</Button> : null}

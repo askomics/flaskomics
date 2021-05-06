@@ -1136,7 +1136,6 @@ export default class Query extends Component {
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
   }
 
-
   handleFilterDateValue (event) {
     if (!isNaN(event.target.value)) {
       this.graphState.attr.map(attr => {
