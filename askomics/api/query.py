@@ -32,6 +32,7 @@ def query():
         if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
             startpoints = []
             public_queries = []
+            public_simple_queries = []
         else:
             tse = TriplestoreExplorer(current_app, session)
             results_handler = ResultsHandler(current_app, session)
