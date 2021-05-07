@@ -96,16 +96,51 @@ class ResultsHandler(Params):
         """
         database = Database(self.app, self.session)
 
-        where_substring = ""
-        sql_var = (True, )
+        where_substring = "WHERE template = ? and public = ?"
+        sql_var = (True, True,)
         if "user" in self.session:
-            where_substring = " or (template = ? and user_id = ?)"
+            where_substring = "WHERE template = ? and (public = ? or user_id = ?)"
             sql_var = (True, True, self.session["user"]["id"])
 
         query = '''
         SELECT id, description, public
         FROM results
-        WHERE public = ?{}
+        {}
+        '''.format(where_substring)
+
+        rows = database.execute_sql_query(query, sql_var)
+
+        queries = []
+
+        for row in rows:
+            queries.append({
+                "id": row[0],
+                "description": row[1],
+                "public": row[2]
+            })
+
+        return queries
+
+    def get_public_simple_queries(self):
+        """Get id and description of published simple queries
+
+        Returns
+        -------
+        List
+            List of published simple queries (id and description)
+        """
+        database = Database(self.app, self.session)
+
+        where_substring = "WHERE simple_template = ? and public = ?"
+        sql_var = (True, True,)
+        if "user" in self.session:
+            where_substring = "WHERE simple_template = ? and (public = ? or user_id = ?)"
+            sql_var = (True, True, self.session["user"]["id"])
+
+        query = '''
+        SELECT id, description, public
+        FROM results
+        {}
         '''.format(where_substring)
 
         rows = database.execute_sql_query(query, sql_var)

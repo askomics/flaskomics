@@ -37,12 +37,14 @@ def query():
             results_handler = ResultsHandler(current_app, session)
             startpoints = tse.get_startpoints()
             public_queries = results_handler.get_public_queries()
+            public_simple_queries = results_handler.get_public_simple_queries()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'startpoints': [],
             "publicQueries": [],
+            "publicSimpleQueries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
@@ -50,6 +52,7 @@ def query():
     return jsonify({
         'startpoints': startpoints,
         "publicQueries": public_queries,
+        "publicSimpleQueries": public_simple_queries,
         'error': False,
         'errorMessage': ''
     })

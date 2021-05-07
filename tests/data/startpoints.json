@@ -2,6 +2,7 @@
     "error": false,
     "errorMessage": "",
     "publicQueries": [],
+    "publicSimpleQueries": [],
     "startpoints": [
         {
             "entity": "http://askomics.org/test/data/transcript",

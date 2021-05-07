@@ -23,11 +23,13 @@ export default class Ask extends Component {
       selected: null,
       startSession: false,
       publicQueries: [],
+      publicSimpleQueries: [],
       modalGalaxy: false,
       showGalaxyButton: false,
       dropdownOpen: false,
       selectedEndpoint: [],
-      frontMessage: ""
+      frontMessage: "",
+      redirectSimpleBuilder: false
     }
     this.utils = new Utils()
     this.cancelRequest
@@ -88,6 +90,7 @@ export default class Ask extends Component {
               selected: false
             })),
             publicQueries: response.data.publicQueries,
+            publicSimpleQueries: response.data.publicSimpleQueries,
             startSessionWithExemple: false
           })
         })
@@ -153,6 +156,29 @@ export default class Ask extends Component {
             diskSpace: response.data.diskSpace,
           })
         }
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
+  handleClickTemplateSimpleQuery (event) {
+    let requestUrl = '/api/results/graphstate'
+    let data = { fileId: event.target.id, formated: false }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          redirectSimpleBuilder: true,
+          graphState: response.data.graphState
+        })
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -254,6 +280,17 @@ export default class Ask extends Component {
       }} />
     }
 
+    let redirectSimpleBuilder
+    if (this.state.redirectSimpleBuilder) {
+      redirectSimpleBuilder = <Redirect to={{
+        pathname: '/simple',
+        state: {
+          config: this.props.config,
+          graphState: this.state.graphState
+        }
+      }} />
+    }
+
 
     let errorDiv
     if (this.state.error) {
@@ -267,6 +304,7 @@ export default class Ask extends Component {
     }
 
     let templateQueries
+    let templateSimpleQueries
     let emptyPrivate
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
       templateQueries = (
@@ -285,6 +323,30 @@ export default class Ask extends Component {
               {this.state.publicQueries.map(query => {
                 if (query.public == 1) {
                   return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+        </div>
+      )
+    }
+
+    if (!this.state.waiting && this.state.publicSimpleQueries.length > 0) {
+      templateSimpleQueries = (
+        <div>
+          <p>Or start with a simplified form:</p>
+            <ListGroup>
+              {this.state.publicSimpleQueries.map(query => {
+                if (query.public == 0) {
+                  emptyPrivate = <br />
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateSimpleQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+            {emptyPrivate}
+            <ListGroup>
+              {this.state.publicSimpleQueries.map(query => {
+                if (query.public == 1) {
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateSimpleQuery}>{query.description}</ListGroupItem>
                 }
               })}
             </ListGroup>
@@ -408,6 +470,7 @@ export default class Ask extends Component {
         {redirectQueryBuilder}
         {redirectLogin}
         {redirectSparqlEditor}
+        {redirectSimpleBuilder}
         {HtmlFrontMessage}
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
@@ -417,6 +480,7 @@ export default class Ask extends Component {
               {galaxyForm}
             </Col>
             <Col xs="7">
+              {templateSimpleQueries}
               {templateQueries}
             </Col>
           </Row>

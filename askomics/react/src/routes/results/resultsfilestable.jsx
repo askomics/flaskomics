@@ -19,7 +19,6 @@ export default class ResultsFilesTable extends Component {
     super(props)
     this.state = {
       redirectQueryBuilder: false,
-      redirectSimpleBuilder: false,
       graphState: [],
       modal: false,
       idToPublish: null,
@@ -383,18 +382,6 @@ export default class ResultsFilesTable extends Component {
         }
       }} />
     }
-
-    let redirectSimpleBuilder
-    if (this.state.redirectSimpleBuilder) {
-      redirectSimpleBuilder = <Redirect to={{
-        pathname: '/simple',
-        state: {
-          config: this.props.config,
-          graphState: this.state.graphState
-        }
-      }} />
-    }
-
 
     let columns = [{
       dataField: 'id',

@@ -52,7 +52,8 @@ class Result(Params):
 
         if "id" in result_info and not force_no_db:
             self.id = result_info["id"]
-            self.set_info_from_db_with_id()
+            if not self.set_info_from_db_with_id():
+                return None
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
@@ -264,6 +265,9 @@ class Result(Params):
 
             rows = database.execute_sql_query(query, (True, self.id))
 
+        if not rows:
+            return False
+
         self.celery_id = rows[0][0] if rows[0][0] else ''
         self.file_path = rows[0][1] if rows[0][1] else ''
         self.file_name = os.path.basename(self.file_path)
@@ -279,6 +283,8 @@ class Result(Params):
         gne = json.loads(rows[0][7]) if rows[0][7] else {"graphs": [], "endpoints": []}
         self.graphs = gne["graphs"]
         self.endpoints = gne["endpoints"]
+
+        return True
 
     def get_file_preview(self):
         """Get a preview of the results file
