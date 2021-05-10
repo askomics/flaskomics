@@ -35,11 +35,11 @@ export default class ResultsFilesTable extends Component {
     this.handlePreview = this.handlePreview.bind(this)
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
-    this.handleSimple = this.handleSimple.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
     this.toggleTemplateQuery = this.toggleTemplateQuery.bind(this)
+    this.toggleSimpleTemplateQuery = this.toggleSimpleTemplateQuery.bind(this)
     this.handleClickError = this.handleClickError.bind(this)
     this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
@@ -137,30 +137,6 @@ export default class ResultsFilesTable extends Component {
       })
   }
 
-  handleSimple (event) {
-    // request api to get a preview of file
-    let requestUrl = '/api/results/graphstate'
-    let data = { fileId: event.target.id, formated: false }
-    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        // set state of resultsPreview
-        this.setState({
-          redirectSimpleBuilder: true,
-          graphState: response.data.graphState
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
-        })
-      })
-  }
-
   handleEditQuery (event) {
     let requestUrl = '/api/results/sparqlquery'
     let data = { fileId: event.target.id }
@@ -221,7 +197,6 @@ export default class ResultsFilesTable extends Component {
   }
 
   toggleSimpleTemplateQuery(event) {
-    // Unpublish
     this.setState({
       idToSimpleTemplate: parseInt(event.target.id.replace("simple-template-", "")),
       newSimpleTemplateStatus: event.target.value == 1 ? false : true
@@ -421,13 +396,13 @@ export default class ResultsFilesTable extends Component {
       editable: false
     }, {
       dataField: 'simple_template',
-      text: 'Simplified Template',
+      text: 'Form',
       sort: true,
       formatter: (cell, row) => {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={(row.status != "success" ? || row.sparqlQuery != null || row.has_simple_attr == null || row.has_simple_attr == false) ? true : false} type="switch" simple-template-id={row.id} id={"simple-template-" + row.id} onChange={this.toggleSimpleTemplateQuery} checked={cell} value={cell} />
+              <CustomInput disabled={(row.status != "success" || row.sparqlQuery != null || row.has_simple_attr == null || row.has_simple_attr == false) ? true : false} type="switch" simple-template-id={row.id} id={"simple-template-" + row.id} onChange={this.toggleSimpleTemplateQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -442,7 +417,7 @@ export default class ResultsFilesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={(row.status != "success" || ! (row.template || row.simple_template)) ? true : false} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput disabled={row.status == "success" ? false : true} type="switch" public-id={row.id} id={"publish-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -534,7 +509,7 @@ export default class ResultsFilesTable extends Component {
     return (
       <div>
         <div className="asko-table-height-div">
-          {redirectQueryBuilder}{redirectSparqlEditor}{redirectSimpleBuilder}
+          {redirectQueryBuilder}{redirectSparqlEditor}
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"

@@ -510,7 +510,7 @@ class Result(Params):
             sql_var = (public, self.id, self.session["user"]["id"])
             where_query = "AND user_id=?"
         if public:
-            if self.simple_template:
+            if self.has_simple_attr:
                 sql_substr = 'simple_template=?,'
             else:
                 sql_substr = 'template=?,'
@@ -546,7 +546,7 @@ class Result(Params):
         database.execute_sql_query(query, sql_var)
 
     def simple_template_query(self, simple_template):
-        """Set template to True or False, and public to False if template and simple_template are False"""
+        """Set simple_template to True or False, and public to False if template and simple_template are False"""
         database = Database(self.app, self.session)
         if not self.has_simple_attr:
             raise Exception("This query does not has any simple template attribute")

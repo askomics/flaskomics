@@ -37,6 +37,7 @@ export default class Ask extends Component {
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
     this.handleClickTemplateQuery = this.handleClickTemplateQuery.bind(this)
+    this.handleClickTemplateSimpleQuery = this.handleClickTemplateSimpleQuery.bind(this)
     this.toggleDropDown = this.toggleDropDown.bind(this)
     this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
     this.clickOnEndpoint = this.clickOnEndpoint.bind(this)
