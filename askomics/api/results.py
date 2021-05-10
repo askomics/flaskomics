@@ -555,7 +555,7 @@ def template_query():
 @api_auth
 @login_required
 def form_query():
-    """Form Template a query from a result
+    """Create a form from a result
 
     Returns
     -------
