@@ -18,7 +18,7 @@ export default class AttributeBox extends Component {
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.handleNegative = this.props.handleNegative.bind(this)
-    this.toggleSimpleAttribute = this.props.toggleSimpleAttribute.bind(this)
+    this.toggleFormAttribute = this.props.toggleFormAttribute.bind(this)
     this.toggleOptional = this.props.toggleOptional.bind(this)
     this.toggleExclude = this.props.toggleExclude.bind(this)
     this.handleFilterType = this.props.handleFilterType.bind(this)
@@ -83,9 +83,9 @@ export default class AttributeBox extends Component {
 
   renderUri () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -131,7 +131,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
@@ -142,9 +142,9 @@ export default class AttributeBox extends Component {
 
   renderText () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -213,7 +213,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -225,9 +225,9 @@ export default class AttributeBox extends Component {
 
   renderNumeric () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -289,7 +289,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -301,9 +301,9 @@ export default class AttributeBox extends Component {
 
   renderCategory () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -347,7 +347,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
@@ -360,9 +360,9 @@ export default class AttributeBox extends Component {
 
   renderBoolean () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -399,7 +399,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -411,9 +411,9 @@ export default class AttributeBox extends Component {
 
   renderDate () {
 
-    let simpleIcon = 'attr-icon fas fa-bookmark inactive'
-    if (this.props.attribute.simple) {
-      simpleIcon = 'attr-icon fas fa-bookmark '
+    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    if (this.props.attribute.form) {
+      formIcon = 'attr-icon fas fa-bookmark '
     }
 
     let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
@@ -483,7 +483,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={simpleIcon} id={this.props.attribute.id} onClick={this.toggleSimpleAttribute}></i>
+          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -519,7 +519,7 @@ AttributeBox.propTypes = {
   handleNegative: PropTypes.func,
   toggleVisibility: PropTypes.func,
   toggleOptional: PropTypes.func,
-  toggleSimpleAttribute: PropTypes.func,
+  toggleFormAttribute: PropTypes.func,
   toggleExclude: PropTypes.func,
   toggleAddNumFilter: PropTypes.func,
   handleFilterType: PropTypes.func,

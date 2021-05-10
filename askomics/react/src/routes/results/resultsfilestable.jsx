@@ -39,7 +39,7 @@ export default class ResultsFilesTable extends Component {
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
     this.toggleTemplateQuery = this.toggleTemplateQuery.bind(this)
-    this.toggleSimpleTemplateQuery = this.toggleSimpleTemplateQuery.bind(this)
+    this.toggleFormTemplateQuery = this.toggleFormTemplateQuery.bind(this)
     this.handleClickError = this.handleClickError.bind(this)
     this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
@@ -196,12 +196,12 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
-  toggleSimpleTemplateQuery(event) {
+  toggleFormTemplateQuery(event) {
     this.setState({
-      idToSimpleTemplate: parseInt(event.target.id.replace("simple-template-", "")),
-      newSimpleTemplateStatus: event.target.value == 1 ? false : true
+      idToFormTemplate: parseInt(event.target.id.replace("form-template-", "")),
+      newFormTemplateStatus: event.target.value == 1 ? false : true
     }, () => {
-      this.simple_template()
+      this.form()
     })
   }
 
@@ -258,11 +258,11 @@ export default class ResultsFilesTable extends Component {
     })
   }
 
-  simple_template() {
-    let requestUrl = '/api/results/simple_template'
+  form() {
+    let requestUrl = '/api/results/form'
     let data = {
-      id: this.state.idToSimpleTemplate,
-      template: this.state.newSimpleTemplateStatus
+      id: this.state.idToFormTemplate,
+      template: this.state.newFormTemplateStatus
     }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
@@ -395,14 +395,14 @@ export default class ResultsFilesTable extends Component {
       },
       editable: false
     }, {
-      dataField: 'simple_template',
+      dataField: 'form',
       text: 'Form',
       sort: true,
       formatter: (cell, row) => {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={(row.status != "success" || row.sparqlQuery != null || row.has_simple_attr == null || row.has_simple_attr == false) ? true : false} type="switch" simple-template-id={row.id} id={"simple-template-" + row.id} onChange={this.toggleSimpleTemplateQuery} checked={cell} value={cell} />
+              <CustomInput disabled={(row.status != "success" || row.sparqlQuery != null || row.has_form_attr == null || row.has_form_attr == false) ? true : false} type="switch" form-template-id={row.id} id={"form-template-" + row.id} onChange={this.toggleFormTemplateQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )

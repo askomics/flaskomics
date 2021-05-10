@@ -66,9 +66,9 @@ class Result(Params):
             self.start = None
             self.end = None
             self.nrows = 0
-            self.has_simple_attr = False
+            self.has_form_attr = False
             self.template = False
-            self.simple_template = False
+            self.form = False
 
     def clean_node(self, node):
         """Clean a node by removing coordinates and other stuff
@@ -249,7 +249,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_simple_attr, template, simple_template
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
@@ -258,7 +258,7 @@ class Result(Params):
 
         else:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_simple_attr, template, simple_template
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
             FROM results
             WHERE public = ? AND id = ?
             '''
@@ -276,9 +276,9 @@ class Result(Params):
         self.end = rows[0][4]
         self.nrows = rows[0][5]
         self.sparql_query = rows[0][6]
-        self.has_simple_attr = rows[0][8] if rows[0][8] else False
+        self.has_form_attr = rows[0][8] if rows[0][8] else False
         self.template = rows[0][9] if rows[0][9] else False
-        self.simple_template = rows[0][10] if rows[0][10] else False
+        self.form = rows[0][10] if rows[0][10] else False
 
         gne = json.loads(rows[0][7]) if rows[0][7] else {"graphs": [], "endpoints": []}
         self.graphs = gne["graphs"]
@@ -383,7 +383,7 @@ class Result(Params):
             self.sparql_query,
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
             False,
-            any([attrib.get("simple") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
+            any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
             False
         ), get_id=True)
 
@@ -500,7 +500,7 @@ class Result(Params):
         """Set public to True or False, and template to True if public is True"""
         database = Database(self.app, self.session)
 
-        # If query is set to public, template or simple_template (if available) have to be True
+        # If query is set to public, template or form (if available) have to be True
         sql_substr = ''
         if admin and self.session['user']['admin']:
             sql_var = (public, self.id)
@@ -510,8 +510,8 @@ class Result(Params):
             sql_var = (public, self.id, self.session["user"]["id"])
             where_query = "AND user_id=?"
         if public:
-            if self.has_simple_attr:
-                sql_substr = 'simple_template=?,'
+            if self.has_form_attr:
+                sql_substr = 'form=?,'
             else:
                 sql_substr = 'template=?,'
             sql_var = (public,) + sql_var
@@ -527,12 +527,12 @@ class Result(Params):
         database.execute_sql_query(query, sql_var)
 
     def template_query(self, template):
-        """Set template to True or False, and public to False if template and simple_template are False"""
+        """Set template to True or False, and public to False if template and form are False"""
         database = Database(self.app, self.session)
 
         sql_substr = ''
         sql_var = (template, self.session["user"]["id"], self.id)
-        if not (template or self.simple_template):
+        if not (template or self.form):
             sql_substr = 'public=?,'
             sql_var = (template, template, self.session["user"]["id"], self.id)
 
@@ -545,22 +545,22 @@ class Result(Params):
 
         database.execute_sql_query(query, sql_var)
 
-    def simple_template_query(self, simple_template):
-        """Set simple_template to True or False, and public to False if template and simple_template are False"""
+    def form_query(self, form):
+        """Set form to True or False, and public to False if template and form are False"""
         database = Database(self.app, self.session)
-        if not self.has_simple_attr:
-            raise Exception("This query does not has any simple template attribute")
+        if not self.has_form_attr:
+            raise Exception("This query does not has any form template attribute")
 
         sql_substr = ''
-        sql_var = (simple_template, self.session["user"]["id"], self.id)
-        if not (simple_template or self.template):
+        sql_var = (form, self.session["user"]["id"], self.id)
+        if not (form or self.template):
             sql_substr = 'public=?,'
-            sql_var = (simple_template, simple_template, self.session["user"]["id"], self.id)
+            sql_var = (form, form, self.session["user"]["id"], self.id)
 
         query = '''
         UPDATE results SET
         {}
-        simple_template=?
+        form=?
         WHERE user_id=? AND id=?
         '''.format(sql_substr)
 

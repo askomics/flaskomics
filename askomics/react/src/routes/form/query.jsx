@@ -11,7 +11,7 @@ import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 
-export default class SimpleQuery extends Component {
+export default class FormQuery extends Component {
 
   constructor (props) {
     super(props)
@@ -94,10 +94,10 @@ export default class SimpleQuery extends Component {
     this.updateGraphState()
   }
 
-  toggleSimpleAttribute (event) {
+  toggleFormAttribute (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.simple = !attr.simple
+        attr.form = !attr.form
       }
     })
     this.updateGraphState()
@@ -427,7 +427,7 @@ export default class SimpleQuery extends Component {
 
     if (!this.state.waiting) {
       this.state.graphState.attr.forEach(attribute => {
-        if (attribute.simple) {
+        if (attribute.form) {
           if (! entityMap.has(attribute.entityLabel)){
             entityMap.set(attribute.entityLabel, [])
           }
@@ -519,7 +519,7 @@ export default class SimpleQuery extends Component {
   }
 }
 
-SimpleQuery.propTypes = {
+FormQuery.propTypes = {
   location: PropTypes.object,
   waitForStart: PropTypes.bool
 }
