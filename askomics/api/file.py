@@ -295,7 +295,7 @@ def integrate():
     Returns
     -------
     json
-        dataset_id: dataset id
+        datasets_id: dataset ids
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
@@ -309,6 +309,7 @@ def integrate():
 
     session_dict = {'user': session['user']}
     task = None
+    dataset_ids = []
 
     try:
 
@@ -331,7 +332,7 @@ def integrate():
             dataset = Dataset(current_app, session, dataset_info)
             dataset.save_in_db()
             data["dataset_id"] = dataset.id
-
+            dataset_ids.append(dataset.id)
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
 
             dataset.update_celery(task.id)
@@ -341,13 +342,13 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'dataset_id': None
+            'dataset_ids': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'dataset_id': dataset.id
+        'dataset_ids': dataset_ids
     })
 
 
