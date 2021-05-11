@@ -515,15 +515,14 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 0
+        assert response.json["dataset_ids"] == []
 
         response = client.client.post('/api/files/integrate', json=tsv_data)
         assert response.status_code == 200
-        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
         response = client.client.post('/api/files/integrate', json=gff_data)
         assert response.status_code == 200
@@ -531,7 +530,7 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
         response = client.client.post('/api/files/integrate', json=bed_data)
         assert response.status_code == 200
@@ -539,7 +538,7 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
     def test_serve_file(self, client):
         """Test /api/files/ttl/<userid>/<username>/<filepath> route"""
