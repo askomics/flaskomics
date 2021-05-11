@@ -262,7 +262,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        simple: false,
+        form: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -285,7 +285,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
-        simple: false,
+        form: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -309,7 +309,7 @@ export default class Query extends Component {
           type: attributeType,
           faldo: attr.faldo,
           optional: false,
-          simple: false,
+          form: false,
           negative: false,
           linked: false,
           linkedWith: null
@@ -1018,10 +1018,10 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  toggleSimpleAttribute (event) {
+  toggleFormAttribute (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
-        attr.simple = !attr.simple
+        attr.form = !attr.form
       }
     })
     this.updateGraphState()
@@ -1456,7 +1456,7 @@ export default class Query extends Component {
                 toggleExclude={p => this.toggleExclude(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
-                toggleSimpleAttribute={p => this.toggleSimpleAttribute(p)}
+                toggleFormAttribute={p => this.toggleFormAttribute(p)}
                 handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}

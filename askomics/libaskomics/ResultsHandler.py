@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback, has_simple_attr, simple_template
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback, has_form_attr, form
         FROM results
         WHERE user_id = ?
         '''
@@ -80,8 +80,8 @@ class ResultsHandler(Params):
                 'size': row[11],
                 'sparqlQuery': row[12],
                 'traceback': row[13],
-                'has_simple_attr': row[14],
-                'simple_template': row[15]
+                'has_form_attr': row[14],
+                'form': row[15]
             })
 
         return files
@@ -121,20 +121,20 @@ class ResultsHandler(Params):
 
         return queries
 
-    def get_public_simple_queries(self):
-        """Get id and description of published simple queries
+    def get_public_form_queries(self):
+        """Get id and description of published form queries
 
         Returns
         -------
         List
-            List of published simple queries (id and description)
+            List of published form queries (id and description)
         """
         database = Database(self.app, self.session)
 
-        where_substring = "WHERE simple_template = ? and public = ?"
+        where_substring = "WHERE form = ? and public = ?"
         sql_var = (True, True,)
         if "user" in self.session:
-            where_substring = "WHERE simple_template = ? and (public = ? or user_id = ?)"
+            where_substring = "WHERE form = ? and (public = ? or user_id = ?)"
             sql_var = (True, True, self.session["user"]["id"])
 
         query = '''

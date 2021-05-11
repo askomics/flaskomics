@@ -32,20 +32,20 @@ def query():
         if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
             startpoints = []
             public_queries = []
-            public_simple_queries = []
+            public_form_queries = []
         else:
             tse = TriplestoreExplorer(current_app, session)
             results_handler = ResultsHandler(current_app, session)
             startpoints = tse.get_startpoints()
             public_queries = results_handler.get_public_queries()
-            public_simple_queries = results_handler.get_public_simple_queries()
+            public_form_queries = results_handler.get_public_form_queries()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'startpoints': [],
             "publicQueries": [],
-            "publicSimpleQueries": [],
+            "publicFormQueries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
@@ -53,7 +53,7 @@ def query():
     return jsonify({
         'startpoints': startpoints,
         "publicQueries": public_queries,
-        "publicSimpleQueries": public_simple_queries,
+        "publicFormQueries": public_form_queries,
         'error': False,
         'errorMessage': ''
     })

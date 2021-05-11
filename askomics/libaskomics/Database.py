@@ -233,8 +233,8 @@ class Database(Params):
             traceback text,
             graphs_and_endpoints text,
             template boolean,
-            has_simple_attr boolean,
-            simple_template boolean,
+            has_form_attr boolean,
+            form boolean,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
@@ -300,7 +300,7 @@ class Database(Params):
 
         query = '''
         ALTER TABLE results
-        ADD has_simple_attr boolean NULL
+        ADD has_form_attr boolean NULL
         DEFAULT(0)
         '''
 
@@ -311,7 +311,7 @@ class Database(Params):
 
         query = '''
         ALTER TABLE results
-        ADD simple_template boolean NULL
+        ADD form boolean NULL
         DEFAULT(0)
         '''
 

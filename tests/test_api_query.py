@@ -21,7 +21,7 @@ class TestApiStartpoints(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'publicQueries': [],
-            'publicSimpleQueries': [],
+            'publicFormQueries': [],
             'startpoints': []
         }
 
@@ -34,7 +34,7 @@ class TestApiStartpoints(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'publicQueries': [],
-            'publicSimpleQueries': [],
+            'publicFormQueries': [],
             'startpoints': []
         }
 

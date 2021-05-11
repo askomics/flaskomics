@@ -551,11 +551,11 @@ def template_query():
     })
 
 
-@results_bp.route('/api/results/simple_template', methods=['POST'])
+@results_bp.route('/api/results/form', methods=['POST'])
 @api_auth
 @login_required
-def simple_template_query():
-    """Simple Template a query from a result
+def form_query():
+    """Create a form from a result
 
     Returns
     -------
@@ -581,7 +581,7 @@ def simple_template_query():
                 'error': True,
                 'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
             }), 401
-        result.simple_template_query(data.get("template", False))
+        result.form_query(data.get("template", False))
 
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()
@@ -591,7 +591,7 @@ def simple_template_query():
         return jsonify({
             'files': [],
             'error': True,
-            'errorMessage': 'Failed to create simple template query: \n{}'.format(str(e))
+            'errorMessage': 'Failed to create form template query: \n{}'.format(str(e))
         }), 500
 
     return jsonify({
