@@ -304,7 +304,7 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': "Missing fileId parameter",
-            'dataset_id': None
+            'dataset_ids': None
         }), 400
 
     session_dict = {'user': session['user']}
