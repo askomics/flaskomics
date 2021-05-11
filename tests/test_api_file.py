@@ -515,11 +515,10 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert response.json["dataset_ids"] is None
+        assert response.json["dataset_ids"] == []
 
         response = client.client.post('/api/files/integrate', json=tsv_data)
         assert response.status_code == 200
-        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
