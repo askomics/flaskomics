@@ -253,7 +253,7 @@ class TestApiStartpoints(AskomicsTestCase):
         assert response.json == {
             "error": True,
             "errorMessage": "Exceeded quota",
-            "task_id": None
+            "result_id": None
         }
 
         # remove quota

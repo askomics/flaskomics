@@ -162,7 +162,7 @@ def save_result():
     Returns
     -------
     json
-        task_id: celery task id
+        result_id: result id
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
@@ -174,14 +174,14 @@ def save_result():
             return jsonify({
                 'error': True,
                 'errorMessage': "Exceeded quota",
-                'task_id': None
+                'result_id': None
             }), 400
 
         # Get query and endpoints and graphs of the query
         data = request.get_json()
         if not (data and data.get("graphState")):
             return jsonify({
-                'task_id': None,
+                'result_id': None,
                 'error': True,
                 'errorMessage': "Missing graphState parameter"
             }), 400
@@ -208,11 +208,11 @@ def save_result():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': None
+            'result_id': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id
+        'result_id': info["id"]
     })

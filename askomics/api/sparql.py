@@ -186,7 +186,7 @@ def save_query():
         return jsonify({
             'error': True,
             'errorMessage': "No graph selected in local triplestore",
-            'task_id': None
+            'result_id': None
         }), 400
 
     # No endpoint selected
@@ -194,7 +194,7 @@ def save_query():
         return jsonify({
             'error': True,
             'errorMessage': "No endpoint selected",
-            'task_id': None
+            'result_id': None
         }), 400
 
     try:
@@ -205,7 +205,7 @@ def save_query():
             return jsonify({
                 'error': True,
                 'errorMessage': "Exceeded quota",
-                'task_id': None
+                'result_id': None
             }), 400
 
         # Is query federated?
@@ -240,11 +240,11 @@ def save_query():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': None
+            'result_id': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id
+        'result_id': info["id"]
     })
