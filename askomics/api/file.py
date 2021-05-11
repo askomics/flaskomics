@@ -295,7 +295,7 @@ def integrate():
     Returns
     -------
     json
-        task_id: celery task id
+        dataset_id: dataset id
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
@@ -304,7 +304,7 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': "Missing fileId parameter",
-            'task_id': ''
+            'dataset_id': None
         }), 400
 
     session_dict = {'user': session['user']}
@@ -341,13 +341,13 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': ''
+            'dataset_id': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id if task else ''
+        'dataset_id': dataset.id
     })
 
 

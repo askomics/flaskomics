@@ -110,7 +110,7 @@ class TestApiSparql(AskomicsTestCase):
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert 'task_id' in response.json
+        assert 'result_id' in response.json
 
         # 500
         response = client.client.post("/api/sparql/previewquery", json=no_endpoint_data)

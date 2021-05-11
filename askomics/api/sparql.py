@@ -240,11 +240,11 @@ def save_query():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': None
+            'result_id': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id
+        'result_id': info["id"]
     })
