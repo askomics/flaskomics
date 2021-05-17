@@ -58,7 +58,18 @@ export default class FormQuery extends Component {
     
   }
 
-    toggleVisibility (event) {
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
+  toggleVisibility (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.visible = !attr.visible
@@ -428,10 +439,10 @@ export default class FormQuery extends Component {
     if (!this.state.waiting) {
       this.state.graphState.attr.forEach(attribute => {
         if (attribute.form) {
-          if (! entityMap.has(attribute.entityLabel)){
-            entityMap.set(attribute.entityLabel, [])
+          if (! entityMap.has(attribute.nodeId)){
+            entityMap.set(attribute.nodeId, {entity_label: attribute.entityLabel, attributes:[]})
           }
-          entityMap.get(attribute.entityLabel).push(
+          entityMap.get(attribute.nodeId).attributes.push(
             <AttributeBox
               attribute={attribute}
               graph={this.state.graphState}
@@ -458,8 +469,8 @@ export default class FormQuery extends Component {
     entityMap.forEach((value, key) => {
       Entities.push(
         <Entity
-          entity={key}
-          attribute_boxes={value}
+          entity={value.entity_label}
+          attribute_boxes={value.attributes}
         />
       )
     })
@@ -472,13 +483,6 @@ export default class FormQuery extends Component {
     previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
     if (this.state.config.logged) {
       launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
-    }
-    if (this.currentSelected != null) {
-      removeButton = (
-        <ButtonGroup>
-          <Button disabled={this.currentSelected.id == 1 ? true : false} onClick={this.handleRemoveNode} color="secondary" size="sm">Remove {this.currentSelected.type == "link" ? "Link" : "Node"}</Button>
-        </ButtonGroup>
-      )
     }
     }
 
@@ -505,6 +509,7 @@ export default class FormQuery extends Component {
           </Col>
         </Row>
         {warningDiskSpace}
+        <br />
         <ButtonGroup>
           {previewButton}
           {launchQueryButton}
