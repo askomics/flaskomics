@@ -19,6 +19,7 @@ export default class ResultsFilesTable extends Component {
     super(props)
     this.state = {
       redirectQueryBuilder: false,
+      redirectForm: false,
       graphState: [],
       modal: false,
       idToPublish: null,
@@ -141,7 +142,8 @@ export default class ResultsFilesTable extends Component {
   handleForm(event) {
     // request api to get a preview of file
     let requestUrl = '/api/results/graphstate'
-    let data = { fileId: event.target.id }
+    let fileId = event.target.id
+    let data = { fileId: fileId, formated: false }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -149,7 +151,7 @@ export default class ResultsFilesTable extends Component {
         this.setState({
           redirectForm: true,
           graphState: response.data.graphState,
-          idToPublish: event.target.id
+          idToPublish: fileId
         })
       })
       .catch(error => {
@@ -373,8 +375,8 @@ export default class ResultsFilesTable extends Component {
     }
 
     let redirectForm
-    if (this.state.redirectSparqlEditor) {
-      redirectSparqlEditor = <Redirect to={{
+    if (this.state.redirectForm) {
+      redirectForm = <Redirect to={{
         pathname: '/form_edit',
         state: {
           config: this.props.config,

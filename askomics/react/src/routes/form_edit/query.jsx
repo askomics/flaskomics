@@ -200,14 +200,12 @@ export default class FormEditQuery extends Component {
   }
 
   setEntityName(event){
-    if (!isNaN(event.target.value)) {
-      this.graphState.attr.map(attr => {
-        if (attr.nodeId == event.target.id) {
-          attr.entityDisplayLabel = event.target.value
-        }
-      })
-      this.updateGraphState()
-    }
+    this.graphState.attr.map(attr => {
+      if (attr.nodeId == event.target.id) {
+        attr.entityDisplayLabel = event.target.value
+      }
+    })
+    this.updateGraphState()
   }
 
   setAttributeName(event){
@@ -394,7 +392,7 @@ export default class FormEditQuery extends Component {
       this.state.graphState.attr.forEach(attribute => {
         if (attribute.form) {
           if (! entityMap.has(attribute.nodeId)){
-            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel ? attribute.entityDisplayLabel : attribute.entityLabel, attributes:[]})
+            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel, attributes:[]})
           }
           entityMap.get(attribute.nodeId).attributes.push(
             <AttributeBox
@@ -420,11 +418,12 @@ export default class FormEditQuery extends Component {
           )
         }
       })
+    }
 
     entityMap.forEach((value, key) => {
       Entities.push(
         <Entity
-          setEntityName={this.setEntityName(p)}
+          setEntityName={p => this.setEntityName(p)}
           entity_id={key}
           entity={value.entity_label}
           attribute_boxes={value.attributes}

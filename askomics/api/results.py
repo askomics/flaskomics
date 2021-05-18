@@ -663,7 +663,7 @@ def save_form():
                 'errorMessage': "Missing graphState or formId parameter"
             }), 400
 
-        result_info = {"id": data["id"]}
+        result_info = {"id": data["formId"]}
 
         result = Result(current_app, session, result_info)
         if not result:

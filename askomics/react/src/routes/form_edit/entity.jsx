@@ -1,6 +1,6 @@
 import React, { Component} from 'react'
 import axios from 'axios'
-import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
+import { Input, FormGroup, CustomInput, FormFeedback, Label } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import DatePicker from "react-datepicker";
 import ErrorDiv from '../error/error'
