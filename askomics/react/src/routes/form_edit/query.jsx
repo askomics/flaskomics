@@ -35,7 +35,7 @@ export default class FormEditQuery extends Component {
 
       // Preview icons
       disableSave: false,
-      previewIcon: "table"
+      saveIcon: "play",
     }
 
     this.graphState = {
@@ -209,14 +209,12 @@ export default class FormEditQuery extends Component {
   }
 
   setAttributeName(event){
-    if (!isNaN(event.target.value)) {
-      this.graphState.attr.map(attr => {
-        if (attr.id == event.target.id) {
-          attr.displayLabel = event.target.value
-        }
-      })
-      this.updateGraphState()
-    }
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.displayLabel = event.target.value
+      }
+    })
+    this.updateGraphState()
   }
 
   handleFilterDateValue (event) {
@@ -432,11 +430,9 @@ export default class FormEditQuery extends Component {
     })
 
       // buttons
-    let previewIcon = <i className={"fas fa-" + this.state.previewIcon}></i>
-    if (this.state.previewIcon == "spinner") {
-      previewIcon = <Spinner size="sm" color="light" />
-    }
-    previewButton = <Button onClick={this.handleSave} color="secondary" disabled={this.state.disableSave}>{previewIcon} Save</Button>
+    
+    
+    let saveButton = <Button onClick={this.handleSave} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Save</Button>
 
     // preview
     let resultsTable
@@ -463,7 +459,7 @@ export default class FormEditQuery extends Component {
         {warningDiskSpace}
         <br />
         <ButtonGroup>
-          {previewButton}
+          {saveButton}
         </ButtonGroup>
         <br /> <br />
         <div>

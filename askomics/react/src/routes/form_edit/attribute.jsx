@@ -110,7 +110,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -188,7 +188,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
@@ -227,7 +227,6 @@ export default class AttributeBox extends Component {
 
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
-    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -259,7 +258,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -293,7 +292,6 @@ export default class AttributeBox extends Component {
     }
 
     let form
-    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -312,7 +310,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -342,7 +340,6 @@ export default class AttributeBox extends Component {
     }
 
     let form
-    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -359,7 +356,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -397,7 +394,6 @@ export default class AttributeBox extends Component {
     }
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
-    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -438,7 +434,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{label}</label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
