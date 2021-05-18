@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-werkzeug = "==0.16.1"
+werkzeug = "*"
 flask = "*"
 flask-reverse-proxy-fix = "*"
 validate-email = "*"
