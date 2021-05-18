@@ -582,6 +582,22 @@ class Result(Params):
             self.id
         ))
 
+    def update_graph(self, newGraph):
+        """Change the result description"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        graph_state=?
+        WHERE user_id=? AND id=?
+        '''
+
+        database.execute_sql_query(query, (
+            json.dumps(newGraph),
+            self.session["user"]["id"],
+            self.id
+        ))
+
     def send2galaxy(self, file2send):
         """Send files to Galaxy"""
         if file2send == "result":

@@ -640,3 +640,48 @@ def send2galaxy():
         'error': False,
         'errorMessage': ''
     })
+
+
+@results_bp.route('/api/results/save_form', methods=['POST'])
+@api_auth
+@login_required
+def save_form():
+    """Update a form
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        # Get query and endpoints and graphs of the query
+        data = request.get_json()
+        if not (data and data.get("graphState") and data.get("formId")):
+            return jsonify({
+                'error': True,
+                'errorMessage': "Missing graphState or formId parameter"
+            }), 400
+
+        result_info = {"id": data["id"]}
+
+        result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'error': True,
+                'errorMessage': 'Failed to edit form: \n{}'.format("You do not have access to this form")
+            }), 401
+
+        result.update_graph(data.get("graphState"))
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e),
+        }), 500
+
+    return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })

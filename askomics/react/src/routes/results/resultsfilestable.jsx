@@ -35,6 +35,7 @@ export default class ResultsFilesTable extends Component {
     this.handlePreview = this.handlePreview.bind(this)
     this.handleDownload = this.handleDownload.bind(this)
     this.handleRedo = this.handleRedo.bind(this)
+    this.handleForm = this.handleForm.bind(this)
     this.handleEditQuery = this.handleEditQuery.bind(this)
     this.handleSendToGalaxy = this.handleSendToGalaxy.bind(this)
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
@@ -124,6 +125,31 @@ export default class ResultsFilesTable extends Component {
         this.setState({
           redirectQueryBuilder: true,
           graphState: response.data.graphState
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
+  handleForm(event) {
+    // request api to get a preview of file
+    let requestUrl = '/api/results/graphstate'
+    let data = { fileId: event.target.id }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          redirectForm: true,
+          graphState: response.data.graphState,
+          idToPublish: event.target.id
         })
       })
       .catch(error => {
@@ -346,6 +372,18 @@ export default class ResultsFilesTable extends Component {
       }} />
     }
 
+    let redirectForm
+    if (this.state.redirectSparqlEditor) {
+      redirectSparqlEditor = <Redirect to={{
+        pathname: '/form_edit',
+        state: {
+          config: this.props.config,
+          graphState: this.state.graphState,
+          formId: this.state.idToPublish
+        }
+      }} />
+    }
+
     let redirectQueryBuilder
     if (this.state.redirectQueryBuilder) {
       redirectQueryBuilder = <Redirect to={{
@@ -479,6 +517,7 @@ export default class ResultsFilesTable extends Component {
           <ButtonGroup>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
+            <Button disabled={(row.status != "success" || row.sparqlQuery != null || row.has_form_attr == null || row.has_form_attr == false) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleForm}>Form</Button>
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}
@@ -509,7 +548,7 @@ export default class ResultsFilesTable extends Component {
     return (
       <div>
         <div className="asko-table-height-div">
-          {redirectQueryBuilder}{redirectSparqlEditor}
+          {redirectQueryBuilder}{redirectSparqlEditor}{redirectForm}
           <BootstrapTable
             classes="asko-table"
             wrapperClasses="asko-table-wrapper"

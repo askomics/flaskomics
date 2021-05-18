@@ -154,7 +154,7 @@ export default class AttributeBox extends Component {
 
     selected[this.props.attribute.filterType] = true
 
-    let label = this.props.attribute.display_label ?  this.props.attribute.display_label : this.props.attribute.label
+    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     let form
 
@@ -227,7 +227,7 @@ export default class AttributeBox extends Component {
 
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
-    let label = this.props.attribute.display_label ?  this.props.attribute.display_label : this.props.attribute.label
+    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -293,7 +293,7 @@ export default class AttributeBox extends Component {
     }
 
     let form
-    let label = this.props.attribute.display_label ?  this.props.attribute.display_label : this.props.attribute.label
+    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -342,7 +342,7 @@ export default class AttributeBox extends Component {
     }
 
     let form
-    let label = this.props.attribute.display_label ?  this.props.attribute.display_label : this.props.attribute.label
+    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -397,7 +397,7 @@ export default class AttributeBox extends Component {
     }
     let form
     let numberOfFilters = this.props.attribute.filters.length - 1
-    let label = this.props.attribute.display_label ?  this.props.attribute.display_label : this.props.attribute.label
+    let label = this.props.attribute.displayLabel ?  this.props.attribute.displayLabel : this.props.attribute.label
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -489,4 +489,5 @@ AttributeBox.propTypes = {
   handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
+  setAttributeName: PropTypes.func
 }
