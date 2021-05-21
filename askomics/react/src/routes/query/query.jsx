@@ -464,8 +464,8 @@ export default class Query extends Component {
     let resFilterNode
     let resFilterLink
 
-    let reNode = new RegExp(node.filterNode, 'g')
-    let reLink = new RegExp(node.filterLink, 'g')
+    let reNode = new RegExp(node.filterNode.toLowerCase(), 'g')
+    let reLink = new RegExp(node.filterLink.toLowerCase(), 'g')
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
