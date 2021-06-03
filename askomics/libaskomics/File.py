@@ -226,7 +226,7 @@ class File(Params):
                     return rdflib.URIRef("{}{}".format(namespace, val))
             else:
                 # If not prefix, default to entity prefix
-                string = prefix
+                string = val
         if custom_namespace:
             return custom_namespace[self.format_uri(string)]
         else:
