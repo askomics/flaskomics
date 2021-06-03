@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
+from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
@@ -198,7 +199,7 @@ class File(Params):
             return quote(string.replace(' ', ''))
         return quote(string)
 
-    def rdfize(self, string):
+    def rdfize(self, string, custom_namespace=None):
         """Rdfize a string
 
         Return the literal is string is an url, else,
@@ -216,6 +217,18 @@ class File(Params):
         """
         if Utils.is_valid_url(string):
             return rdflib.URIRef(string)
+        elif ":" in string:
+            prefix, val = string.split(":")
+            if prefix:
+                prefix_manager = PrefixManager(self.app, self.session)
+                namespace = prefix_manager.get_namespace(prefix)
+                if namespace:
+                    return rdflib.URIRef("{}{}".format(namespace, val))
+            else:
+                # If not prefix, default to entity prefix
+                string = prefix
+        if custom_namespace:
+            return custom_namespace[self.format_uri(string)]
         else:
             return self.namespace_data[self.format_uri(string)]
 
