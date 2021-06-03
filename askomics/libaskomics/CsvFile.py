@@ -501,8 +501,9 @@ class CsvFile(File):
 
                 # Entity
                 entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
+                label = self.get_uri_label(entity)
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
-                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
+                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(label))
 
                 # Faldo
                 faldo_reference = None

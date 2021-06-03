@@ -232,6 +232,31 @@ class File(Params):
         else:
             return self.namespace_data[self.format_uri(string)]
 
+    def get_uri_label(uri):
+        """Labelize a string
+
+        Try to extract a label from an URI
+        Parameters
+        ----------
+        uri : string
+            Term to extract label from
+
+        Returns
+        -------
+        String
+            Label
+        """
+
+        uri = uri.strip("/")
+
+        if "/" in uri:
+            end_term = uri.split("/")[-1].rstrip("#")
+            if "#" in end_term:
+                return end_term.split("#")[-1]
+            return end_term
+        else:
+            return uri
+
     def set_metadata(self):
         """Get a rdflib graph of the metadata
 
