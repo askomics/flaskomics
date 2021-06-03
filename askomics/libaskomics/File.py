@@ -232,7 +232,7 @@ class File(Params):
         else:
             return self.namespace_data[self.format_uri(string)]
 
-    def get_uri_label(uri):
+    def get_uri_label(self, uri):
         """Labelize a string
 
         Try to extract a label from an URI
