@@ -247,7 +247,7 @@ class File(Params):
             Label
         """
 
-        uri = uri.strip("/")
+        uri = uri.rstrip("/")
 
         if "/" in uri:
             end_term = uri.split("/")[-1].rstrip("#")
