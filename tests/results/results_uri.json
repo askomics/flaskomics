@@ -19,7 +19,7 @@
 			"test_uri1_uri": "http://askomics.org/test/data/myuri3"
 		},
 		{
-			"test_uri1_Label": "wrongprefix:myuri4",
+			"test_uri1_Label": "myuri4",
 			"test_uri1_uri": "http://askomics.org/test/data/wrongprefix%3Amyuri4"
 		}
 	]
