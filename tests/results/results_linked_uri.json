@@ -20,7 +20,7 @@
 		{
 			"linked_uri1_Label": "luri3",
 			"test_uri1_Label": "myuri3",
-			"test_uri4_uri": "https://myapp-192-168-100-87.vm.openstack.genouest.org/bla/data/myuri3"
+			"test_uri4_uri": "http://askomics.org/test/data/myuri3"
 		}
 	]
 }

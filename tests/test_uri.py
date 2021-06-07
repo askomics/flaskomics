@@ -46,7 +46,7 @@ class TestURIResults(AskomicsTestCase):
 
         client.integrate_file({
             "id": 2,
-            "columns_type": ["start_entity", "reference"]
+            "columns_type": ["start_entity", "general_relation"]
         })
 
         with open("tests/data/linked_uri_query.json") as file:
@@ -60,6 +60,7 @@ class TestURIResults(AskomicsTestCase):
         expected = json.loads(file_content)
 
         response = client.client.post('/api/query/preview', json=json_query)
+        print(response.json)
 
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
