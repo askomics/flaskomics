@@ -2,7 +2,7 @@ import datetime
 import os
 import time
 from dateutil import parser
-from urllib.parse import quote, unquote
+from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
@@ -202,7 +202,7 @@ class File(Params):
     def rdfize(self, string, custom_namespace=None):
         """Rdfize a string
 
-        Return the literal is string is an url, else,
+        Return the literal if string is an url, else,
         prefix it with askomics prefix
 
         Parameters
@@ -214,23 +214,25 @@ class File(Params):
         -------
         rdflib.???
             Rdfized term
+        String
+            Label
         """
         if Utils.is_valid_url(string):
-            return rdflib.URIRef(string)
+            return rdflib.URIRef(string), self.get_uri_label(string)
         elif ":" in string:
             prefix, val = string.split(":")
             if prefix:
                 prefix_manager = PrefixManager(self.app, self.session)
                 namespace = prefix_manager.get_namespace(prefix)
                 if namespace:
-                    return rdflib.URIRef("{}{}".format(namespace, val))
+                    return rdflib.URIRef("{}{}".format(namespace, val)), val
             else:
                 # If not prefix, default to entity prefix
                 string = val
         if custom_namespace:
-            return custom_namespace[self.format_uri(string)]
+            return custom_namespace[self.format_uri(string)], string
         else:
-            return self.namespace_data[self.format_uri(string)]
+            return self.namespace_data[self.format_uri(string)], string
 
     def get_uri_label(self, uri):
         """Labelize a string
@@ -256,7 +258,7 @@ class File(Params):
         else:
             end_term = uri
 
-        return unquote(end_term)
+        return end_term
 
     def set_metadata(self):
         """Get a rdflib graph of the metadata
