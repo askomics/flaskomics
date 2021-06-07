@@ -133,10 +133,10 @@
 					"suggested": false,
 					"type": "node",
 					"uri": "http://askomics.org/test/data/linked_uri",
-					"vx": -0.000006995123717505612,
-					"vy": 0.000009488256138636105,
-					"x": 22.29947750446946,
-					"y": 16.860972754548946
+					"vx": -0.0003003627462221435,
+					"vy": 0.0004075881106325289,
+					"x": 22.29802567993402,
+					"y": 16.856149975826618
 				},
 				"strict": true,
 				"suggested": false,
@@ -146,7 +146,7 @@
 					"filterLink": "",
 					"filterNode": "",
 					"graphs": [
-						"urn:sparql:askomics:1_jdoe:uris.csv_1623050448"
+						"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
 					],
 					"humanId": 1,
 					"id": 4,
@@ -162,10 +162,10 @@
 					"suggested": false,
 					"type": "node",
 					"uri": "http://askomics.org/test/data/test_uri",
-					"vx": -0.000005526223265217558,
-					"vy": 0.0000048958209504578575,
-					"x": -8.55305276938307,
-					"y": 7.48056790944898
+					"vx": -0.00023729076359030172,
+					"vy": 0.00021021021380291738,
+					"x": -8.557144404461111,
+					"y": 7.4840022124046435
 				},
 				"type": "link",
 				"uri": "http://askomics.org/test/data/link"
@@ -200,10 +200,10 @@
 					"suggested": true,
 					"type": "node",
 					"uri": "http://askomics.org/test/data/linked_uri",
-					"vx": -0.000010352317034181414,
-					"vy": 0.000005568701494273952,
-					"x": -13.746447608750405,
-					"y": -24.341520711219342
+					"vx": -0.0004446376825207742,
+					"vy": 0.00023908510760271463,
+					"x": -13.741863566665243,
+					"y": -24.339295304799222
 				},
 				"suggested": true,
 				"target": {
@@ -212,7 +212,7 @@
 					"filterLink": "",
 					"filterNode": "",
 					"graphs": [
-						"urn:sparql:askomics:1_jdoe:uris.csv_1623050448"
+						"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
 					],
 					"humanId": 1,
 					"id": 4,
@@ -228,10 +228,10 @@
 					"suggested": false,
 					"type": "node",
 					"uri": "http://askomics.org/test/data/test_uri",
-					"vx": -0.000005526223265217558,
-					"vy": 0.0000048958209504578575,
-					"x": -8.55305276938307,
-					"y": 7.48056790944898
+					"vx": -0.00023729076359030172,
+					"vy": 0.00021021021380291738,
+					"x": -8.557144404461111,
+					"y": 7.4840022124046435
 				},
 				"type": "link",
 				"uri": "http://askomics.org/test/data/link"
@@ -258,10 +258,10 @@
 				"suggested": false,
 				"type": "node",
 				"uri": "http://askomics.org/test/data/linked_uri",
-				"vx": -0.000006995123717505612,
-				"vy": 0.000009488256138636105,
-				"x": 22.29947750446946,
-				"y": 16.860972754548946
+				"vx": -0.0003003627462221435,
+				"vy": 0.0004075881106325289,
+				"x": 22.29802567993402,
+				"y": 16.856149975826618
 			},
 			{
 				"__indexColor": "#d80002",
@@ -269,7 +269,7 @@
 				"filterLink": "",
 				"filterNode": "",
 				"graphs": [
-					"urn:sparql:askomics:1_jdoe:uris.csv_1623050448"
+					"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
 				],
 				"humanId": 1,
 				"id": 4,
@@ -285,10 +285,10 @@
 				"suggested": false,
 				"type": "node",
 				"uri": "http://askomics.org/test/data/test_uri",
-				"vx": -0.000005526223265217558,
-				"vy": 0.0000048958209504578575,
-				"x": -8.55305276938307,
-				"y": 7.48056790944898
+				"vx": -0.00023729076359030172,
+				"vy": 0.00021021021380291738,
+				"x": -8.557144404461111,
+				"y": 7.4840022124046435
 			},
 			{
 				"__indexColor": "#b00004",
@@ -310,10 +310,10 @@
 				"suggested": true,
 				"type": "node",
 				"uri": "http://askomics.org/test/data/linked_uri",
-				"vx": -0.000010352317034181414,
-				"vy": 0.000005568701494273952,
-				"x": -13.746447608750405,
-				"y": -24.341520711219342
+				"vx": -0.0004446376825207742,
+				"vy": 0.00023908510760271463,
+				"x": -13.741863566665243,
+				"y": -24.339295304799222
 			}
 		]
 	}

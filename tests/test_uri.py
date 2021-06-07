@@ -30,7 +30,7 @@ class TestURIResults(AskomicsTestCase):
         response = client.client.post('/api/query/preview', json=json_query)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
 
     def test_linked_uri(self, client):
         """Test linked uri interpretation"""
@@ -62,4 +62,4 @@ class TestURIResults(AskomicsTestCase):
         response = client.client.post('/api/query/preview', json=json_query)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
