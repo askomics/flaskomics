@@ -362,7 +362,7 @@ class CsvFile(File):
                 s = self.namespace_data["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
-                    o, _ = self.rdfize(value)
+                    o = self.rdfize(value)
                     self.graph_abstraction_dk.add((s, p, o))
                     self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
@@ -375,13 +375,13 @@ class CsvFile(File):
         # Check subclass syntax (<)
         if self.header[0].find('<') > 0:
             splitted = self.header[0].split('<')
-            entity, _ = self.rdfize(splitted[0])
+            entity = self.rdfize(splitted[0])
             entity_label = rdflib.Literal(splitted[0])
-            mother_class, _ = self.rdfize(splitted[1])
+            mother_class = self.rdfize(splitted[1])
             # subClassOf
             self.graph_abstraction_dk.add((entity, rdflib.RDFS.subClassOf, mother_class))
         else:
-            entity, _ = self.rdfize(self.header[0])
+            entity = self.rdfize(self.header[0])
             entity_label = rdflib.Literal(self.header[0])
 
         self.graph_abstraction_dk.add((entity, rdflib.RDF.type, rdflib.OWL.Class))
@@ -406,15 +406,15 @@ class CsvFile(File):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
                 splitted = attribute_name.split('@')
 
-                attribute, _ = self.rdfize(splitted[0])
+                attribute = self.rdfize(splitted[0])
                 label = rdflib.Literal(splitted[0])
-                rdf_range, _ = self.rdfize(splitted[1])
+                rdf_range = self.rdfize(splitted[1])
                 rdf_type = rdflib.OWL.ObjectProperty
                 self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
 
             # Category
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
-                attribute, _ = self.rdfize(attribute_name)
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.namespace_data["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
@@ -422,28 +422,28 @@ class CsvFile(File):
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
-                attribute, _ = self.rdfize(attribute_name)
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.decimal
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             # Boolean
             elif self.columns_type[index] == "boolean":
-                attribute, _ = self.rdfize(attribute_name)
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.boolean
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             # Date
             elif self.columns_type[index] == "date":
-                attribute, _ = self.rdfize(attribute_name)
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.date
                 rdf_type = rdflib.OWL.DatatypeProperty
 
             # Text (default)
             else:
-                attribute, _ = self.rdfize(attribute_name)
+                attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
@@ -482,9 +482,9 @@ class CsvFile(File):
             # Check subclass syntax (<)
             if self.header[0].find('<') > 0:
                 splitted = self.header[0].split('<')
-                entity_type, _ = self.rdfize(splitted[0])
+                entity_type = self.rdfize(splitted[0])
             else:
-                entity_type, _ = self.rdfize(self.header[0])
+                entity_type = self.rdfize(self.header[0])
 
             # Faldo
             self.faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
@@ -500,7 +500,8 @@ class CsvFile(File):
                     continue
 
                 # Entity
-                entity, label = self.rdfize(row[0], custom_namespace=self.namespace_entity)
+                entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
+                label = self.get_uri_label(row[0])
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(label)))
 
@@ -532,12 +533,12 @@ class CsvFile(File):
                     if current_type in ('general_relation', 'symetric_relation'):
                         symetric_relation = True if current_type == 'symetric_relation' else False
                         splitted = current_header.split('@')
-                        relation, _ = self.rdfize(splitted[0])
-                        attribute, _ = self.rdfize(cell)
+                        relation = self.rdfize(splitted[0])
+                        attribute = self.rdfize(cell)
 
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
-                        potential_relation, _ = self.rdfize(current_header)
+                        potential_relation = self.rdfize(current_header)
                         if not cell:
                             cell = "unknown/both"
                         if current_header not in self.category_values.keys():
@@ -547,7 +548,7 @@ class CsvFile(File):
                             # add the cell in the set
                             self.category_values[current_header].add(cell)
                         if current_type == 'reference':
-                            faldo_reference, _ = self.rdfize(cell)
+                            faldo_reference = self.rdfize(cell)
                             reference = cell
                             self.faldo_abstraction["reference"] = potential_relation
                         elif current_type == 'strand':
@@ -555,11 +556,11 @@ class CsvFile(File):
                             self.faldo_abstraction["strand"] = potential_relation
                         else:
                             relation = potential_relation
-                            attribute, _ = self.rdfize(cell)
+                            attribute = self.rdfize(cell)
 
                     # Numeric
                     elif current_type in ('numeric', 'start', 'end'):
-                        potential_relation, _ = self.rdfize(current_header)
+                        potential_relation = self.rdfize(current_header)
                         if current_type == "start":
                             faldo_start = rdflib.Literal(self.convert_type(cell))
                             start = cell
@@ -574,19 +575,19 @@ class CsvFile(File):
 
                     # Boolean
                     elif current_type == "boolean":
-                        relation, _ = self.rdfize(current_header)
+                        relation = self.rdfize(current_header)
                         if cell.lower() in ("1", "true"):
                             attribute = rdflib.Literal("true", datatype=rdflib.XSD.boolean)
                         else:
                             attribute = rdflib.Literal("false", datatype=rdflib.XSD.boolean)
 
                     elif current_type == "date":
-                        relation, _ = self.rdfize(current_header)
+                        relation = self.rdfize(current_header)
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     # default is text
                     else:
-                        relation, _ = self.rdfize(current_header)
+                        relation = self.rdfize(current_header)
                         attribute = rdflib.Literal(self.convert_type(cell))
 
                     if entity and relation is not None and attribute is not None:
@@ -627,7 +628,7 @@ class CsvFile(File):
                     for slice_block in range(block_start, block_end + 1):
                         self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
                         if reference:
-                            block_reference, _ = self.rdfize(self.format_uri("{}_{}".format(reference, slice_block)))
+                            block_reference = self.rdfize(self.format_uri("{}_{}".format(reference, slice_block)))
                             self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
 
                 yield

@@ -359,7 +359,7 @@ class GffFile(File):
 
                     for slice_block in range(block_start, block_end + 1):
                         self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
-                        block_reference, _ = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
+                        block_reference = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
                         self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
 
                 yield

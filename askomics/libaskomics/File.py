@@ -214,27 +214,25 @@ class File(Params):
         -------
         rdflib.???
             Rdfized term
-        String
-            Label
         """
         if Utils.is_valid_url(string):
-            return rdflib.URIRef(string), self.get_uri_label(string)
+            return rdflib.URIRef(string)
         elif ":" in string and len(string.split(":")) == 2:
             prefix, val = string.split(":")
             if prefix:
                 prefix_manager = PrefixManager(self.app, self.session)
                 namespace = prefix_manager.get_namespace(prefix)
                 if namespace:
-                    return rdflib.URIRef("{}{}".format(namespace, val)), val
+                    return rdflib.URIRef("{}{}".format(namespace, val))
             else:
                 # If not prefix, default to entity prefix
                 string = val
         if custom_namespace:
-            return custom_namespace[self.format_uri(string)], string
+            return custom_namespace[self.format_uri(string)]
         else:
-            return self.namespace_data[self.format_uri(string)], string
+            return self.namespace_data[self.format_uri(string)]
 
-    def get_uri_label(self, uri):
+    def get_uri_label(self, string):
         """Labelize a string
 
         Try to extract a label from an URI
@@ -249,15 +247,18 @@ class File(Params):
             Label
         """
 
-        uri = uri.rstrip("/")
-
-        if "/" in uri:
-            end_term = uri.split("/")[-1].rstrip("#")
-            if "#" in end_term:
-                end_term = end_term.split("#")[-1]
+        if Utils.is_valid_url(string):
+            string = string.rstrip("/")
+            if "/" in string:
+                end_term = string.split("/")[-1].rstrip("#")
+                if "#" in end_term:
+                    end_term = end_term.split("#")[-1]
+            else:
+                end_term = string
+        elif ":" in string and len(string.split(":")) == 2:
+            end_term = string.split(":")[-1]
         else:
-            end_term = uri
-
+            end_term = string
         return end_term
 
     def set_metadata(self):
