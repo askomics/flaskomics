@@ -1,0 +1,320 @@
+{
+	"graphState": {
+		"attr": [
+			{
+				"entityLabel": "linked_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/linked_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 2,
+				"label": "Uri",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 1,
+				"optional": false,
+				"type": "uri",
+				"uri": "rdf:type",
+				"visible": false
+			},
+			{
+				"entityLabel": "linked_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/linked_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 3,
+				"label": "Label",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 1,
+				"optional": false,
+				"type": "text",
+				"uri": "rdfs:label",
+				"visible": true
+			},
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 6,
+				"label": "Uri",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 4,
+				"optional": false,
+				"type": "uri",
+				"uri": "rdf:type",
+				"visible": true
+			},
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 7,
+				"label": "Label",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 4,
+				"optional": false,
+				"type": "text",
+				"uri": "rdfs:label",
+				"visible": true
+			},
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": null,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 8,
+				"label": "mydata",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 4,
+				"optional": false,
+				"type": "text",
+				"uri": "http://askomics.org/test/data/mydata",
+				"visible": false
+			}
+		],
+		"links": [
+			{
+				"__controlPoints": null,
+				"__indexColor": "#9c0005",
+				"directed": true,
+				"id": 9,
+				"index": 0,
+				"label": "link",
+				"sameRef": false,
+				"sameStrand": false,
+				"selected": false,
+				"source": {
+					"__indexColor": "#ec0001",
+					"faldo": false,
+					"filterLink": "",
+					"filterNode": "",
+					"graphs": [],
+					"humanId": 1,
+					"id": 1,
+					"index": 0,
+					"label": "linked_uri",
+					"selected": false,
+					"specialNodeGroupId": null,
+					"specialNodeId": null,
+					"specialPreviousIds": [
+						null,
+						null
+					],
+					"suggested": false,
+					"type": "node",
+					"uri": "http://askomics.org/test/data/linked_uri",
+					"vx": -0.0003003627462221435,
+					"vy": 0.0004075881106325289,
+					"x": 22.29802567993402,
+					"y": 16.856149975826618
+				},
+				"strict": true,
+				"suggested": false,
+				"target": {
+					"__indexColor": "#d80002",
+					"faldo": false,
+					"filterLink": "",
+					"filterNode": "",
+					"graphs": [
+						"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
+					],
+					"humanId": 1,
+					"id": 4,
+					"index": 1,
+					"label": "test_uri",
+					"selected": true,
+					"specialNodeGroupId": null,
+					"specialNodeId": null,
+					"specialPreviousIds": [
+						null,
+						null
+					],
+					"suggested": false,
+					"type": "node",
+					"uri": "http://askomics.org/test/data/test_uri",
+					"vx": -0.00023729076359030172,
+					"vy": 0.00021021021380291738,
+					"x": -8.557144404461111,
+					"y": 7.4840022124046435
+				},
+				"type": "link",
+				"uri": "http://askomics.org/test/data/link"
+			},
+			{
+				"__controlPoints": null,
+				"__indexColor": "#880006",
+				"directed": true,
+				"id": 12,
+				"index": 1,
+				"label": "link",
+				"sameRef": false,
+				"sameStrand": false,
+				"selected": false,
+				"source": {
+					"__indexColor": "#b00004",
+					"faldo": false,
+					"filterLink": "",
+					"filterNode": "",
+					"graphs": [],
+					"humanId": null,
+					"id": 10,
+					"index": 2,
+					"label": "linked_uri",
+					"selected": false,
+					"specialNodeGroupId": null,
+					"specialNodeId": null,
+					"specialPreviousIds": [
+						null,
+						null
+					],
+					"suggested": true,
+					"type": "node",
+					"uri": "http://askomics.org/test/data/linked_uri",
+					"vx": -0.0004446376825207742,
+					"vy": 0.00023908510760271463,
+					"x": -13.741863566665243,
+					"y": -24.339295304799222
+				},
+				"suggested": true,
+				"target": {
+					"__indexColor": "#d80002",
+					"faldo": false,
+					"filterLink": "",
+					"filterNode": "",
+					"graphs": [
+						"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
+					],
+					"humanId": 1,
+					"id": 4,
+					"index": 1,
+					"label": "test_uri",
+					"selected": true,
+					"specialNodeGroupId": null,
+					"specialNodeId": null,
+					"specialPreviousIds": [
+						null,
+						null
+					],
+					"suggested": false,
+					"type": "node",
+					"uri": "http://askomics.org/test/data/test_uri",
+					"vx": -0.00023729076359030172,
+					"vy": 0.00021021021380291738,
+					"x": -8.557144404461111,
+					"y": 7.4840022124046435
+				},
+				"type": "link",
+				"uri": "http://askomics.org/test/data/link"
+			}
+		],
+		"nodes": [
+			{
+				"__indexColor": "#ec0001",
+				"faldo": false,
+				"filterLink": "",
+				"filterNode": "",
+				"graphs": [],
+				"humanId": 1,
+				"id": 1,
+				"index": 0,
+				"label": "linked_uri",
+				"selected": false,
+				"specialNodeGroupId": null,
+				"specialNodeId": null,
+				"specialPreviousIds": [
+					null,
+					null
+				],
+				"suggested": false,
+				"type": "node",
+				"uri": "http://askomics.org/test/data/linked_uri",
+				"vx": -0.0003003627462221435,
+				"vy": 0.0004075881106325289,
+				"x": 22.29802567993402,
+				"y": 16.856149975826618
+			},
+			{
+				"__indexColor": "#d80002",
+				"faldo": false,
+				"filterLink": "",
+				"filterNode": "",
+				"graphs": [
+					"urn:sparql:askomics:1_jdoe:uris.csv_1623055495"
+				],
+				"humanId": 1,
+				"id": 4,
+				"index": 1,
+				"label": "test_uri",
+				"selected": true,
+				"specialNodeGroupId": null,
+				"specialNodeId": null,
+				"specialPreviousIds": [
+					null,
+					null
+				],
+				"suggested": false,
+				"type": "node",
+				"uri": "http://askomics.org/test/data/test_uri",
+				"vx": -0.00023729076359030172,
+				"vy": 0.00021021021380291738,
+				"x": -8.557144404461111,
+				"y": 7.4840022124046435
+			},
+			{
+				"__indexColor": "#b00004",
+				"faldo": false,
+				"filterLink": "",
+				"filterNode": "",
+				"graphs": [],
+				"humanId": null,
+				"id": 10,
+				"index": 2,
+				"label": "linked_uri",
+				"selected": false,
+				"specialNodeGroupId": null,
+				"specialNodeId": null,
+				"specialPreviousIds": [
+					null,
+					null
+				],
+				"suggested": true,
+				"type": "node",
+				"uri": "http://askomics.org/test/data/linked_uri",
+				"vx": -0.0004446376825207742,
+				"vy": 0.00023908510760271463,
+				"x": -13.741863566665243,
+				"y": -24.339295304799222
+			}
+		]
+	}
+}
