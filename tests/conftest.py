@@ -374,7 +374,7 @@ class Client(object):
 
         int_de = self.integrate_file({
             "id": 2,
-            "columns_type": ["start_entity", "directed", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"]
+            "columns_type": ["start_entity", "general_relation", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"]
         })
 
         int_qtl = self.integrate_file({
