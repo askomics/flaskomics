@@ -2,7 +2,7 @@ import datetime
 import os
 import time
 from dateutil import parser
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
@@ -252,10 +252,11 @@ class File(Params):
         if "/" in uri:
             end_term = uri.split("/")[-1].rstrip("#")
             if "#" in end_term:
-                return end_term.split("#")[-1]
-            return end_term
+                end_term = end_term.split("#")[-1]
         else:
-            return uri
+            end_term = uri
+
+        return unquote(end_term)
 
     def set_metadata(self):
         """Get a rdflib graph of the metadata

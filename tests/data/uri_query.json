@@ -1,0 +1,96 @@
+{
+	"graphState": {
+		"attr": [
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 2,
+				"label": "Uri",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 1,
+				"optional": false,
+				"type": "uri",
+				"uri": "rdf:type",
+				"visible": true
+			},
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": false,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 3,
+				"label": "Label",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 1,
+				"optional": false,
+				"type": "text",
+				"uri": "rdfs:label",
+				"visible": true
+			},
+			{
+				"entityLabel": "test_uri",
+				"entityUris": [
+					"http://askomics.org/test/data/test_uri"
+				],
+				"faldo": null,
+				"filterType": "exact",
+				"filterValue": "",
+				"humanNodeId": 1,
+				"id": 4,
+				"label": "mydata",
+				"linked": false,
+				"linkedWith": null,
+				"negative": false,
+				"nodeId": 1,
+				"optional": false,
+				"type": "text",
+				"uri": "http://askomics.org/test/data/mydata",
+				"visible": false
+			}
+		],
+		"links": [],
+		"nodes": [
+			{
+				"__indexColor": "#ec0001",
+				"faldo": false,
+				"filterLink": "",
+				"filterNode": "",
+				"graphs": [
+					"urn:sparql:askomics:1_jdoe:uris.csv_1623050448"
+				],
+				"humanId": 1,
+				"id": 1,
+				"index": 0,
+				"label": "test_uri",
+				"selected": true,
+				"specialNodeGroupId": null,
+				"specialNodeId": null,
+				"specialPreviousIds": [
+					null,
+					null
+				],
+				"suggested": false,
+				"type": "node",
+				"uri": "http://askomics.org/test/data/test_uri",
+				"vx": 0,
+				"vy": 0,
+				"x": 0,
+				"y": 0
+			}
+		]
+	}
+}

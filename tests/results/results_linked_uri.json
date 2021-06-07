@@ -1,0 +1,26 @@
+{
+	"error": false,
+	"errorMessage": "",
+	"headerPreview": [
+		"linked_uri1_Label",
+		"test_uri4_uri",
+		"test_uri1_Label"
+	],
+	"resultsPreview": [
+		{
+			"linked_uri1_Label": "luri1",
+			"test_uri1_Label": "myuri",
+			"test_uri4_uri": "https://myuri.com/myuri"
+		},
+		{
+			"linked_uri1_Label": "luri2",
+			"test_uri1_Label": "myuri2",
+			"test_uri4_uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#myuri2"
+		},
+		{
+			"linked_uri1_Label": "luri3",
+			"test_uri1_Label": "myuri3",
+			"test_uri4_uri": "https://myapp-192-168-100-87.vm.openstack.genouest.org/bla/data/myuri3"
+		}
+	]
+}
