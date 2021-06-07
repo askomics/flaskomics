@@ -219,7 +219,7 @@ class File(Params):
         """
         if Utils.is_valid_url(string):
             return rdflib.URIRef(string), self.get_uri_label(string)
-        elif ":" in string:
+        elif ":" in string and len(string.split(":")) == 2:
             prefix, val = string.split(":")
             if prefix:
                 prefix_manager = PrefixManager(self.app, self.session)
