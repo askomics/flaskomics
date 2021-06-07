@@ -1,0 +1,26 @@
+{
+	"error": false,
+	"errorMessage": "",
+	"headerPreview": [
+		"test_uri1_uri",
+		"test_uri1_Label"
+	],
+	"resultsPreview": [
+		{
+			"test_uri1_Label": "myuri",
+			"test_uri1_uri": "https://myuri.com/myuri"
+		},
+		{
+			"test_uri1_Label": "myuri2",
+			"test_uri1_uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#myuri2"
+		},
+		{
+			"test_uri1_Label": "myuri3",
+			"test_uri1_uri": "http://askomics.org/test/data/myuri3"
+		},
+		{
+			"test_uri1_Label": "myuri4",
+			"test_uri1_uri": "http://askomics.org/test/data/wrongprefix%3Amyuri4"
+		}
+	]
+}
