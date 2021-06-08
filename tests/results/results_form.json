@@ -12,7 +12,7 @@
       "has_form_attr": ###HAS_FORM_ATTR###,
       "id": ###ID###,
       "nrows": 11,
-      "path": "/tmp/askotest_g7q8lbhl/1_jdoe/results/5WK9XwT2Ld",
+      "path": "###PATH###",
       "public": ###PUBLIC###,
       "size": ###SIZE###,
       "sparqlQuery": null,
