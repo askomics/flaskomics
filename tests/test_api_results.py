@@ -55,7 +55,7 @@ class TestApiResults(AskomicsTestCase):
 
         response = client.client.get('/api/results')
 
-        with open("tests/results/results.json", "r") as file:
+        with open("tests/results/results_form.json", "r") as file:
             file_content = file.read()
         raw_results = file_content.replace("###START###", str(result_info["start"]))
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
@@ -89,7 +89,7 @@ class TestApiResults(AskomicsTestCase):
 
         response = client.client.get('/api/results')
 
-        with open("tests/results/results.json", "r") as file:
+        with open("tests/results/results_form.json", "r") as file:
             file_content = file.read()
         raw_results = file_content.replace("###START###", str(result_info["start"]))
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
@@ -334,7 +334,7 @@ class TestApiResults(AskomicsTestCase):
 
         data = {"id": result_info["id"], "form": True}
 
-        with open("tests/results/results.json", "r") as file:
+        with open("tests/results/results_form.json", "r") as file:
             file_content = file.read()
         raw_results = file_content.replace("###START###", str(result_info["start"]))
         raw_results = raw_results.replace("###END###", str(result_info["end"]))
