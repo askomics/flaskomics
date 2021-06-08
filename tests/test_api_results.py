@@ -72,7 +72,7 @@ class TestApiResults(AskomicsTestCase):
         expected = json.loads(raw_results)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
 
     def test_get_results_form_non_admin(self, client):
         """test /api/results route"""
@@ -106,7 +106,7 @@ class TestApiResults(AskomicsTestCase):
         expected = json.loads(raw_results)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
 
     def test_get_preview(self, client):
         """test /api/results/preview route"""
@@ -354,7 +354,7 @@ class TestApiResults(AskomicsTestCase):
         response = client.client.post("/api/results/form", json=data)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
 
         # untemplate a public result => unpublic it
         data_public = {"id": result_info["id"], "public": True}
@@ -381,7 +381,7 @@ class TestApiResults(AskomicsTestCase):
         response = client.client.post("/api/results/template", json=data_template)
 
         assert response.status_code == 200
-        assert response.json == expected
+        assert self.equal_objects(response.json, expected)
 
     def test_form_no_attr(self, client):
         """test /api/results/form route"""
@@ -400,12 +400,12 @@ class TestApiResults(AskomicsTestCase):
         }
 
         assert response.status_code == 500
-        assert response.error == expected
+        assert response.json == expected
 
     def test_form_non_admin(self, client):
         """test /api/results/form route"""
         client.create_two_users()
-        client.log_user("jdoe")
+        client.log_user("jsmith")
         client.upload_and_integrate()
         result_info = client.create_result(has_form=True)
 
