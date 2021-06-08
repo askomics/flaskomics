@@ -131,7 +131,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>} : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
@@ -213,7 +213,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -289,7 +289,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -347,7 +347,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
@@ -399,7 +399,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -483,7 +483,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -534,4 +534,5 @@ AttributeBox.propTypes = {
   handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
+  config: PropTypes.object
 }

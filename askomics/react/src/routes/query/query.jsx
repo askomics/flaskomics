@@ -1469,6 +1469,7 @@ export default class Query extends Component {
                 toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
+                config={this.state.config}
               />
             )
           }
