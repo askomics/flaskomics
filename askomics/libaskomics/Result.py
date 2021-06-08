@@ -532,6 +532,11 @@ class Result(Params):
 
         sql_substr = ''
         sql_var = (template, self.session["user"]["id"], self.id)
+
+        if template and self.form:
+            sql_substr = 'form=?,'
+            sql_var = (template, False, self.session["user"]["id"], self.id)
+
         if not (template or self.form):
             sql_substr = 'public=?,'
             sql_var = (template, template, self.session["user"]["id"], self.id)
@@ -546,13 +551,18 @@ class Result(Params):
         database.execute_sql_query(query, sql_var)
 
     def form_query(self, form):
-        """Set form to True or False, and public to False if template and form are False"""
+        """Set form to True or False, Set Template to False if True, public to False if template and form are False"""
         database = Database(self.app, self.session)
         if not self.has_form_attr:
             raise Exception("This query does not has any form template attribute")
 
         sql_substr = ''
         sql_var = (form, self.session["user"]["id"], self.id)
+
+        if form and self.template:
+            sql_substr = 'template=?,'
+            sql_var = (form, False, self.session["user"]["id"], self.id)
+
         if not (form or self.template):
             sql_substr = 'public=?,'
             sql_var = (form, form, self.session["user"]["id"], self.id)
