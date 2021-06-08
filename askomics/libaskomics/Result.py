@@ -383,7 +383,7 @@ class Result(Params):
             self.sparql_query,
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
             False,
-            any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
+            self.session["user"]["admin"] and any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
             False
         ), get_id=True)
 

@@ -438,6 +438,7 @@ export default class ResultsFilesTable extends Component {
       dataField: 'form',
       text: 'Form',
       sort: true,
+      hidden: this.props.config.user.admin === 1 ? false : true,
       formatter: (cell, row) => {
         return (
           <FormGroup>
@@ -519,7 +520,7 @@ export default class ResultsFilesTable extends Component {
           <ButtonGroup>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handlePreview}>Preview</Button>
             <Button disabled={row.status == "success" ? false : true} id={row.id} size="sm" outline color="secondary" onClick={this.handleDownload}>Download</Button>
-            <Button disabled={(row.status != "success" || row.sparqlQuery != null || row.has_form_attr == null || row.has_form_attr == false) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleForm}>Form</Button>
+            {this.props.config.user.admin === 1 ? <Button disabled={(row.status != "success" || row.sparqlQuery != null || row.has_form_attr == null || row.has_form_attr == false) ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleForm}>Form</Button> : <nodiv></nodiv>}
             <Button disabled={row.sparqlQuery != null ? true : false} id={row.id} size="sm" outline color="secondary" onClick={this.handleRedo}>Redo</Button>
             <Button id={row.id} size="sm" outline color="secondary" onClick={this.handleEditQuery}>Sparql</Button>
             {this.props.config.user.galaxy ? <Button disabled={row.status == "success" ? false : true} name="result" id={row.id} size="sm" outline color="secondary" onClick={this.handleSendToGalaxy}>Send result to Galaxy</Button> : null}

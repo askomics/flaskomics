@@ -553,7 +553,7 @@ def template_query():
 
 @results_bp.route('/api/results/form', methods=['POST'])
 @api_auth
-@login_required
+@admin_required
 def form_query():
     """Create a form from a result
 
@@ -644,7 +644,7 @@ def send2galaxy():
 
 @results_bp.route('/api/results/save_form', methods=['POST'])
 @api_auth
-@login_required
+@admin_required
 def save_form():
     """Update a form
 
