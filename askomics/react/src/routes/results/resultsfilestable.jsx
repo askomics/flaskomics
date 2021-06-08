@@ -290,7 +290,7 @@ export default class ResultsFilesTable extends Component {
     let requestUrl = '/api/results/form'
     let data = {
       id: this.state.idToFormTemplate,
-      template: this.state.newFormTemplateStatus
+      form: this.state.newFormTemplateStatus
     }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {

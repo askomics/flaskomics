@@ -581,7 +581,7 @@ def form_query():
                 'error': True,
                 'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
             }), 401
-        result.form_query(data.get("template", False))
+        result.form_query(data.get("form", False))
 
         results_handler = ResultsHandler(current_app, session)
         files = results_handler.get_files_info()

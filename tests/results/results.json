@@ -17,8 +17,8 @@
       "start": ###START###,
       "status": "success",
       "template": ###TEMPLATE###,
-      "form": 0,
-      "has_form_attr": 0,
+      "form": ###FORM###,
+      "has_form_attr": ###HAS_FORM_ATTR###,
       "traceback": null
     }
   ],
