@@ -510,7 +510,7 @@ class Result(Params):
             sql_var = (public, self.id, self.session["user"]["id"])
             where_query = "AND user_id=?"
         if public:
-            if self.has_form_attr:
+            if self.has_form_attr and not self.template:
                 sql_substr = 'form=?,'
             else:
                 sql_substr = 'template=?,'
@@ -535,7 +535,7 @@ class Result(Params):
 
         if template and self.form:
             sql_substr = 'form=?,'
-            sql_var = (template, False, self.session["user"]["id"], self.id)
+            sql_var = (False, template, self.session["user"]["id"], self.id)
 
         if not (template or self.form):
             sql_substr = 'public=?,'
@@ -561,7 +561,7 @@ class Result(Params):
 
         if form and self.template:
             sql_substr = 'template=?,'
-            sql_var = (form, False, self.session["user"]["id"], self.id)
+            sql_var = (False, form, self.session["user"]["id"], self.id)
 
         if not (form or self.template):
             sql_substr = 'public=?,'

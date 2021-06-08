@@ -131,7 +131,7 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          {this.props.config.user.admin ? {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>} : <nodiv></nodiv>}
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>} : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
