@@ -378,7 +378,7 @@ class TestApiResults(AskomicsTestCase):
         del expected["triplestoreMaxRows"]
 
         client.client.post("/api/results/public", json=data_public)
-        response = client.client.post("/api/results/template", json=data_template)
+        response = client.client.post("/api/results/form", json=data_template)
 
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
