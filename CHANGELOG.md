@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+## [4.2.2] - 2021-06-09
+
+### Fixed
+
+- Fixed startup issue: race condition on config file creation
+
 ## [4.2.1] - 2021-03-29
 
 ### Fixed
