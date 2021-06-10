@@ -511,25 +511,26 @@ class SparqlQuery(Params):
         str
             Corresponding SPARQL
         """
-        # if triple_block["type"] == "UNION":
         if triple_block["type"] in ("UNION", "MINUS"):
 
-            block_string = ""
-            length = len(triple_block) - 1
-            i = 1
+            block_string = "{\n"
+            i = 0
+            current_spacing = "    "
 
             for sblock in triple_block["sblocks"]:
                 sblock_string = "{"
-                triples_string = '\n'.join([self.triple_dict_to_string(triple_dict) for triple_dict in sblock["triples"]])
-                triples_string += '\n'
-                triples_string += '\n'.join([filtr for filtr in sblock["filters"]])
-                triples_string += '\n'
-                triples_string += '\n'.join([value for value in sblock["values"]])
-                sblock_string += "\n    {}\n}}".format(triples_string)
+                triples_string = '\n{}'.format(current_spacing * 2).join([self.triple_dict_to_string(triple_dict) for triple_dict in sblock["triples"]])
+                triples_string += '\n{}'.format(current_spacing * 2)
+                triples_string += '\n{}'.format(current_spacing * 2).join([filtr for filtr in sblock["filters"]])
+                triples_string += '\n{}'.format(current_spacing * 2)
+                triples_string += '\n{}'.format(current_spacing * 2).join([value for value in sblock["values"]])
+                sblock_string += "\n{}{}\n{}}}".format(current_spacing * 2, triples_string, current_spacing * 2)
 
-                block_string += triple_block["type"] if i == length else ""
-                i += 1
+                block_string += "{}{} ".format(current_spacing * 2, triple_block["type"]) if (triple_block["type"] == "MINUS" or i > 0) else current_spacing * 2
                 block_string += sblock_string + "\n"
+                i += 1
+
+            block_string += current_spacing + "}\n"
 
         return block_string
 
@@ -548,7 +549,15 @@ class SparqlQuery(Params):
         """
         triple = "{} {} {} .".format(triple_dict["subject"], triple_dict["predicate"], triple_dict["object"])
         if triple_dict["optional"]:
-            triple = "OPTIONAL {{{}}}".format(triple)
+            if triple_dict.get("nested_start"):
+                triple = "OPTIONAL {{{}".format(triple)
+            else:
+                triple = "OPTIONAL {{{}}}".format(triple)
+        # Close the }} if end of the nest
+        if triple_dict.get("nested_end"):
+            triple = "    " + triple + "}"
+        elif triple_dict.get("nested"):
+            triple = "    " + triple
 
         return triple
 
@@ -795,7 +804,7 @@ class SparqlQuery(Params):
             var_target = tpl_var[1]
             for i, triple_dict in enumerate(self.triples):
                 for key, value in triple_dict.items():
-                    if key != "optional":
+                    if key not in ["optional", "nested", "nested_start", "nested_end", "form"]:
                         self.triples[i][key] = value.replace(var_source, var_target)
             for i, select in enumerate(self.selects):
                 self.selects[i] = select.replace(var_source, var_target)
@@ -822,7 +831,7 @@ class SparqlQuery(Params):
                     # Iterate over triples
                     for ntriple, triple_dict in enumerate(sblock["triples"]):
                         for key, value in triple_dict.items():
-                            if key != "optional":
+                            if key not in ["optional", "nested", "nested_start", "nested_end", "form"]:
                                 self.triples_blocks[nblock]["sblocks"][nsblock]["triples"][ntriple][key] = value.replace(var_source, var_target)
 
                     for i, filtr in enumerate(sblock["filters"]):
@@ -1171,6 +1180,37 @@ class SparqlQuery(Params):
                     ))
                     var_to_replace.append((obj, var_2))
 
+            if attribute["type"] == "date":
+                if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in linked_attributes:
+                    subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                    predicate = "<{}>".format(attribute["uri"])
+                    obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
+                    self.store_triple({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": obj,
+                        "optional": True if attribute["optional"] else False
+                    }, block_id, sblock_id, pblock_ids)
+                    if attribute["visible"]:
+                        self.selects.append(obj)
+                # filters
+                for filtr in attribute["filters"]:
+                    if filtr["filterValue"] and not attribute["optional"] and not attribute["linked"]:
+                        # COnvert datetime to date
+                        val = filtr["filterValue"].split("T")[0]
+                        if filtr['filterSign'] == "=":
+                            self.store_value("VALUES {} {{ '{}'^^xsd:date }} .".format(obj, val), block_id, sblock_id, pblock_ids)
+                        else:
+                            filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], val)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
+                if attribute["linked"]:
+                    var_2 = self.format_sparql_variable("{}{}_{}".format(
+                        attributes[attribute["linkedWith"]]["entity_label"],
+                        attributes[attribute["linkedWith"]]["entity_id"],
+                        attributes[attribute["linkedWith"]]["label"]
+                    ))
+                    var_to_replace.append((obj, var_2))
+
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
@@ -1184,14 +1224,16 @@ class SparqlQuery(Params):
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
+                            "optional": True if attribute["optional"] else False,
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
                             self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
-                                "optional": True if attribute["optional"] else False
+                                "optional": True if attribute["optional"] else False,
+                                "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
                         category_name = 'faldo:location/faldo:begin/rdf:type'
@@ -1214,21 +1256,23 @@ class SparqlQuery(Params):
                                 "object": category_label,
                                 "optional": False
                             }, block_id, sblock_id, pblock_ids)
-                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition }} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
+                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition faldo:BothStrandPosition}} .".format(category_value_uri), block_id, sblock_id, pblock_ids)
                     else:
                         category_name = "<{}>".format(attribute["uri"])
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
+                            "optional": True if attribute["optional"] else False,
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids)
                         if attribute["visible"]:
                             self.store_triple({
                                 "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
-                                "optional": True if attribute["optional"] else False
+                                "optional": True if attribute["optional"] else False,
+                                "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids)
 
                     if attribute["visible"]:
@@ -1244,8 +1288,12 @@ class SparqlQuery(Params):
                             value_var = category_value_uri
                             uri_val_list.append("<{}>".format(value))
 
-                    if uri_val_list:
-                        self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
+                        if uri_val_list:
+                            if attribute["exclude"]:
+                                filter_string = "FILTER ( {} NOT IN ( {} ) ) .".format(value_var, " ,".join(uri_val_list))
+                                self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
+                            else:
+                                self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
 
                 if attribute["linked"]:
                     var_2 = self.format_sparql_variable("{}{}_{}Category".format(

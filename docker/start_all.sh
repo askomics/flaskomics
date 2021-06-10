@@ -30,6 +30,9 @@ while [[ ! -f /askomics/config/askomics.ini ]]; do
     sleep 1s
 done
 
+# Wait a bit more, you never know...
+sleep 1s
+
 # Start Celery
 nohup make serve-celery &> /var/log/celery.log &
 

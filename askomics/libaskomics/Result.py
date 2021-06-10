@@ -52,7 +52,8 @@ class Result(Params):
 
         if "id" in result_info and not force_no_db:
             self.id = result_info["id"]
-            self.set_info_from_db_with_id()
+            if not self.set_info_from_db_with_id():
+                return None
         else:
             self.id = result_info["id"] if "id" in result_info else None
             self.graph_state = result_info["graph_state"] if "graph_state" in result_info else None
@@ -65,6 +66,9 @@ class Result(Params):
             self.start = None
             self.end = None
             self.nrows = 0
+            self.has_form_attr = False
+            self.template = False
+            self.form = False
 
     def clean_node(self, node):
         """Clean a node by removing coordinates and other stuff
@@ -245,7 +249,7 @@ class Result(Params):
 
         if "user" in self.session:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
             FROM results
             WHERE (user_id = ? OR public = ?) AND id = ?
             '''
@@ -254,12 +258,15 @@ class Result(Params):
 
         else:
             query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
             FROM results
             WHERE public = ? AND id = ?
             '''
 
             rows = database.execute_sql_query(query, (True, self.id))
+
+        if not rows:
+            return False
 
         self.celery_id = rows[0][0] if rows[0][0] else ''
         self.file_path = rows[0][1] if rows[0][1] else ''
@@ -269,10 +276,15 @@ class Result(Params):
         self.end = rows[0][4]
         self.nrows = rows[0][5]
         self.sparql_query = rows[0][6]
+        self.has_form_attr = rows[0][8] if rows[0][8] else False
+        self.template = rows[0][9] if rows[0][9] else False
+        self.form = rows[0][10] if rows[0][10] else False
 
         gne = json.loads(rows[0][7]) if rows[0][7] else {"graphs": [], "endpoints": []}
         self.graphs = gne["graphs"]
         self.endpoints = gne["endpoints"]
+
+        return True
 
     def get_file_preview(self):
         """Get a preview of the results file
@@ -355,6 +367,8 @@ class Result(Params):
             ?,
             NULL,
             ?,
+            ?,
+            ?,
             ?
         )
         '''
@@ -368,6 +382,8 @@ class Result(Params):
             "Query",
             self.sparql_query,
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
+            False,
+            self.session["user"]["admin"] and any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
             False
         ), get_id=True)
 
@@ -484,16 +500,20 @@ class Result(Params):
         """Set public to True or False, and template to True if public is True"""
         database = Database(self.app, self.session)
 
-        # If query is set to public, template have to be True
+        # If query is set to public, template or form (if available) have to be True
         sql_substr = ''
         if admin and self.session['user']['admin']:
             sql_var = (public, self.id)
             where_query = ""
+        # Should not happen
         else:
             sql_var = (public, self.id, self.session["user"]["id"])
             where_query = "AND user_id=?"
         if public:
-            sql_substr = 'template=?,'
+            if self.has_form_attr and not self.template:
+                sql_substr = 'form=?,'
+            else:
+                sql_substr = 'template=?,'
             sql_var = (public,) + sql_var
 
         query = '''
@@ -507,13 +527,17 @@ class Result(Params):
         database.execute_sql_query(query, sql_var)
 
     def template_query(self, template):
-        """Set template to True or False, and public to False if template is False"""
+        """Set template to True or False, and public to False if template and form are False"""
         database = Database(self.app, self.session)
 
-        # If query is set to public, template have to be True
         sql_substr = ''
         sql_var = (template, self.session["user"]["id"], self.id)
-        if not template:
+
+        if template and self.form:
+            sql_substr = 'form=?,'
+            sql_var = (False, template, self.session["user"]["id"], self.id)
+
+        if not (template or self.form):
             sql_substr = 'public=?,'
             sql_var = (template, template, self.session["user"]["id"], self.id)
 
@@ -521,6 +545,32 @@ class Result(Params):
         UPDATE results SET
         {}
         template=?
+        WHERE user_id=? AND id=?
+        '''.format(sql_substr)
+
+        database.execute_sql_query(query, sql_var)
+
+    def form_query(self, form):
+        """Set form to True or False, Set Template to False if True, public to False if template and form are False"""
+        database = Database(self.app, self.session)
+        if not self.has_form_attr:
+            raise Exception("This query does not has any form template attribute")
+
+        sql_substr = ''
+        sql_var = (form, self.session["user"]["id"], self.id)
+
+        if form and self.template:
+            sql_substr = 'template=?,'
+            sql_var = (False, form, self.session["user"]["id"], self.id)
+
+        if not (form or self.template):
+            sql_substr = 'public=?,'
+            sql_var = (form, form, self.session["user"]["id"], self.id)
+
+        query = '''
+        UPDATE results SET
+        {}
+        form=?
         WHERE user_id=? AND id=?
         '''.format(sql_substr)
 
@@ -538,6 +588,22 @@ class Result(Params):
 
         database.execute_sql_query(query, (
             description,
+            self.session["user"]["id"],
+            self.id
+        ))
+
+    def update_graph(self, newGraph):
+        """Change the result description"""
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        graph_state=?
+        WHERE user_id=? AND id=?
+        '''
+
+        database.execute_sql_query(query, (
+            json.dumps(newGraph),
             self.session["user"]["id"],
             self.id
         ))

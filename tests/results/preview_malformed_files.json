@@ -1,0 +1,26 @@
+{
+  "error": false,
+  "errorMessage": "",
+  "previewFiles": [
+    {
+      "data": {
+        "columns_type": [
+          "start_entity",
+          "text",
+          "text"
+        ],
+        "content_preview": [],
+        "header": [
+          "",
+          "column2",
+          "column3"
+        ]
+      },
+      "id": 6,
+      "name": "malformed.tsv",
+      "type": "csv/tsv",
+      "error": true,
+      "error_message": "Malformated CSV/TSV (Empty column in header)"
+    }
+  ]
+}

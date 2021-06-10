@@ -18,7 +18,7 @@ export default class Utils {
     // take last elem
     let last = splitList[splitList.length - 1]
     let splitList2 = last.split('#')
-    return splitList2[splitList2.length - 1]
+    return decodeURI(splitList2[splitList2.length - 1])
   }
 
   humanFileSize (bytes, si) {

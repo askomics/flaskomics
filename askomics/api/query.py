@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import login_required
+from askomics.api.auth import api_auth, login_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -16,6 +16,7 @@ query_bp = Blueprint('query', __name__, url_prefix='/')
 
 
 @query_bp.route('/api/query/startpoints', methods=['GET'])
+@api_auth
 def query():
     """Get start points
 
@@ -31,17 +32,20 @@ def query():
         if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
             startpoints = []
             public_queries = []
+            public_form_queries = []
         else:
             tse = TriplestoreExplorer(current_app, session)
             results_handler = ResultsHandler(current_app, session)
             startpoints = tse.get_startpoints()
             public_queries = results_handler.get_public_queries()
+            public_form_queries = results_handler.get_public_form_queries()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'startpoints': [],
             "publicQueries": [],
+            "publicFormQueries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
@@ -49,12 +53,14 @@ def query():
     return jsonify({
         'startpoints': startpoints,
         "publicQueries": public_queries,
+        "publicFormQueries": public_form_queries,
         'error': False,
         'errorMessage': ''
     })
 
 
 @query_bp.route('/api/query/abstraction', methods=['GET'])
+@api_auth
 def get_abstraction():
     """Get abstraction
 
@@ -92,6 +98,7 @@ def get_abstraction():
 
 
 @query_bp.route('/api/query/preview', methods=['POST'])
+@api_auth
 def get_preview():
     """Get a preview of query
 
@@ -110,6 +117,13 @@ def get_preview():
             header = []
         else:
             data = request.get_json()
+            if not (data and data.get("graphState")):
+                return jsonify({
+                    'resultsPreview': [],
+                    'headerPreview': [],
+                    'error': True,
+                    'errorMessage': "Missing graphState parameter"
+                }), 400
 
             query = SparqlQuery(current_app, session, data["graphState"])
             query.build_query_from_json(preview=True, for_editor=False)
@@ -140,6 +154,7 @@ def get_preview():
 
 
 @query_bp.route('/api/query/save_result', methods=['POST'])
+@api_auth
 @login_required
 def save_result():
     """Save a query in filesystem and db, using a celery task
@@ -147,7 +162,7 @@ def save_result():
     Returns
     -------
     json
-        task_id: celery task id
+        result_id: result id
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
@@ -159,11 +174,19 @@ def save_result():
             return jsonify({
                 'error': True,
                 'errorMessage': "Exceeded quota",
-                'task_id': None
-            }), 500
+                'result_id': None
+            }), 400
 
         # Get query and endpoints and graphs of the query
-        query = SparqlQuery(current_app, session, request.get_json()["graphState"])
+        data = request.get_json()
+        if not (data and data.get("graphState")):
+            return jsonify({
+                'result_id': None,
+                'error': True,
+                'errorMessage': "Missing graphState parameter"
+            }), 400
+
+        query = SparqlQuery(current_app, session, data["graphState"])
         query.build_query_from_json(preview=False, for_editor=False)
 
         info = {
@@ -185,11 +208,11 @@ def save_result():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': None
+            'result_id': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id
+        'result_id': info["id"]
     })

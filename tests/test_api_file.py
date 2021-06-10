@@ -25,7 +25,7 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 1986,
+                'size': 2102,
                 'type': 'csv/tsv'
             }, {
                 'date': info["de"]["upload"]["file_date"],
@@ -73,7 +73,7 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 1986,
+                'size': 2102,
                 'type': 'csv/tsv'
             }]
         }
@@ -105,7 +105,7 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'new name.tsv',
-                'size': 1986,
+                'size': 2102,
                 'type': 'csv/tsv'
             }, {
                 'date': info["de"]["upload"]["file_date"],
@@ -331,6 +331,8 @@ class TestApiFile(AskomicsTestCase):
         client.log_user("jdoe")
         client.upload()
 
+        client.upload_file("test-data/malformed.tsv")
+
         csv_data = {
             "filesId": [1, ]
         }
@@ -343,8 +345,15 @@ class TestApiFile(AskomicsTestCase):
             "filesId": [42, ]
         }
 
+        malformed_data = {
+            "filesId": [6, ]
+        }
+
         with open("tests/results/preview_files.json") as file:
             csv_expected = json.loads(file.read())
+
+        with open("tests/results/preview_malformed_files.json") as file:
+            csv_malformed = json.loads(file.read())
 
         response = client.client.post('/api/files/preview', json=fake_data)
         assert response.status_code == 200
@@ -353,6 +362,10 @@ class TestApiFile(AskomicsTestCase):
             'errorMessage': '',
             'previewFiles': []
         }
+
+        response = client.client.post('/api/files/preview', json=malformed_data)
+        assert response.status_code == 200
+        assert response.json == csv_malformed
 
         response = client.client.post('/api/files/preview', json=csv_data)
         assert response.status_code == 200
@@ -502,15 +515,14 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 0
+        assert response.json["dataset_ids"] == []
 
         response = client.client.post('/api/files/integrate', json=tsv_data)
         assert response.status_code == 200
-        # print(response.json)
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
         response = client.client.post('/api/files/integrate', json=gff_data)
         assert response.status_code == 200
@@ -518,7 +530,7 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
         response = client.client.post('/api/files/integrate', json=bed_data)
         assert response.status_code == 200
@@ -526,7 +538,7 @@ class TestApiFile(AskomicsTestCase):
         assert len(response.json) == 3
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
-        assert len(response.json["task_id"]) == 36
+        assert response.json["dataset_ids"]
 
     def test_serve_file(self, client):
         """Test /api/files/ttl/<userid>/<username>/<filepath> route"""

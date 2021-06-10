@@ -369,7 +369,7 @@ class Client(object):
         # integrate
         int_transcripts = self.integrate_file({
             "id": 1,
-            "columns_type": ["start_entity", "category", "text", "reference", "start", "end", "category", "strand", "text", "text"]
+            "columns_type": ["start_entity", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
         })
 
         int_de = self.integrate_file({
@@ -425,7 +425,7 @@ class Client(object):
             }
         }
 
-    def create_result(self):
+    def create_result(self, has_form=False):
         """Create a result entry in db
 
         Returns
@@ -435,8 +435,13 @@ class Client(object):
         """
         # Query: transcript concerned by DE and included in QTL
 
-        with open("tests/data/graphState_simple_query.json", "r") as file:
-            file_content = file.read()
+        if has_form:
+            with open("tests/data/graphState_simple_query_form.json", "r") as file:
+                file_content = file.read()
+
+        else:
+            with open("tests/data/graphState_simple_query.json", "r") as file:
+                file_content = file.read()
 
         json_query = json.loads(file_content)
 

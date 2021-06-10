@@ -1,10 +1,12 @@
 import datetime
 import os
 import time
+from dateutil import parser
 from urllib.parse import quote
 
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Database import Database
+from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 from askomics.libaskomics.RdfGraph import RdfGraph
@@ -197,10 +199,10 @@ class File(Params):
             return quote(string.replace(' ', ''))
         return quote(string)
 
-    def rdfize(self, string):
+    def rdfize(self, string, custom_namespace=None):
         """Rdfize a string
 
-        Return the literal is string is an url, else,
+        Return the literal if string is an url, else,
         prefix it with askomics prefix
 
         Parameters
@@ -215,8 +217,49 @@ class File(Params):
         """
         if Utils.is_valid_url(string):
             return rdflib.URIRef(string)
+        elif ":" in string and len(string.split(":")) == 2:
+            prefix, val = string.split(":")
+            if prefix:
+                prefix_manager = PrefixManager(self.app, self.session)
+                namespace = prefix_manager.get_namespace(prefix)
+                if namespace:
+                    return rdflib.URIRef("{}{}".format(namespace, val))
+            else:
+                # If not prefix, default to entity prefix
+                string = val
+        if custom_namespace:
+            return custom_namespace[self.format_uri(string)]
         else:
             return self.namespace_data[self.format_uri(string)]
+
+    def get_uri_label(self, string):
+        """Labelize a string
+
+        Try to extract a label from an URI
+        Parameters
+        ----------
+        uri : string
+            Term to extract label from
+
+        Returns
+        -------
+        String
+            Label
+        """
+
+        if Utils.is_valid_url(string):
+            string = string.rstrip("/")
+            if "/" in string:
+                end_term = string.split("/")[-1].rstrip("#")
+                if "#" in end_term:
+                    end_term = end_term.split("#")[-1]
+            else:
+                end_term = string
+        elif ":" in string and len(string.split(":")) == 2:
+            end_term = string.split(":")[-1]
+        else:
+            end_term = string
+        return end_term
 
     def set_metadata(self):
         """Get a rdflib graph of the metadata
@@ -410,12 +453,16 @@ class File(Params):
                 float(value)
                 return rdflib.XSD.decimal
             except ValueError:
-                return rdflib.XSD.string
+                try:
+                    parser.parse(value, dayfirst=True).date()
+                    return rdflib.XSD.date
+                except parser.ParserError:
+                    return rdflib.XSD.string
 
         return rdflib.XSD.string
 
     def convert_type(self, value):
-        """Convert a value to a int or float or text
+        """Convert a value to a date, an int or float or text
 
         Parameters
         ----------
@@ -433,6 +480,9 @@ class File(Params):
             try:
                 return float(value)
             except ValueError:
-                return value
+                try:
+                    return parser.parse(value, dayfirst=True).date()
+                except parser.ParserError:
+                    return value
 
         return value

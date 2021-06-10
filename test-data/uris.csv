@@ -1,0 +1,5 @@
+test_uri,mydata
+https://myuri.com/myuri,data1
+rdf:myuri2,data2
+:myuri3,data3
+wrongprefix:myuri4,data4

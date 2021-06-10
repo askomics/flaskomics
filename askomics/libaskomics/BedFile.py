@@ -66,7 +66,7 @@ class BedFile(File):
             "entity_name": self.entity_name
         }
 
-    def integrate(self, dataset_id, entity_name, public=True):
+    def integrate(self, dataset_id, entity_name="", public=True):
         """Integrate BED file
 
         Parameters
@@ -77,7 +77,10 @@ class BedFile(File):
             Insert in public dataset
         """
         self.public = public
-        self.entity_name = entity_name
+        if entity_name:
+            self.entity_name = entity_name
+        else:
+            self.entity_name = self.human_name
 
         File.integrate(self, dataset_id=dataset_id)
 
@@ -231,6 +234,14 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
+            else:
+                self.category_values["strand"] = {".", }
+                relation = self.namespace_data[self.format_uri("strand")]
+                attribute = self.namespace_data[self.format_uri(".")]
+                faldo_strand = self.get_faldo_strand(".")
+                self.faldo_abstraction["strand"] = relation
+                self.graph_chunk.add((entity, relation, attribute))
+                strand = True
 
             if strand:
                 if "strand" not in attribute_list:
@@ -241,7 +252,7 @@ class BedFile(File):
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-"]
+                        "values": ["+", "-", "."]
                     })
 
             # Score

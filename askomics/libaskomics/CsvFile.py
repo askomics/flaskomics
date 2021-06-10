@@ -3,6 +3,7 @@ import re
 import rdflib
 import sys
 import traceback
+from dateutil import parser
 
 from rdflib import BNode
 
@@ -107,6 +108,8 @@ class CsvFile(File):
                 # Store header
                 header = next(reader)
                 self.header = [h.strip() for h in header]
+                if not all(self.header):
+                    raise Exception("Empty column in header")
 
                 # Loop on lines
                 preview = []
@@ -193,10 +196,8 @@ class CsvFile(File):
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
-            'datetime': ('date', 'time', 'birthday', 'day')
+            'date': ('date', 'time', 'birthday', 'day')
         }
-
-        date_regex = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}')
 
         # First, detect boolean values
         if self.are_boolean(values):
@@ -204,19 +205,19 @@ class CsvFile(File):
 
         # Then, detect special type with header
         for stype, expressions in special_types.items():
-            for expression in expressions:
-                epression_regexp = ".*{}.*".format(expression.lower())
-                if re.match(epression_regexp, self.header[header_index], re.IGNORECASE) is not None:
-                    # Test if start and end are numerical
-                    if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
-                        break
-                    # test if strand is a category with 2 elements max
-                    if stype == 'strand' and len(set(list(filter(None, values)))) > 2:
-                        break
-                    # Test if date respect a date format
-                    if stype == 'datetime' and all(date_regex.match(val) for val in values):
-                        break
-                    return stype
+            # Need to check once if it matches any subtype
+            expression_regexp = "|".join([".*{}.*".format(expression.lower()) for expression in expressions])
+            if re.match(expression_regexp, self.header[header_index].lower(), re.IGNORECASE) is not None:
+                # Test if start and end are numerical
+                if stype in ('start', 'end') and not all(self.is_decimal(val) for val in values):
+                    break
+                # test if strand is a category with 3 elements max
+                if stype == 'strand' and len(set(list(filter(None, values)))) > 3:
+                    break
+                # Test if date respects a date format
+                if stype == 'date' and not all(self.is_date(val) for val in values):
+                    break
+                return stype
 
         # Then, check goterm
         # if all((val.startswith("GO:") and val[3:].isdigit()) for val in values):
@@ -275,6 +276,28 @@ class CsvFile(File):
             except ValueError:
                 return False
 
+    @staticmethod
+    def is_date(value):
+        """Guess if a variable is a date
+
+        Parameters
+        ----------
+        value :
+            The var to test
+
+        Returns
+        -------
+        boolean
+            True if it's a date
+        """
+        if value == "":
+            return True
+        try:
+            parser.parse(value, dayfirst=True).date()
+            return True
+        except parser.ParserError:
+            return False
+
     @property
     def transposed_preview(self):
         """Transpose the preview
@@ -306,7 +329,7 @@ class CsvFile(File):
             dialect = csv.Sniffer().sniff(contents, delimiters=';,\t ')
             return dialect
 
-    def integrate(self, dataset_id, forced_columns_type, forced_header_names=None, public=False):
+    def integrate(self, dataset_id, forced_columns_type=None, forced_header_names=None, public=False):
         """Integrate the file
 
         Parameters
@@ -318,7 +341,10 @@ class CsvFile(File):
         """
         self.public = public
         self.set_preview_and_header()
-        self.force_columns_type(forced_columns_type)
+        if forced_columns_type:
+            self.force_columns_type(forced_columns_type)
+        else:
+            self.set_columns_type()
         if forced_header_names:
             self.force_header_names(forced_header_names)
         File.integrate(self, dataset_id=dataset_id)
@@ -408,6 +434,13 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.boolean
                 rdf_type = rdflib.OWL.DatatypeProperty
 
+            # Date
+            elif self.columns_type[index] == "date":
+                attribute = self.rdfize(attribute_name)
+                label = rdflib.Literal(attribute_name)
+                rdf_range = rdflib.XSD.date
+                rdf_type = rdflib.OWL.DatatypeProperty
+
             # Text (default)
             else:
                 attribute = self.rdfize(attribute_name)
@@ -467,9 +500,10 @@ class CsvFile(File):
                     continue
 
                 # Entity
-                entity = self.namespace_entity[self.format_uri(row[0])]
+                entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
+                label = self.get_uri_label(row[0])
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
-                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(row[0])))
+                self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(label)))
 
                 # Faldo
                 faldo_reference = None
@@ -492,7 +526,7 @@ class CsvFile(File):
                     symetric_relation = False
 
                     # Skip entity and blank cells
-                    if column_number == 0 or not cell:
+                    if column_number == 0 or (not cell and not current_type == "strand"):
                         continue
 
                     # Relation
@@ -505,6 +539,8 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
+                        if not cell:
+                            cell = "unknown/both"
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
@@ -544,6 +580,10 @@ class CsvFile(File):
                             attribute = rdflib.Literal("true", datatype=rdflib.XSD.boolean)
                         else:
                             attribute = rdflib.Literal("false", datatype=rdflib.XSD.boolean)
+
+                    elif current_type == "date":
+                        relation = self.rdfize(current_header)
+                        attribute = rdflib.Literal(self.convert_type(cell))
 
                     # default is text
                     else:

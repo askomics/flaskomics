@@ -79,7 +79,7 @@ class GffFile(File):
             }
         }
 
-    def integrate(self, dataset_id, entities, public=True):
+    def integrate(self, dataset_id, entities=[], public=True):
         """Integrate GFF file
 
         Parameters
@@ -90,7 +90,11 @@ class GffFile(File):
             Insert in public dataset
         """
         self.public = public
-        self.entities_to_integrate = entities
+        if entities:
+            self.entities_to_integrate = entities
+        else:
+            self.set_preview()
+            self.entities_to_integrate = self.entities
 
         File.integrate(self, dataset_id=dataset_id)
 
@@ -272,6 +276,12 @@ class GffFile(File):
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
                     # self.graph_chunk.add((entity, relation, attribute))
+                else:
+                    self.category_values["strand"] = {".", }
+                    relation = self.namespace_data[self.format_uri("strand")]
+                    attribute = self.namespace_data[self.format_uri(".")]
+                    faldo_strand = self.get_faldo_strand(".")
+                    self.faldo_abstraction["strand"] = relation
 
                 if (feature.type, "strand") not in attribute_list:
                     attribute_list.append((feature.type, "strand"))
@@ -281,7 +291,7 @@ class GffFile(File):
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-"]
+                        "values": ["+", "-", "."]
                     })
 
                 # Qualifiers (9th columns)

@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+## [4.3.0] - 2021-06-10
+
+### Added
+
+- Added 'Date' entity type, with associated Date picker in UI
+- Added API-key authentication for most endpoints. The api key should be passed with the header "X-API-KEY".
+- Added CLI (using token-auth) (https://github.com/askomics/askoclics). Still a WIP, with the python package 'askoclics'.
+- "Not" filter for categories
+- URI management in first column (and link column). Manage both full URI and CURIE. Check #223 for details.
+- 'Forms' : Minimal templates (users only access a basic form for modifying parameters, and not the graph) Restricted to admins. Form creators can customized entities and attributes display names to improve usability.
+
+### Changed
+
+- Faldo entity "Strand" now default to "faldo:BothStrandPosition" when the value is empty. The label will be "unknown/both" for CSV. For GFF and BED, "." will be "faldo:BothStrandPosition" instead of being ignored.
+- If one of the column name of a CSV file is empty, raise an Exception.
+- Now return the created result id (instead of celery task id) in the sparql query endpoint
+- Now return the created file id (instead of celery task id) in the create file endpoint
+- Fixed Flask version to < 2.0.0 due to compatibility issues
+
+
+### Fixed
+
+- Fixed the console restriction to admin/users (was not fully functional)
+- Fixed an issue with spaces (and other characters) in URIs
+- Fixed an issue with "Optional" button when using categories (and faldo entities) (either wrong values or nothing showing up) (Cf Changed category)
+- Fixed table ordering in results for numerical values (they were managed as strings)
+- Fixed UNION and MINUS blocks
+- Fixed an issue with Faldo "same strand" (clicking on the link between Faldo nodes)
+- Fixed Node/Link filter issue when using values with caps.
+
+### Security
+
+- Bump hosted-git-info from 2.8.8 to 2.8.9
+
+## [4.2.2] - 2021-06-09
+
+### Fixed
+
+- Fixed startup issue: race condition on config file creation
+
 ## [4.2.1] - 2021-03-29
 
 ### Fixed

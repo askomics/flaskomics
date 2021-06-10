@@ -1,7 +1,9 @@
 """Api routes"""
+import urllib.parse
 import sys
 import traceback
 
+from askomics.api.auth import api_auth
 from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
@@ -12,6 +14,7 @@ data_bp = Blueprint('data', __name__, url_prefix='/')
 
 
 @data_bp.route('/api/data/<string:uri>', methods=['GET'])
+@api_auth
 def get_data(uri):
     """Get information about uri
 
@@ -33,10 +36,11 @@ def get_data(uri):
         # If the user do not have access to any endpoint (no viewable graph), skip
         if endpoints:
 
+            uri = urllib.parse.quote(uri)
             base_uri = current_app.iniconfig.get('triplestore', 'namespace_data')
             full_uri = "<%s%s>" % (base_uri, uri)
 
-            raw_query = "SELECT DISTINCT ?predicat ?object\nWHERE {\n%s ?predicat ?object\n}" % (full_uri)
+            raw_query = "SELECT DISTINCT ?predicat ?object\nWHERE {\n?URI ?predicat ?object\nVALUES ?URI {%s}}\n" % (full_uri)
             federated = query.is_federated()
             replace_froms = query.replace_froms()
 

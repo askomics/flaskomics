@@ -3,7 +3,7 @@ import sys
 import traceback
 import urllib
 
-from askomics.api.auth import login_required
+from askomics.api.auth import login_required, api_auth
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
@@ -14,6 +14,7 @@ file_bp = Blueprint('file', __name__, url_prefix='/')
 
 
 @file_bp.route('/api/files', methods=['GET', 'POST'])
+@api_auth
 @login_required
 def get_files():
     """Get files info of the logged user
@@ -28,7 +29,8 @@ def get_files():
     files_id = None
     if request.method == 'POST':
         data = request.get_json()
-        files_id = data['filesId']
+        if data:
+            files_id = data.get('filesId')
 
     try:
         files_handler = FilesHandler(current_app, session)
@@ -52,6 +54,7 @@ def get_files():
 
 
 @file_bp.route('/api/files/editname', methods=['POST'])
+@api_auth
 @login_required
 def edit_file():
     """Edit file name
@@ -65,6 +68,14 @@ def edit_file():
     """
     data = request.get_json()
     current_app.logger.debug(data)
+    if not (data and data.get("id") and data.get("newName")):
+        return jsonify({
+            'files': [],
+            'diskSpace': 0,
+            'error': True,
+            'errorMessage': "Missing parameters"
+        }), 400
+
     files_id = [data["id"]]
     new_name = data["newName"]
 
@@ -94,6 +105,7 @@ def edit_file():
 
 
 @file_bp.route('/api/files/upload_chunk', methods=['POST'])
+@api_auth
 @login_required
 def upload_chunk():
     """Upload a file chunk
@@ -113,9 +125,22 @@ def upload_chunk():
             'errorMessage': "Exceeded quota",
             "path": '',
             "error": True
-        }), 500
+        }), 400
 
     data = request.get_json()
+    if not (data and all([key in data for key in ["first", "last", "size", "name", "type", "size", "chunk"]])):
+        return jsonify({
+            "path": '',
+            "error": True,
+            "errorMessage": "Missing parameters"
+        }), 400
+
+    if not (data["first"] or data.get("path")):
+        return jsonify({
+            "path": '',
+            "error": True,
+            "errorMessage": "Missing path parameter"
+        }), 400
 
     try:
         files = FilesHandler(current_app, session)
@@ -135,6 +160,8 @@ def upload_chunk():
 
 
 @file_bp.route('/api/files/upload_url', methods=["POST"])
+@api_auth
+@login_required
 def upload_url():
     """Upload a distant file with an URL
 
@@ -151,9 +178,14 @@ def upload_url():
         return jsonify({
             'errorMessage': "Exceeded quota",
             "error": True
-        }), 500
+        }), 400
 
     data = request.get_json()
+    if not (data and data.get("url")):
+        return jsonify({
+            "error": True,
+            "errorMessage": "Missing url parameter"
+        }), 400
 
     try:
         files = FilesHandler(current_app, session)
@@ -171,6 +203,7 @@ def upload_url():
 
 
 @file_bp.route('/api/files/preview', methods=['POST'])
+@api_auth
 @login_required
 def get_preview():
     """Get files preview
@@ -183,6 +216,12 @@ def get_preview():
         errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
+    if not (data and data.get('filesId')):
+        return jsonify({
+            'previewFiles': [],
+            'error': True,
+            'errorMessage': "Missing filesId parameter"
+        }), 400
 
     try:
         files_handler = FilesHandler(current_app, session)
@@ -209,10 +248,10 @@ def get_preview():
 
 
 @file_bp.route('/api/files/delete', methods=['POST'])
+@api_auth
 @login_required
 def delete_files():
     """Delete files
-
     Returns
     -------
     json
@@ -220,11 +259,18 @@ def delete_files():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+
     data = request.get_json()
+    if not (data and data.get('filesIdToDelete')):
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': "Missing filesIdToDelete parameter"
+        }), 400
 
     try:
         files = FilesHandler(current_app, session)
-        remaining_files = files.delete_files(data['filesIdToDelete'])
+        remaining_files = files.delete_files(data.get('filesIdToDelete', []))
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -241,6 +287,7 @@ def delete_files():
 
 
 @file_bp.route('/api/files/integrate', methods=['POST'])
+@api_auth
 @login_required
 def integrate():
     """Integrate a file
@@ -248,14 +295,21 @@ def integrate():
     Returns
     -------
     json
-        task_id: celery task id
+        datasets_id: dataset ids
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
+    if not (data and data.get("fileId")):
+        return jsonify({
+            'error': True,
+            'errorMessage': "Missing fileId parameter",
+            'dataset_ids': None
+        }), 400
 
     session_dict = {'user': session['user']}
     task = None
+    dataset_ids = []
 
     try:
 
@@ -264,21 +318,21 @@ def integrate():
 
         for file in files_handler.files:
 
-            data["externalEndpoint"] = data["externalEndpoint"] if data["externalEndpoint"] else None
-            data["customUri"] = data["customUri"] if data["customUri"] else None
+            data["externalEndpoint"] = data["externalEndpoint"] if data.get("externalEndpoint") else None
+            data["customUri"] = data["customUri"] if data.get("customUri") else None
 
             dataset_info = {
                 "celery_id": None,
                 "file_id": file.id,
                 "name": file.human_name,
                 "graph_name": file.file_graph,
-                "public": data["public"] if session["user"]["admin"] else False
+                "public": data.get("public") if session["user"]["admin"] else False
             }
 
             dataset = Dataset(current_app, session, dataset_info)
             dataset.save_in_db()
             data["dataset_id"] = dataset.id
-
+            dataset_ids.append(dataset.id)
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
 
             dataset.update_celery(task.id)
@@ -288,17 +342,18 @@ def integrate():
         return jsonify({
             'error': True,
             'errorMessage': str(e),
-            'task_id': ''
+            'dataset_ids': None
         }), 500
 
     return jsonify({
         'error': False,
         'errorMessage': '',
-        'task_id': task.id if task else ''
+        'dataset_ids': dataset_ids
     })
 
 
 @file_bp.route('/api/files/ttl/<path:user_id>/<path:username>/<path:path>', methods=['GET'])
+@api_auth
 def serve_file(path, user_id, username):
     """Serve a static ttl file of a user
 
@@ -326,3 +381,20 @@ def serve_file(path, user_id, username):
     )
 
     return(send_from_directory(dir_path, path))
+
+
+@file_bp.route('/api/files/columns', methods=['GET'])
+def get_column_types():
+    """Give the list of available column types
+
+    Returns
+    -------
+    json
+        types: list of available column types
+    """
+
+    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation"]
+
+    return jsonify({
+        "types": data
+    })

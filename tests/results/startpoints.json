@@ -3,6 +3,7 @@
     false,
     "errorMessage": "",
     "publicQueries": [],
+    "publicFormQueries": [],
     "startpoints":
     [{
         "endpoints": [{
