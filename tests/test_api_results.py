@@ -356,9 +356,9 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
-        # untemplate a public result => unpublic it
+        # unform a public result => unpublic it
         data_public = {"id": result_info["id"], "public": True}
-        data_template = {"id": result_info["id"], "form": False}
+        data_form = {"id": result_info["id"], "form": False}
 
         with open("tests/results/results_form.json", "r") as file:
             file_content = file.read()
@@ -378,7 +378,32 @@ class TestApiResults(AskomicsTestCase):
         del expected["triplestoreMaxRows"]
 
         client.client.post("/api/results/public", json=data_public)
-        response = client.client.post("/api/results/form", json=data_template)
+        response = client.client.post("/api/results/form", json=data_form)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # If template is on and form is toggled, un-toggle template
+        data_template = {"id": result_info["id"], "template": True}
+        client.client.post("/api/results/template", json=data_template)
+        response = client.client.post("/api/results/form", json=data)
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(1))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
 
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
