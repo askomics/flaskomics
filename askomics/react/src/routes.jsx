@@ -15,6 +15,8 @@ import PasswordReset from './routes/login/passwordreset'
 import Account from './routes/account/account'
 import Admin from './routes/admin/admin'
 import Sparql from './routes/sparql/sparql'
+import FormQuery from './routes/form/query'
+import FormEditQuery from './routes/form_edit/query'
 import Query from './routes/query/query'
 import Results from './routes/results/results'
 import AskoNavbar from './navbar'
@@ -112,6 +114,8 @@ export default class Routes extends Component {
             <Route path="/account" exact component={() => (<Account config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
+            <Route path="/form" exact component={FormQuery} />
+            <Route path="/form_edit" exact component={FormEditQuery} />
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
             <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
             <Route path="/data/:uri" exact component={() => (<Data config={this.state.config} waitForStart={this.state.waiting} />)} />

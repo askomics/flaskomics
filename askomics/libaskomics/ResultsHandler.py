@@ -49,7 +49,7 @@ class ResultsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback
+        SELECT id, status, path, start, end, graph_state, nrows, error, public, template, description, size, sparql_query, traceback, has_form_attr, form
         FROM results
         WHERE user_id = ?
         '''
@@ -79,7 +79,9 @@ class ResultsHandler(Params):
                 'description': row[10],
                 'size': row[11],
                 'sparqlQuery': row[12],
-                'traceback': row[13]
+                'traceback': row[13],
+                'has_form_attr': row[14],
+                'form': row[15]
             })
 
         return files
@@ -94,16 +96,51 @@ class ResultsHandler(Params):
         """
         database = Database(self.app, self.session)
 
-        where_substring = ""
-        sql_var = (True, )
+        where_substring = "WHERE template = ? and public = ?"
+        sql_var = (True, True,)
         if "user" in self.session:
-            where_substring = " or (template = ? and user_id = ?)"
+            where_substring = "WHERE template = ? and (public = ? or user_id = ?)"
             sql_var = (True, True, self.session["user"]["id"])
 
         query = '''
         SELECT id, description, public
         FROM results
-        WHERE public = ?{}
+        {}
+        '''.format(where_substring)
+
+        rows = database.execute_sql_query(query, sql_var)
+
+        queries = []
+
+        for row in rows:
+            queries.append({
+                "id": row[0],
+                "description": row[1],
+                "public": row[2]
+            })
+
+        return queries
+
+    def get_public_form_queries(self):
+        """Get id and description of published form queries
+
+        Returns
+        -------
+        List
+            List of published form queries (id and description)
+        """
+        database = Database(self.app, self.session)
+
+        where_substring = "WHERE form = ? and public = ?"
+        sql_var = (True, True,)
+        if "user" in self.session:
+            where_substring = "WHERE form = ? and (public = ? or user_id = ?)"
+            sql_var = (True, True, self.session["user"]["id"])
+
+        query = '''
+        SELECT id, description, public
+        FROM results
+        {}
         '''.format(where_substring)
 
         rows = database.execute_sql_query(query, sql_var)

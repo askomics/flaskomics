@@ -31,12 +31,82 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
 
         assert response.status_code == 200
         assert response.json == expected
+
+    def test_get_results_form(self, client):
+        """test /api/results route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+
+        response = client.client.get('/api/results')
+
+        assert response.status_code == 200
+        assert response.json == {'error': False, 'errorMessage': '', 'files': [], 'triplestoreMaxRows': 10000}
+
+        result_info = client.create_result(has_form=True)
+
+        response = client.client.get('/api/results')
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+    def test_get_results_form_non_admin(self, client):
+        """test /api/results route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+        client.upload_and_integrate()
+
+        response = client.client.get('/api/results')
+
+        assert response.status_code == 200
+        assert response.json == {'error': False, 'errorMessage': '', 'files': [], 'triplestoreMaxRows': 10000}
+
+        result_info = client.create_result(has_form=True)
+
+        response = client.client.get('/api/results')
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
 
     def test_get_preview(self, client):
         """test /api/results/preview route"""
@@ -185,6 +255,8 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "new description")
 
         expected = json.loads(raw_results)
@@ -214,6 +286,8 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###TEMPLATE###", str(1))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
@@ -238,6 +312,8 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
@@ -248,6 +324,121 @@ class TestApiResults(AskomicsTestCase):
 
         assert response.status_code == 200
         assert response.json == expected
+
+    def test_form(self, client):
+        """test /api/results/form route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result(has_form=True)
+
+        data = {"id": result_info["id"], "form": True}
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(1))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        response = client.client.post("/api/results/form", json=data)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # unform a public result => unpublic it
+        data_public = {"id": result_info["id"], "public": True}
+        data_form = {"id": result_info["id"], "form": False}
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        client.client.post("/api/results/public", json=data_public)
+        response = client.client.post("/api/results/form", json=data_form)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+        # If template is on and form is toggled, un-toggle template
+        data_template = {"id": result_info["id"], "template": True}
+        client.client.post("/api/results/template", json=data_template)
+        response = client.client.post("/api/results/form", json=data)
+
+        with open("tests/results/results_form.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(1))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(1))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+        del expected["triplestoreMaxRows"]
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
+    def test_form_no_attr(self, client):
+        """test /api/results/form route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        data = {"id": result_info["id"], "form": True}
+        response = client.client.post("/api/results/form", json=data)
+
+        expected = {
+            'files': [],
+            'error': True,
+            'errorMessage': 'Failed to create form template query: \nThis query does not has any form template attribute'
+        }
+
+        assert response.status_code == 500
+        assert response.json == expected
+
+    def test_form_non_admin(self, client):
+        """test /api/results/form route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+        client.upload_and_integrate()
+        result_info = client.create_result(has_form=True)
+
+        data = {"id": result_info["id"], "form": True}
+
+        response = client.client.post("/api/results/form", json=data)
+
+        assert response.status_code == 401
 
     def test_publish(self, client):
         """test /api/results/publish route"""
@@ -268,6 +459,8 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(1))
         raw_results = raw_results.replace("###TEMPLATE###", str(1))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
@@ -290,6 +483,8 @@ class TestApiResults(AskomicsTestCase):
         raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
         raw_results = raw_results.replace("###PUBLIC###", str(0))
         raw_results = raw_results.replace("###TEMPLATE###", str(1))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
         raw_results = raw_results.replace("###DESC###", "Query")
 
         expected = json.loads(raw_results)
@@ -299,6 +494,34 @@ class TestApiResults(AskomicsTestCase):
 
         assert response.status_code == 200
         assert response.json == expected
+
+    def test_update_form(self, client):
+        """test /api/results/save_form route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result(has_form=True)
+
+        with open("tests/data/graphState_simple_query_form_modified.json", "r") as file:
+            file_content = file.read()
+        body = json.loads(file_content)
+        data = {"formId": result_info["id"], "graphState": body}
+
+        response = client.client.post("/api/results/save_form", json=data)
+
+        assert response.status_code == 200
+
+        response = client.client.get('/api/results')
+        assert response.status_code == 200
+
+        res = json.loads(response.json["files"][0]["graphState"])
+
+        assert self.equal_objects(res, body)
+
+        client.log_user("jsmith")
+        response = client.client.post("/api/results/save_form", json=data)
+
+        assert response.status_code == 401
 
     def test_send2galaxy(self, client):
         """test /api/results/send2galaxy route"""

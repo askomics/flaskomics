@@ -84,6 +84,15 @@ def get_preview():
         file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'preview': [],
+                'header': [],
+                'id': file_id,
+                'error': True,
+                'errorMessage': "You do not have access to this query"
+            }), 401
+
         headers, preview = result.get_file_preview()
 
     except Exception as e:
@@ -132,6 +141,16 @@ def get_graph_and_sparql_query():
         file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'graphState': {},
+                'sparqlQuery': "",
+                'graphs': [],
+                'endpoints': [],
+                'diskSpace': 0,
+                'error': True,
+                'errorMessage': "You do not have access to this query"
+            }), 401
 
         # Get graph state and sparql query
         graph_state = result.get_graph_state(formated=True)
@@ -195,9 +214,18 @@ def get_graph_state():
             }), 400
 
         file_id = data["fileId"]
+        formated = data.get("formated", True)
+
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
-        graph_state = result.get_graph_state(formated=True)
+        if not result:
+            return jsonify({
+                'graphState': {},
+                'id': file_id,
+                'error': True,
+                'errorMessage': "You do not have access to this graph"
+            }), 401
+        graph_state = result.get_graph_state(formated=formated)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -232,6 +260,11 @@ def download_result():
         file_id = data["fileId"]
         result_info = {"id": file_id}
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'error': True,
+                'errorMessage': "You do not have access to this result"
+            }), 401
         dir_path = result.get_dir_path()
         file_name = result.get_file_name()
 
@@ -317,6 +350,15 @@ def get_sparql_query():
         result_info = {"id": file_id}
 
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'query': {},
+                'graphs': [],
+                'endpoints': [],
+                'diskSpace': 0,
+                'error': True,
+                'errorMessage': "You do not have access to this result"
+            }), 401
         query = SparqlQuery(current_app, session)
 
         sparql = result.get_sparql_query()
@@ -383,6 +425,12 @@ def set_description():
         new_desc = data["newDesc"]
 
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "You do not have access to this result"
+            }), 500
         result.update_description(new_desc)
 
         results_handler = ResultsHandler(current_app, session)
@@ -427,6 +475,12 @@ def publish_query():
         result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
+            }), 401
         result.publish_query(data.get("public", False))
 
         results_handler = ResultsHandler(current_app, session)
@@ -471,6 +525,12 @@ def template_query():
         result_info = {"id": data["id"]}
 
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
+            }), 401
         result.template_query(data.get("template", False))
 
         results_handler = ResultsHandler(current_app, session)
@@ -482,6 +542,56 @@ def template_query():
             'files': [],
             'error': True,
             'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'files': files,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@results_bp.route('/api/results/form', methods=['POST'])
+@api_auth
+@admin_required
+def form_query():
+    """Create a form from a result
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        data = request.get_json()
+        if not (data and data.get("id")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing id parameter"
+            }), 400
+
+        result_info = {"id": data["id"]}
+
+        result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
+            }), 401
+        result.form_query(data.get("form", False))
+
+        results_handler = ResultsHandler(current_app, session)
+        files = results_handler.get_files_info()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': 'Failed to create form template query: \n{}'.format(str(e))
         }), 500
 
     return jsonify({
@@ -513,12 +623,62 @@ def send2galaxy():
 
         result_info = {"id": data["fileId"]}
         result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'error': True,
+                'errorMessage': 'Failed to publish query: \n{}'.format("You do not have access to this query")
+            }), 401
         result.send2galaxy(data["fileToSend"])
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'error': True,
             'errorMessage': 'Failed to publish query: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@results_bp.route('/api/results/save_form', methods=['POST'])
+@api_auth
+@admin_required
+def save_form():
+    """Update a form
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        # Get query and endpoints and graphs of the query
+        data = request.get_json()
+        if not (data and data.get("graphState") and data.get("formId")):
+            return jsonify({
+                'error': True,
+                'errorMessage': "Missing graphState or formId parameter"
+            }), 400
+
+        result_info = {"id": data["formId"]}
+
+        result = Result(current_app, session, result_info)
+        if not result:
+            return jsonify({
+                'error': True,
+                'errorMessage': 'Failed to edit form: \n{}'.format("You do not have access to this form")
+            }), 401
+
+        result.update_graph(data.get("graphState"))
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'error': True,
+            'errorMessage': str(e),
         }), 500
 
     return jsonify({

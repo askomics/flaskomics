@@ -23,11 +23,13 @@ export default class Ask extends Component {
       selected: null,
       startSession: false,
       publicQueries: [],
+      publicFormQueries: [],
       modalGalaxy: false,
       showGalaxyButton: false,
       dropdownOpen: false,
       selectedEndpoint: [],
-      frontMessage: ""
+      frontMessage: "",
+      redirectFormBuilder: false
     }
     this.utils = new Utils()
     this.cancelRequest
@@ -35,6 +37,7 @@ export default class Ask extends Component {
     this.handleStart = this.handleStart.bind(this)
     this.handleFilter = this.handleFilter.bind(this)
     this.handleClickTemplateQuery = this.handleClickTemplateQuery.bind(this)
+    this.handleClickTemplateFormQuery = this.handleClickTemplateFormQuery.bind(this)
     this.toggleDropDown = this.toggleDropDown.bind(this)
     this.toggleModalGalaxy = this.toggleModalGalaxy.bind(this)
     this.clickOnEndpoint = this.clickOnEndpoint.bind(this)
@@ -88,6 +91,7 @@ export default class Ask extends Component {
               selected: false
             })),
             publicQueries: response.data.publicQueries,
+            publicFormQueries: response.data.publicFormQueries,
             startSessionWithExemple: false
           })
         })
@@ -153,6 +157,29 @@ export default class Ask extends Component {
             diskSpace: response.data.diskSpace,
           })
         }
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
+  handleClickTemplateFormQuery (event) {
+    let requestUrl = '/api/results/graphstate'
+    let data = { fileId: event.target.id, formated: false }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          redirectFormBuilder: true,
+          graphState: response.data.graphState
+        })
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -254,6 +281,17 @@ export default class Ask extends Component {
       }} />
     }
 
+    let redirectFormBuilder
+    if (this.state.redirectFormBuilder) {
+      redirectFormBuilder = <Redirect to={{
+        pathname: '/form',
+        state: {
+          config: this.props.config,
+          graphState: this.state.graphState
+        }
+      }} />
+    }
+
 
     let errorDiv
     if (this.state.error) {
@@ -267,6 +305,7 @@ export default class Ask extends Component {
     }
 
     let templateQueries
+    let templateFormQueries
     let emptyPrivate
     if (!this.state.waiting && this.state.publicQueries.length > 0) {
       templateQueries = (
@@ -285,6 +324,30 @@ export default class Ask extends Component {
               {this.state.publicQueries.map(query => {
                 if (query.public == 1) {
                   return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+        </div>
+      )
+    }
+
+    if (!this.state.waiting && this.state.publicFormQueries.length > 0) {
+      templateFormQueries = (
+        <div>
+          <p>Or start with a simplified form:</p>
+            <ListGroup>
+              {this.state.publicFormQueries.map(query => {
+                if (query.public == 0) {
+                  emptyPrivate = <br />
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateFormQuery}>{query.description}</ListGroupItem>
+                }
+              })}
+            </ListGroup>
+            {emptyPrivate}
+            <ListGroup>
+              {this.state.publicFormQueries.map(query => {
+                if (query.public == 1) {
+                  return <ListGroupItem key={query.id} tag="button" action id={query.id} onClick={this.handleClickTemplateFormQuery}>{query.description}</ListGroupItem>
                 }
               })}
             </ListGroup>
@@ -408,6 +471,7 @@ export default class Ask extends Component {
         {redirectQueryBuilder}
         {redirectLogin}
         {redirectSparqlEditor}
+        {redirectFormBuilder}
         {HtmlFrontMessage}
         <WaitingDiv waiting={this.state.waiting} center />
           <Row>
@@ -417,6 +481,7 @@ export default class Ask extends Component {
               {galaxyForm}
             </Col>
             <Col xs="7">
+              {templateFormQueries}
               {templateQueries}
             </Col>
           </Row>

@@ -262,6 +262,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
+        form: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -284,6 +285,7 @@ export default class Query extends Component {
         filterType: 'exact',
         filterValue: '',
         optional: false,
+        form: false,
         negative: false,
         linked: false,
         linkedWith: null
@@ -302,11 +304,14 @@ export default class Query extends Component {
           humanNodeId: this.getHumanIdFromId(nodeId),
           uri: attr.uri,
           label: attr.label,
+          displayLabel: attr.displayLabel ? attr.displayLabel : attr.label,
           entityLabel: this.getLabel(nodeUri),
+          entityDisplayLabel: attr.entityDisplayLabel ? attr.entityDisplayLabel : this.getLabel(nodeUri),
           entityUris: this.getEntityUris(attr.uri),
           type: attributeType,
           faldo: attr.faldo,
           optional: false,
+          form: false,
           negative: false,
           linked: false,
           linkedWith: null
@@ -1015,6 +1020,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  toggleFormAttribute (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.form = !attr.form
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleNegative (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1123,7 +1137,6 @@ export default class Query extends Component {
     if(!date){return null};
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
   }
-
 
   handleFilterDateValue (event) {
     if (!isNaN(event.target.value)) {
@@ -1445,6 +1458,7 @@ export default class Query extends Component {
                 toggleExclude={p => this.toggleExclude(p)}
                 handleNegative={p => this.handleNegative(p)}
                 toggleOptional={p => this.toggleOptional(p)}
+                toggleFormAttribute={p => this.toggleFormAttribute(p)}
                 handleFilterType={p => this.handleFilterType(p)}
                 handleFilterValue={p => this.handleFilterValue(p)}
                 handleFilterCategory={p => this.handleFilterCategory(p)}
@@ -1455,6 +1469,7 @@ export default class Query extends Component {
                 toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
+                config={this.state.config}
               />
             )
           }
