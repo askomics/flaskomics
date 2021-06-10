@@ -489,7 +489,6 @@ class TestApiResults(AskomicsTestCase):
         response = client.client.get('/api/results')
         assert response.status_code == 200
 
-
         res = json.loads(response.json["files"][0]["graphState"])
 
         assert self.equal_objects(res, body)
