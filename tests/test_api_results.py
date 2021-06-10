@@ -485,7 +485,14 @@ class TestApiResults(AskomicsTestCase):
         response = client.client.post("/api/results/save_form", json=data)
 
         assert response.status_code == 200
-        assert self.equal_objects(response.json["files"][0]["graphState"], body)
+
+        response = client.client.get('/api/results')
+        assert response.status_code == 200
+
+
+        res = json.loads(response.json["files"][0]["graphState"])
+
+        assert self.equal_objects(res, body)
 
         client.log_user("jsmith")
         response = client.client.post("/api/results/save_form", json=data)
