@@ -470,6 +470,28 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == expected
 
+    def test_update_form(self, client):
+        """test /api/results/save_form route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        result_info = client.create_result(has_form=True)
+
+        with open("tests/data/graphState_simple_query_form_modified.json", "r") as file:
+            file_content = file.read()
+        body = json.loads(file_content)
+        data = {"formId": result_info["id"], "graphState": body}
+
+        response = client.client.post("/api/results/save_form", json=data)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json["files"][0]["graphState"], body)
+
+        client.log_user("jsmith")
+        response = client.client.post("/api/results/save_form", json=data)
+
+        assert response.status_code == 401
+
     def test_send2galaxy(self, client):
         """test /api/results/send2galaxy route"""
         client.create_two_users()
