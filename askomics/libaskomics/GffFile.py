@@ -168,9 +168,9 @@ class GffFile(File):
             feature_dict = {}
             for feature in rec.features:
                 if feature.id:
-                    feature_dict[feature.id] = feature.type
+                    feature_dict[self.format_gff_entity(feature.id)] = feature.type
                 elif "ID" in feature.qualifiers.keys():
-                    feature_dict[feature.qualifiers["ID"][0]] = feature.type
+                    feature_dict[self.format_gff_entity(feature.qualifiers["ID"][0])] = feature.type
 
             # Percent
             row_number += 1
