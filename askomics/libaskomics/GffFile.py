@@ -309,14 +309,16 @@ class GffFile(File):
                         if qualifier_key in ("Parent", "Derives_from"):
                             if len(value.split(":")) == 1:
                                 # The entity is not in the value, try to detect it
-                                related_type = value
-                                related_qualifier_key = qualifier_key
                                 if value in feature_dict:
                                     related_type = feature_dict[value]
+
+                                else:
+                                    continue
                             else:
                                 related_type = value.split(":")[0]
                                 related_qualifier_key = qualifier_key + "_" + related_type
 
+                            related_qualifier_key = qualifier_key + "_" + related_type
                             relation = self.namespace_data[self.format_uri(qualifier_key)]
                             attribute = self.namespace_data[self.format_uri(self.format_gff_entity(value))]
 
