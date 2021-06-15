@@ -311,12 +311,10 @@ class GffFile(File):
                                 # The entity is not in the value, try to detect it
                                 if value in feature_dict:
                                     related_type = feature_dict[value]
-
                                 else:
                                     continue
                             else:
                                 related_type = value.split(":")[0]
-                                related_qualifier_key = qualifier_key + "_" + related_type
 
                             related_qualifier_key = qualifier_key + "_" + related_type
                             relation = self.namespace_data[self.format_uri(qualifier_key)]
