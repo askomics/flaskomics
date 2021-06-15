@@ -1284,7 +1284,7 @@ class SparqlQuery(Params):
                         value_var = faldo_strand
                     else:
                         value_var = category_value_uri
-                    uri_val_list = ["<{}>".format(value) for value in attribute["filterSelectedValues"]
+                    uri_val_list = ["<{}>".format(value) for value in attribute["filterSelectedValues"]]
                     if uri_val_list:
                         if attribute["exclude"]:
                             filter_string = "FILTER ( {} NOT IN ( {} ) ) .".format(value_var, " ,".join(uri_val_list))
