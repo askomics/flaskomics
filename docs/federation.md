@@ -15,7 +15,7 @@ abstractor -e <endpoint_url> -p <entity_prefix> -o <output_file>
 ```
 
 !!! Warning
-    Abstractor scan all things in the SPARQL endpoint. You may review the generated file to delete unwanted things.
+    Abstractor scan all things in the SPARQL endpoint. You may wish to review the generated file to delete unwanted things.
 
 
 ## Integrate external abstraction into AskOmics
@@ -27,27 +27,21 @@ Once external endpoint's abstraction is generated, its time to add it into AskOm
     Check that `advanced options` > `Distant endpoint` contain URL of the external endpoint
 
 
-
 # Query external endpoint
 
-## Simple query
+## Starting entities
 
 If AskOmics contain local data, external startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
 
 ![external_startpoint](img/external_startpoint.png)
 
+## Linking to your own data
 
-## Federated query
+To link a local dataset to the external endpoint, the file must be structured in a certain way.
 
+The input file must describe the relation with the external entity. Much like a 'normal' relation, it goes through the header. In this case however, the column name must contain either the full URI or the CURIE of the entity (e.g *http://nextprot.org/rdf#Gene*). The values of the column must also be the exact uri (full URI of CURIE) of the targeted entity.
 
-External entities can be interrogate just as local entities. But to link a local dataset to the external endpoint, the file must be structured in a certain way.
-
-### Build file
-
-The input file must describe the relation with the external entity. It goes through the header, who must contain the URI of the targeted entity. Content of the file must also be the exact uri of the targeted entity.
-
-
-For example, the file below describe en entity *gene* who is linked to an external entity *Gene*. The external one is prefixed with the full uri used in the external endpoint. In the content of the file, full URI have to be used to.
+For example, the file below describe en entity *gene* who is linked to an external entity *Gene*. The external one is prefixed with the full uri used in the external endpoint. In the content of the file, full URI / CURIE have to be used too.
 
 
 gene|value|concern@http://nextprot.org/rdf#Gene
@@ -56,6 +50,6 @@ gene_1|0|http://nextprot.org/rdf/gene/ENSG00000169594
 gene_2|1|http://nextprot.org/rdf/gene/ENSG00000156603
 
 
-### Perform a federated query
+## Perform a federated query
 
-Once the relations are well described, link between local and distant entities are automatically done by AskOmics. The Query is distributed to the concerned endpoint and results are returned like a classic query.
+Once the relations are described, links between local and distant entities are automatically done by AskOmics. The query is distributed to the external endpoint and results are returned like a classic query.

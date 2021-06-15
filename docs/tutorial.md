@@ -11,6 +11,8 @@ Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> con
 
 To complete the tutorial, you will need an AskOmics instance. You can [install your own](production-deployment.md) or use this [public instance](https://use.askomics.org).
 
+A Galaxy Training tutorial is also available [here](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-analysis-with-askomics-it/tutorial.html)
+
 
 # Account creation and management
 
@@ -95,6 +97,7 @@ Attributes can take the following types:
 
 - Numeric: if all the values are numeric
 - Text: if all the values are strings
+- Date: if all the values are dates
 - Category: if there is a limited number of repeated values
 
 If the entity describe a locatable element on a genome:
@@ -152,7 +155,7 @@ Integration can take some times depending on the file size. The <navbar><i class
 
 
 
-The table show all integrated datasets. The *status* column show if the datasets is fully integrated or in the process of being integrated.
+The table show all integrated datasets. The *status* column show if the datasets are fully integrated or in the process of being integrated.
 
 
 
@@ -178,7 +181,7 @@ The first step to build a query is to choose a start point for the query.
 Once the start entity is chosen, the query builder is displayed.
 
 
-The query builder is composed of a graph. Nodes represents *entities* and links represents *relations* between entities. The selected entity is surrounded by a red circle. links and other entities are dotted and lighter because there are not instantiated.
+The query builder is composed of a graph. Nodes represents *entities* and links represents *relations* between entities. The selected entity is surrounded by a red circle. Links and other entities are dotted and lighter because there are not instantiated.
 
 ![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
 
@@ -248,7 +251,7 @@ To go further, we can filter on `QTL` to refine the results.
 
 
 !!! Hands-on
-    1. got back to the `QTL` node
+    1. Go back to the `QTL` node
     2. Show the `Name` attribute using the eye icon
     3. Filter the name with a `regexp` with `growth`
     4. <btn><i class="fa fa-table"></i> Run & Preview</btn>

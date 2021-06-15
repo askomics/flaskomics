@@ -1,6 +1,6 @@
 During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples that describe the data. This set of triple are called *Abstraction*. *Abstraction* is a set of RDF triples who describes the data. This triples define *Entities*, *Attributes* and *Relations*. Abstraction is used to build the *Query builder*.
 
-Raw RDF can be integrated into AskOmics. In this case, abstraction have to be built manually. The following documentation explain how to write an AskOmics abstraction in turtle format.
+Raw RDF can be integrated into AskOmics. In this case, abstraction have to be built manually. The following documentation explain how to write manually write an AskOmics abstraction in turtle format.
 
 # Namespaces
 
