@@ -165,6 +165,13 @@ class GffFile(File):
 
         for rec in GFF.parse(handle, limit_info=limit, target_lines=1):
 
+            feature_dict = {}
+            for feature in rec.features:
+                if feature.id:
+                    feature_dict[feature.id] = feature.type
+                elif "ID" in feature.qualifiers.keys():
+                    feature_dict[feature.qualifiers["ID"][0]] = feature.type
+
             # Percent
             row_number += 1
             self.graph_chunk.percent = row_number * 100 / total_lines
@@ -300,17 +307,27 @@ class GffFile(File):
                     for value in qualifier_value:
 
                         if qualifier_key in ("Parent", "Derives_from"):
+                            if len(value.split(":")) == 1:
+                                # The entity is not in the value, try to detect it
+                                related_type = value
+                                related_qualifier_key = qualifier_key
+                                if value in feature_dict:
+                                    related_type = feature_dict[value]
+                            else:
+                                related_type = value.split(":")[0]
+                                related_qualifier_key = qualifier_key + "_" + related_type
+
                             relation = self.namespace_data[self.format_uri(qualifier_key)]
                             attribute = self.namespace_data[self.format_uri(self.format_gff_entity(value))]
 
-                            if (feature.type, qualifier_key) not in attribute_list:
-                                attribute_list.append((feature.type, qualifier_key))
+                            if (feature.type, related_qualifier_key) not in attribute_list:
+                                attribute_list.append((feature.type, related_qualifier_key))
                                 self.attribute_abstraction.append({
                                     "uri": self.namespace_data[self.format_uri(qualifier_key)],
                                     "label": rdflib.Literal(qualifier_key),
                                     "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                     "domain": entity_type,
-                                    "range": self.namespace_data[self.format_uri(value.split(":")[0])]
+                                    "range": self.namespace_data[self.format_uri(related_type)]
                                 })
 
                         else:
