@@ -310,15 +310,13 @@ class GffFile(File):
                                     related_type = feature_dict[value]
                                 else:
                                     # Do this later
-                                    delayed_link.append(
-                                        {
+                                    delayed_link.append({
                                         "uri": self.namespace_data[self.format_uri(qualifier_key)],
                                         "label": rdflib.Literal(qualifier_key),
                                         "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                         "domain": entity_type,
                                         "range": value
-                                        }
-                                    )
+                                    })
                             else:
                                 related_type = value.split(":")[0]
 
