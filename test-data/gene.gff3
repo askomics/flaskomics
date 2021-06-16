@@ -5,8 +5,8 @@
 #!genome-date 2010-09
 #!genome-build-accession GCA_000001735.1
 #!genebuild-last-updated 2010-09
+1	tair	transcript	3631	5899	.	+	.	ID=transcript:AT1G01010.1;Parent=AT1G01010;Name=ANAC001;biotype=protein_coding;transcript_id=AT1G01010.1
 1	tair	gene	3631	5899	.	+	.	ID=gene:AT1G01010;Name=NAC001;biotype=protein_coding;description=NAC domain-containing protein 1 [Source:UniProtKB/Swiss-Prot%3BAcc:Q0WV96];gene_id=AT1G01010;logic_name=tair
-1	tair	transcript	3631	5899	.	+	.	ID=transcript:AT1G01010.1;Parent=gene:AT1G01010;Name=ANAC001;biotype=protein_coding;transcript_id=AT1G01010.1
 1	tair	five_prime_UTR	3631	3759	.	+	.	Parent=transcript:AT1G01010.1
 1	tair	exon	3631	3913	.	+	.	Parent=transcript:AT1G01010.1;Name=AT1G01010.1.exon1;constitutive=1;ensembl_end_phase=1;ensembl_phase=-1;exon_id=AT1G01010.1.exon1;rank=1
 1	tair	CDS	3760	3913	.	+	0	ID=CDS:AT1G01010.1;Parent=transcript:AT1G01010.1;protein_id=AT1G01010.1
