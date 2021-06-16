@@ -394,8 +394,8 @@ class GffFile(File):
         for link in delayed_link:
             if link["range"] in feature_dict:
                 entity_type = feature_dict[link['range']]
-                qualifier_key = link.pop("qualifier_key") + "_" + entity_type
+                related_qualifier_key = link.pop("qualifier_key") + "_" + entity_type
                 feature_type = link.pop("feature_type")
                 if (feature_type, related_qualifier_key) not in attribute_list:
-                    link['range'] = entity_type
+                    link['range'] = self.namespace_data[self.format_uri(entity_type)]
                     self.attribute_abstraction.append(link)
