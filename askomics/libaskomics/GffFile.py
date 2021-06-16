@@ -162,6 +162,8 @@ class GffFile(File):
 
         total_lines = sum(1 for line in open(self.path))
         row_number = 0
+        feature_dict = {}
+        delayed_link = []
 
         for rec in GFF.parse(handle, limit_info=limit, target_lines=1):
 
@@ -196,9 +198,11 @@ class GffFile(File):
                     else:
                         entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.qualifiers["ID"][0]))]
                         entity_label = self.format_gff_entity(feature.qualifiers["ID"][0])
+                        feature_dict[self.format_gff_entity(feature.qualifiers["ID"][0])] = feature.type
                 else:
                     entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.id))]
                     entity_label = self.format_gff_entity(feature.id)
+                    feature_dict[self.format_gff_entity(feature.id)] = feature.type
 
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
@@ -298,19 +302,41 @@ class GffFile(File):
                 for qualifier_key, qualifier_value in feature.qualifiers.items():
 
                     for value in qualifier_value:
+                        skip = False
 
                         if qualifier_key in ("Parent", "Derives_from"):
+                            if len(value.split(":")) == 1:
+                                # The entity is not in the value, try to detect it
+                                if value in feature_dict:
+                                    related_type = feature_dict[value]
+                                    related_qualifier_key = qualifier_key + "_" + related_type
+                                else:
+                                    # Do this later
+                                    delayed_link.append({
+                                        "uri": self.namespace_data[self.format_uri(qualifier_key)],
+                                        "label": rdflib.Literal(qualifier_key),
+                                        "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
+                                        "domain": entity_type,
+                                        "range": value,
+                                        "qualifier_key": qualifier_key,
+                                        "feature_type": feature.type
+                                    })
+                                    skip = True
+                            else:
+                                related_type = value.split(":")[0]
+                                related_qualifier_key = qualifier_key + "_" + related_type
+
                             relation = self.namespace_data[self.format_uri(qualifier_key)]
                             attribute = self.namespace_data[self.format_uri(self.format_gff_entity(value))]
 
-                            if (feature.type, qualifier_key) not in attribute_list:
-                                attribute_list.append((feature.type, qualifier_key))
+                            if not skip and (feature.type, related_qualifier_key) not in attribute_list:
+                                attribute_list.append((feature.type, related_qualifier_key))
                                 self.attribute_abstraction.append({
                                     "uri": self.namespace_data[self.format_uri(qualifier_key)],
                                     "label": rdflib.Literal(qualifier_key),
                                     "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                     "domain": entity_type,
-                                    "range": self.namespace_data[self.format_uri(value.split(":")[0])]
+                                    "range": self.namespace_data[self.format_uri(related_type)]
                                 })
 
                         else:
@@ -363,3 +389,13 @@ class GffFile(File):
                         self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
 
                 yield
+
+        # Add missing abstractions
+        for link in delayed_link:
+            if link["range"] in feature_dict:
+                entity_type = feature_dict[link['range']]
+                related_qualifier_key = link.pop("qualifier_key") + "_" + entity_type
+                feature_type = link.pop("feature_type")
+                if (feature_type, related_qualifier_key) not in attribute_list:
+                    link['range'] = self.namespace_data[self.format_uri(entity_type)]
+                    self.attribute_abstraction.append(link)
