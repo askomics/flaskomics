@@ -162,15 +162,10 @@ class GffFile(File):
 
         total_lines = sum(1 for line in open(self.path))
         row_number = 0
+        feature_dict = {}
+        delayed_link = []
 
         for rec in GFF.parse(handle, limit_info=limit, target_lines=1):
-
-            feature_dict = {}
-            for feature in rec.features:
-                if feature.id:
-                    feature_dict[self.format_gff_entity(feature.id)] = feature.type
-                elif "ID" in feature.qualifiers.keys():
-                    feature_dict[self.format_gff_entity(feature.qualifiers["ID"][0])] = feature.type
 
             # Percent
             row_number += 1
@@ -203,9 +198,11 @@ class GffFile(File):
                     else:
                         entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.qualifiers["ID"][0]))]
                         entity_label = self.format_gff_entity(feature.qualifiers["ID"][0])
+                        feature_dict[self.format_gff_entity(feature.qualifiers["ID"][0])] = feature.type
                 else:
                     entity = self.namespace_entity[self.format_uri(self.format_gff_entity(feature.id))]
                     entity_label = self.format_gff_entity(feature.id)
+                    feature_dict[self.format_gff_entity(feature.id)] = feature.type
 
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(entity_label)))
@@ -312,7 +309,16 @@ class GffFile(File):
                                 if value in feature_dict:
                                     related_type = feature_dict[value]
                                 else:
-                                    continue
+                                    # Do this later
+                                    delayed_link.append(
+                                        {
+                                        "uri": self.namespace_data[self.format_uri(qualifier_key)],
+                                        "label": rdflib.Literal(qualifier_key),
+                                        "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
+                                        "domain": entity_type,
+                                        "range": value
+                                        }
+                                    )
                             else:
                                 related_type = value.split(":")[0]
 
@@ -345,6 +351,11 @@ class GffFile(File):
                                 })
 
                         self.graph_chunk.add((entity, relation, attribute))
+
+                for link in delayed_link:
+                    if link["range"] in feature_dict:
+                        link['range'] = feature_dict[link['range']]
+                        self.attribute_abstraction.append(link)
 
                 location = BNode()
                 begin = BNode()
