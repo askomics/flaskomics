@@ -17,7 +17,7 @@ The query builder is composed of a graph. Nodes (circles) represents entities an
 
 ## Entity attribute
 
-The currently selected entity's parameters are shown as attribute boxes on the right of the graph. By default, every instanciated entity has its **label** attribute set to visible. Various filters are available to further refine the query.
+The currently selected entity's parameters are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible. Various filters are available to further refine the query.
 
 !!! Warning
     Unless specified with the <i class="fa fa-question-circle inactive"></i> button, empty values for attributes will not be shown in the results.
