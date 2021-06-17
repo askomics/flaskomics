@@ -1,0 +1,59 @@
+One of the goal of AskOmics is to enable re-use and customization of complex queries shared by other users.
+This functionality is available in two different ways.
+
+# Templates
+
+Templates are a simple way for another user to replay your queries. They will access a **copy** of the query graph, and be able to customize any parameter and relation (this includes linking to additional entities).
+
+Templates will appears on the right-side of the homepage. The description of the template can be customized to include more information regarding the query.
+
+!!! Warning
+    By default, only you can see your templates. To publicize these templates, you need administrator privileges.
+
+## Creating a template
+
+To create a template, first create the query you want, and <btn><i class="fa fa-table"></i> Run & save</btn>.
+Then, in the result page, you can toggle the 'template' attribute to create the template.
+
+## Editing the template description
+
+You can modify the template description the same way you would edit the result description. Simple click on the value of the 'Description' column, and enter your own description.
+
+!!! Warning
+    Don't forget to save with the **Enter** key
+
+## Using the template
+
+On the AskOmics homepage, simply click on the template or interest to access the query interface. From there, you can simply interact with it as you would with a normal query, including saving the results.
+
+!!! info
+    Your changes to the query will not affect the template.
+
+## Removing the templates
+
+To remove the template, you can either toggle the 'template' attribute back to *off*, or delete the result as a whole.
+
+
+# Forms
+
+Whereas forms allow users to completely replay your queries (including modifying the query graphs), forms aim to be a much simpler way to share your queries for users not familiar with the way AskOmics works.
+
+When using a form, other users will only able to change the values for a set of parameters you will have selected beforehand.
+For instance, if your query is *List all users whose favorite color is red*, you will be able to create a simple form where users will only be able to change the favorite color, before sending the query.
+
+In addition, you will be able to customize the form, such as changing the description (much like templates), but also the name of each entity and attributes.
+
+Much like templates, forms will appear on the right side of the homepage, with the chosen description.
+
+!!! Warning
+    Forms are restricted to administrators
+
+!!! Warning
+    A given **Result** can be either a form or a template, but not both
+
+## Creating a form
+
+To create a form, you will first to create a form-ifiable query. To do so, start with a regular query, and toggle the template (<i class="fa fa-bookmark">) button on all attributes of interest.
+
+After saving the query (<btn><i class="fa fa-table"></i> Run & save</btn>), head to the *Results* page.
+You will be able to toggle the 'Form' button, creating the form.
