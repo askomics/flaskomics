@@ -8,51 +8,58 @@ AskOmics will integrate a CSV/TSV file using its header. The *type* of each colu
 ### Entity URI
 
 The first column of the file will manage the entity itself : the column name will become the entity name, and the values will become the entity **URI**.  
-The **uri** will be created as follows :
+The **URI** will be created as follows :
 
-* If the value is an **url**, it will be integrated as it is.
-* If the value is a **CURIE**, it will be transformed in a full uri before integration. The list of managed CURIE format is available [here](https://github.com/askomics/flaskomics/blob/master/askomics/libaskomics/prefix.cc.json)
-* Else, the value will be added to either the *askomics base data uri* or a custom base uri if specified in the integration form.
+* If the value is an **URL**, it will be integrated as it is.
+* If the value is a **CURIE**, it will be transformed into an URL before integration. The list of managed CURIE formats is available [here](https://github.com/askomics/flaskomics/blob/master/askomics/libaskomics/prefix.cc.json)
+* Else, the value will be added to either the *askomics base data URI* or a custom base URI if specified in the integration form.
 
 !!! Warning
-    Unless you are trying to merge entities, make sure your uris are unique across **both your personal and public datasets**.
-
+    Unless you are trying to merge entities, make sure your URIs are unique across **both your personal and public datasets**.
 
 ### Entity type
 
-The entity type can either be "starting entity", or "entity". If "starting entity", it may be used to start a query on the AskOmics homepage.
+The entity type can either be "starting entity", or "entity". If "starting entity", it may be used to start a query on the AskOmics homepage. Both types will appear as a node in the AskOmics interface.
 
 ### Inheritance
 
 The entity can inherit the attributes and relations of a 'mother' entity. Meaning, you will be able to query the sub-entity on both its own, and its 'mother' attributes and relations. The 'mother' entity however will not have access to any 'daughter' attributes or relations.
 
-To setup inheritance, the column name will need to be of the form *daughter_entity_name*<*mother_entity_name*. Make sure the uris match between "mother" entities and "daughter" entities.
+To setup inheritance, the column name will need to be of the form *daughter_entity_name*<*mother_entity_name*. The "daughters" URIs should match a "mother" URI to create the link.
 
 ## Attributes
 
-Each column after the first one will be integrated as an *attribute* of the entity. The column name will be set as the name of the attribute. Several attribute types are available (AskOmics will try to guess the type of a column based on whether the column name contains a specific term). The type of an attribute will dictate the way it will be managed in the query form (eg: text field, value selector, etc...)
+Each column after the first one will be integrated as an *attribute* of the entity. The column name will be set as the name of the attribute.  
+Several attribute types are available (AskOmics will guess the type of a column based on its name and its values). The type of an attribute will dictate the way it will be managed in the query form (eg: text field, value selector, etc...)
 
-Attributes can take the following types:
+Attributes can take the following types :
 
 ### Base types
 
 - Numeric: if all the values are numeric
 - Text: if all the values are strings
-- Date: if all the values are dates (managed using dateutil.parser) (Autodetected terms : 'date', 'time', 'birthday', 'day')
+- Date: if all the values are dates (managed using dateutil.parser) (Auto-detected terms : 'date', 'time', 'birthday', 'day')
 - Category: if there is a limited number of repeated values
+
+!!! Warning
+    If the date format is ambiguous (eg: 01/01/2020), AskOmics will interpret it as *day-month-year*
 
 ### FALDO types
 
 If the entity describe a locatable element on a genome (based on the FALDO ontology):
 
-- [Reference](http://biohackathon.org/resource/faldo#reference): chromosome (Autodetected terms : 'chr', 'ref')
-- [Strand](http://biohackathon.org/resource/faldo#StrandedPosition): strand (Autodetected terms : 'strand')
+- [Reference](http://biohackathon.org/resource/faldo#reference): chromosome (Auto-detected terms : 'chr', 'ref')
+- [Strand](http://biohackathon.org/resource/faldo#StrandedPosition): strand (Auto-detected terms : 'strand')
 - Start: start position (Autodetected terms : 'start', 'begin')
 - End: end position (Autodetected terms : 'end', 'stop')
 
-### Relation types
+!!! Warning
+    To mark an entity as a *FALDO entity* (enabling custom FALDO queries), you need to provide **at least** a 'Start' and 'End' columns.
+    Providing a 'Reference' and/or 'Strand' is optional, but will enabled more specific queries (eg: *Same reference* or  *Same strand*)
 
-A column can also symbolise a relation to another entity. In this case, the column name must be of the form *relationName@RelatedEntityName*. Two types are available :
+### Relations
+
+A column can also symbolize a relation to another entity. In this case, the column name must be of the form *relationName@RelatedEntityName*. Two types are available :
 
 - Directed: Relation from this entity to the targeted one (e.g. A is B’s father, but B is not A’s father)
 - Symetric: Relation that works in both directions (e.g. A loves B, and B loves A)
@@ -69,19 +76,19 @@ Linked URIs must match one of these three formats :
 This link between entities will show up in the query screen, allowing users to query related entities.
 
 !!! info
-    Entities using FALDO attributes will be automatically linked, without needing an explicit link.
-
+    **All** *FALDO entities* will be automatically linked with the *included_in* relation, without needing an explicit link.
+    You can still specify your own relations.
 
 !!! Warning
-    For federated queries, the syntax is slighly different. Please refer to [this page](abstraction.md#linking-your-own-data) for more information.
+    For federated queries, the syntax is slightly different. Please refer to [this page](abstraction.md#linking-your-own-data) for more information.
 
 
 # GFF files
 
 !!! Warning
-    Only the GFF3 format is managed by AskOmics.
+    Only the *GFF3* format is managed by AskOmics.
 
-You will be able to select the entities you wish to integrate beforehand. Available entities are the values of the 'type' column of the GFF file. The relations betwen entities will also be integrated.
+Each GFF file can be integrated in several entities. You will be able to select the entities you wish to integrate beforehand. Available entities are the values of the 'type' column of the GFF file. The relations between entities (eg: *Parents* or *Derives_from*) will also be integrated.
 
 Extracted attributes are the following :
 
@@ -91,9 +98,12 @@ Extracted attributes are the following :
 - End
 - Any attribute in the "attributes" column ("Parents" and "Derives_from" will be converted in relations)
 
+!!! info
+    All entities extracted from GFF files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
+
 # BED files
 
-BED files will be transformed in entities (the default entity name will be the file name, but it can be customized).
+Each BED file will be integrated into one entity (the default entity name will be the file name, but it can be customized).
 
 Extracted attributes are the following :
 
@@ -102,3 +112,12 @@ Extracted attributes are the following :
 - Start
 - End
 - Score
+
+!!! info
+    All entities extracted from BED files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
+
+# TTL Files
+
+You can integrate TTL files in AskOmics, either to integrate your own data, or to enable [federated queries](federation.md) to remote endpoints. In both case, you will need to generate or convert your data in AskOmics's format.
+
+This can be done either [manually](abstraction.md) or [automatically](federation.md#auto-generate-external-abstraction-with-abstractor)

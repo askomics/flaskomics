@@ -1,5 +1,5 @@
-The main goal of AskOmics is to provide a simple query interface able to create complex queries on linked entities.
-The query interface is customized based on the integrated data.
+The main goal of AskOmics is to provide a simple interface able to create complex queries on linked entities.
+The query interface is customized based on available (both personal and public) integrated data.
 
 # Starting point
 
@@ -11,19 +11,19 @@ Any entity integrated with the "starting entity" type can be used to start a que
 
 Once the start entity is chosen, the query builder is displayed.
 
-The query builder is composed of a graph. Nodes (circles) represents entities and links represents relations between entities. The currently selected entity is surrounded by a red circle. Links and other entities are dotted and lighter because there are not instantiated.
+The query builder is composed of a graph. Nodes (circles) represent entities and links represent relations between entities. The currently selected entity is surrounded by a red circle. Dotted links and entities are not yet instantiated.
 
 ![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
 
 ## Entity attribute
 
-The currently selected entity's parameters are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible. Various filters are available to further refine the query.
+The currently selected entity's attribute are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible (though it can be toggled off). Various filters are available to further refine the query.
 
 !!! Warning
-    Unless specified with the <i class="fa fa-question-circle inactive"></i> button, empty values for attributes will not be shown in the results.
+    Due to the way SPARQL works, any result row with an empty value in any of its column will not be shown. You can force the display of these rows by using the <i class="fa fa-question-circle></i> button.
 
 !!! info
-    For the Category type, you can ctrl+clic to either deselect or select multiple values.
+    For the Category type, you can Ctrl+Click to either deselect a value, or select multiple values.
 
 !!! info
     For the Numeric and Date types, you can add filters by clicking on the "+" button.
