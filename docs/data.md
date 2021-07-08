@@ -40,6 +40,7 @@ Attributes can take the following types :
 - Text: if all the values are strings
 - Date: if all the values are dates (managed using dateutil.parser) (Auto-detected terms : 'date', 'time', 'birthday', 'day')
 - Category: if there is a limited number of repeated values
+- Boolean: if the values are binary ("True" and "False", or "0" and "1")
 
 !!! Warning
     If the date format is ambiguous (eg: 01/01/2020), AskOmics will interpret it as *day-month-year*

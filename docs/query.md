@@ -15,12 +15,20 @@ The query builder is composed of a graph. Nodes (circles) represent entities and
 
 ![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
 
-## Entity attribute
+## Entity attributes
 
 The currently selected entity's attribute are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible (though it can be toggled off). Various filters are available to further refine the query.
 
+Each attribute type has its own filters :
+
+- Entity URI, entity label, and String attribute type: exact match or regular expression (equal or not equal)
+- Numeric attribute type, FALDO start, FALDO end: comparison operators
+- Category attribute type, FALDO reference, FALDO strand: Value selection among a list
+- Date attribute type: comparison operators with a date picker
+- Boolean attribute type: "True" or "False" selector
+
 !!! Warning
-    Due to the way SPARQL works, any result row with an empty value in any of its column will not be shown. You can force the display of these rows by using the <i class="fa fa-question-circle></i> button.
+    Due to the way SPARQL works, any result row with an empty value in **any** of its column will not be shown. You can force the display of these rows by using the <i class="fa fa-question-circle></i> button.
 
 !!! info
     For the Category type, you can Ctrl+Click to either deselect a value, or select multiple values.
@@ -36,11 +44,11 @@ In addition to the filter, several customization options are available for each 
 
 From left to right :
 
-- <i class="fa fa-bookmark inactive"></i>: Mark the attribute as a **form** attribute. More information [here](template.md).
-- <i class="fa fa-link inactive"></i>: Link this attribute to another (only showing rows where they have the same value).
-- <i class="fa fa-question-circle inactive"></i>: Show all values for this attribute, including empty values.
-- <i class="fa fa-ban inactive"></i>: Exclude one or more categories, instead of including.
-- <i class="fa fa-eye-slash inactive"></i>: Show the value of the attribute in the results.
+- <i class="fa fa-bookmark"></i>: Mark the attribute as a **form** attribute. More information [here](template.md).
+- <i class="fa fa-link"></i>: Link this attribute to another (on a different entity or the same one) *(only showing rows where both attributes have the same value)*.
+- <i class="fa fa-question-circle"></i>: Show all values for this attribute, including empty values.
+- <i class="fa fa-ban"></i>: Exclude one or more categories, instead of including *(Select where the attribute IS NOT)*.
+- <i class="fa fa-eye"></i>: Show the value of the attribute in the results.
 
 
 ## Linking entities
@@ -49,3 +57,12 @@ To query on a linked entity, simple click on a suggested node. The linked node w
 
 !!! info
      Linking entity A (after filtering on parameter A1) to entity B (filtering on parameter B1) in the interface create the following query : *List all entities A who match parameter A1 , AND are linked to any entity B matching parameter B1*
+
+
+### Explicit relations
+
+Explicit relations between entities (defined by the "@" symbol in CSV files, and the "Parents" / "Derives_from" relations from GFF files) will appears between related entities. The label will be the name of the relation. If the relation is a *symetric* relation, it will appear twice between entities.
+
+### FALDO relations
+
+All *FALDO* entities will be linked by an implicit *Included_in* relation.
