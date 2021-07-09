@@ -15,6 +15,8 @@ Templates will appears on the right-side of the homepage. The description of the
 To create a template, first create the query you want, and <btn><i class="fa fa-table"></i> Run & save</btn>.
 Then, in the result page, you can toggle the 'template' attribute to create the template.
 
+![template_creation](img/template_toggle.png)
+
 ## Editing the template description
 
 You can modify the template description the same way you would edit the result description. Simple click on the value of the 'Description' column, and enter your own description.
@@ -24,15 +26,16 @@ You can modify the template description the same way you would edit the result d
 
 ## Using the template
 
-On the AskOmics homepage, simply click on the template or interest to access the query interface. From there, you can simply interact with it as you would with a normal query, including saving the results.
+On the AskOmics homepage, simply click on the template of interest to access the query interface. From there, you can simply interact with it as you would with a normal query, including saving the results.
+
+![template](img/template.png)
 
 !!! info
     Your changes to the query will not affect the template.
 
-## Removing the templates
+## Removing the template
 
 To remove the template, you can either toggle the 'template' attribute back to *off*, or delete the result as a whole.
-
 
 # Forms
 
@@ -57,3 +60,27 @@ To create a form, you will first to create a form-ifiable query. To do so, start
 
 After saving the query (<btn><i class="fa fa-table"></i> Run & save</btn>), head to the *Results* page.
 You will be able to toggle the 'Form' button, creating the form.
+
+![form_create](img/form_toggle.png)
+
+!!! Warning
+    The form creation option is restricted to form-ifiable queries
+
+## Editing the form description
+
+You can modify the form description the same way you would edit the result (and template) description. Simple click on the value of the 'Description' column, and enter your own description.
+
+!!! Warning
+    Don't forget to save with the **Enter** key
+
+## Editing the form display
+
+## Using the form
+
+On the AskOmics homepage, simply click on the form of interest to access the interface.
+
+![form](img/form.png)
+
+## Removing the form
+
+To remove the form, you can either toggle the 'form' attribute back to *off*, or delete the result as a whole.

@@ -189,11 +189,11 @@ On the right, attributes of the selected entity are displayed as attribute boxes
 
 !!! Hands-on
     1. Display `logFC` and `adj.P.val` by clicking on the <i class="fa fa-eye"></i> eye icon
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 ![preview results](img/preview_results.png "Results preview")
 
-<btn><i class="fa fa-table"></i> Run & Preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
+<btn><i class="fa fa-table"></i> Run & preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
 
 
 ### Filter on attributes
@@ -203,7 +203,7 @@ Next query will search for all over-expressed genes. Genes are considered over-e
 !!! Hands-on
     1. Filter `logFC` with `>` `2`
     2. Filter `adj.P.val` with `≤` `0.05`
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 Results show only significantly over-expressed genes.
 
@@ -218,14 +218,14 @@ To constraint on relation, we have to click on suggested nodes, linked to our en
     1. First, hide `Label`, `logFC` and `adj.P.val` of `Differential Expression`
     2. Instantiate `GeneLink`, and hide `Label`
     3. Instantiate `gene`
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. for example, we can filter on chromosome and display chromosome and strand to get information about gene location.
 
 !!! Hands-on
     1. Show `reference` and `strand` using the eye icon
     2. Filter `reference` to select `X` and `Y` chromosomes (use `ctrl`+`click` to multiple selection)
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 ### Use FALDO ontology to query on the position of elements on the genome.
 
@@ -244,7 +244,7 @@ On the query builder interface, FALDO entities are represented with a green circ
     3. Instantiate `QTL`
     4. Click on the link between `gene` and `QTL` to edit the relation
     5. check that the relation is `gene` `included in` `QTL` `on the same reference` with `strict` ticked
-    7. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    7. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 
 To go further, we can filter on `QTL` to refine the results.
@@ -254,7 +254,7 @@ To go further, we can filter on `QTL` to refine the results.
     1. Go back to the `QTL` node
     2. Show the `Name` attribute using the eye icon
     3. Filter the name with a `regexp` with `growth`
-    4. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    4. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. So we can save it.
 
