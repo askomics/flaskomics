@@ -110,7 +110,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -186,7 +186,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
@@ -256,7 +256,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -308,7 +308,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -354,7 +354,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
@@ -432,7 +432,7 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.displayLabel}</label>
+        <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>

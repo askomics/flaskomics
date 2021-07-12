@@ -390,7 +390,7 @@ export default class FormEditQuery extends Component {
       this.state.graphState.attr.forEach(attribute => {
         if (attribute.form) {
           if (! entityMap.has(attribute.nodeId)){
-            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel, attributes:[]})
+            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel ? attribute.entityDisplayLabel : attribute.entityLabel, attributes:[]})
           }
           entityMap.get(attribute.nodeId).attributes.push(
             <AttributeBox
