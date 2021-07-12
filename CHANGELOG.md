@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+
 ## [4.3.1] - 2021-06-16
 
 ### Fixed
 
 - Fixed an issue with categories
 - Fixed an issue with GFF import
-
 
 ## [4.3.0] - 2021-06-10
 
