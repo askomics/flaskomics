@@ -383,7 +383,6 @@ export default class FormQuery extends Component {
           })
         }).then(response => {
           this.graphState = this.props.location.state.graphState
-          console.log(this.props.location.state.graphState)
           this.updateGraphState()
           this.setState({ waiting: false })
         })
