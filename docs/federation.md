@@ -27,15 +27,15 @@ Once external endpoint's abstraction is generated, its time to add it into AskOm
     Check that `advanced options` > `Distant endpoint` contain URL of the external endpoint
 
 
-# Query external endpoint
+## Query external endpoint
 
-## Starting entities
+### Starting entities
 
 If AskOmics contain local data, external startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
 
 ![external_startpoint](img/external_startpoint.png)
 
-## Linking to your own data
+### Linking to your own data
 
 To link a local dataset to the external endpoint, the file must be structured in a certain way.
 
@@ -50,6 +50,6 @@ gene_1|0|http://nextprot.org/rdf/gene/ENSG00000169594
 gene_2|1|http://nextprot.org/rdf/gene/ENSG00000156603
 
 
-## Perform a federated query
+### Perform a federated query
 
 Once the relations are described, links between local and distant entities are automatically done by AskOmics. The query is distributed to the external endpoint and results are returned like a classic query.
