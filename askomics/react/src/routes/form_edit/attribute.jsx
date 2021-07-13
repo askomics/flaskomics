@@ -32,6 +32,17 @@ export default class AttributeBox extends Component {
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
   }
 
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
   renderLinker () {
     let options = []
 
@@ -110,9 +121,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
@@ -188,9 +198,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
@@ -258,9 +267,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
@@ -310,9 +318,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
@@ -356,9 +363,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
@@ -434,9 +440,8 @@ export default class AttributeBox extends Component {
 
     return (
       <div className="attribute-box">
-        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel} value={this.props.attribute.displayLabel} onChange={this.props.setAttributeName} /></label>
+        <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
           <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
