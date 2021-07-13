@@ -44,12 +44,17 @@ Whereas forms allow users to completely replay your queries (including modifying
 When using a form, other users will only able to change the values for a set of parameters you will have selected beforehand.
 For instance, if your query is *List all users whose favorite color is red*, you will be able to create a simple form where users will only be able to change the favorite color, before sending the query.
 
+![form_example](img/form_example.png)
+
 In addition, you will be able to customize the form, such as changing the description (much like templates), but also the name of each entity and attributes.
 
 Much like templates, forms will appear on the right side of the homepage, with the chosen description.
 
 !!! Warning
     Forms are restricted to administrators
+
+!!! Warning
+    Users will only be able to interact with *form attributes*. They will not be able to affect or change visibility for other attributes.
 
 !!! Warning
     A given **Result** can be either a form or a template, but not both
@@ -74,6 +79,16 @@ You can modify the form description the same way you would edit the result (and 
     Don't forget to save with the **Enter** key
 
 ## Editing the form display
+
+For each entity with a form attribute, the form will display both the entity name, and each attribute label (in addition to the input field). You can customize this display (for instance, changing the display entity name to something more readable, or changing an attribute label to make your query more explicit)
+
+To do so, simply click on <btn>Form</btn> to access the *form editing interface*.
+You can then simply edit entities and attributes labels, and click on <btn><i class="fa fa-save"></i> Save</btn> to save the new display.
+
+![form_edit](img/form_edit.png)
+
+!!! Warning
+    The query results will not be affected by these changes (the column name will still match the default attribute label)
 
 ## Using the form
 
