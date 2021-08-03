@@ -1,13 +1,13 @@
 The main goal of AskOmics is to provide a simple interface able to create complex queries on linked entities.
 The query interface is customized based on available (both personal and public) integrated data.
 
-## Starting point
+# Starting point
 
 Any entity integrated with the "starting entity" type can be used to start a query. Other entities can still be queried through a linked entity. The starting entity will start with its label already set to 'visible'
 
 ![ask](img/startpoint.png)
 
-## Query interface
+# Query interface
 
 Once the start entity is chosen, the query builder is displayed.
 
@@ -15,7 +15,7 @@ The query builder is composed of a graph. Nodes (circles) represent entities and
 
 ![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
 
-### Entity attributes
+## Entity attributes
 
 The currently selected entity's attribute are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible (though it can be toggled off). Various filters are available to further refine the query.
 
@@ -38,7 +38,7 @@ Each attribute type has its own filters :
 !!! Tip
     For the Numeric and Date types, you can add filters by clicking on the "+" button.
 
-#### Additional customization
+### Additional customization
 
 In addition to the filter, several customization options are available for each attribute box. Depending on the attribute type, not all options will be available.
 
@@ -52,18 +52,18 @@ From left to right :
 - <i class="fa fa-ban"></i>: Exclude one or more categories, instead of including *(Select where the attribute IS NOT)*.
 - <i class="fa fa-eye"></i>: Show the value of the attribute in the results.
 
-### Linking entities
+## Linking entities
 
 To query on a linked entity, simple click on a suggested node. The linked node will be surrounded in a red circle, and the list of attributes on the right-hand side will change to show the new node's attributes.
 
 !!! info
      Linking entity A (after filtering on parameter A1) to entity B (filtering on parameter B1) in the interface create the following query : *List all entities A who match parameter A1 , AND are linked to any entity B matching parameter B1*
 
-#### Explicit relations
+### Explicit relations
 
 Explicit relations between entities (defined by the "@" symbol in CSV files, and the "Parents" / "Derives_from" relations from GFF files) will appears between related entities. The label will be the name of the relation. If the relation is a *symetric* relation, it will appear twice between entities.
 
-#### FALDO relations
+### FALDO relations
 
 All *FALDO* entities will be linked by an implicit *Included_in* relation. This relation is slightly different than *explicit* relations: it relies on the *FALDO* attributes of both entities for the query, instead of a direct link.
 
@@ -85,7 +85,7 @@ If both entities have a defined *Reference* and/or *Strand* attribute, you will 
 !!! Warning
     *Included_in* queries are **ressource-intensive**, especially if you have a lot of entities.
 
-#### Filtering relations
+### Filtering relations
 
 If there are too many related entities displayed, it can be difficult to select the entity you wish to link to.
 It is possible to filter the displayed relations on either the name of the entity, or the name of the link.
@@ -93,13 +93,13 @@ Simply type out the name you want to filter in either the "Filter links" or the 
 
 ![filters](img/filters.png)
 
-#### Removing relations
+### Removing relations
 
 At any point, you can remove an instanciated node (and any node linked to it), by selecting the node you wish to remove, and using the <button type="button" class="btn btn-secondary btn-sm">Remove Node</button> button.
 
 ![remove](img/remove_node.png)
 
-### MINUS and UNION nodes
+## MINUS and UNION nodes
 
 In addition to querying on attributes and relations, it is possible to use both **MINUS** and **UNION** *SPARQL* concepts.
 
@@ -107,7 +107,7 @@ In addition to querying on attributes and relations, it is possible to use both 
     Simply *right-click* to any **non-instanciated** node, and select the type of concept you wish to use.
     ![custom_nodes](img/custom_nodes.png)
 
-#### MINUS nodes
+### MINUS nodes
 
 The behavior of *MINUS* nodes is the following:
 
@@ -153,7 +153,7 @@ To create this query:
 !!! Warning
     While nested MINUS node are possible, the generated query might not be what you would expect. Make sure to check the generated SPARQL query in the results page if the results appear to be strange.
 
-#### UNION node
+### UNION node
 
 Creating an UNION node behaves as creating an UNION sub-query. **Any** link to this node will be managed as a sub-sub-query, part of the UNION sub-query.
 
@@ -204,7 +204,7 @@ To create this query:
 !!! Warning
     Just as MINUS node, nested UNION nodes might not behave as you want. Make sure to check the generated SPARQL query in the results page if the results appear to be strange.
 
-## Launching queries
+# Launching queries
 
 Once you are satisfied with your query, you can either request a preview of the results with <btn><i class="fa fa-table"></i> Run & Preview</btn> (listing at most 30 results), or send a full query with <btn><i class="fa fa-table"></i> Run & save</btn> .
 

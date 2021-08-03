@@ -1,11 +1,11 @@
-## CSV/TSV files
+# CSV/TSV files
 
 AskOmics will integrate a CSV/TSV file using its header. The *type* of each column will be predicted, but you will be able to modify it before integration.
 
 
-### Entity (first column)
+## Entity (first column)
 
-#### Entity URI
+### Entity URI
 
 The first column of the file will manage the entity itself : the column name will become the entity name, and the values will become the entity **URI**.  
 The **URI** will be created as follows :
@@ -17,11 +17,11 @@ The **URI** will be created as follows :
 !!! Warning
     Unless you are trying to merge entities, make sure your URIs are unique across **both your personal and public datasets**.
 
-#### Entity type
+### Entity type
 
 The entity type can either be "starting entity", or "entity". If "starting entity", it may be used to start a query on the AskOmics homepage. Both types will appear as a node in the AskOmics interface.
 
-#### Inheritance
+### Inheritance
 
 The entity can inherit the attributes and relations of a 'mother' entity. Meaning, you will be able to query the sub-entity on both its own, and its 'mother' attributes and relations. The 'mother' entity however will not have access to any 'daughter' attributes or relations.
 
@@ -31,7 +31,7 @@ To setup inheritance, the column name needs to be formated as follows:
 !!! Warning
     The values of this columns must be an URI of the 'mother' entity
 
-### Attributes
+## Attributes
 
 Each column after the first one will be integrated as an *attribute* of the entity.  
 The column name will be set as the name of the attribute.  
@@ -40,7 +40,7 @@ The type of an attribute will dictate the way it will be managed in the query fo
 
 Attributes can take the following types :
 
-#### Base types
+### Base types
 
 - Numeric: if the values are numeric
 - Text: if all values are strings
@@ -52,7 +52,7 @@ Attributes can take the following types :
 !!! Warning
     If the date format is ambiguous (eg: 01/01/2020), AskOmics will interpret it as *day/month/year*
 
-#### FALDO types
+### FALDO types
 
 If the entity describe a locatable element on a genome (based on the FALDO ontology):
 
@@ -65,7 +65,7 @@ If the entity describe a locatable element on a genome (based on the FALDO ontol
     To mark an entity as a *FALDO entity*, you need to provide **at least** a *'Start'* and *'End'* columns.  
     'Reference' and/or 'Strand' are optional, but will enabled more specific queries (eg: *Same reference* or  *Same strand*)
 
-#### Relations
+### Relations
 
 A column can also symbolize a relation to another entity. In this case, the column name must be of the form :  
 
@@ -96,7 +96,7 @@ This link between entities will show up in the query screen, allowing users to q
     For federated queries, the syntax is slightly different. Please refer to [this page](abstraction.md#linking-your-own-data) for more information.
 
 
-## GFF files
+# GFF files
 
 !!! Warning
     Only the *GFF3* format is managed by AskOmics.
@@ -115,7 +115,7 @@ Extracted attributes are the following :
 !!! info
     All entities extracted from GFF files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
 
-## BED files
+# BED files
 
 Each BED file will be integrated into one entity (the default entity name will be the file name, but it can be customized).
 
@@ -130,7 +130,7 @@ Extracted attributes are the following :
 !!! info
     All entities extracted from BED files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
 
-## TTL Files
+# TTL Files
 
 You can integrate TTL files in AskOmics, either to integrate your own data, or to enable [federated queries](federation.md) to remote endpoints.  
 In both case, you will need to generate or convert your data in AskOmics's format.
