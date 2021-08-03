@@ -12,12 +12,12 @@ Useful information can be found for each row :
 - Rows: Number of rows in the result
 - Size: Size of the result file
 
-# Description
+## Description
 
 Each description can be customized by clicking on the field, and entering the desired value. You can use this to identify the query related to this result.
 
 !!! Warning
-  Don't forget to save your new description using **ENTER**
+    Don't forget to save your new description using **ENTER**
 
 !!! info
     The description will be displayed on the main page if you transform this query in a [template or form](template.md).
@@ -27,7 +27,7 @@ Each description can be customized by clicking on the field, and entering the de
 You can use the available toggles if you wish to create a [template or form](template.md).
 
 !!! Warning
-  Form creation is restricted to administrators. The related query must also be a [form-able query](template.md#Forms).
+    Form creation is restricted to administrators. The related query must also be a [form-able query](template.md#Forms).
 
 # Publication
 
@@ -54,14 +54,14 @@ Clicking on <btn>Download</btn> will let you download a CSV file containing the 
 Clicking on <btn>Form</btn> will let you customize the related form display.
 
 !!! Warning
-  Only available for administator and form-able results.
+    Only available for administator and form-able results.
 
 ## Redo
 
 Clicking on <btn>Redo</btn> will let you directly replay the query from the query interface. It will be in the exact same state as when you clicked on <btn><i class="fa fa-save"></i> Run & save</btn>.
 
 !!! Warning
-  Only available results generated from the query interface.
+    Only available results generated from the query interface.
 
 ## Sparql
 
@@ -77,4 +77,4 @@ Clicking on <btn>Sparql</btn> will redirect you to the SPARQL console. You will 
 To delete one or more results, simply select them in the table, and use the "Delete" button at the bottom of the table.
 
 !!! Warning
-  This will delete any template or form generated from the result.
+    This will delete any template or form generated from the result.

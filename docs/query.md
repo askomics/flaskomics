@@ -206,6 +206,6 @@ To create this query:
 
 # Launching queries
 
-Once you are satisfied with your query, you can either request a preview of the results with <btn><i class="fa fa-table"></i> Run & Preview</btn> (listing at most 30 results), or send a full query with <btn><i class="fa fa-table"></i> Run & save</btn> .
+Once you are satisfied with your query, you can either preview the results with <btn><i class="fa fa-table"></i> Run & Preview</btn> (listing at most 30 results), or send a full query with <btn><i class="fa fa-table"></i> Run & save</btn> .
 
 In the case of a full query, you will be able to access the query results (and more) on the [results page](results.md)

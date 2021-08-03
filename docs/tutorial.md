@@ -1,4 +1,4 @@
-AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
+7AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
 
 In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial:
 
@@ -256,7 +256,7 @@ To go further, we can filter on `QTL` to refine the results.
     3. Filter the name with a `regexp` with `growth`
     4. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. So we can save it.
+From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. We can now save it.
 
 !!! Hands-on
     1. <btn><i class="fa fa-table"></i> Run & save</btn>
@@ -273,15 +273,29 @@ The results page store the saved queries. A table show some useful information a
 
     ![results table](img/results_table.png)
 
-The **Action** column contain button to perform certain action:
+The **Action** column contain buttons to perform certain action:
 
 - Preview: show a results preview on the bottom of the table
 - Download: Download the results (TSV file)
 - Edit: Edit the query with the query builder
 - SPARQL: edit the query with a SPARQL editor for advanced users
 
+For more information about the Results page, please head [here](results.md)
+
 !!! Hands-on
-    1. Download the results file on your computer using <btn class="white">Download</btn> button
+    1. Download the results file on your computer using <btn class="white">Download</btn> button.
+
+The "Edit" button can be used to simply replay the query after changing some parameters.
+
+!!! Hands-on
+    1. Edit the query, and replace "growth" with another term of interest (such as "anxiety").
+    2. Preview the results
+
+
+## Advanced queries
+
+Advanced queries, including *UNION* and *MINUS* SPARQL queries are available.  
+Please head [here](query.md#minus-and-union-nodes) for more information.
 
 
 # Conclusion

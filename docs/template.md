@@ -15,14 +15,12 @@ Templates will appears on the right-side of the homepage. The description of the
 To create a template, first create the query you want, and <btn><i class="fa fa-table"></i> Run & save</btn>.
 Then, in the result page, you can toggle the 'template' attribute to create the template.
 
-![template_creation](img/template_toggle.png)
-
 ## Editing the template description
 
 You can modify the template description the same way you would edit the result description. Simple click on the value of the 'Description' column, and enter your own description.
 
 !!! Warning
-    Don't forget to save with the **Enter** key
+    Don't forget to save with the **Enter** key.
 
 ## Using the template
 
@@ -51,32 +49,30 @@ In addition, you will be able to customize the form, such as changing the descri
 Much like templates, forms will appear on the right side of the homepage, with the chosen description.
 
 !!! Warning
-    Forms are restricted to administrators
+    Forms are restricted to administrators.
 
 !!! Warning
     Users will only be able to interact with *form attributes*. They will not be able to affect or change visibility for other attributes.
 
 !!! Warning
-    A given **Result** can be either a form or a template, but not both
+    A given **Result** can be either a form or a template, but not both.
 
 ## Creating a form
 
-To create a form, you will first to create a form-ifiable query. To do so, start with a regular query, and toggle the template (<i class="fa fa-bookmark">) button on all attributes of interest.
+To create a form, you will first to create a form-ifiable query. To do so, start with a regular query, and toggle the template ( <i class="fa fa-bookmark"></i> ) button on all attributes of interest.
 
 After saving the query (<btn><i class="fa fa-table"></i> Run & save</btn>), head to the *Results* page.
 You will be able to toggle the 'Form' button, creating the form.
 
-![form_create](img/form_toggle.png)
-
 !!! Warning
-    The form creation option is restricted to form-ifiable queries
+    The form creation option is restricted to form-ifiable queries.
 
 ## Editing the form description
 
 You can modify the form description the same way you would edit the result (and template) description. Simple click on the value of the 'Description' column, and enter your own description.
 
 !!! Warning
-    Don't forget to save with the **Enter** key
+    Don't forget to save with the **Enter** key.
 
 ## Editing the form display
 
@@ -88,7 +84,7 @@ You can then simply edit entities and attributes labels, and click on <btn><i cl
 ![form_edit](img/form_edit.png)
 
 !!! Warning
-    The query results will not be affected by these changes (the column name will still match the default attribute label)
+    The query results will not be affected by these changes (the column name will still match the default attribute label).
 
 ## Using the form
 
