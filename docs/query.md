@@ -7,7 +7,7 @@ The query interface is customized based on available (both personal and public) 
 Any entity integrated with the "starting entity" type can be used to start a query. Other entities can still be queried through a linked entity.  
 The starting entity will start with its label already set to 'visible'.  
 
-![ask](img/startpoint.png){: .center}
+![Startpoints](img/startpoint.png){: .center}
 Once the start entity is chosen, the query builder is displayed.  
 
 The query builder is composed of a graph. Nodes (circles) represent *entities* and links represent *relations* between entities.
@@ -208,7 +208,7 @@ UNION nodes implement the conditional **OR**.
 
 !!! note "Info"
     Due to the way UNION nodes works, entities will appear once for each matching sub-query. This can lead to a duplication of results.  
-    This can be solved by setting the label of the entities in the subquery to **Not visible** (<i class="fa fa-eye-slash>)
+    This can be solved by setting the label of the entities in the subquery to **Not visible** (<i class="fa fa-eye-slash"></i>)
     ![Duplicated results](img/union_duplicated.png){: .center}
 
 !!! Warning
@@ -220,8 +220,10 @@ UNION nodes implement the conditional **OR**.
     - Entity A is currently selected
     - Right-clicking on entity B and selecting "UNION" add a new node to the graph
     - Entity B is instanciated and linked to the new union node
+    - Click on Entity B and set the label to "Not visible"
     - For now, the *union* node has no effect
     - Click on the *union* node, and then click on entity C to instanciate it
+    - Set the label to "Not visible"
     - The sparql query is now: *List all instances of entity A that are either linked to entity B or entity C*
 
 
@@ -270,11 +272,14 @@ WHERE {
 
 ## Removing special nodes
 
-Much like a "normal" node, you can remove special nodes (and any node linked to it) at any time by selecting it, and using the <button type="button" class="btn btn-secondary btn-sm">Remove Node</button> button.
+Much like a "normal" node, you can remove special nodes (and any node linked to it) at any time by selecting it, and using the **Remove Node** button.
 
 
 # Launching queries
 
-Once you are satisfied with your query, you can either preview the results with <btn><i class="fa fa-table"></i> Run & Preview</btn> (listing at most 30 results), or send a full query with <btn><i class="fa fa-table"></i> Run & save</btn> .
+Once you are satisfied with your query, you can either:
+
+- Preview the results (*at most 30 rows*) with <btn><i class="fa fa-table"></i> Run & Preview</btn>
+- Send a full query with <btn><i class="fa fa-table"></i> Run & save</btn>
 
 In the case of a full query, you will be able to access the query results (and more) on the [results page](results.md)

@@ -77,4 +77,5 @@ div.admonition.quote > p.admonition-title {
     margin: auto;
     float: none!important;
     text-align: center;
+    font-style: italic;
 }
