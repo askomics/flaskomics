@@ -7,19 +7,19 @@ The query interface is customized based on available (both personal and public) 
 Any entity integrated with the "starting entity" type can be used to start a query. Other entities can still be queried through a linked entity.  
 The starting entity will start with its label already set to 'visible'.  
 
-![ask](img/startpoint.png)
+![ask](img/startpoint.png){: .center}
 Once the start entity is chosen, the query builder is displayed.  
 
 The query builder is composed of a graph. Nodes (circles) represent *entities* and links represent *relations* between entities.
 The currently selected entity is surrounded by a red circle. Dotted links and entities are not yet instantiated.
 
-![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
+![Query builder: Differential Expression is the selected entity, GeneLink is a suggested entity](img/query_builder.png){: .center}
 
 
 # Filtering on attributes
 
 The selected entity's attributes are shown as attribute boxes on the right of the graph. By default, every instantiated entity has its **label** attribute set to visible (though it can be toggled off).  
- 
+
 Various filters are available to further refine the query, with each attribute type having its own filter:
 
 - Entity URI, entity label, and String attribute type: exact match or regular expression (equal or not equal)
@@ -28,7 +28,7 @@ Various filters are available to further refine the query, with each attribute t
 - Date attribute type: comparison operators with a date picker
 - Boolean attribute type: "True" or "False" selector
 
-![attributes](img/attributes.png){: .center}
+![Attribute boxes for an entity](img/attributes.png){: .center}
 
 !!! note "Info"
     Due to the way SPARQL works, any result row with an empty value for **any** of its column will not be shown. You can force the display of these rows by using the <i class="fa fa-question-circle"></i> button.
@@ -44,7 +44,7 @@ Various filters are available to further refine the query, with each attribute t
 
 In addition to the filter, several customization options are available for each attribute box. Depending on the attribute type, not all options will be available.
 
-![customization](img/attribute_box.png)
+![Additional customization](img/attribute_box.png){: .center}
 
 From left to right :
 
@@ -60,7 +60,7 @@ To query on a linked entity, simple click on a suggested node. The linked node w
 
 !!! note "Info"
     Linking entity A (after filtering on parameter A1) to entity B (filtering on parameter B1) in the interface create the following query :  
-    
+
     - *List all entities A who match parameter A1 , AND are linked to any entity B matching parameter B1*
 
 ## Explicit relations
@@ -74,7 +74,7 @@ All *FALDO* entities will be linked by an implicit *Included_in* relation. This 
 !!! Tip
     You can customize the relation by clicking on the *Included in* relation.
 
-    ![faldo](img/faldo.png)
+    ![Customizing the 'Included in' relation](img/faldo.png){: .center}
 
 !!! note "Info"
     Entity A is *Included_in* Entity B means:
@@ -98,7 +98,7 @@ If there are too many related entities displayed, it can be difficult to select 
 It is possible to filter the displayed relations on either the name of the entity, or the name of the link.
 Simply type out the name you want to filter in either the "Filter links" or the "Filter nodes" fields on the top of the graph.
 
-![filters](img/filters.png)
+![Filtering displayed relations](img/filters.png){: .center}
 
 ## Removing instanciated relations
 
@@ -122,10 +122,13 @@ Both type of nodes can be integrated in a bigger query
 !!! note "Info"
     *Right-click* on any **non-instanciated** node, and select the type of node you wish to use.
 
-    ![custom_nodes](img/custom_nodes.png)
+    ![Creating a Minus or Union node](img/custom_nodes.png){: .center}
 
 !!! note "Info"
     The entity linked by the 'union' or 'minus' relation to the special node is the one affected by it.  
+
+!!! warning
+    To avoid displaying empty columns or duplicates in the results, you should disable the label display for entities in the sub-queries.
 
 
 ## MINUS nodes
@@ -135,7 +138,7 @@ Both type of nodes can be integrated in a bigger query
 - **Display all genes that are not linked to an mRNA**
 - **Display all genes that are not linked to an mRNA whose reference is XXX**
 
-![minus](img/minus.png)
+![List all genes, except those linked to a mRNA](img/minus.png){: .center}
 
 
 !!! tip
@@ -147,7 +150,7 @@ Both type of nodes can be integrated in a bigger query
 
     - Entity A is currently selected
     - Right-clicking on entity B and selecting "MINUS" add a new node to the graph
-    - Entity B is instanciated and linked to the new minus node 
+    - Entity B is instanciated and linked to the new minus node
     - The query is now: *List all instances of entity A, without instances linked to entity B*
 
 The SPARQL query *"under the hood"* will look like this:
@@ -169,7 +172,7 @@ WHERE {
 ```
 
 !!! tip
-    You can customize the sub-query further: instead of simply removing any instance linked to a specific entity, you can remove all instances linked to a specific entity whose attribute A is XXX. 
+    You can customize the sub-query further: instead of simply removing any instance linked to a specific entity, you can remove all instances linked to a specific entity whose attribute A is XXX.
 
     - I want to list all instances of Entity A with the attribute A1
     - But I want to exclude all instances of Entity A that are linked to any instance of Entity B with the attribute B1
@@ -182,7 +185,7 @@ WHERE {
     4) Select attribute B1 for entity B  
 
 !!! note "Info"
-    You can create multiple *minus* nodes starting from the same entity. Instances that match **any** of the sub-queries will be removed. 
+    You can create multiple *minus* nodes starting from the same entity. Instances that match **any** of the sub-queries will be removed.
 
     - I want to remove instances that match *condition A*
     - I also want to remove instances that match *condition B*
@@ -195,13 +198,18 @@ WHERE {
 
 ## UNION node
 
-UNION nodes implement the conditionnal **OR**.
+UNION nodes implement the conditional **OR**.
 
-- Display genes that are either
-    - Linked to an mRna
-    - Linked to a transcript
+- Display transcripts that are either
+    - Linked to a 3′-UTR
+    - Linked to a 5′-UTR
 
-![union](img/union.png)
+![List all transcripts linked to either a 3′-UTR or a 5′-UTR](img/union.png){: .center}
+
+!!! note "Info"
+    Due to the way UNION nodes works, entities will appear once for each matching sub-query. This can lead to a duplication of results.  
+    This can be solved by setting the label of the entities in the subquery to **Not visible** (<i class="fa fa-eye-slash>)
+    ![Duplicated results](img/union_duplicated.png){: .center}
 
 !!! Warning
     UNION nodes will only behave as a UNION if there are more than one entity linked to it
@@ -213,7 +221,7 @@ UNION nodes implement the conditionnal **OR**.
     - Right-clicking on entity B and selecting "UNION" add a new node to the graph
     - Entity B is instanciated and linked to the new union node
     - For now, the *union* node has no effect
-    - Click on the *union* node, and then click on entity C to instanciate it 
+    - Click on the *union* node, and then click on entity C to instanciate it
     - The sparql query is now: *List all instances of entity A that are either linked to entity B or entity C*
 
 
@@ -247,9 +255,10 @@ WHERE {
 ```
 
 !!! tip
-    You can customize the sub-query further: 
-
-
+    You can customize the sub-query further.  
+    I want to list all instances of Entity A that are either:
+    - Linked to entity B with attribute B1
+    - Linked to entity C, itself linked to entity D
 
 
 !!! note "Info"

@@ -1,4 +1,4 @@
-7AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
+AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
 
 In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial:
 
@@ -59,7 +59,7 @@ You can upload files from your computer, or distant files using an URL.
 
 Uploaded files are displayed into the files table. Filenames can be change by clicking on it.
 
-![files_table](img/files_table.png "files_table")
+![Files table](img/files_table.png "files_table"){: .center}
 
 Next step is to convert this files into RDF triples. This step is called *Integration*. Integration will produce a RDF description of your data: the *Abstraction*.
 
@@ -71,16 +71,18 @@ Next step is to convert this files into RDF triples. This step is called *Integr
 
 The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files. During the step of integration, AskOmics show a preview of each files. We can choose how the file will be integrated at this step.
 
+More information about data integration is available [here](data.md)
+
 ### GFF
 
-GFF files contain genetic coordinate of entities. Each entities contained in the GFF file are displayed on the preview page. We can Select the entities that will be integrated.
+GFF files contain genetic coordinate of entities. Each entity contained in the GFF file is displayed on the preview page. We can Select the entities that will be integrated.
 
 !!! Hands-on
     1. Search for `Mus_musculus.GRCm38.98.subset.gff3 (preview)`
     2. Select `gene` and `mRNA`
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![De results preview](img/gff_preview.png)
+    ![Integration interface for GFF files](img/gff_preview.png){: .center}
 
 
 ### CSV/TSV
@@ -119,7 +121,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - Keep the other column names and set their types to *numeric*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![De results preview](img/de_results_preview.png)
+    ![Integration interface for CSV files](img/de_results_preview.png){: .center}
 
 !!! Hands-on
     1. Search for `symbol-ensembl.tsv (preview)`
@@ -128,7 +130,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - change `ensembl` to `linkedTo@gene` and set type to *Directed relation*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![Symbol to Ensembl preview](img/symbol_to_ensembl_preview.png)
+    ![Modifying the name and type of a column](img/symbol_to_ensembl_preview.png){: .center}
 
 !!! Hands-on
     1. Search for `MGIBatchReport_Qtl_Subset.txt (preview)`
@@ -139,7 +141,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - set `End` type to *End*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![QTL preview](img/qtl_preview.png)
+    ![Preview of the QTL file](img/qtl_preview.png){: .center}
 
 
 ### Manage integrated datasets
@@ -151,7 +153,7 @@ Integration can take some times depending on the file size. The <navbar><i class
     1. Go to <navbar><i class="fa fa-database"></i> Datasets</navbar> page
     2. Wait for all datasets to be *success*
 
-    ![dataset](img/datasets.png "Datasets table")
+    ![Table of datasets](img/datasets.png "Datasets table"){: .center}
 
 
 
@@ -163,13 +165,15 @@ The table show all integrated datasets. The *status* column show if the datasets
 
 Once all the data of interest is integrated (converted to RDF graphs), its time to query them. Querying RDF data is done by using the SPARQL language. Fortunately, AskOmics provides a user-friendly interface to build SPARQL queries without having to learn the SPARQL language.
 
+More information about the query building process is available [here](query.md)
+
 ## Query builder overview
 
 ### Simple query
 
 The first step to build a query is to choose a start point for the query.
 
-![ask](img/startpoint.png)
+![List of startpoints](img/startpoint.png){: .center}
 
 
 !!! Hands-on
@@ -183,7 +187,7 @@ Once the start entity is chosen, the query builder is displayed.
 
 The query builder is composed of a graph. Nodes represents *entities* and links represents *relations* between entities. The selected entity is surrounded by a red circle. Links and other entities are dotted and lighter because there are not instantiated.
 
-![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
+![The query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity"){: .center}
 
 On the right, attributes of the selected entity are displayed as attribute boxes. Each boxes have an eye icon. Open eye mean the attribute will be displayed on the results.
 
@@ -191,7 +195,7 @@ On the right, attributes of the selected entity are displayed as attribute boxes
     1. Display `logFC` and `adj.P.val` by clicking on the <i class="fa fa-eye"></i> eye icon
     2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-![preview results](img/preview_results.png "Results preview")
+![Preview of results](img/preview_results.png "Results preview"){: .center}
 
 <btn><i class="fa fa-table"></i> Run & preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
 
@@ -271,7 +275,7 @@ The results page store the saved queries. A table show some useful information a
     1. Click on the name and enter `Over-expressed genes on a growth QTL`
     2. press `enter` key
 
-    ![results table](img/results_table.png)
+    ![Table of results](img/results_table.png){: .center}
 
 The **Action** column contain buttons to perform certain action:
 

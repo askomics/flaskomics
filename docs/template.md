@@ -26,7 +26,7 @@ You can modify the template description the same way you would edit the result d
 
 On the AskOmics homepage, simply click on the template of interest to access the query interface. From there, you can simply interact with it as you would with a normal query, including saving the results.
 
-![template](img/template.png)
+![Template display on the home page](img/template.png){: .center}
 
 !!! note "Info"
     Your changes to the query will not affect the template.
@@ -42,7 +42,7 @@ Whereas forms allow users to completely replay your queries (including modifying
 When using a form, other users will only able to change the values for a set of parameters you will have selected beforehand.
 For instance, if your query is *List all users whose favorite color is red*, you will be able to create a simple form where users will only be able to change the favorite color, before sending the query.
 
-![form_example](img/form_example.png)
+![Example of a form: the user can change the favorite color](img/form_example.png){: .center}
 
 In addition, you will be able to customize the form, such as changing the description (much like templates), but also the name of each entity and attributes.
 
@@ -81,7 +81,7 @@ For each entity with a form attribute, the form will display both the entity nam
 To do so, simply click on <btn>Form</btn> to access the *form editing interface*.
 You can then simply edit entities and attributes labels, and click on <btn><i class="fa fa-save"></i> Save</btn> to save the new display.
 
-![form_edit](img/form_edit.png)
+![Form editing interface](img/form_edit.png){: .center}
 
 !!! Warning
     The query results will not be affected by these changes (the column name will still match the default attribute label).
@@ -90,7 +90,7 @@ You can then simply edit entities and attributes labels, and click on <btn><i cl
 
 On the AskOmics homepage, simply click on the form of interest to access the interface.
 
-![form](img/form.png)
+![Form display on the home page](img/form.png){: .center}
 
 ## Removing the form
 
