@@ -23,8 +23,8 @@ nav:
   - Home: index.md
   - AskOmics tutorials:
     - Quickstart: tutorial.md
-    - Prepare data: data.md
-    - Create a query: query.md
+    - Preparing data: data.md
+    - Building a query: query.md
     - Results: results.md
     - Templates & forms: template.md
     - Build RDF Abstraction: abstraction.md
