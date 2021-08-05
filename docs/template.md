@@ -28,7 +28,7 @@ On the AskOmics homepage, simply click on the template of interest to access the
 
 ![template](img/template.png)
 
-!!! info
+!!! note "Info"
     Your changes to the query will not affect the template.
 
 ## Removing the template

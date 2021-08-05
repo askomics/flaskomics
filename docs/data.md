@@ -88,7 +88,7 @@ Linked URIs must match one of these three formats :
 
 This link between entities will show up in the query screen, allowing users to query related entities.
 
-!!! info
+!!! note "Info"
     **All** FALDO entities will be automatically linked with the *included_in* relation, without needing an explicit link.
     You can still specify your own relations.
 
@@ -112,7 +112,7 @@ Extracted attributes are the following :
 - Any attribute in the "attributes" column
   - "Parents" and "Derives_from" will be converted in relations
 
-!!! info
+!!! note "Info"
     All entities extracted from GFF files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
 
 # BED files
@@ -127,7 +127,7 @@ Extracted attributes are the following :
 - End
 - Score
 
-!!! info
+!!! note "Info"
     All entities extracted from BED files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
 
 # TTL Files
