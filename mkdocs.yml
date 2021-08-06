@@ -25,7 +25,7 @@ nav:
     - Quickstart: tutorial.md
     - Preparing data: data.md
     - Building a query: query.md
-    - Results: results.md
+    - Managing results: results.md
     - Templates & forms: template.md
     - Build RDF Abstraction: abstraction.md
     - Federated queries: federation.md

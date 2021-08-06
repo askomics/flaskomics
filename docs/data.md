@@ -2,6 +2,8 @@
 
 AskOmics will integrate a CSV/TSV file using its header. The *type* of each column will be predicted, but you will be able to modify it before integration.
 
+![CSV/TSV integration](img/csv_convert.png){: .center}
+
 
 ## Entity (first column)
 
