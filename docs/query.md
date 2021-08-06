@@ -49,10 +49,12 @@ In addition to the filter, several customization options are available for each 
 From left to right :
 
 - <i class="fa fa-bookmark"></i>: Mark the attribute as a **form** attribute. More information [here](template.md#forms).
-- <i class="fa fa-link"></i>: Link this attribute to another (on a different entity or the same one). *This will only show rows where both attributes have the same value*.
+- <i class="fa fa-link"></i>: Link this attribute to another (on a different entity or the same one).
+    - *This will only show rows where both attributes have the same value*.
 - <i class="fa fa-question-circle"></i>: Show all values for this attribute, including empty values.
-- <i class="fa fa-ban"></i>: Exclude one or more categories, instead of including *(Select where the attribute IS NOT)*.
-- <i class="fa fa-eye"></i>: Display the attribute in the results.
+- <i class="fa fa-ban"></i>: Exclude one or more categories, instead of including.
+    - *(Select where the attribute is not XXX)*.
+- <i class="fa fa-eye"></i>: Display the attribute value in the results.
 
 # Filtering on related entities
 
@@ -65,7 +67,7 @@ To query on a linked entity, simple click on a suggested node. The linked node w
 
 ## Explicit relations
 
-Explicit relations between entities (defined by the "@" symbol in CSV files, and the "Parents" / "Derives_from" relations from GFF files) will appears between related entities. If the relation is a *symetric* relation, it will appear twice between entities.
+Explicit relations between entities (defined by the "@" symbol in CSV files, and the *"Parents"/"Derives_from"* relations from GFF files) will appears between related entities. If the relation is a *symetric* relation, it will appear twice between entities.
 
 ## FALDO relations
 
@@ -90,19 +92,19 @@ All *FALDO* entities will be linked by an implicit *Included_in* relation. This 
     You can **Reverse** the relation (Entity B *Included_in* Entity A instead of the opposite) from the interface.
 
 !!! Warning
-    *Included_in* queries are **ressource-intensive**, especially if you have a lot of entities.
+    *Included_in* queries are **ressource-intensive**, especially if you have a lot of instances for each entity.
 
 ## Filtering displayed relations
 
-If there are too many related entities displayed, it can be difficult to select the entity you wish to link to.
-It is possible to filter the displayed relations on either the name of the entity, or the name of the link.
+If there are too many related entities displayed, it can be difficult to select the entity you wish to link to.  
+It is possible to filter the displayed relations on either the name of the entity, or the name of the link.  
 Simply type out the name you want to filter in either the "Filter links" or the "Filter nodes" fields on the top of the graph.
 
 ![Filtering displayed relations](img/filters.png){: .center}
 
 ## Removing instanciated relations
 
-At any point, you can remove an instanciated node (and any node linked to it), by selecting the node you wish to remove, and using the **Remove Node** button at the top of the interface.
+At any point, you can remove an instanciated node **(and any node linked to it)**, by selecting the node you wish to remove, and using the **Remove Node** button at the top of the interface.
 
 
 # MINUS and UNION subqueries
@@ -122,7 +124,7 @@ Both type of nodes can be integrated in a bigger query
 !!! note "Info"
     *Right-click* on any **non-instanciated** node, and select the type of node you wish to use.
 
-    ![Creating a Minus or Union node](img/custom_nodes.png){: .center}
+    ![Creating a minus or union node](img/custom_nodes.png){: .center}
 
 !!! note "Info"
     The entity linked by the 'union' or 'minus' relation to the special node is the one affected by it.  

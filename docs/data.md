@@ -13,8 +13,8 @@ The first column of the file will manage the entity itself : the column name wil
 The **URI** will be created as follows :
 
 * If the value is an **URL**, it will be integrated as it is.
-* If the value is a **CURIE**, it will be transformed into an URL before integration. The list of managed CURIE formats is available [here](https://github.com/askomics/flaskomics/blob/master/askomics/libaskomics/prefix.cc.json)
-* Else, the value will be added to either the *askomics base data URI* or a custom base URI if specified in the integration form.
+* If the value is a [CURIE](https://www.w3.org/TR/2010/NOTE-curie-20101216/), it will be transformed into an URL before integration. The list of managed CURIE formats is available [here](https://github.com/askomics/flaskomics/blob/master/askomics/libaskomics/prefix.cc.json).
+* Else, the value will be added to either AskOmics *namespace_data* value, or a custom base URI if specified in the integration form.
 
 !!! Warning
     Unless you are trying to merge entities, make sure your URIs are unique across **both your personal and public datasets**.
@@ -31,13 +31,12 @@ To setup inheritance, the column name needs to be formated as follows:
 * *daughter_entity_name*<*mother_entity_name* (with the < symbol)
 
 !!! Warning
-    The values of this columns must be an URI of the 'mother' entity
+    The values of this column must be an URI of the 'mother' entity
 
 ## Attributes
 
-Each column after the first one will be integrated as an *attribute* of the entity.  
-The column name will be set as the name of the attribute.  
-Several attribute types are available (AskOmics will guess the type of a column based on its name and its values).
+Each column after the first one will be integrated as an *attribute* of the entity. The column name will be set as the name of the attribute.  
+Several attribute types are available (AskOmics will guess the type of a column based on its name and its values).  
 The type of an attribute will dictate the way it will be managed in the query form (eg: text field, value selector...)
 
 Attributes can take the following types :
@@ -47,7 +46,7 @@ Attributes can take the following types :
 - Numeric: if the values are numeric
 - Text: if all values are strings
 - Date: if all values are dates (using *dateutil.parser*)
-  - *(Auto-detected terms : 'date', 'time', 'birthday', 'day')*
+    - *(Auto-detected terms : 'date', 'time', 'birthday', 'day')*
 - Category: if there is a limited number of repeated values
 - Boolean: if the values are binary ("True" and "False", or "0" and "1")
 
@@ -65,7 +64,7 @@ If the entity describe a locatable element on a genome (based on the FALDO ontol
 
 !!! Warning
     To mark an entity as a *FALDO entity*, you need to provide **at least** a *'Start'* and *'End'* columns.  
-    'Reference' and/or 'Strand' are optional, but will enabled more specific queries (eg: *Same reference* or  *Same strand*)
+    'Reference' and/or 'Strand' are optional, but will enable more specific queries (eg: *Same reference* or *Same strand*)
 
 ### Relations
 
@@ -79,14 +78,14 @@ Two types are available :
 - Symetric: Relation that works in both directions *(e.g. A loves B, and B loves A)*
 
 !!! Warning
-    The content of the column must the the URIs of the related entity.  
-    *(The related entity does not need to exist at this point, it can be created later)*
+    The content of the column must be URIs of the related entity.  
+    *(The related entity and its URIs may be created afterwards)*
 
 Linked URIs must match one of these three formats :
 
 - Full URI
 - CURIE
-- Simple value (the value will transformed into an URI with the *askomics base data uri*)
+- Simple value (the value will transformed into an URI with AskOmics *namespace_data* value)
 
 This link between entities will show up in the query screen, allowing users to query related entities.
 
@@ -103,7 +102,9 @@ This link between entities will show up in the query screen, allowing users to q
 !!! Warning
     Only the *GFF3* format is managed by AskOmics.
 
-Each GFF file can be integrated in several entities. You will be able to select the entities you wish to integrate beforehand. Available entities are the values of the 'type' column of the GFF file. The relations between entities (eg: *Parents* or *Derives_from*) will also be integrated.
+Each GFF file can be integrated into several entities. You will be able to select the entities you wish to integrate beforehand. Available entities are the values of the 'type' column of the GFF file. The relations between entities (eg: *Parents* or *Derives_from*) will also be integrated.
+
+![Integration interface for GFF files](img/gff_preview.png){: .center}
 
 Extracted attributes are the following :
 
@@ -112,7 +113,7 @@ Extracted attributes are the following :
 - Start
 - End
 - Any attribute in the "attributes" column
-  - "Parents" and "Derives_from" will be converted in relations
+    - "Parents" and "Derives_from" will be converted in relations
 
 !!! note "Info"
     All entities extracted from GFF files are *FALDO entities*, and will be linked implicitly with the *included_in* relation.
