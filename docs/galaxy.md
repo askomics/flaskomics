@@ -1,5 +1,7 @@
 Galaxy is a scientific workflow, data integration, and data and analysis persistence and publishing platform that aims to make computational biology accessible to research scientists that do not have computer programming or systems administration experience.
 
+A Galaxy Training tutorial is available [here](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-analysis-with-askomics-it/tutorial.html)
+
 AskOmics can be used with a Galaxy instance in two way:
 
 - With a dedicated AskOmics, import Galaxy datasets into AskOmics and export AskOmics results into Galaxy.

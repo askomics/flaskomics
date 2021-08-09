@@ -22,15 +22,16 @@ markdown_extensions:
 nav:
   - Home: index.md
   - AskOmics tutorials:
-    - Quickstart: tutorial.md
+    - Overview tutorial: tutorial.md
     - Preparing data: data.md
     - Building a query: query.md
     - Managing results: results.md
     - Templates & forms: template.md
+    - SPARQL console: console.md
+    - Command-line interface: cli.md
     - Build RDF Abstraction: abstraction.md
     - Federated queries: federation.md
     - AskOmics and Galaxy: galaxy.md
-    - Contribute: issues.md
   - Admin :
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md

@@ -3,12 +3,12 @@ This functionality is available in two different ways.
 
 # Templates
 
-Templates are a simple way for yourself or another user to replay your queries. They will access a **copy** of the query graph, and be able to customize any parameter and relation (this includes linking to additional entities).
+Templates are a simple way for yourself or another user to replay your queries. They will access a **copy** of the query graph, and be able to customize all parameters and relations (this includes linking to additional entities).
 
 Templates will appears on the right-side of the homepage. The description of the template can be customized to include more information regarding the query.
 
 !!! Warning
-    By default, only you can see your templates. To publicize these templates, you need administrator privileges.
+    By default, your templates are private. To publicize them, you need administrator privileges.
 
 ## Creating a template
 
@@ -29,7 +29,7 @@ On the AskOmics homepage, simply click on the template of interest to access the
 ![Template display on the home page](img/template.png){: .center}
 
 !!! note "Info"
-    Your changes to the query will not affect the template.
+    Any change to the query will not affect the template.
 
 ## Removing the template
 
@@ -37,19 +37,20 @@ To remove the template, you can either toggle the 'template' attribute back to *
 
 # Forms
 
-Whereas forms allow users to completely replay your queries (including modifying the query graphs), forms aim to be a much simpler way to share your queries for users not familiar with the way AskOmics works.
-
-When using a form, other users will only able to change the values for a set of parameters you will have selected beforehand.
-For instance, if your query is *List all users whose favorite color is red*, you will be able to create a simple form where users will only be able to change the favorite color, before sending the query.
-
-![Example of a form: the user can change the favorite color](img/form_example.png){: .center}
-
-In addition, you will be able to customize the form, such as changing the description (much like templates), but also the name of each entity and attributes.
-
-Much like templates, forms will appear on the right side of the homepage, with the chosen description.
+Whereas templates allow users to completely replay your queries (including modifying the query graphs), forms aim to be a much simpler way to share your queries for users not familiar with the way AskOmics works.
 
 !!! Warning
     Forms are restricted to administrators.
+
+When using a form, other users will only able to change the values for a set of parameters you will have selected beforehand.
+
+For instance, if your query is *List all users whose favorite color is red*, users will only be able to change the favorite color, before sending the query.
+
+![Example of a form: the user can only change the favorite color](img/form_example.png){: .center}
+
+In addition, you will be able to customize the form before sharing it, such as changing the description (much like templates), but also the name of each entity and attribute.
+
+Like templates, forms will appear on the right side of the homepage, with the chosen description.
 
 !!! Warning
     Users will only be able to interact with *form attributes*. They will not be able to affect or change visibility for other attributes.
@@ -59,13 +60,13 @@ Much like templates, forms will appear on the right side of the homepage, with t
 
 ## Creating a form
 
-To create a form, you will first to create a form-ifiable query. To do so, start with a regular query, and toggle the template ( <i class="fa fa-bookmark"></i> ) button on all attributes of interest.
+To create a form, you will first to create a **form-ifiable** query. To do so, start with a regular query, and toggle the template ( <i class="fa fa-bookmark"></i> ) button on all attributes of interest. Selected attributes will be modifiable in the form.
 
-After saving the query (<btn><i class="fa fa-table"></i> Run & save</btn>), head to the *Results* page.
+After saving the query with <btn><i class="fa fa-table"></i> Run & save</btn>, head to the *Results* page.
 You will be able to toggle the 'Form' button, creating the form.
 
 !!! Warning
-    The form creation option is restricted to form-ifiable queries.
+    The form creation option is restricted to form-ifiable (meaning, with at least one selected attribute) queries.
 
 ## Editing the form description
 
@@ -78,7 +79,7 @@ You can modify the form description the same way you would edit the result (and 
 
 For each entity with a form attribute, the form will display both the entity name, and each attribute label (in addition to the input field). You can customize this display (for instance, changing the display entity name to something more readable, or changing an attribute label to make your query more explicit)
 
-To do so, simply click on <btn>Form</btn> to access the *form editing interface*.
+To do so, simply click on <btn class="white">Form</btn> to access the *form editing interface*.
 You can then simply edit entities and attributes labels, and click on <btn><i class="fa fa-save"></i> Save</btn> to save the new display.
 
 ![Form editing interface](img/form_edit.png){: .center}

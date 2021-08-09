@@ -11,4 +11,4 @@ make serve-doc
 ```
 Doc will be available at [localhost:8000](localhost:8000)
 
-To change port, use `make serve-doc DOCPORT=8001`
+To change the port, use `make serve-doc DOCPORT=8001`

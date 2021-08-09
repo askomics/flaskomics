@@ -2,7 +2,7 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
 
 AskOmics allows heterogeneous data (formatted as tabular files, GFF, BED or native RDF files) to be loaded into an RDF triplestore, to be transparently and interactively queried through a user-friendly interface.
 
-AskoMics also support federated queries to external SPARQL endpoints.
+AskOmics also support federated queries to external SPARQL endpoints.
 
 ![AskOmics](img/askograph.png){: .center}
 
@@ -27,5 +27,5 @@ AskoMics also support federated queries to external SPARQL endpoints.
 - Developer documentation
     - [Deploy a development instance locally](dev-deployment.md)
     - [Contribute to AskOmics](contribute.md)
-    - [CI](ci.md): Test code with continuous integration
+    - [CI](ci.md): Test your code with continuous integration
     - [Contribute to doc](docs.md): Write documentation

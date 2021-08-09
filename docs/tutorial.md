@@ -4,10 +4,10 @@ In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq resul
 
 - [Differentially expressed results file](https://zenodo.org/record/2529117/files/limma-voom_luminalpregnant-luminallactate): genes in rows, and 4 required columns: identifier (ENTREZID), gene symbol (SYMBOL), log fold change (logFC) and adjusted P values (adj.P.Val)
 - [Reference genome annotation file](https://zenodo.org/record/3601076/files/Mus_musculus.GRCm38.98.subset.gff3) in GFF format
-- [Correspondence file between gene symbol and Ensembl id](https://zenodo.org/record/3601076/files/symbol-ensembl.tsv): TSV of two columns: symbol and the corresponding Ensembl id
+- [Correspondence file between gene symbol and Ensembl id](https://zenodo.org/record/3601076/files/symbol-ensembl.tsv): TSV with two columns: symbol and the corresponding Ensembl id
 - [QTL file](https://zenodo.org/record/3601076/files/MGIBatchReport_Qtl_Subset.txt): QTL in row, with 5 required columns: identifier, chromosome, start, end and name
 
-Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> containing tutorial instruction to perform in order to get started with AskOmics.
+Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> containing instructions to perform in order to get started with AskOmics.
 
 To complete the tutorial, you will need an AskOmics instance. You can [install your own](production-deployment.md) or use this [public instance](https://use.askomics.org).
 
@@ -24,18 +24,18 @@ AskOmics is a multi-user platform. To use it, you will need an account on the in
     Create your AskOmics account (or login with your existing one)
 
 
-Once your are logged, you can use all the functionalities of AskOmics.
+Once you are logged, you can use all the functionalities of AskOmics.
 
 ## Manage your account
 
 To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> Your Name &#9662;</navbar> on the navigation bar.
 
 
-Uses the forms to change your personal information.
+Use the forms to change your personal information.
 
 # Data integration
 
-AskOmics convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files.
+AskOmics will convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files.
 
 !!! Hands-on
     Download the files for the tutorial using the following links:<br />
@@ -57,7 +57,7 @@ You can upload files from your computer, or distant files using an URL.
 !!! Tip
     You can also copy files URL and use the <navbar><i class="fa fa-upload"></i> URL</navbar> button.
 
-Uploaded files are displayed into the files table. Filenames can be change by clicking on it.
+Uploaded files are displayed into the files table. Filenames can be changed by clicking on it.
 
 ![Files table](img/files_table.png "files_table"){: .center}
 
@@ -214,9 +214,9 @@ Results show only significantly over-expressed genes.
 
 ### Filter on relations
 
-Now that we have our genes if interest, we will link these genes to the reference genome to get information about location.
+Now that we have our genes if interest, we will link these genes to the reference genome to get information about the location.
 
-To constraint on relation, we have to click on suggested nodes, linked to our entity of interest.
+To constraint on a relation, we have to click on any suggested nodes linked to our entity of interest.
 
 !!! Hands-on
     1. First, hide `Label`, `logFC` and `adj.P.val` of `Differential Expression`
@@ -224,7 +224,7 @@ To constraint on relation, we have to click on suggested nodes, linked to our en
     3. Instantiate `gene`
     2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. for example, we can filter on chromosome and display chromosome and strand to get information about gene location.
+Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. For example, we can filter on chromosome and display chromosome and strand to get information about the gene location.
 
 !!! Hands-on
     1. Show `reference` and `strand` using the eye icon
@@ -233,12 +233,13 @@ Results now show the Ensembl id of our over-expressed genes. We have now access 
 
 ### Use FALDO ontology to query on the position of elements on the genome.
 
-The [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) ontology describe sequence feature positions and regions. AskOmics use FALDO ontology to represent entity positions. GFF are using FALDO, as well as TSV entities with chromosome, strand, start and end.
+The [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) ontology describe sequence features's positions and regions. AskOmics use the FALDO ontology to represent entity positions.  
+All entities extracted from GFF and BED files use this ontology, in addition to any entity extracted from a CSV/TSV file with a reference, strand, start and end columns.
 
-The FALDO ontology are used in AskOmics to perform special queries between 2 FALDO entities. These queries are:
+The FALDO ontology is used in AskOmics to perform special queries between 2 FALDO entities. These queries are:
 
-- Entity included in another entity
-- Entity overlapping another one
+- Entity is included in another entity
+- Entity is overlapping another entity
 
 On the query builder interface, FALDO entities are represented with a green circle and FALDO relations have a green arrow.
 
@@ -298,10 +299,10 @@ The "Edit" button can be used to simply replay the query after changing some par
 
 ## Advanced queries
 
-Advanced queries, including *UNION* and *MINUS* SPARQL queries are available.  
+Advanced queries, including *UNION* and *MINUS* SPARQL queries are also available to further your queries.  
 Please head [here](query.md#minus-and-union-nodes) for more information.
 
 
 # Conclusion
 
-In this tutorial we have seen how to use AskOmics Interactive Tool to Build a complex SPARQL query to interrogate 4 different datasets and answer a biological question.
+In this tutorial we have seen how to use the AskOmics Interactive Tool, building a complex SPARQL query to interrogate 4 different datasets and answer a biological question.

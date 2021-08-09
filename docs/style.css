@@ -19,11 +19,15 @@ btn {
 }
 
 btn.white {
+    border: 2px solid #6c757d;
     background-color: white;
-    color: #5a6268;
-    padding-right: 5px;
-    padding-left: 5px;
-    border-radius: 5px; 
+    color: #6c757d;
+    cursor: pointer;
+}
+
+btn.white:hover {
+    color:white;
+    background: #6c757d;
 }
 
 badge {
@@ -79,3 +83,5 @@ div.admonition.quote > p.admonition-title {
     text-align: center;
     font-style: italic;
 }
+
+.fa { display:inline; }
