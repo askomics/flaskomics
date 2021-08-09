@@ -46,5 +46,6 @@ If you save the query, it will appears as a normal result in the "Results" tab. 
 
 !!! warning
     The generated *template* will redirect to the SPARQL console. It means
+
     - Non-logged users will not be able to use it
     - Only logged users with **editing privileges** will be able to launch the query
