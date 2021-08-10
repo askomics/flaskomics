@@ -1,6 +1,6 @@
 AskOmics is a visual SPARQL query interface supporting both intuitive data integration and querying while shielding the user from most of the technical difficulties underlying RDF and SPARQL.
 
-AskOmics allows heterogeneous data (formatted as tabular files, GFF, BED or native RDF files) to be loaded into an RDF triplestore, to be transparently and interactively queried through a user-friendly interface.
+AskOmics helps loading heterogeneous data (formatted as tabular files, GFF, BED or native RDF files) into an RDF triplestore, to be transparently and interactively queried through a user-friendly interface.
 
 AskOmics also support federated queries to external SPARQL endpoints.
 
@@ -12,10 +12,11 @@ AskOmics also support federated queries to external SPARQL endpoints.
     - [Building a query](query.md): Learn how the query building interface works
     - [Results interface](results.md): In-depth guide of the results interface
     - [Template & forms](template.md): An overview of the templates & forms functionalities
+    - [SPARQL console](console.md): How to interact with the provided SPARQL console
+    - [Command-line interface](cli.md): A python-based CLI for interacting with AskOmics
     - [Build an RDF abstraction](abstraction.md): Learn how to build an RDF abstraction for RDF data
     - [Perform federated queries](federation.md): How to query your own data with external resources
     - [Use AskOmics with Galaxy](galaxy.md): How to connect AskOmics with your Galaxy history
-    - [Contribute as a user](issues.md): How to contribute to the development of AskOmics as a user
 <br /><br />
 
 - Administration

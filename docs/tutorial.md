@@ -1,13 +1,15 @@
 AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
 
-In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial:
+In this tutorial, we will learn the basics of AskOmics by analysing RNA-seq results. The provided datasets come from a differential expression analysis.
+
+4 files will be used in this tutorial:
 
 - [Differentially expressed results file](https://zenodo.org/record/2529117/files/limma-voom_luminalpregnant-luminallactate): genes in rows, and 4 required columns: identifier (ENTREZID), gene symbol (SYMBOL), log fold change (logFC) and adjusted P values (adj.P.Val)
 - [Reference genome annotation file](https://zenodo.org/record/3601076/files/Mus_musculus.GRCm38.98.subset.gff3) in GFF format
 - [Correspondence file between gene symbol and Ensembl id](https://zenodo.org/record/3601076/files/symbol-ensembl.tsv): TSV with two columns: symbol and the corresponding Ensembl id
 - [QTL file](https://zenodo.org/record/3601076/files/MGIBatchReport_Qtl_Subset.txt): QTL in row, with 5 required columns: identifier, chromosome, start, end and name
 
-Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> containing instructions to perform in order to get started with AskOmics.
+Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> sections containing instructions to perform in order to get started with AskOmics.
 
 To complete the tutorial, you will need an AskOmics instance. You can [install your own](production-deployment.md) or use this [public instance](https://use.askomics.org).
 
@@ -28,10 +30,10 @@ Once you are logged, you can use all the functionalities of AskOmics.
 
 ## Manage your account
 
-To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> Your Name &#9662;</navbar> on the navigation bar.
+To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> *Your Name &#9662;*</navbar> on the navigation bar.
 
 
-Use the forms to change your personal information.
+You can use the forms to change your personal information.
 
 # Data integration
 
@@ -69,6 +71,8 @@ Next step is to convert this files into RDF triples. This step is called *Integr
 
 ## Integration
 
+Detailed information regarding the *Integration* step can be found [here](data.md).
+
 The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files. During the step of integration, AskOmics show a preview of each files. We can choose how the file will be integrated at this step.
 
 More information about data integration is available [here](data.md)
@@ -90,7 +94,7 @@ GFF files contain genetic coordinate of entities. Each entity contained in the G
 The TSV preview show an HTML table representing the TSV file. During integration, AskOmics will convert the file using the header.
 
 <!-- First col: entity, then, attribute -->
-The first column of a TSV file will be the *entity* name. Other columns of the file will be *attributes* of the *entity*. *Labels* of the *entity* and *attributes* will be set by the header. This *labels* can be edited by clicking on it.  
+The first column of a TSV file will be the *entity* name. Other columns of the file will be *attributes* of the *entity*. *Labels* of the *entity* and *attributes* will be set by the header. The column names can be edited by clicking on it.  
 
 <!-- Attribute types -->
 Entity and attributes can have special types. The types are defined with the select below the header. An *entity* can be a *start entity* or an *entity*. A *start entity* mean that the entity may be used to start a query.
@@ -274,23 +278,23 @@ The results page store the saved queries. A table show some useful information a
 
 !!! Hands-on
     1. Click on the name and enter `Over-expressed genes on a growth QTL`
-    2. press `enter` key
+    2. Press the `Enter` key
 
     ![Table of results](img/results_table.png){: .center}
 
 The **Action** column contain buttons to perform certain action:
 
-- Preview: show a results preview on the bottom of the table
+- Preview: Show a results preview on the bottom of the table
 - Download: Download the results (TSV file)
 - Edit: Edit the query with the query builder
-- SPARQL: edit the query with a SPARQL editor for advanced users
+- SPARQL: Access the generated SPARQL query for the result
 
 For more information about the Results page, please head [here](results.md)
 
 !!! Hands-on
-    1. Download the results file on your computer using <btn class="white">Download</btn> button.
+    1. Download the results file on your computer using the <btn class="white">Download</btn> button.
 
-The "Edit" button can be used to simply replay the query after changing some parameters.
+The <btn class="white">Edit</btn> button can be used to simply replay the query after changing some parameters.
 
 !!! Hands-on
     1. Edit the query, and replace "growth" with another term of interest (such as "anxiety").
@@ -302,7 +306,8 @@ The "Edit" button can be used to simply replay the query after changing some par
 Advanced queries, including *UNION* and *MINUS* SPARQL queries are also available to further your queries.  
 Please head [here](query.md#minus-and-union-nodes) for more information.
 
-
 # Conclusion
 
 In this tutorial we have seen how to use the AskOmics Interactive Tool, building a complex SPARQL query to interrogate 4 different datasets and answer a biological question.
+
+This tutorial was a brief overview of AskOmics's functionalities. Please check the other categories on the left-side for more information.

@@ -32,7 +32,7 @@ nav:
     - Build RDF Abstraction: abstraction.md
     - Federated queries: federation.md
     - AskOmics and Galaxy: galaxy.md
-  - Admin :
+  - Administrator guide:
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
     - Manage: manage.md
@@ -40,7 +40,7 @@ nav:
     - Dev deployment: dev-deployment.md
     - Contribute: contribute.md
     - CI: ci.md
-    - Doc: docs.md
+    - Documentation: docs.md
   - Bug Tracker: https://github.com/askomics/flaskomics/issues
   - Project monitoring: https://github.com/askomics/flaskomics/projects
 

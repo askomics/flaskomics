@@ -1,3 +1,15 @@
+# Data visibility
+
+By default, all your uploaded files and datasets are private.
+If you have administrator privileges, you can select the <btn><i class="fa fa-globe-europe"></i>Integrate (Public dataset)</btn> button during integration to make the dataset **Public**
+
+!!! note "Info"
+    *Public* datasets will be queriable by any user, including non-logged users. They will not be able to directly access the file, but generated entities will appear on the query graph (and on the starting screen for starting entities).
+
+!!! warning
+    Make sure your public datasets do not contain sensitive information.
+
+
 # CSV/TSV files
 
 AskOmics will integrate a CSV/TSV file using its header. The *type* of each column will be predicted, but you will be able to modify it before integration.

@@ -1,4 +1,4 @@
-On the Results page, you will be able to see all your saved results (after using the <btn><i class="fa fa-save"></i> Run & save</btn> button). Each row stores both the query and its results.
+On the <navbar><i class="fa fa-tasks"></i> Results</navbar> page, you will be able to see all your saved results (after using the <btn><i class="fa fa-save"></i> Run & save</btn> button). Each row stores both the query and its results.
 
 # General information
 
