@@ -7,6 +7,7 @@ from askomics.api.auth import login_required, api_auth
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
+from askomics.libaskomics.RdfFile import RdfFile
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
 
@@ -319,7 +320,7 @@ def integrate():
         for file in files_handler.files:
 
             data["externalEndpoint"] = data["externalEndpoint"] if data.get("externalEndpoint") else None
-            data["customUri"] = data["customUri"] if data.get("customUri") else None
+            data["customUri"] = data["customUri"] if (data.get("customUri") and isinstance(file, RdfFile)) else None
 
             dataset_info = {
                 "celery_id": None,
