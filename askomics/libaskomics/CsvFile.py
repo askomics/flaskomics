@@ -500,7 +500,7 @@ class CsvFile(File):
             has_label = None
             # Get first value, ignore others
             if "label" in self.columns_type and self.columns_type.index("label") == 1:
-                has_label = 1
+                has_label = True
 
             # Loop on lines
             for row_number, row in enumerate(reader):
