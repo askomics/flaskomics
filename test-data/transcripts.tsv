@@ -1,11 +1,11 @@
-transcript	taxon	featureName	chromosomeName	start	end	featureType	strand	biotype	description	date
-AT3G10490	Arabidopsis_thaliana	ANAC052	At3	3267835	3270883	gene	plus	protein_coding	NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]	01/01/2000
-AT3G13660	Arabidopsis_thaliana	DIR22	At3	4464908	4465586	gene	plus	protein_coding	Dirigent_protein_22_[Source:UniProtKB/Swiss-Prot%3BAcc:Q66GI2]	02/01/2000
-AT3G51470	Arabidopsis_thaliana	na	At3	19097787	19099275	gene	minus	protein_coding	Probable_protein_phosphatase_2C_47_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9SD02]	03/01/2000
-AT3G10460	Arabidopsis_thaliana	na	At3	3255800	3256439	gene	plus	protein_coding	Plant_self-incompatibility_protein_S1_family_[Source:TAIR%3BAcc:AT3G10460]	04/01/2000
-AT3G22640	Arabidopsis_thaliana	PAP85	At3	8011724	8013902	gene	minus	protein_coding	cupin_family_protein_[Source:TAIR%3BAcc:AT3G22640]	05/01/2000
-AT1G33615	Arabidopsis_thaliana	na	At1	12193325	12194374	ncRNA_gene	minus	ncRNA	other_RNA_[Source:TAIR%3BAcc:AT1G33615]	06/01/2000
-AT5G41905	Arabidopsis_thaliana	MIR166E	At5	16775524	16775658	miRNA_gene	minus	miRNA	MIR166/MIR166E%3B_miRNA_[Source:TAIR%3BAcc:AT5G41905]	07/01/2000
-AT1G57800	Arabidopsis_thaliana	ORTH3	At1	21408623	21412283	gene	minus	protein_coding	E3_ubiquitin-protein_ligase_ORTHRUS_3_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9FVS2]	08/01/2000
-AT1G49500	Arabidopsis_thaliana	na	At1	18321295	18322284	gene	minus	protein_coding	unknown_protein%3B_FUNCTIONS_IN:_molecular_function_unknown%3B_INVOLVED_IN:_biological_process_unknown%3B_LOCATED_IN:_endomembrane_system%3B_EXPRESSED_IN:_19_plant_structures%3B_EXPRESSED_DURING:_10_growth_stages%3B_BEST_Arabidopsis_thaliana_protein_match_is:_u_/.../_protein_(TAIR:AT3G19030.1)%3B_Has_24_Blast_hits_to_24_proteins_in_2_species:_Archae_-_0%3B_Bacteria_-_0%3B_Metazoa_-_0%3B_Fungi_-_0%3B_Plants_-_24%3B_Viruses_-_0%3B_Other_Eukaryotes_-_0_(source:_NCBI_BLink)._[Source:TAIR%3BAcc:AT1G49500]	09/01/2000
-AT5G35334	Arabidopsis_thaliana	na	At5	13537917	13538984	gene	plus	transposable_element	transposable_element_gene_[Source:TAIR%3BAcc:AT5G35334]	10/01/2000
+transcript	label	taxon	featureName	chromosomeName	start	end	featureType	strand	biotype	description	date
+AT3G10490	label_AT3G10490	Arabidopsis_thaliana	ANAC052	At3	3267835	3270883	gene	plus	protein_coding	NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]	01/01/2000
+AT3G13660	label_AT3G13660	Arabidopsis_thaliana	DIR22	At3	4464908	4465586	gene	plus	protein_coding	Dirigent_protein_22_[Source:UniProtKB/Swiss-Prot%3BAcc:Q66GI2]	02/01/2000
+AT3G51470	label_AT3G51470	Arabidopsis_thaliana	na	At3	19097787	19099275	gene	minus	protein_coding	Probable_protein_phosphatase_2C_47_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9SD02]	03/01/2000
+AT3G10460	label_AT3G10460	Arabidopsis_thaliana	na	At3	3255800	3256439	gene	plus	protein_coding	Plant_self-incompatibility_protein_S1_family_[Source:TAIR%3BAcc:AT3G10460]	04/01/2000
+AT3G22640	label_AT3G22640	Arabidopsis_thaliana	PAP85	At3	8011724	8013902	gene	minus	protein_coding	cupin_family_protein_[Source:TAIR%3BAcc:AT3G22640]	05/01/2000
+AT1G33615	label_AT1G33615	Arabidopsis_thaliana	na	At1	12193325	12194374	ncRNA_gene	minus	ncRNA	other_RNA_[Source:TAIR%3BAcc:AT1G33615]	06/01/2000
+AT5G41905	label_AT5G41905	Arabidopsis_thaliana	MIR166E	At5	16775524	16775658	miRNA_gene	minus	miRNA	MIR166/MIR166E%3B_miRNA_[Source:TAIR%3BAcc:AT5G41905]	07/01/2000
+AT1G57800	label_AT1G57800	Arabidopsis_thaliana	ORTH3	At1	21408623	21412283	gene	minus	protein_coding	E3_ubiquitin-protein_ligase_ORTHRUS_3_[Source:UniProtKB/Swiss-Prot%3BAcc:Q9FVS2]	08/01/2000
+AT1G49500	label_AT1G49500	Arabidopsis_thaliana	na	At1	18321295	18322284	gene	minus	protein_coding	unknown_protein%3B_FUNCTIONS_IN:_molecular_function_unknown%3B_INVOLVED_IN:_biological_process_unknown%3B_LOCATED_IN:_endomembrane_system%3B_EXPRESSED_IN:_19_plant_structures%3B_EXPRESSED_DURING:_10_growth_stages%3B_BEST_Arabidopsis_thaliana_protein_match_is:_u_/.../_protein_(TAIR:AT3G19030.1)%3B_Has_24_Blast_hits_to_24_proteins_in_2_species:_Archae_-_0%3B_Bacteria_-_0%3B_Metazoa_-_0%3B_Fungi_-_0%3B_Plants_-_24%3B_Viruses_-_0%3B_Other_Eukaryotes_-_0_(source:_NCBI_BLink)._[Source:TAIR%3BAcc:AT1G49500]	09/01/2000
+AT5G35334	label_AT5G35334	Arabidopsis_thaliana	na	At5	13537917	13538984	gene	plus	transposable_element	transposable_element_gene_[Source:TAIR%3BAcc:AT5G35334]	10/01/2000

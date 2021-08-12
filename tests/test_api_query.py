@@ -153,7 +153,7 @@ class TestApiStartpoints(AskomicsTestCase):
         client.log_user("jdoe")
 
         response = client.client.post('/api/query/preview', json=data)
-        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT1G57800'}, {'transcript1_Label': 'AT5G35334'}, {'transcript1_Label': 'AT3G10460'}, {'transcript1_Label': 'AT1G49500'}, {'transcript1_Label': 'AT3G10490'}, {'transcript1_Label': 'AT3G51470'}, {'transcript1_Label': 'AT5G41905'}, {'transcript1_Label': 'AT1G33615'}, {'transcript1_Label': 'AT3G22640'}, {'transcript1_Label': 'AT3G13660'}, {'transcript1_Label': 'AT1G01010.1'}]}
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'label_AT1G57800'}, {'transcript1_Label': 'label_AT5G35334'}, {'transcript1_Label': 'label_AT3G10460'}, {'transcript1_Label': 'label_AT1G49500'}, {'transcript1_Label': 'label_AT3G10490'}, {'transcript1_Label': 'label_AT3G51470'}, {'transcript1_Label': 'label_AT5G41905'}, {'transcript1_Label': 'label_AT1G33615'}, {'transcript1_Label': 'label_AT3G22640'}, {'transcript1_Label': 'label_AT3G13660'}, {'transcript1_Label': 'AT1G01010.1'}]}
 
         # print(response.json)
 
@@ -171,7 +171,7 @@ class TestApiStartpoints(AskomicsTestCase):
             "graphState": json_query,
         }
         response = client.client.post('/api/query/preview', json=data)
-        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT3G10490'}]}
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'label_AT3G10490'}]}
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
@@ -197,7 +197,7 @@ class TestApiStartpoints(AskomicsTestCase):
             "graphState": json_query,
         }
         response = client.client.post('/api/query/preview', json=data)
-        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'AT3G10490'}]}
+        expected = {'error': False, 'errorMessage': '', 'headerPreview': ['transcript1_Label'], 'resultsPreview': [{'transcript1_Label': 'label_AT3G10490'}]}
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 

@@ -68,7 +68,7 @@ class TestApiAdmin(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 2102,
+                'size': 2268,
                 'type': 'csv/tsv',
                 'user': 'jsmith'
 
