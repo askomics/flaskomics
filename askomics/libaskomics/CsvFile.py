@@ -497,10 +497,10 @@ class CsvFile(File):
             # Faldo
             self.faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
 
-            label_column = None
+            has_label = None
             # Get first value, ignore others
-            if "label" in self.columns_type:
-                label_column = self.columns_type.index("label")
+            if "label" in self.columns_type and self.columns_type.index("label") == 1:
+                has_label = 1
 
             # Loop on lines
             for row_number, row in enumerate(reader):
@@ -514,8 +514,8 @@ class CsvFile(File):
 
                 # Entity
                 entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
-                if label_column and row[label_column]:
-                    label = row[label_column]
+                if has_label and row[1]:
+                    label = row[1]
                 else:
                     label = self.get_uri_label(row[0])
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
@@ -541,8 +541,9 @@ class CsvFile(File):
                     relation = None
                     symetric_relation = False
 
-                    # Skip label type
-                    if current_type == "label":
+                    # Skip label type for second column
+                    # if type is label but not second column, default to string
+                    if current_type == "label" and column_number == 1:
                         continue
 
                     # Skip entity and blank cells
