@@ -187,12 +187,15 @@ class CsvFile(File):
         if header_index == 0:
             return "start_entity"
 
+        # If it matches "label"
+        if header_index == 1 and re.match(r".*label.*", self.header[header_index].lower(), re.IGNORECASE) is not None:
+            return "label"
+
         # if name contain @, this is a relation
         if self.header[header_index].find("@") > 0:
             return "general_relation"
 
         special_types = {
-            'label': ('label'),
             'reference': ('chr', 'ref'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
@@ -497,7 +500,7 @@ class CsvFile(File):
             label_column = None
             # Get first value, ignore others
             if "label" in self.columns_type:
-                label_column = self.column_type.index("label")
+                label_column = self.columns_type.index("label")
 
             # Loop on lines
             for row_number, row in enumerate(reader):

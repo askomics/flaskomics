@@ -91,7 +91,7 @@ export default class CsvTable extends Component {
       )
     }
 
-    if (colIndex == 0) {
+    if (colIndex == 1) {
       return (
         <div>
           <FormGroup>
