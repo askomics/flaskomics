@@ -192,6 +192,7 @@ class CsvFile(File):
             return "general_relation"
 
         special_types = {
+            'label': ('label'),
             'reference': ('chr', 'ref'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
@@ -401,6 +402,10 @@ class CsvFile(File):
             if index == 0:
                 continue
 
+            # Skip label
+            if self.columns_type[index] == "label":
+                continue
+
             # Relation
             if self.columns_type[index] in ('general_relation', 'symetric_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
@@ -489,6 +494,11 @@ class CsvFile(File):
             # Faldo
             self.faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
 
+            label_column = None
+            # Get first value, ignore others
+            if "label" in self.columns_type:
+                label_column = self.column_type.index("label")
+
             # Loop on lines
             for row_number, row in enumerate(reader):
 
@@ -501,7 +511,10 @@ class CsvFile(File):
 
                 # Entity
                 entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
-                label = self.get_uri_label(row[0])
+                if label_column and row[label_column]:
+                    label = row[label_column]
+                else:
+                    label = self.get_uri_label(row[0])
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(label)))
 
@@ -524,6 +537,10 @@ class CsvFile(File):
                     attribute = None
                     relation = None
                     symetric_relation = False
+
+                    # Skip label type
+                    if current_type == "label":
+                        continue
 
                     # Skip entity and blank cells
                     if column_number == 0 or (not cell and not current_type == "strand"):

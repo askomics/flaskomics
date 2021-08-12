@@ -394,7 +394,7 @@ def get_column_types():
         types: list of available column types
     """
 
-    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation"]
+    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation", "label"]
 
     return jsonify({
         "types": data
