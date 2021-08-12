@@ -236,6 +236,7 @@ export default class CsvTable extends Component {
           <br />
           <AdvancedOptions
             config={this.props.config}
+            hideDistantEndpoint={true}
             handleChangeUri={p => this.handleChangeUri(p)}
             handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
             customUri={this.state.customUri}
