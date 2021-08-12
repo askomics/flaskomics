@@ -320,7 +320,7 @@ def integrate():
         for file in files_handler.files:
 
             data["externalEndpoint"] = data["externalEndpoint"] if (data.get("externalEndpoint") and isinstance(file, RdfFile)) else None
-            data["customUri"] = data["customUri"] if data.get("customUri") else None
+            data["customUri"] = data["customUri"] if (data.get("customUri") and not isinstance(file, RdfFile)) else None
 
             dataset_info = {
                 "celery_id": None,
