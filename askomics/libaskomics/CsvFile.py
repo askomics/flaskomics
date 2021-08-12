@@ -192,7 +192,7 @@ class CsvFile(File):
             return "general_relation"
 
         special_types = {
-            'reference': ('chr', 'ref'),
+            'reference': ('chr', 'ref', 'scaff'),
             'strand': ('strand', ),
             'start': ('start', 'begin'),
             'end': ('end', 'stop'),
