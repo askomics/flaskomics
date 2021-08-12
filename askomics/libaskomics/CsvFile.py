@@ -405,8 +405,8 @@ class CsvFile(File):
             if index == 0:
                 continue
 
-            # Skip label
-            if self.columns_type[index] == "label":
+            # Skip label for second column
+            if self.columns_type[index] == "label" and index == 1:
                 continue
 
             # Relation
