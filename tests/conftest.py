@@ -369,7 +369,7 @@ class Client(object):
         # integrate
         int_transcripts = self.integrate_file({
             "id": 1,
-            "columns_type": ["start_entity", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
+            "columns_type": ["start_entity", "label", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
         })
 
         int_de = self.integrate_file({
