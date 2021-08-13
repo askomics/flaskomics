@@ -5,7 +5,7 @@
             "predicat": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
         },
         {
-            "object": "AT3G10490",
+            "object": "label_AT3G10490",
             "predicat": "http://www.w3.org/2000/01/rdf-schema#label"
         },
         {

@@ -191,6 +191,10 @@ class CsvFile(File):
         if self.header[header_index].find("@") > 0:
             return "general_relation"
 
+        # If it matches "label"
+        if header_index == 1 and re.match(r".*label.*", self.header[header_index].lower(), re.IGNORECASE) is not None:
+            return "label"
+
         special_types = {
             'reference': ('chr', 'ref', 'scaff'),
             'strand': ('strand', ),
@@ -401,6 +405,10 @@ class CsvFile(File):
             if index == 0:
                 continue
 
+            # Skip label for second column
+            if self.columns_type[index] == "label" and index == 1:
+                continue
+
             # Relation
             if self.columns_type[index] in ('general_relation', 'symetric_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
@@ -489,6 +497,11 @@ class CsvFile(File):
             # Faldo
             self.faldo_entity = True if 'start' in self.columns_type and 'end' in self.columns_type else False
 
+            has_label = None
+            # Get first value, ignore others
+            if "label" in self.columns_type and self.columns_type.index("label") == 1:
+                has_label = True
+
             # Loop on lines
             for row_number, row in enumerate(reader):
 
@@ -501,7 +514,10 @@ class CsvFile(File):
 
                 # Entity
                 entity = self.rdfize(row[0], custom_namespace=self.namespace_entity)
-                label = self.get_uri_label(row[0])
+                if has_label and row[1]:
+                    label = row[1]
+                else:
+                    label = self.get_uri_label(row[0])
                 self.graph_chunk.add((entity, rdflib.RDF.type, entity_type))
                 self.graph_chunk.add((entity, rdflib.RDFS.label, rdflib.Literal(label)))
 
@@ -524,6 +540,11 @@ class CsvFile(File):
                     attribute = None
                     relation = None
                     symetric_relation = False
+
+                    # Skip label type for second column
+                    # if type is label but not second column, default to string
+                    if current_type == "label" and column_number == 1:
+                        continue
 
                     # Skip entity and blank cells
                     if column_number == 0 or (not cell and not current_type == "strand"):

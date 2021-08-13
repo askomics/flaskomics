@@ -6,6 +6,7 @@
       "data": {
         "columns_type": [
           "start_entity",
+          "label",
           "text",
           "text",
           "reference",
@@ -29,7 +30,8 @@
             "strand": "plus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT3G10490",
-            "date": "01/01/2000"
+            "date": "01/01/2000",
+            "label": "label_AT3G10490"
           },
           {
             "biotype": "protein_coding",
@@ -42,7 +44,8 @@
             "strand": "plus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT3G13660",
-            "date": "02/01/2000"
+            "date": "02/01/2000",
+            "label": "label_AT3G13660"
           },
           {
             "biotype": "protein_coding",
@@ -55,7 +58,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT3G51470",
-            "date": "03/01/2000"
+            "date": "03/01/2000",
+            "label": "label_AT3G51470"
           },
           {
             "biotype": "protein_coding",
@@ -68,7 +72,8 @@
             "strand": "plus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT3G10460",
-            "date": "04/01/2000"
+            "date": "04/01/2000",
+            "label": "label_AT3G10460"
           },
           {
             "biotype": "protein_coding",
@@ -81,7 +86,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT3G22640",
-            "date": "05/01/2000"
+            "date": "05/01/2000",
+            "label": "label_AT3G22640"
           },
           {
             "biotype": "ncRNA",
@@ -94,7 +100,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT1G33615",
-            "date": "06/01/2000"
+            "date": "06/01/2000",
+            "label": "label_AT1G33615"
           },
           {
             "biotype": "miRNA",
@@ -107,7 +114,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT5G41905",
-            "date": "07/01/2000"
+            "date": "07/01/2000",
+            "label": "label_AT5G41905"
           },
           {
             "biotype": "protein_coding",
@@ -120,7 +128,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT1G57800",
-            "date": "08/01/2000"
+            "date": "08/01/2000",
+            "label": "label_AT1G57800"
           },
           {
             "biotype": "protein_coding",
@@ -133,7 +142,8 @@
             "strand": "minus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT1G49500",
-            "date": "09/01/2000"
+            "date": "09/01/2000",
+            "label": "label_AT1G49500"
           },
           {
             "biotype": "transposable_element",
@@ -146,11 +156,13 @@
             "strand": "plus",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT5G35334",
-            "date": "10/01/2000"
+            "date": "10/01/2000",
+            "label": "label_AT5G35334"
           }
         ],
         "header": [
           "transcript",
+          "label",
           "taxon",
           "featureName",
           "chromosomeName",

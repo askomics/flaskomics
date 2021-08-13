@@ -91,6 +91,38 @@ export default class CsvTable extends Component {
       )
     }
 
+    if (colIndex == 1) {
+      return (
+        <div>
+          <FormGroup>
+            {colInput}
+            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
+              <optgroup label="Properties">
+                <option value="label" >Entity label</option>
+              </optgroup>
+              <optgroup label="Attributes">
+                <option value="numeric" >Numeric</option>
+                <option value="text" >Text</option>
+                <option value="category" >Category</option>
+                <option value="boolean" >Boolean</option>
+                <option value="date" >Date</option>
+              </optgroup>
+              <optgroup label="Faldo attributes">
+                <option value="reference" >Reference</option>
+                <option value="strand" >Strand</option>
+                <option value="start" >Start</option>
+                <option value="end" >End</option>
+              </optgroup>
+              <optgroup label="Relation">
+                <option value="general_relation" >Directed</option>
+                <option value="symetric_relation" >Symetric</option>
+              </optgroup>
+            </CustomInput>
+          </FormGroup>
+        </div>
+      )
+    }
+
     return (
       <div>
         <FormGroup>
