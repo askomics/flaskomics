@@ -187,13 +187,13 @@ class CsvFile(File):
         if header_index == 0:
             return "start_entity"
 
-        # If it matches "label"
-        if header_index == 1 and re.match(r".*label.*", self.header[header_index].lower(), re.IGNORECASE) is not None:
-            return "label"
-
         # if name contain @, this is a relation
         if self.header[header_index].find("@") > 0:
             return "general_relation"
+
+        # If it matches "label"
+        if header_index == 1 and re.match(r".*label.*", self.header[header_index].lower(), re.IGNORECASE) is not None:
+            return "label"
 
         special_types = {
             'reference': ('chr', 'ref'),
