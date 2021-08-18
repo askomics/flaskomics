@@ -115,6 +115,19 @@ class GffFile(File):
             self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
             self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
 
+            # New way of storing relations (starting from 4.4.0)
+            if attribute.get("relation"):
+                blank = BNode()
+                endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
+                for attr_type in attribute["type"]:
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attribute["uri"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.endpointURL, endpoint))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
+
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -319,7 +332,8 @@ class GffFile(File):
                                         "domain": entity_type,
                                         "range": value,
                                         "qualifier_key": qualifier_key,
-                                        "feature_type": feature.type
+                                        "feature_type": feature.type,
+                                        "relation": True
                                     })
                                     skip = True
                             else:
@@ -336,7 +350,8 @@ class GffFile(File):
                                     "label": rdflib.Literal(qualifier_key),
                                     "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                     "domain": entity_type,
-                                    "range": self.namespace_data[self.format_uri(related_type)]
+                                    "range": self.namespace_data[self.format_uri(related_type)],
+                                    "relation": True
                                 })
 
                         else:
