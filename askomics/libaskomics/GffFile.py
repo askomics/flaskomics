@@ -121,7 +121,7 @@ class GffFile(File):
                 endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
                 for attr_type in attribute["type"]:
                     self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
-                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attribute["uri"]))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))

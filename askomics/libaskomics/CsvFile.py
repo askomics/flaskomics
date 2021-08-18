@@ -425,7 +425,7 @@ class CsvFile(File):
                 endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdflib.OWL.ObjectProperty))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
-                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attribute))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, label))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, entity))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, rdf_range))

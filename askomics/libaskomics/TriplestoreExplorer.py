@@ -520,23 +520,26 @@ class TriplestoreExplorer(Params):
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 # Property (relations and categories)
-                ?property_uri a owl:ObjectProperty .
-                ?property_uri a askomics:AskomicsRelation .
-                ?property_uri rdfs:label ?property_label .
-                ?property_uri rdfs:range ?range_uri .
+                ?node a owl:ObjectProperty .
+                ?node a askomics:AskomicsRelation .
+                ?node rdfs:label ?property_label .
+                ?node rdfs:range ?range_uri .
+                ?node askomics:uri ?property_uri
+                # Retrocompatibility (before blank nodes)
+                {}
             }}
             # Relation of entity (or motherclass of entity)
             {{
-                ?property_uri rdfs:domain ?mother .
+                ?node rdfs:domain ?mother .
                 ?entity_uri rdfs:subClassOf ?mother .
             }} UNION {{
-                ?property_uri rdfs:domain ?entity_uri .
+                ?node rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
             )
         }}
-        '''.format(filter_user)
+        '''.format("FILTER (isBlank(?node))", filter_user)
 
         header, data = query_launcher.process_query(query_builder.prefix_query(query))
 
