@@ -524,7 +524,6 @@ class TriplestoreExplorer(Params):
                 ?node a askomics:AskomicsRelation .
                 ?node rdfs:label ?property_label .
                 ?node rdfs:range ?range_uri .
-                ?node askomics:uri ?property_uri
                 # Retrocompatibility
                 OPTIONAL {{?node askomics:uri ?property_uri}}
             }}
@@ -545,7 +544,6 @@ class TriplestoreExplorer(Params):
 
         relations_list = []
         relations = []
-
         for result in data:
             # Relation
             if "node" in result:
