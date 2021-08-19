@@ -418,7 +418,6 @@ class CsvFile(File):
                 label = rdflib.Literal(splitted[0])
                 rdf_range = self.rdfize(splitted[1])
                 rdf_type = rdflib.OWL.ObjectProperty
-                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
 
                 # New way of storing relations (starting from 4.4.0)
                 blank = BNode()
@@ -434,6 +433,8 @@ class CsvFile(File):
                 if symetric_relation:
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+
+                continue
 
             # Category
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
@@ -475,9 +476,6 @@ class CsvFile(File):
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.label, label))
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, entity))
             self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, rdf_range))
-            if symetric_relation:
-                self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, rdf_range))
-                self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, entity))
 
         # Faldo:
         if self.faldo_entity:

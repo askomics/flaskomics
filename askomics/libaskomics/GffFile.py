@@ -109,12 +109,6 @@ class GffFile(File):
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
         for attribute in self.attribute_abstraction:
-            for attr_type in attribute["type"]:
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
-
             # New way of storing relations (starting from 4.4.0)
             if attribute.get("relation"):
                 blank = BNode()
@@ -127,6 +121,13 @@ class GffFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
                 self.graph_abstraction_dk.add((blank, rdflib.DCAT.endpointURL, endpoint))
                 self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
+
+            else:
+                for attr_type in attribute["type"]:
+                    self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
+                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
+                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
+                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
 
             # Domain Knowledge
             if "values" in attribute.keys():
