@@ -526,7 +526,7 @@ class TriplestoreExplorer(Params):
                 ?node rdfs:range ?range_uri .
                 ?node askomics:uri ?property_uri
                 # Retrocompatibility
-                OPTIONAL {?node askomics:uri ?property_uri}
+                OPTIONAL {{?node askomics:uri ?property_uri}}
             }}
             # Relation of entity (or motherclass of entity)
             {{
