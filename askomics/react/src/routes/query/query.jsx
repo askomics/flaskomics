@@ -40,7 +40,9 @@ export default class Query extends Component {
 
       // Preview icons
       disablePreview: false,
-      previewIcon: "table"
+      previewIcon: "table",
+
+      showFaldo: true;
     }
 
     this.graphState = {
@@ -570,7 +572,7 @@ export default class Query extends Component {
     })
 
     // Position
-    if (node.faldo) {
+    if (node.faldo && this.state.showFaldo) {
       this.state.abstraction.entities.map(entity => {
         if (entity.faldo) {
           let new_id = this.getId()
@@ -981,6 +983,16 @@ export default class Query extends Component {
         node.filterLink = event.target.value
       }
     })
+    // Reset suggestion
+    this.removeAllSuggestion()
+    this.insertSuggestion(this.currentSelected)
+    this.updateGraphState()
+  }
+
+  // Filter Faldo --------------------------
+  handleFilterFaldo (event) {
+    // Toggle filter
+    this.state.showFaldo = event.target.value
     // Reset suggestion
     this.removeAllSuggestion()
     this.insertSuggestion(this.currentSelected)
@@ -1542,6 +1554,8 @@ export default class Query extends Component {
           current={this.currentSelected}
           handleFilterNodes={this.handleFilterNodes}
           handleFilterLinks={this.handleFilterLinks}
+          handleFilterFaldo={this.handleFilterFaldo}
+          showFaldo:{this.state.showFaldo}
         />
       )
 

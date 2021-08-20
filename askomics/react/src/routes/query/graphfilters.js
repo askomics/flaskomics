@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Row, Col, Input } from 'reactstrap'
+import { Row, Col, CustomInput, Input } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -39,15 +39,20 @@ export default class GraphFilters extends Component {
 
     return (
       <Row>
-        <Col md={6}>
+        <Col md={4}>
           <div>
             <Input type="text" disabled={disabled} name="filterlinks" id="filterlinks" value={filterLinkValue} placeholder="Filter links" onChange={this.props.handleFilterLinks}/>
           </div>
         </Col>
-        <Col md={6}>
+        <Col md={4}>
           <div>
             <Input type="text" disabled={disabled} name="filternodes" id="filternodes" value={filterNodeValue} placeholder="Filter nodes" onChange={this.props.handleFilterNodes}/>
-          </div> 
+          </div>
+        </Col>
+        <Col md={4}>
+          <div>
+            <CustomInput type="switch" id="filterFaldo" onChange={this.props.handleFilterFaldo} checked={this.props.showFaldo} value={this.props.showFaldo} />
+          </div>
         </Col>
       </Row>
     )
@@ -57,6 +62,8 @@ export default class GraphFilters extends Component {
 GraphFilters.propTypes = {
   graph: PropTypes.object,
   current: PropTypes.object,
+  showFaldo: PropTypes.bool,
   handleFilterLinks: PropTypes.func,
-  handleFilterNodes: PropTypes.func
+  handleFilterNodes: PropTypes.func,
+  handleFilterFaldo: PropTypes.func
 }
