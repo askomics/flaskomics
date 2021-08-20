@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
+import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -42,7 +42,7 @@ export default class Query extends Component {
       disablePreview: false,
       previewIcon: "table",
 
-      showFaldo: true;
+      showFaldo: true
     }
 
     this.graphState = {
@@ -64,6 +64,7 @@ export default class Query extends Component {
     this.handleRemoveNode = this.handleRemoveNode.bind(this)
     this.handleFilterNodes = this.handleFilterNodes.bind(this)
     this.handleFilterLinks = this.handleFilterLinks.bind(this)
+    this.handleFilterFaldo = this.handleFilterFaldo.bind(this)
   }
 
   resetIcons() {
@@ -992,11 +993,19 @@ export default class Query extends Component {
   // Filter Faldo --------------------------
   handleFilterFaldo (event) {
     // Toggle filter
-    this.state.showFaldo = event.target.value
-    // Reset suggestion
-    this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
-    this.updateGraphState()
+    console.log(this.state.showFaldo)
+    this.setState(prevState => ({
+        showFaldo: !prevState.showFaldo
+    }));
+
+    this.setState({
+        showFaldo: !this.state.showFaldo
+    }, () => {
+        // Reset suggestion
+        this.removeAllSuggestion()
+        this.insertSuggestion(this.currentSelected)
+        this.updateGraphState()
+    })
   }
 
   // Attributes managment -----------------------
@@ -1456,6 +1465,7 @@ export default class Query extends Component {
     let AttributeBoxes
     let linkView
     let previewButton
+    let faldoButton
     let launchQueryButton
     let removeButton
     let graphFilters
@@ -1547,6 +1557,12 @@ export default class Query extends Component {
         )
       }
 
+      faldoButton = (
+        <div>
+            <CustomInput type="switch" id="filterFaldo" onChange={this.handleFilterFaldo} checked={this.state.showFaldo} value={this.state.showFaldo} label="Show FALDO relations"  />
+        </div>
+      )
+
       // Filters
       graphFilters = (
         <GraphFilters
@@ -1554,8 +1570,6 @@ export default class Query extends Component {
           current={this.currentSelected}
           handleFilterNodes={this.handleFilterNodes}
           handleFilterLinks={this.handleFilterLinks}
-          handleFilterFaldo={this.handleFilterFaldo}
-          showFaldo:{this.state.showFaldo}
         />
       )
 
@@ -1576,11 +1590,14 @@ export default class Query extends Component {
         <h2>Query Builder</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
-        <Row>
+        <Row className="align-items-center">
           <Col xs="7">
             {graphFilters}
           </Col>
-          <Col xs="5">
+          <Col xs="3">
+            {faldoButton}
+          </Col>
+          <Col xs="2">
             {removeButton}
           </Col>
         </Row>

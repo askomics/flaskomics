@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Row, Col, CustomInput, Input } from 'reactstrap'
+import { Row, Col, Input } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -39,19 +39,14 @@ export default class GraphFilters extends Component {
 
     return (
       <Row>
-        <Col md={4}>
+        <Col md={6}>
           <div>
             <Input type="text" disabled={disabled} name="filterlinks" id="filterlinks" value={filterLinkValue} placeholder="Filter links" onChange={this.props.handleFilterLinks}/>
           </div>
         </Col>
-        <Col md={4}>
+        <Col md={6}>
           <div>
             <Input type="text" disabled={disabled} name="filternodes" id="filternodes" value={filterNodeValue} placeholder="Filter nodes" onChange={this.props.handleFilterNodes}/>
-          </div>
-        </Col>
-        <Col md={4}>
-          <div>
-            <CustomInput type="switch" id="filterFaldo" onChange={this.props.handleFilterFaldo} checked={this.props.showFaldo} value={this.props.showFaldo} />
           </div>
         </Col>
       </Row>
