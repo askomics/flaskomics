@@ -41,8 +41,6 @@ export default class Query extends Component {
       // Preview icons
       disablePreview: false,
       previewIcon: "table",
-
-      showFaldo: true
     }
 
     this.graphState = {
@@ -52,6 +50,8 @@ export default class Query extends Component {
     }
 
     this.divHeight = 650
+    this.showFaldo = true;
+
 
     this.idNumber = 0
     this.specialNodeIdNumber = 0
@@ -573,7 +573,7 @@ export default class Query extends Component {
     })
 
     // Position
-    if (node.faldo && this.state.showFaldo) {
+    if (node.faldo && this.showFaldo) {
       this.state.abstraction.entities.map(entity => {
         if (entity.faldo) {
           let new_id = this.getId()
@@ -993,19 +993,12 @@ export default class Query extends Component {
   // Filter Faldo --------------------------
   handleFilterFaldo (event) {
     // Toggle filter
-    console.log(this.state.showFaldo)
-    this.setState(prevState => ({
-        showFaldo: !prevState.showFaldo
-    }));
 
-    this.setState({
-        showFaldo: !this.state.showFaldo
-    }, () => {
-        // Reset suggestion
-        this.removeAllSuggestion()
-        this.insertSuggestion(this.currentSelected)
-        this.updateGraphState()
-    })
+    this.showFaldo = !this.showFaldo
+    // Reset suggestion
+    this.removeAllSuggestion()
+    this.insertSuggestion(this.currentSelected)
+    this.updateGraphState()
   }
 
   // Attributes managment -----------------------
@@ -1559,7 +1552,7 @@ export default class Query extends Component {
 
       faldoButton = (
         <div>
-            <CustomInput type="switch" id="filterFaldo" onChange={this.handleFilterFaldo} checked={this.state.showFaldo} value={this.state.showFaldo} label="Show FALDO relations"  />
+            <CustomInput type="switch" id="filterFaldo" onChange={this.handleFilterFaldo} checked={this.showFaldo} value={this.showFaldo} label="Show FALDO relations"  />
         </div>
       )
 
