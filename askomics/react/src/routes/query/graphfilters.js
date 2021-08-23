@@ -47,7 +47,7 @@ export default class GraphFilters extends Component {
         <Col md={6}>
           <div>
             <Input type="text" disabled={disabled} name="filternodes" id="filternodes" value={filterNodeValue} placeholder="Filter nodes" onChange={this.props.handleFilterNodes}/>
-          </div> 
+          </div>
         </Col>
       </Row>
     )
@@ -57,6 +57,8 @@ export default class GraphFilters extends Component {
 GraphFilters.propTypes = {
   graph: PropTypes.object,
   current: PropTypes.object,
+  showFaldo: PropTypes.bool,
   handleFilterLinks: PropTypes.func,
-  handleFilterNodes: PropTypes.func
+  handleFilterNodes: PropTypes.func,
+  handleFilterFaldo: PropTypes.func
 }
