@@ -148,10 +148,10 @@ export default class GffPreview extends Component {
                 return (
                 <div>
                   <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox" /> {key}</p>
-                  <FormGroup row>
+                  <FormGroup check inline>
                   {
                     values.map((value, valkey) => {
-                      return (<div><Input value={value} onClick={this.handleSelection} type="checkbox"/>{value}</div>)
+                      return (<div><Input value={value} onClick={this.handleSelection} type="checkbox"/>{value}&nbsp;</div>)
                     })
                   }
                   </FormGroup>
