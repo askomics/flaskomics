@@ -12,7 +12,8 @@ export default class GffPreview extends Component {
     this.state = {
       name: props.file.name,
       availableEntities: props.file.data.entities,
-      entitiesToIntegrate: new Set(),
+      entitiesToIntegrate: new Object(),
+      // entitiesToIntegrate: new Set(),
       id: props.file.id,
       integrated: false,
       publicTick: false,
@@ -54,7 +55,33 @@ export default class GffPreview extends Component {
       })
   }
 
+  isChecked(value){
+    return this.state.entitiesToIntegrate.hasOwnProperty(value);
+  }
+ 
+
   handleSelection (event) {
+
+    let value = event.target.value
+
+    if (!this.state.entitiesToIntegrate.hasOwnProperty(value)) {
+      this.state.entitiesToIntegrate[value] = []
+      this.setState({
+        entitiesToIntegrate: this.state.entitiesToIntegrate,
+        publicTick: false,
+        privateTick: false
+      })
+    } else {
+      delete this.state.entitiesToIntegrate[value]
+      this.setState({
+        entitiesToIntegrate: this.state.entitiesToIntegrate,
+        publicTick: false,
+        privateTick: false
+      })
+    }
+  }
+
+  handleSubSelection (event) {
 
     let value = event.target.value
 
@@ -64,7 +91,7 @@ export default class GffPreview extends Component {
         publicTick: false,
         privateTick: false
       })
-    }else {
+    } else {
       this.state.entitiesToIntegrate.delete(value)
       this.setState({
         entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]),
@@ -73,6 +100,7 @@ export default class GffPreview extends Component {
       })
     }
   }
+
 
   handleChangeUri (event) {
     this.setState({
@@ -106,6 +134,7 @@ export default class GffPreview extends Component {
     }
 
     let body
+    let id = 0
     if (this.props.file.error) {
       body = <ErrorDiv status={500} error={this.props.file.error} errorMessage={this.props.file.error_message} />
     } else {
@@ -114,8 +143,20 @@ export default class GffPreview extends Component {
           <br />
             <div>
               <FormGroup check>
-                {this.state.availableEntities.map((entity, index) => {
-                  return (<p key={entity + "_" + index}><Input value={entity} onClick={this.handleSelection} type="checkbox" /> {entity}</p>)
+                {Object.entries(this.state.availableEntities).map(([key, values]) => {
+                id +=1
+                return (
+                <div>
+                  <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox" /> {key}</p>
+                  <FormGroup row>
+                  {
+                    values.map((value, valkey) => {
+                      return (<div><Input value={value} onClick={this.handleSelection} type="checkbox"/>{value}</div>)
+                    })
+                  }
+                  </FormGroup>
+                </div>
+                )
                 })}
               </FormGroup>
             </div>

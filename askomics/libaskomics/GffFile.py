@@ -57,11 +57,14 @@ class GffFile(File):
 
             data = defaultdict(lambda: set())
 
-            for rec in GFF.parse(handle):
+            for rec in GFF.parse(handle, target_lines=1):
                 for feature in rec.features:
                     data[feature.type] |= set(feature.qualifiers.keys())
-            self.entities = data
             handle.close()
+
+            for key, values in data.items():
+                self.entities[key] = list(values)
+
         except Exception as e:
             self.error = True
             self.error_message = "Malformated GFF ({})".format(str(e))
