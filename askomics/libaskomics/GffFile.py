@@ -2,6 +2,7 @@ import rdflib
 import sys
 import traceback
 
+from collections import defaultdict
 from rdflib import BNode
 from BCBio.GFF import GFFExaminer
 from BCBio import GFF
@@ -34,7 +35,7 @@ class GffFile(File):
         """
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
-        self.entities = []
+        self.entities = {}
         self.entities_to_integrate = []
 
         self.category_values = {}
@@ -48,12 +49,18 @@ class GffFile(File):
     def set_preview(self):
         """Summary"""
         try:
-            exam = GFFExaminer()
+            # exam = GFFExaminer()
             handle = open(self.path, encoding="utf-8", errors="ignore")
-            gff_type = exam.available_limits(handle)['gff_type']
-            for entity in gff_type:
-                self.entities.append(entity[0])
+            # gff_type = exam.available_limits(handle)['gff_type']
+            # for entity in gff_type:
+            #    self.entities.append(entity[0])
 
+            data = defaultdict(lambda: set())
+
+            for rec in GFF.parse(handle):
+                for feature in rec.features:
+                    data[feature.type] |= set(feature.qualifiers.keys())
+            self.entities = data
             handle.close()
         except Exception as e:
             self.error = True
