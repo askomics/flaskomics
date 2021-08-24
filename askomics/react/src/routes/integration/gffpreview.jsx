@@ -12,17 +12,28 @@ export default class GffPreview extends Component {
     this.state = {
       name: props.file.name,
       availableEntities: props.file.data.entities,
-      entitiesToIntegrate: new Object(),
-      // entitiesToIntegrate: new Set(),
+      entitiesToIntegrate: new Set(),
       id: props.file.id,
       integrated: false,
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: ""
+      externalEndpoint: "",
+      subEntities: {}
     }
+
+    let subEntities = {}
+    Object.entries(this.state.availableEntities).map(([key, values]) => {
+        let data = new Set()
+        values.map((value, valkey) => {
+          data.add(value)
+        })
+        subEntities[key]= data
+    })
+    this.setState({subEntities: subEntities})
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
+    this.handleSubSelection = this.handleSubSelection.bind(this)
     this.handleSelection = this.handleSelection.bind(this)
   }
 
@@ -37,6 +48,8 @@ export default class GffPreview extends Component {
       customUri: this.state.customUri,
       externalEndpoint: this.state.externalEndpoint
     }
+    console.log(this.state)
+    return
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -58,33 +71,10 @@ export default class GffPreview extends Component {
   isChecked(value){
     return this.state.entitiesToIntegrate.hasOwnProperty(value);
   }
- 
+
 
   handleSelection (event) {
-
     let value = event.target.value
-
-    if (!this.state.entitiesToIntegrate.hasOwnProperty(value)) {
-      this.state.entitiesToIntegrate[value] = []
-      this.setState({
-        entitiesToIntegrate: this.state.entitiesToIntegrate,
-        publicTick: false,
-        privateTick: false
-      })
-    } else {
-      delete this.state.entitiesToIntegrate[value]
-      this.setState({
-        entitiesToIntegrate: this.state.entitiesToIntegrate,
-        publicTick: false,
-        privateTick: false
-      })
-    }
-  }
-
-  handleSubSelection (event) {
-
-    let value = event.target.value
-
     if (!this.state.entitiesToIntegrate.has(value)) {
       this.setState({
         entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]).add(value),
@@ -101,6 +91,20 @@ export default class GffPreview extends Component {
     }
   }
 
+
+  handleSubSelection (event) {
+    let value = event.target.value
+    let name = event.target.name
+    let state = this.state.subEntities
+    if (!state[name].has(value)) {
+      state[name] = new Set([...state[name]]).add(value)
+      this.setState({subEntities:state})
+    } else {
+      state[name].delete(value)
+      state[name] = new Set([...this.state[name]])
+      this.setState({subEntities:state})
+    }
+  }
 
   handleChangeUri (event) {
     this.setState({
@@ -151,7 +155,7 @@ export default class GffPreview extends Component {
                   <FormGroup check inline>
                   {
                     values.map((value, valkey) => {
-                      return (<div><Input value={value} onClick={this.handleSelection} type="checkbox"/>{value}&nbsp;</div>)
+                      return (<div><Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" checked="true"/>{value}&nbsp;</div>)
                     })
                   }
                   </FormGroup>
