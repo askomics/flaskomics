@@ -30,7 +30,7 @@ export default class GffPreview extends Component {
         })
         subEntities[key]= data
     })
-    this.setState({subEntities: subEntities})
+    this.state.subEntities = subEntities
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
     this.handleSubSelection = this.handleSubSelection.bind(this)
@@ -40,16 +40,20 @@ export default class GffPreview extends Component {
   integrate (event) {
     let requestUrl = '/api/files/integrate'
     let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
+    let selectedEntities = [...this.state.entitiesToIntegrate]
+    let entities = {}
+    selectedEntities.map((key) => {
+        entities[key] = [...this.state.subEntities[key]]
+    })
+
     let data = {
       fileId: this.state.id,
-      entities: [...this.state.entitiesToIntegrate],
+      entities: entities,
       public: event.target.value == 'public',
       type: 'gff/gff3',
       customUri: this.state.customUri,
       externalEndpoint: this.state.externalEndpoint
     }
-    console.log(this.state)
-    return
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -96,12 +100,12 @@ export default class GffPreview extends Component {
     let value = event.target.value
     let name = event.target.name
     let state = this.state.subEntities
+    console.log(state[name])
     if (!state[name].has(value)) {
-      state[name] = new Set([...state[name]]).add(value)
+      state[name].add(value)
       this.setState({subEntities:state})
     } else {
       state[name].delete(value)
-      state[name] = new Set([...this.state[name]])
       this.setState({subEntities:state})
     }
   }
@@ -151,14 +155,17 @@ export default class GffPreview extends Component {
                 id +=1
                 return (
                 <div>
-                  <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox" /> {key}</p>
+                <div>
+                  <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox"/> {key}</p>
                   <FormGroup check inline>
                   {
                     values.map((value, valkey) => {
-                      return (<div><Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" checked="true"/>{value}&nbsp;</div>)
+                      return (<div><Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} disabled={this.state.entitiesToIntegrate.has(key)? false : true}/>{value}&nbsp;</div>)
                     })
                   }
                   </FormGroup>
+                </div>
+                <br />
                 </div>
                 )
                 })}

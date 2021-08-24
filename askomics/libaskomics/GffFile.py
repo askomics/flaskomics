@@ -36,7 +36,7 @@ class GffFile(File):
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
         self.entities = {}
-        self.entities_to_integrate = []
+        self.entities_to_integrate = {}
 
         self.category_values = {}
 
@@ -184,6 +184,8 @@ class GffFile(File):
             # Loop on entities
             for feature in rec.features:
 
+                selected_attributes = self.entities_to_integrate.get(feature.type, [])
+
                 # Entity type
                 entity_type = self.namespace_data[self.format_uri(feature.type, remove_space=True)]
 
@@ -310,6 +312,9 @@ class GffFile(File):
 
                 # Qualifiers (9th columns)
                 for qualifier_key, qualifier_value in feature.qualifiers.items():
+
+                    if qualifier_key not in selected_attributes:
+                        continue
 
                     for value in qualifier_value:
                         skip = False
