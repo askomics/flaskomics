@@ -4,7 +4,6 @@ import traceback
 
 from collections import defaultdict
 from rdflib import BNode
-from BCBio.GFF import GFFExaminer
 from BCBio import GFF
 
 from askomics.libaskomics.File import File
@@ -89,7 +88,7 @@ class GffFile(File):
             }
         }
 
-    def integrate(self, dataset_id, entities=[], public=True):
+    def integrate(self, dataset_id, entities={}, public=True):
         """Integrate GFF file
 
         Parameters
@@ -165,7 +164,8 @@ class GffFile(File):
             Rdf content
         """
         handle = open(self.path, 'r', encoding='utf-8')
-        limit = dict(gff_type=self.entities_to_integrate)
+
+        limit = dict(gff_type=self.entities_to_integrate.keys())
 
         indexes = {}
         attribute_list = []
@@ -183,8 +183,13 @@ class GffFile(File):
 
             # Loop on entities
             for feature in rec.features:
+                
+                filter_attributes = False
+                selected_attributes = []
 
-                selected_attributes = self.entities_to_integrate.get(feature.type, [])
+                if self.entities_to_integrate.get(feature.type):
+                    filter_attributes = self.entities_to_integrate[feature.type].get("filter_attributes", False)
+                    selected_attributes = self.entities_to_integrate[feature.type].get("attributes", [])
 
                 # Entity type
                 entity_type = self.namespace_data[self.format_uri(feature.type, remove_space=True)]
@@ -313,7 +318,7 @@ class GffFile(File):
                 # Qualifiers (9th columns)
                 for qualifier_key, qualifier_value in feature.qualifiers.items():
 
-                    if qualifier_key not in selected_attributes:
+                    if filter_attributes and (qualifier_key not in selected_attributes):
                         continue
 
                     for value in qualifier_value:

@@ -43,7 +43,7 @@ export default class GffPreview extends Component {
     let selectedEntities = [...this.state.entitiesToIntegrate]
     let entities = {}
     selectedEntities.map((key) => {
-        entities[key] = [...this.state.subEntities[key]]
+        entities[key] = {filter_attributes: true, attributes: [...this.state.subEntities[key]]}
     })
 
     let data = {
@@ -149,6 +149,8 @@ export default class GffPreview extends Component {
       body = (
         <div>
           <br />
+          <h4>Please select the entities to integrate:</h4>
+          <br />
             <div>
               <FormGroup check>
                 {Object.entries(this.state.availableEntities).map(([key, values]) => {
@@ -157,10 +159,11 @@ export default class GffPreview extends Component {
                 <div>
                 <div>
                   <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox"/> {key}</p>
-                  <FormGroup check inline>
+                  <FormGroup check inline hidden={this.state.entitiesToIntegrate.has(key)? false : true}>
+                  Attributes of the entity:
                   {
                     values.map((value, valkey) => {
-                      return (<div><Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} disabled={this.state.entitiesToIntegrate.has(key)? false : true}/>{value}&nbsp;</div>)
+                      return (<div>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
                     })
                   }
                   </FormGroup>
