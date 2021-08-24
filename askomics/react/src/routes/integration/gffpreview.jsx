@@ -25,7 +25,7 @@ export default class GffPreview extends Component {
     let subEntities = {}
     Object.entries(this.state.availableEntities).map(([key, values]) => {
         let data = new Set()
-        values.map((value, valkey) => {
+        values.attributes.map((value, valkey) => {
           data.add(value)
         })
         subEntities[key]= data
@@ -100,7 +100,6 @@ export default class GffPreview extends Component {
     let value = event.target.value
     let name = event.target.name
     let state = this.state.subEntities
-    console.log(state[name])
     if (!state[name].has(value)) {
       state[name].add(value)
       this.setState({subEntities:state})
@@ -162,7 +161,7 @@ export default class GffPreview extends Component {
                   <FormGroup check inline hidden={this.state.entitiesToIntegrate.has(key)? false : true}>
                   Attributes of the entity:
                   {
-                    values.map((value, valkey) => {
+                    values.attributes.map((value, valkey) => {
                       return (<div>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
                     })
                   }

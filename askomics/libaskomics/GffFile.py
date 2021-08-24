@@ -62,7 +62,7 @@ class GffFile(File):
             handle.close()
 
             for key, values in data.items():
-                self.entities[key] = list(values)
+                self.entities[key] = {"attributes": list(values)}
 
         except Exception as e:
             self.error = True
