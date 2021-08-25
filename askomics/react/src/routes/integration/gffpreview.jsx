@@ -26,7 +26,7 @@ export default class GffPreview extends Component {
     let subEntities = {}
     Object.entries(this.state.availableAttributes).map(([key, values]) => {
         let data = new Set()
-        values.attributes.map((value, valkey) => {
+        values.map((value, valkey) => {
           data.add(value)
         })
         subEntities[key]= data
@@ -42,14 +42,15 @@ export default class GffPreview extends Component {
     let requestUrl = '/api/files/integrate'
     let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
     let selectedEntities = [...this.state.entitiesToIntegrate]
-    let entities = {}
+    let attributes = {}
     selectedEntities.map((key) => {
-        entities[key] = {filter_attributes: true, attributes: [...this.state.subEntities[key]]}
+        attributes[key] = [...this.state.subEntities[key]]
     })
 
     let data = {
       fileId: this.state.id,
-      entities: entities,
+      entities: selectedEntities,
+      attributes: attributes,
       public: event.target.value == 'public',
       type: 'gff/gff3',
       customUri: this.state.customUri,
