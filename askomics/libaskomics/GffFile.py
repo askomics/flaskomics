@@ -165,6 +165,10 @@ class GffFile(File):
         """
         handle = open(self.path, 'r', encoding='utf-8')
 
+        # Retrocompatibility
+        if isinstance(self.entities_to_integrate, list):
+            self.entities_to_integrate = dict.fromkeys(self.entities_to_integrate, {})
+
         limit = dict(gff_type=self.entities_to_integrate.keys())
 
         indexes = {}
@@ -183,7 +187,7 @@ class GffFile(File):
 
             # Loop on entities
             for feature in rec.features:
-                
+
                 filter_attributes = False
                 selected_attributes = []
 
