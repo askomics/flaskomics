@@ -12,6 +12,7 @@ export default class GffPreview extends Component {
     this.state = {
       name: props.file.name,
       availableEntities: props.file.data.entities,
+      availableAttributes: props.file.data.attributes,
       entitiesToIntegrate: new Set(),
       id: props.file.id,
       integrated: false,
@@ -23,7 +24,7 @@ export default class GffPreview extends Component {
     }
 
     let subEntities = {}
-    Object.entries(this.state.availableEntities).map(([key, values]) => {
+    Object.entries(this.state.availableAttributes).map(([key, values]) => {
         let data = new Set()
         values.attributes.map((value, valkey) => {
           data.add(value)
@@ -152,7 +153,7 @@ export default class GffPreview extends Component {
           <br />
             <div>
               <FormGroup check>
-                {Object.entries(this.state.availableEntities).map(([key, values]) => {
+                {Object.entries(this.state.availableAttributes).map(([key, values]) => {
                 id +=1
                 return (
                 <div>
@@ -161,7 +162,7 @@ export default class GffPreview extends Component {
                   <FormGroup check inline hidden={this.state.entitiesToIntegrate.has(key)? false : true}>
                   Attributes of the entity:
                   {
-                    values.attributes.map((value, valkey) => {
+                    values.map((value, valkey) => {
                       return (<div>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
                     })
                   }

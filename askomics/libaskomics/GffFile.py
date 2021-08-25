@@ -34,12 +34,13 @@ class GffFile(File):
         """
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
 
-        self.entities = {}
-        self.entities_to_integrate = {}
+        self.entities = []
+        self.entities_to_integrate = []
 
         self.category_values = {}
 
         self.attributes = {}
+        self.attributes_to_integrate = {}
 
         self.attribute_abstraction = []
 
@@ -55,14 +56,14 @@ class GffFile(File):
             #    self.entities.append(entity[0])
 
             data = defaultdict(lambda: set())
-
             for rec in GFF.parse(handle, target_lines=1):
                 for feature in rec.features:
                     data[feature.type] |= set(feature.qualifiers.keys())
             handle.close()
 
             for key, values in data.items():
-                self.entities[key] = {"attributes": list(values)}
+                self.entities.append(key)
+                self.attributes[key] = list(values)
 
         except Exception as e:
             self.error = True
@@ -84,11 +85,12 @@ class GffFile(File):
             'error': self.error,
             'error_message': self.error_message,
             'data': {
-                'entities': self.entities
+                'entities': self.entities,
+                'attributes': self.attributes
             }
         }
 
-    def integrate(self, dataset_id, entities={}, public=True):
+    def integrate(self, dataset_id, entities=[], attributes={}, public=True):
         """Integrate GFF file
 
         Parameters
@@ -104,6 +106,9 @@ class GffFile(File):
         else:
             self.set_preview()
             self.entities_to_integrate = self.entities
+
+        if attributes:
+            self.attributes_to_integrate = attributes
 
         File.integrate(self, dataset_id=dataset_id)
 
@@ -165,11 +170,7 @@ class GffFile(File):
         """
         handle = open(self.path, 'r', encoding='utf-8')
 
-        # Retrocompatibility
-        if isinstance(self.entities_to_integrate, list):
-            self.entities_to_integrate = dict.fromkeys(self.entities_to_integrate, {})
-
-        limit = dict(gff_type=self.entities_to_integrate.keys())
+        limit = dict(gff_type=self.entities_to_integrate)
 
         indexes = {}
         attribute_list = []
@@ -191,9 +192,9 @@ class GffFile(File):
                 filter_attributes = False
                 selected_attributes = []
 
-                if self.entities_to_integrate.get(feature.type):
-                    filter_attributes = self.entities_to_integrate[feature.type].get("filter_attributes", False)
-                    selected_attributes = self.entities_to_integrate[feature.type].get("attributes", [])
+                if self.attributes_to_integrate.get(feature.type):
+                    filter_attributes = True
+                    selected_attributes = self.attributes_to_integrate.get(feature.type, [])
 
                 # Entity type
                 entity_type = self.namespace_data[self.format_uri(feature.type, remove_space=True)]

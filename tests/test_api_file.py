@@ -381,7 +381,51 @@ class TestApiFile(AskomicsTestCase):
                     'entities': [
                         'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS',
                         'three_prime_UTR'
-                    ]
+                    ],
+                    'attributes': {
+                        "CDS": [
+                            "source",
+                            "protein_id",
+                            "Parent",
+                            "ID",
+                            "phase"
+                        ],
+                        "exon": [
+                            "exon_id",
+                            "ensembl_end_phase",
+                            "constitutive",
+                            "Parent",
+                            "ensembl_phase",
+                            "source",
+                            "Name",
+                            "rank"
+                        ],
+                        "five_prime_UTR": [
+                            "source",
+                            "Parent"
+                        ],
+                        "gene": [
+                            "logic_name",
+                            "source",
+                            "gene_id",
+                            "description",
+                            "ID",
+                            "biotype",
+                            "Name"
+                        ],
+                        "three_prime_UTR": [
+                            "source",
+                            "Parent"
+                        ],
+                        "transcript": [
+                            "source",
+                            "ID",
+                            "transcript_id",
+                            "biotype",
+                            "Name",
+                            "Parent"
+                        ]
+                    }
                 },
                 'id': 4,
                 'name': 'gene.gff3',
