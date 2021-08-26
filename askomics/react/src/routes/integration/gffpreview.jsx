@@ -159,7 +159,7 @@ export default class GffPreview extends Component {
                   Attributes of the entity:
                   {
                     values.map((value, valkey) => {
-                      return (<div key={key + "_" + value}>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
+                      return (<div key={key + "_" + value}>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}&nbsp;</div>)
                     })
                   }
                   </FormGroup>
