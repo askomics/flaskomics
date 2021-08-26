@@ -20,7 +20,8 @@ export default class GffPreview extends Component {
       privateTick: false,
       customUri: "",
       externalEndpoint: "",
-      subEntities: {}
+      subEntities: {},
+      errorMessage: null
     }
 
     let subEntities = {}
@@ -72,10 +73,6 @@ export default class GffPreview extends Component {
           waiting: false
         })
       })
-  }
-
-  isChecked(value){
-    return this.state.entitiesToIntegrate.hasOwnProperty(value);
   }
 
 
@@ -143,7 +140,6 @@ export default class GffPreview extends Component {
     }
 
     let body
-    let id = 0
     if (this.props.file.error) {
       body = <ErrorDiv status={500} error={this.props.file.error} errorMessage={this.props.file.error_message} />
     } else {
@@ -155,16 +151,15 @@ export default class GffPreview extends Component {
             <div>
               <FormGroup check>
                 {Object.entries(this.state.availableAttributes).map(([key, values]) => {
-                id +=1
                 return (
+                <div key={key}>
                 <div>
-                <div>
-                  <p key={key + "_" + id}><Input value={key} onClick={this.handleSelection} type="checkbox"/> {key}</p>
+                  <p><Input value={key} onClick={this.handleSelection} type="checkbox"/> {key}</p>
                   <FormGroup check inline hidden={this.state.entitiesToIntegrate.has(key)? false : true}>
                   Attributes of the entity:
                   {
                     values.map((value, valkey) => {
-                      return (<div>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
+                      return (<div key={key + "_" + value}>&nbsp;<Input value={value} name={key} onClick={this.handleSubSelection} type="checkbox" defaultChecked={true} />{value}</div>)
                     })
                   }
                   </FormGroup>

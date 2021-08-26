@@ -49,12 +49,8 @@ class GffFile(File):
     def set_preview(self):
         """Summary"""
         try:
-            # exam = GFFExaminer()
-            handle = open(self.path, encoding="utf-8", errors="ignore")
-            # gff_type = exam.available_limits(handle)['gff_type']
-            # for entity in gff_type:
-            #    self.entities.append(entity[0])
 
+            handle = open(self.path, encoding="utf-8", errors="ignore")
             data = defaultdict(lambda: set())
             for rec in GFF.parse(handle, target_lines=1):
                 for feature in rec.features:
@@ -190,11 +186,10 @@ class GffFile(File):
             for feature in rec.features:
 
                 filter_attributes = False
-                selected_attributes = []
+                selected_attributes = self.attributes_to_integrate.get(feature.type, [])
 
-                if self.attributes_to_integrate.get(feature.type):
+                if selected_attributes:
                     filter_attributes = True
-                    selected_attributes = self.attributes_to_integrate.get(feature.type, [])
 
                 # Entity type
                 entity_type = self.namespace_data[self.format_uri(feature.type, remove_space=True)]
