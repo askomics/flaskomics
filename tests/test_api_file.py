@@ -541,6 +541,30 @@ class TestApiFile(AskomicsTestCase):
             "externalEndpoint": None
         }
 
+        gff_data = {
+            "fileId": 4,
+            "public": True,
+            "customUri": None,
+            "externalEndpoint": None
+        }
+
+        gff_partial_entities_data = {
+            "fileId": 4,
+            "public": True,
+            "entities": ["CDS"],
+            "customUri": None,
+            "externalEndpoint": None
+        }
+
+        gff_partial_attributes_data = {
+            "fileId": 4,
+            "entities": ["CDS"],
+            "attributes": {"CDS": ["protein_id", "phase"]},
+            "public": True,
+            "customUri": None,
+            "externalEndpoint": None
+        }
+
         bed_data = {
             "fileId": 5,
             "public": True,
@@ -571,6 +595,22 @@ class TestApiFile(AskomicsTestCase):
         assert response.json["dataset_ids"]
 
         response = client.client.post('/api/files/integrate', json=gff_data)
+        assert response.status_code == 200
+        print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["dataset_ids"]
+
+        response = client.client.post('/api/files/integrate', json=gff_partial_entities_data)
+        assert response.status_code == 200
+        print(response.json)
+        assert len(response.json) == 3
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert response.json["dataset_ids"]
+
+        response = client.client.post('/api/files/integrate', json=gff_partial_attributes_data)
         assert response.status_code == 200
         print(response.json)
         assert len(response.json) == 3
