@@ -103,7 +103,7 @@ class GffFile(File):
             self.set_preview()
             self.entities_to_integrate = self.entities
 
-        if attributes:
+        if attributes and isinstance(attributes, dict):
             self.attributes_to_integrate = attributes
 
         File.integrate(self, dataset_id=dataset_id)
@@ -186,9 +186,9 @@ class GffFile(File):
             for feature in rec.features:
 
                 filter_attributes = False
-                selected_attributes = self.attributes_to_integrate.get(feature.type, [])
-
-                if selected_attributes:
+                selected_attributes = self.attributes_to_integrate.get(feature.type)
+                # Sanity check
+                if self.attributes_to_integrate and isinstance(selected_attributes, list):
                     filter_attributes = True
 
                 # Entity type
