@@ -50,12 +50,11 @@ class GffFile(File):
         """Summary"""
         try:
 
-            handle = open(self.path, encoding="utf-8", errors="ignore")
-            data = defaultdict(lambda: set())
-            for rec in GFF.parse(handle, target_lines=1):
-                for feature in rec.features:
-                    data[feature.type] |= set(feature.qualifiers.keys())
-            handle.close()
+            with open(self.path, encoding="utf-8", errors="ignore") as f:
+                data = defaultdict(lambda: set())
+                for rec in GFF.parse(f, target_lines=1):
+                    for feature in rec.features:
+                        data[feature.type] |= set(feature.qualifiers.keys())
 
             for key, values in data.items():
                 self.entities.append(key)
