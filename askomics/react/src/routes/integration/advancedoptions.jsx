@@ -50,8 +50,8 @@ export default class AdvancedOptions extends Component {
 
 AdvancedOptions.propTypes = {
   config: PropTypes.object,
-  handleChangeUri: PropTypes.function,
-  handleChangeEndpoint: PropTypes.function,
+  handleChangeUri: PropTypes.func,
+  handleChangeEndpoint: PropTypes.func,
   hideCustomUri: PropTypes.bool,
   customUri: PropTypes.string,
   hideDistantEndpoint: PropTypes.bool,
