@@ -224,7 +224,7 @@ export default class CsvTable extends Component {
         formatter: (cell, row) => {
           let text = row[this.state.header[index]["name"]]
           if (this.utils.isUrl(text)) {
-            return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
+            return <a href={text} target="_blank">{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
           } else {
             return this.utils.truncate(text, 25)
           }
