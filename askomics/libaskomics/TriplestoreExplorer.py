@@ -513,24 +513,26 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 # Property (relations and categories)
-                ?property_uri a owl:ObjectProperty .
-                ?property_uri a askomics:AskomicsRelation .
-                ?property_uri rdfs:label ?property_label .
-                ?property_uri rdfs:range ?range_uri .
+                ?node a owl:ObjectProperty .
+                ?node a askomics:AskomicsRelation .
+                ?node rdfs:label ?property_label .
+                ?node rdfs:range ?range_uri .
+                # Retrocompatibility
+                OPTIONAL {{?node askomics:uri ?property_uri}}
             }}
             # Relation of entity (or motherclass of entity)
             {{
-                ?property_uri rdfs:domain ?mother .
+                ?node rdfs:domain ?mother .
                 ?entity_uri rdfs:subClassOf ?mother .
             }} UNION {{
-                ?property_uri rdfs:domain ?entity_uri .
+                ?node rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
@@ -542,15 +544,16 @@ class TriplestoreExplorer(Params):
 
         relations_list = []
         relations = []
-
         for result in data:
             # Relation
-            if "property_uri" in result:
-                rel_tpl = (result["property_uri"], result["entity_uri"], result["range_uri"])
+            if "node" in result:
+                # Retrocompatibility
+                property_uri = result.get("property_uri", result["node"])
+                rel_tpl = (property_uri, result["entity_uri"], result["range_uri"])
                 if rel_tpl not in relations_list:
                     relations_list.append(rel_tpl)
                     relation = {
-                        "uri": result["property_uri"],
+                        "uri": property_uri,
                         "label": result["property_label"],
                         "graphs": [result["graph"], ],
                         "source": result["entity_uri"],
