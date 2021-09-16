@@ -203,7 +203,7 @@ class FilesHandler(FilesUtils):
         with open(file_path, mode) as file:
             file.write(data)
 
-    def store_file_info_in_db(self, name, filetype, file_name, size):
+    def store_file_info_in_db(self, name, filetype, file_name, size, status="available"):
         """Store the file info in the database
 
         Parameters
@@ -216,6 +216,8 @@ class FilesHandler(FilesUtils):
             Local file name
         size : string
             Size of file
+        status: string
+            Status of the file (downloading, available, unavailable)
         """
         file_path = "{}/{}".format(self.upload_path, file_name)
 
@@ -223,6 +225,7 @@ class FilesHandler(FilesUtils):
         query = '''
         INSERT INTO files VALUES(
             NULL,
+            ?,
             ?,
             ?,
             ?,
@@ -248,7 +251,7 @@ class FilesHandler(FilesUtils):
 
         self.date = int(time.time())
 
-        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date))
+        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status))
 
     def persist_chunk(self, chunk_info):
         """Persist a file by chunk. Store info in db if the chunk is the last
@@ -316,7 +319,7 @@ class FilesHandler(FilesUtils):
             file.write(req.content)
 
         # insert in db
-        self.store_file_info_in_db(name, "", file_name, os.path.getsize(path))
+        self.store_file_info_in_db(name, "", file_name, os.path.getsize(path), "downloading")
 
     def get_type(self, file_ext):
         """Get files type, based on extension

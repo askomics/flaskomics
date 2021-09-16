@@ -288,3 +288,18 @@ def send_mail_new_user(self, session, user):
     """
     local_auth = LocalAuth(app, session)
     local_auth.send_mail_to_new_user(user)
+
+
+@celery.task(bind=True, name="download_file")
+def download_file(self, session, url):
+    """Send a mail to the new user
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    user : dict
+        New user
+    """
+    files = FilesHandler(app, session)
+    files.download_url(url)

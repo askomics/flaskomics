@@ -350,6 +350,17 @@ class Database(Params):
         '''
         self.execute_sql_query(query)
 
+        query = '''
+        ALTER TABLE files
+        ADD status text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_abstraction_table(self):
         """Create abstraction table"""
         query = """
