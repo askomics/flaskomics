@@ -79,7 +79,7 @@ class Data extends Component {
           if (cell.startsWith(this.props.config.namespaceInternal)){
             return this.utils.splitUrl(cell)
           } else {
-            return <a href={cell} target="_blank">{this.utils.splitUrl(cell)}</a>
+            return <a href={cell} target="_blank" rel="noreferrer">{this.utils.splitUrl(cell)}</a>
           }
         }
         return cell
