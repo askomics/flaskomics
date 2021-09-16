@@ -16,7 +16,7 @@ class Data extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.state = { 
+    this.state = {
       isLoading: true,
       error: false,
       errorMessage: '',
@@ -32,7 +32,7 @@ class Data extends Component {
 
   loadData() {
     let uri = this.props.match.params.uri;
-    let requestUrl = '/api/data/' + uri 
+    let requestUrl = '/api/data/' + uri
     axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
@@ -79,7 +79,7 @@ class Data extends Component {
           if (cell.startsWith(this.props.config.namespaceInternal)){
             return this.utils.splitUrl(cell)
           } else {
-            return <a href={cell}>{this.utils.splitUrl(cell)}</a>
+            return <a href={cell} target="_blank" rel="noreferrer">{this.utils.splitUrl(cell)}</a>
           }
         }
         return cell
@@ -90,7 +90,7 @@ class Data extends Component {
     return (
       <div className="container">
         <h2>Information about uri {uri}</h2>
-        <br />        
+        <br />
         <div className="asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
