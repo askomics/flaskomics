@@ -59,7 +59,7 @@ export default class ResultsTable extends Component {
         index: index,
         formatter: (cell, row) => {
           if (this.utils.isUrl(cell)) {
-            return <a href={cell}>{this.utils.splitUrl(cell)}</a>
+            return <a href={cell} target="_blank">{this.utils.splitUrl(cell)}</a>
           }
           return cell
         },
