@@ -358,7 +358,8 @@ class Database(Params):
 
         try:
             self.execute_sql_query(query)
-        except Exception:
+        except Exception as e:
+            raise e
             pass
 
         query = '''
@@ -369,7 +370,8 @@ class Database(Params):
 
         try:
             self.execute_sql_query(query)
-        except Exception:
+        except Exception as e:
+            raise e
             pass
 
     def create_abstraction_table(self):
