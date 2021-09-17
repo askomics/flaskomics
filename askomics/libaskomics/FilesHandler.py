@@ -260,7 +260,7 @@ class FilesHandler(FilesUtils):
 
         return database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
 
-    def update_file_info(self, file_id, size="", status="", task_id=""):
+    def update_file_info(self, file_id, size=None, status="", task_id=""):
         """Update file size and status
 
         Parameters
@@ -275,37 +275,40 @@ class FilesHandler(FilesUtils):
             Current task id
         """
 
-        if not (size or status or task_id):
+        if not (size is not None or status or task_id):
             return
 
-        query_vars = [file_id]
+        query_vars = []
         database = Database(self.app, self.session)
 
         size_query = ""
         status_query = ""
         task_query = ""
 
-        if size:
-            size_query = "size=?"
+        # Should be a cleaner way of doing this...
+        if size is not None:
+            size_query = "size=?," if (status or task_id) else "size=?"
             query_vars.append(size)
 
         if status:
-            size_query = "status=?"
+            status_query = "status=?," if task_id else "status=?"
             query_vars.append(status)
 
         if task_id:
             task_query = "task_id=?"
             query_vars.append(task_id)
 
+        query_vars.append(file_id)
+
         query = '''
         UPDATE files SET
-        {},
-        {},
-        {},
+        {}
+        {}
+        {}
         WHERE id=?
         '''.format(size_query, status_query, task_query)
 
-        database.execute_sql_query(query, query_vars)
+        database.execute_sql_query(query, tuple(query_vars))
 
     def persist_chunk(self, chunk_info):
         """Persist a file by chunk. Store info in db if the chunk is the last
@@ -367,6 +370,7 @@ class FilesHandler(FilesUtils):
         file_name = self.get_file_name()
         path = "{}/{}".format(self.upload_path, file_name)
         file_id = self.store_file_info_in_db(name, "", file_name, 0, "downloading", task_id)
+
         # Get file
         try:
             with requests.get(url, stream=True) as r:
@@ -384,7 +388,8 @@ class FilesHandler(FilesUtils):
             # Update final value
             self.update_file_info(file_id, size=os.path.getsize(path), status="available")
 
-        except Exception:
+        except Exception as e:
+            raise e
             self.update_file_info(file_id, size=os.path.getsize(path), status="error")
 
     def get_type(self, file_ext):

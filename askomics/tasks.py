@@ -302,4 +302,4 @@ def download_file(self, session, url):
         New user
     """
     files = FilesHandler(app, session)
-    files.download_url(url)
+    files.download_url(url, download_file.request.id)
