@@ -353,13 +353,12 @@ class Database(Params):
         query = '''
         ALTER TABLE files
         ADD status text NOT NULL
-        DEFAULT("available")
+        DEFAULT('available')
         '''
 
         try:
             self.execute_sql_query(query)
-        except Exception as e:
-            raise e
+        except Exception:
             pass
 
         query = '''
@@ -370,8 +369,7 @@ class Database(Params):
 
         try:
             self.execute_sql_query(query)
-        except Exception as e:
-            raise e
+        except Exception:
             pass
 
     def create_abstraction_table(self):

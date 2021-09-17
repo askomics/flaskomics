@@ -258,8 +258,7 @@ class FilesHandler(FilesUtils):
 
         self.date = int(time.time())
 
-        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id))
-        return database.lastrowid
+        return database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
 
     def update_file_info(self, file_id, size="", status="", task_id=""):
         """Update file size and status

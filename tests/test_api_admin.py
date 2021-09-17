@@ -442,7 +442,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["gene"]["upload"]["file_date"],
@@ -450,7 +451,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'gene.gff3',
                 'size': 2267,
                 'type': 'gff/gff3',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["bed"]["upload"]["file_date"],
@@ -458,7 +460,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
             }]
         }
 

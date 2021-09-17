@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import time
 
 from . import AskomicsTestCase
 
@@ -91,7 +92,6 @@ class TestApiFile(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'files': [],
-            'status': 'available'
         }
 
     def test_edit_file(self, client):
@@ -332,6 +332,8 @@ class TestApiFile(AskomicsTestCase):
             "error": False,
             "errorMessage": ""
         }
+
+        time.sleep(10)
 
         response = client.client.get("/api/files")
         assert response.status_code == 200

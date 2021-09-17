@@ -193,7 +193,7 @@ def upload_url():
         with requests.get(data["url"], stream=True) as r:
             # Check header for total size, and check quota.
             if r.headers.get('Content-length'):
-                total_size = r.headers.get('Content-length') + disk_space
+                total_size = int(r.headers.get('Content-length')) + disk_space
                 if session["user"]["quota"] > 0 and total_size >= session["user"]["quota"]:
                     return jsonify({
                         'errorMessage': "File will exceed quota",
