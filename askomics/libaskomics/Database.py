@@ -352,8 +352,19 @@ class Database(Params):
 
         query = '''
         ALTER TABLE files
-        ADD status text NULL
-        DEFAULT(null)
+        ADD status text NOT NULL
+        DEFAULT("available")
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE files
+        ADD task_id text NULL
+        DEFAULT(NULL)
         '''
 
         try:

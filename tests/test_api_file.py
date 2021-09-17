@@ -26,31 +26,36 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2268,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2267,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -74,7 +79,8 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2268,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }]
         }
 
@@ -84,7 +90,8 @@ class TestApiFile(AskomicsTestCase):
             'diskSpace': client.get_size_occupied_by_user(),
             'error': False,
             'errorMessage': '',
-            'files': []
+            'files': [],
+            'status': 'available'
         }
 
     def test_edit_file(self, client):
@@ -106,31 +113,36 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'new name.tsv',
                 'size': 2268,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2267,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -427,25 +439,29 @@ class TestApiFile(AskomicsTestCase):
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2267,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -459,19 +475,22 @@ class TestApiFile(AskomicsTestCase):
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2267,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 

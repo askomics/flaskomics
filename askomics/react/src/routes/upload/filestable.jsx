@@ -88,6 +88,20 @@ export default class FilesTable extends Component {
       formatter: (cell, row) => { return this.utils.humanFileSize(cell, true) },
       sort: true,
       editable: false
+    }, {
+      dataField: 'status',
+      text: 'File status',
+      formatter: (cell, row) => {
+        if (cell == 'downloading') {
+          return <Badge color="secondary">Downloading</Badge>
+        }
+        if (cell == 'available') {
+          return <Badge color="success">Available</Badge>
+        }
+        return <Badge color="danger">Error</Badge>
+      },
+      sort: true,
+      editable: false
     }]
 
     let defaultSorted = [{
