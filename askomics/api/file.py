@@ -190,15 +190,16 @@ def upload_url():
         }), 400
 
     try:
-        with requests.get(data["url"], stream=True) as r:
-            # Check header for total size, and check quota.
-            if r.headers.get('Content-length'):
-                total_size = int(r.headers.get('Content-length')) + disk_space
-                if session["user"]["quota"] > 0 and total_size >= session["user"]["quota"]:
-                    return jsonify({
-                        'errorMessage': "File will exceed quota",
-                        "error": True
-                    }), 400
+        if session["user"]["quota"] > 0:
+            with requests.get(data["url"], stream=True) as r:
+                # Check header for total size, and check quota.
+                if r.headers.get('Content-length'):
+                    total_size = int(r.headers.get('Content-length')) + disk_space
+                    if total_size >= session["user"]["quota"]:
+                        return jsonify({
+                            'errorMessage': "File will exceed quota",
+                            "error": True
+                        }), 400
 
         session_dict = {'user': session['user']}
         current_app.celery.send_task('download_file', (session_dict, data["url"]))

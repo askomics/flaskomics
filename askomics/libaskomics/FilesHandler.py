@@ -379,17 +379,22 @@ class FilesHandler(FilesUtils):
                 with open(path, 'wb') as file:
                     for chunk in r.iter_content(chunk_size=1024 * 1024 * 10):
                         # Update size every ~1GO
+                        # + Check quota
                         if count == 100:
+                            if self.session['user']['quota'] > 0:
+                                total_size = self.get_size_occupied_by_user() + os.path.getsize(path)
+                                if total_size >= self.session['user']['quota']:
+                                    raise Exception("Exceeded quota")
                             self.update_file_info(file_id, size=os.path.getsize(path))
                             count = 0
+
                         file.write(chunk)
                         count += 1
 
             # Update final value
             self.update_file_info(file_id, size=os.path.getsize(path), status="available")
 
-        except Exception as e:
-            raise e
+        except Exception:
             self.update_file_info(file_id, size=os.path.getsize(path), status="error")
 
     def get_type(self, file_ext):

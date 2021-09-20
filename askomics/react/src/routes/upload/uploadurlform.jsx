@@ -45,8 +45,8 @@ export default class UploadUrlForm extends Component {
     this.setState({
       disabled: true,
       progressAnimated: true,
-      progressValue: 99,
-      progressDisplay: "99 %",
+      progressValue: 0,
+      progressDisplay: "0 %",
       progressColor: "success"
     })
 
@@ -96,7 +96,7 @@ export default class UploadUrlForm extends Component {
         <Input onChange={this.handleChange} value={this.state.url} type="url" name="url" id="url" placeholder="Enter file URL" />
         <Progress animated={this.state.progressAnimated} color={this.state.progressColor} value={this.state.progressValue}>{this.state.progressDisplay}</Progress>
         <br />
-        <Button disabled={this.state.disabled} onClick={this.handleSubmit} color="secondary">Upload</Button>
+        <Button disabled={this.state.disabled} onClick={this.handleSubmit} color="secondary">Request upload</Button>
         <br />
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>
