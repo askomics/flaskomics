@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import time
 
 from . import AskomicsTestCase
 
@@ -92,6 +91,29 @@ class TestApiFile(AskomicsTestCase):
             'error': False,
             'errorMessage': '',
             'files': [],
+        }
+
+    def test_get_files_upload(self, client):
+        """test the /api/files route after an url upload"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        date = client.upload_file_url("https://raw.githubusercontent.com/askomics/demo-data/master/Example/gene.tsv")
+
+        response = client.client.get('/api/files')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'diskSpace': client.get_size_occupied_by_user(),
+            'error': False,
+            'errorMessage': '',
+            'files': [{
+                'date': date,
+                'id': 1,
+                'name': 'gene.tsv',
+                'size': 369,
+                'type': 'csv/tsv',
+                'status': 'available'
+            }]
         }
 
     def test_edit_file(self, client):
@@ -333,11 +355,8 @@ class TestApiFile(AskomicsTestCase):
             "errorMessage": ""
         }
 
-        time.sleep(10)
-
         response = client.client.get("/api/files")
         assert response.status_code == 200
-        assert len(response.json["files"]) == 1
 
     def test_get_preview(self, client):
         """Test /api/files/preview route"""
