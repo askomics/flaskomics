@@ -444,6 +444,76 @@ class SparqlQuery(Params):
         self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1
 
+    def get_uri_parameters(self, uri, endpoints):
+        """Get parameters for a specific data URI
+
+        Parameters
+        ----------
+        uri : string
+            URI to search
+
+        Returns
+        -------
+        dict
+            The corresponding parameters
+        """
+        raw_query = '''
+        SELECT DISTINCT ?predicat ?object ?faldo_value ?faldo_uri
+        WHERE {
+          ?URI ?predicat ?object .
+          ?URI a ?entitytype .
+
+          FILTER(! STRSTARTS(STR(?predicat), STR(askomics:)))
+          OPTIONAL {{
+
+            ?faldo_uri rdfs:domain ?entitytype .
+            ?faldo_uri rdfs:label ?attribute_label .
+
+            OPTIONAL {{
+            ?object faldo:begin/faldo:position ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoStart
+            }}
+
+            OPTIONAL {{
+            ?object faldo:end/faldo:position ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoEnd
+            }}
+
+            OPTIONAL {{
+            ?object faldo:begin/faldo:reference/rdfs:label ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoReference
+            }}
+
+            OPTIONAL {{
+            ?object faldo:begin/rdf:type ?Gene1_strandCategory .
+            ?Gene1_strand_faldoStrand a ?Gene1_strandCategory .
+            ?Gene1_strand_faldoStrand rdfs:label ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoStrand .
+            }}
+
+            VALUES ?predicat {faldo:location}
+          }}
+          VALUES ?URI {{{}}}
+        }}
+        '''.format(uri)
+
+        federated = self.is_federated()
+        replace_froms = self.replace_froms()
+
+        sparql = self.format_query(raw_query, replace_froms=replace_froms, federated=federated)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=federated, endpoints=endpoints)
+        _, data = query_launcher.process_query(sparql)
+
+        formated_data = []
+        for row in data:
+            formated_data.append({
+                'predicate': row['faldo_uri '] if row['faldo_uri'] else row['predicate'],
+                'object': row['faldo_value'] if row['faldo_value'] else row['object'],
+            })
+
+        return formated_data
+
     def format_sparql_variable(self, name):
         """Format a name into a sparql variable by remove spacial char and add a ?
 
