@@ -18,9 +18,6 @@ class TestApiData(AskomicsTestCase):
 
         response = client.client.get('/api/data/AT3G10490')
 
-        # Remove this dict since the node value seems to change (dependant on load order maybe?)
-        response.json['data'] = [val for val in response.json['data'] if not val['predicat'] == "http://biohackathon.org/resource/faldo/location"]
-
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
@@ -72,9 +69,6 @@ class TestApiData(AskomicsTestCase):
 
         client.logout()
         response = client.client.get('/api/data/AT3G10490')
-
-        # Remove this dict since the node value seems to change (dependant on load order maybe?)
-        response.json['data'] = [val for val in response.json['data'] if not val['predicat'] == "http://biohackathon.org/resource/faldo/location"]
 
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)

@@ -42,10 +42,6 @@
           {
             "label": "-",
             "uri": "http://askomics.org/test/data/-"
-          },
-          {
-            "label": ".",
-            "uri": "http://askomics.org/test/data/."
           }
         ],
         "entityUri": "http://askomics.org/test/data/gene",
@@ -76,10 +72,6 @@
           {
             "label": "-",
             "uri": "http://askomics.org/test/data/-"
-          },
-          {
-            "label": ".",
-            "uri": "http://askomics.org/test/data/."
           }
         ],
         "entityUri": "http://askomics.org/test/data/transcript",

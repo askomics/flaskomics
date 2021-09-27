@@ -5,7 +5,6 @@ import traceback
 
 from askomics.api.auth import api_auth
 from askomics.libaskomics.SparqlQuery import SparqlQuery
-from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, session)
 

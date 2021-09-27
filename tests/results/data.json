@@ -1,54 +1,54 @@
 {
-    "data": [
+    "data":[
         {
-            "object": "http://askomics.org/test/data/transcript",
-            "predicat": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+            "object":"3267835",
+            "predicate":"http://askomics.org/test/data/start"
         },
         {
-            "object": "label_AT3G10490",
-            "predicat": "http://www.w3.org/2000/01/rdf-schema#label"
+            "object":"3270883",
+            "predicate":"http://askomics.org/test/data/end"
         },
         {
-            "object": "protein_coding",
-            "predicat": "http://askomics.org/test/data/biotype"
+            "object":"At3",
+            "predicate":"http://askomics.org/test/data/chromosomeName"
         },
         {
-            "object": "NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]",
-            "predicat": "http://askomics.org/test/data/description"
+            "object":"plus",
+            "predicate":"http://askomics.org/test/data/strand"
         },
         {
-            "object": "ANAC052",
-            "predicat": "http://askomics.org/test/data/featureName"
+            "object":"protein_coding",
+            "predicate":"http://askomics.org/test/data/biotype"
         },
         {
-            "object": "http://askomics.org/test/data/gene",
-            "predicat": "http://askomics.org/test/data/featureType"
+            "object":"http://askomics.org/test/data/gene",
+            "predicate":"http://askomics.org/test/data/featureType"
         },
         {
-            "object": "http://askomics.org/test/data/Arabidopsis_thaliana",
-            "predicat": "http://askomics.org/test/data/taxon"
+            "object":"label_AT3G10490",
+            "predicate":"http://www.w3.org/2000/01/rdf-schema#label"
         },
         {
-            "object": "326",
-            "predicat": "http://askomics.org/test/internal/includeIn"
+            "object":"2000-01-01",
+            "predicate":"http://askomics.org/test/data/date"
         },
         {
-            "object": "327",
-            "predicat": "http://askomics.org/test/internal/includeIn"
+            "object":"http://askomics.org/test/data/transcript",
+            "predicate":"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
         },
         {
-            "object": "http://askomics.org/test/data/At3_326",
-            "predicat": "http://askomics.org/test/internal/includeInReference"
+            "object":"ANAC052",
+            "predicate":"http://askomics.org/test/data/featureName"
         },
         {
-            "object": "http://askomics.org/test/data/At3_327",
-            "predicat": "http://askomics.org/test/internal/includeInReference"
+            "object":"http://askomics.org/test/data/Arabidopsis_thaliana",
+            "predicate":"http://askomics.org/test/data/taxon"
         },
         {
-            "object": "2000-01-01",
-            "predicat": "http://askomics.org/test/data/date"
+            "object":"NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]",
+            "predicate":"http://askomics.org/test/data/description"
         }
     ],
-    "error": false,
-    "errorMessage": ""
+    "error":false,
+    "errorMessage":""
 }
