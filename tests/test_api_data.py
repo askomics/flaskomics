@@ -12,7 +12,7 @@ class TestApiData(AskomicsTestCase):
         client.log_user("jdoe")
         client.upload_and_integrate()
 
-        with open("tests/results/data.json", "r") as file:
+        with open("tests/results/data_full.json", "r") as file:
             file_content = file.read()
         expected = json.loads(file_content)
 
@@ -63,7 +63,7 @@ class TestApiData(AskomicsTestCase):
             "columns_type": ["start_entity", "label", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
         }, public=True)
 
-        with open("tests/results/data.json", "r") as file:
+        with open("tests/results/data_public.json", "r") as file:
             file_content = file.read()
         expected = json.loads(file_content)
 
