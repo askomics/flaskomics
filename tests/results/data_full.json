@@ -2,35 +2,35 @@
     "data":[
         {
             "object":"3267835",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/start"
+            "predicate":"http://askomics.org/test/data/start"
         },
         {
             "object":"3270883",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/end"
+            "predicate":"http://askomics.org/test/data/end"
         },
         {
             "object":"At3",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/chromosomeName"
+            "predicate":"http://askomics.org/test/data/chromosomeName"
         },
         {
             "object":"At3",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/reference"
+            "predicate":"http://askomics.org/test/data/reference"
         },
         {
             "object":"plus",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/strand"
+            "predicate":"http://askomics.org/test/data/strand"
         },
         {
             "object":"+",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/strand"
+            "predicate":"http://askomics.org/test/data/strand"
         },
         {
             "object":"protein_coding",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/biotype"
+            "predicate":"http://askomics.org/test/data/biotype"
         },
         {
-            "object":"https://test-192-168-100-87.vm.openstack.genouest.org/data/gene",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/featureType"
+            "object":"http://askomics.org/test/data/gene",
+            "predicate":"http://askomics.org/test/data/featureType"
         },
         {
             "object":"label_AT3G10490",
@@ -38,23 +38,23 @@
         },
         {
             "object":"2000-01-01",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/date"
+            "predicate":"http://askomics.org/test/data/date"
         },
         {
-            "object":"https://test-192-168-100-87.vm.openstack.genouest.org/data/transcript",
+            "object":"http://askomics.org/test/data/transcript",
             "predicate":"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
         },
         {
             "object":"ANAC052",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/featureName"
+            "predicate":"http://askomics.org/test/data/featureName"
         },
         {
-            "object":"https://test-192-168-100-87.vm.openstack.genouest.org/data/Arabidopsis_thaliana",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/taxon"
+            "object":"http://askomics.org/test/data/Arabidopsis_thaliana",
+            "predicate":"http://askomics.org/test/data/taxon"
         },
         {
             "object":"NAC_domain_containing_protein_52_[Source:TAIR%3BAcc:AT3G10490]",
-            "predicate":"https://test-192-168-100-87.vm.openstack.genouest.org/data/description"
+            "predicate":"http://askomics.org/test/data/description"
         }
     ],
     "error":false,
