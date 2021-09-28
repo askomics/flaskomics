@@ -153,7 +153,7 @@
             "featureName": "na",
             "featureType": "gene",
             "start": "13537917",
-            "strand": "plus",
+            "strand": "",
             "taxon": "Arabidopsis_thaliana",
             "transcript": "AT5G35334",
             "date": "10/01/2000",
