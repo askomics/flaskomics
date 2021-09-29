@@ -5,7 +5,6 @@ import traceback
 
 from askomics.api.auth import api_auth
 from askomics.libaskomics.SparqlQuery import SparqlQuery
-from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 from flask import (Blueprint, current_app, jsonify, session)
 
@@ -40,14 +39,7 @@ def get_data(uri):
             base_uri = current_app.iniconfig.get('triplestore', 'namespace_data')
             full_uri = "<%s%s>" % (base_uri, uri)
 
-            raw_query = "SELECT DISTINCT ?predicat ?object\nWHERE {\n?URI ?predicat ?object\nVALUES ?URI {%s}}\n" % (full_uri)
-            federated = query.is_federated()
-            replace_froms = query.replace_froms()
-
-            sparql = query.format_query(raw_query, replace_froms=replace_froms, federated=federated)
-
-            query_launcher = SparqlQueryLauncher(current_app, session, get_result_query=True, federated=federated, endpoints=endpoints)
-            header, data = query_launcher.process_query(sparql)
+            data = query.get_uri_parameters(full_uri, endpoints)
 
     except Exception as e:
         current_app.logger.error(str(e).replace('\\n', '\n'))

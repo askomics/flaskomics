@@ -68,7 +68,7 @@ class TestApiAdmin(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 2268,
+                'size': 2264,
                 'type': 'csv/tsv',
                 'user': 'jsmith'
 
@@ -92,7 +92,7 @@ class TestApiAdmin(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2267,
+                'size': 2555,
                 'type': 'gff/gff3',
                 'user': 'jsmith'
 
@@ -443,7 +443,7 @@ class TestApiAdmin(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2267,
+                'size': 2555,
                 'type': 'gff/gff3',
                 'user': 'jsmith'
 
