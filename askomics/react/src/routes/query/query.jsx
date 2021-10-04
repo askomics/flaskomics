@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
+import ReactTooltip from "react-tooltip";
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
@@ -866,6 +867,7 @@ export default class Query extends Component {
       waiting: waiting
     })
     console.log(this.graphState)
+    ReactTooltip.rebuild();
   }
 
   initGraph () {
@@ -1462,6 +1464,13 @@ export default class Query extends Component {
     let launchQueryButton
     let removeButton
     let graphFilters
+    let tooltips = (
+        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark the attribute as a <i>form</i> attribute</ReactTooltip>
+        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
+        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
+        <ReactTooltip id="excludeTooltip">Exclude one or more categories, instead of including</ReactTooltip>
+        <ReactTooltip id="visibleTooltip">Display the attribute value in the results</ReactTooltip>
+    )
 
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
