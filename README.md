@@ -15,3 +15,4 @@ AskOmics is a visual SPARQL query interface supporting both intuitive data integ
 ## Documentation
 
 All documentation, included installation instruction is [here](https://flaskomics.readthedocs.io/en/latest/)
+A Galaxy Training tutorial is available [here](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-analysis-with-askomics-it/tutorial.html)

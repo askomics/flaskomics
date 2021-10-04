@@ -1,9 +1,11 @@
-A federated query is a query who involve several SPARQL endpoints. AskOmics have his dedicated endpoint for the integrated data, but it is also possible to query external resources.
+A federated query is a query who involve several SPARQL endpoints. AskOmics uses its own dedicated endpoint for the integrated data, but it is also possible to query external resources.
 
 
 # Define an external endpoint
 
-The first step is to define an external endpoint. External endpoint have their own description. To Display external entities, AskOmics need the *Abstraction* of the distant endpoint. This external abstraction can be build [automatically](#auto-generate-external-abstraction-with-abstractor) or [manually](abstraction.md).
+The first step is to define an external endpoint. External endpoint have their own description. To display external entities, AskOmics need the *Abstraction* of the distant endpoint.
+
+This external abstraction can be build [automatically](#auto-generate-external-abstraction-with-abstractor) or [manually](abstraction.md).
 
 ## Auto-generate external abstraction with abstractor
 
@@ -15,39 +17,35 @@ abstractor -e <endpoint_url> -p <entity_prefix> -o <output_file>
 ```
 
 !!! Warning
-    Abstractor scan all things in the SPARQL endpoint. You may review the generated file to delete unwanted things.
+    Abstractor scan all things in the SPARQL endpoint. You may wish to review the generated file to delete unwanted things.
 
 
 ## Integrate external abstraction into AskOmics
 
-Once external endpoint's abstraction is generated, its time to add it into AskOmis. Upload it and integrate it.
-![integrate_external](img/integrate_external.png)
+Once external endpoint's abstraction is generated, its time to add it into AskOmics. Upload it and integrate it.
+![Integrating an external abstraction](img/integrate_external.png){: .center}
 
 !!! Warning
     Check that `advanced options` > `Distant endpoint` contain URL of the external endpoint
 
 
-
 # Query external endpoint
 
-## Simple query
+## Starting entities
 
-If AskOmics contain local data, external startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
+If AskOmics already contains local data, external startpoint are not displayed by default on the start page. Use the `Source` dropdown button to display external entities.
 
-![external_startpoint](img/external_startpoint.png)
+![External startpoint](img/external_startpoint.png){: .center}
 
+## Linking to your own data
 
-## Federated query
+To link a local dataset to the external endpoint, the file must be structured in a certain way.
 
+The input file must describe the relation with the external entity. Much like a 'normal' relation, it goes through the header.
 
-External entities can be interrogate just as local entities. But to link a local dataset to the external endpoint, the file must be structured in a certain way.
+In this case however, instead of simply the entity name, the column name must contain either the full URI or the CURIE of the external entity (e.g *http://nextprot.org/rdf#Gene*). The values of the column must also be the exact uri (full URI or CURIE) of the targeted entity, instead of a raw value.
 
-### Build file
-
-The input file must describe the relation with the external entity. It goes through the header, who must contain the URI of the targeted entity. Content of the file must also be the exact uri of the targeted entity.
-
-
-For example, the file below describe en entity *gene* who is linked to an external entity *Gene*. The external one is prefixed with the full uri used in the external endpoint. In the content of the file, full URI have to be used to.
+For example, the file below describe en entity *gene* who is linked to an external entity *Gene*. The external one is prefixed with the full uri used in the external endpoint. In the values of the column, you will need to also use the full URI / CURIE.
 
 
 gene|value|concern@http://nextprot.org/rdf#Gene
@@ -56,6 +54,6 @@ gene_1|0|http://nextprot.org/rdf/gene/ENSG00000169594
 gene_2|1|http://nextprot.org/rdf/gene/ENSG00000156603
 
 
-### Perform a federated query
+## Perform a federated query
 
-Once the relations are well described, link between local and distant entities are automatically done by AskOmics. The Query is distributed to the concerned endpoint and results are returned like a classic query.
+Once the relations are described, links between local and distant entities are automatically created by AskOmics. The query is distributed to the external endpoint and results are returned like a classic query.

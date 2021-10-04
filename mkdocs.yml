@@ -3,7 +3,7 @@ repo_url: https://github.com/askomics/flaskomics
 edit_uri: edit/master/docs/
 site_author: Xavier Garnier
 
-theme: 
+theme:
   name: readthedocs
   highlightjs: true
   hljs_languages:
@@ -12,6 +12,8 @@ theme:
     - javascript
 markdown_extensions:
   - admonition
+  - attr_list
+  - markdown_captions
   - toc:
       permalink: true
       toc_depth: 1
@@ -21,12 +23,16 @@ nav:
   - Home: index.md
   - AskOmics tutorials:
     - Overview tutorial: tutorial.md
-    - Prepare data: data.md
+    - Preparing data: data.md
+    - Building a query: query.md
+    - Managing results: results.md
+    - Templates & forms: template.md
+    - SPARQL console: console.md
+    - Command-line interface: cli.md
     - Build RDF Abstraction: abstraction.md
     - Federated queries: federation.md
     - AskOmics and Galaxy: galaxy.md
-    - Contribute: issues.md
-  - Admin :
+  - Administrator guide:
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
     - Manage: manage.md
@@ -34,7 +40,7 @@ nav:
     - Dev deployment: dev-deployment.md
     - Contribute: contribute.md
     - CI: ci.md
-    - Doc: docs.md
+    - Documentation: docs.md
   - Bug Tracker: https://github.com/askomics/flaskomics/issues
   - Project monitoring: https://github.com/askomics/flaskomics/projects
 

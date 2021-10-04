@@ -1,15 +1,19 @@
 AskOmics is a web software for data integration and query using the Semantic Web technologies. It helps users to convert multiple data sources (CSV/TSV files, GFF and BED annotation) into RDF triples, and perform complex queries using a user-friendly interface.
 
-In this tutorial, we will learn the basics of AskOmics by analyses RNA-seq results. The data comes from a differential expression analysis and are provided for you. 4 files will be used in this tutorial:
+In this tutorial, we will learn the basics of AskOmics by analysing RNA-seq results. The provided datasets come from a differential expression analysis.
+
+4 files will be used in this tutorial:
 
 - [Differentially expressed results file](https://zenodo.org/record/2529117/files/limma-voom_luminalpregnant-luminallactate): genes in rows, and 4 required columns: identifier (ENTREZID), gene symbol (SYMBOL), log fold change (logFC) and adjusted P values (adj.P.Val)
 - [Reference genome annotation file](https://zenodo.org/record/3601076/files/Mus_musculus.GRCm38.98.subset.gff3) in GFF format
-- [Correspondence file between gene symbol and Ensembl id](https://zenodo.org/record/3601076/files/symbol-ensembl.tsv): TSV of two columns: symbol and the corresponding Ensembl id
+- [Correspondence file between gene symbol and Ensembl id](https://zenodo.org/record/3601076/files/symbol-ensembl.tsv): TSV with two columns: symbol and the corresponding Ensembl id
 - [QTL file](https://zenodo.org/record/3601076/files/MGIBatchReport_Qtl_Subset.txt): QTL in row, with 5 required columns: identifier, chromosome, start, end and name
 
-Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> containing tutorial instruction to perform in order to get started with AskOmics.
+Throughout the guide, you will find <badge class="hands-on">Hands-on</badge> sections containing instructions to perform in order to get started with AskOmics.
 
 To complete the tutorial, you will need an AskOmics instance. You can [install your own](production-deployment.md) or use this [public instance](https://use.askomics.org).
+
+A Galaxy Training tutorial is also available [here](https://training.galaxyproject.org/training-material/topics/transcriptomics/tutorials/rna-seq-analysis-with-askomics-it/tutorial.html)
 
 
 # Account creation and management
@@ -22,18 +26,18 @@ AskOmics is a multi-user platform. To use it, you will need an account on the in
     Create your AskOmics account (or login with your existing one)
 
 
-Once your are logged, you can use all the functionalities of AskOmics.
+Once you are logged, you can use all the functionalities of AskOmics.
 
 ## Manage your account
 
-To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> Your Name &#9662;</navbar> on the navigation bar.
+To manage your account, use the <navbar><i class="fa fa-cog"></i> Account management</navbar> tab by clicking on <navbar><i class="fa fa-user"></i> *Your Name &#9662;*</navbar> on the navigation bar.
 
 
-Uses the forms to change your personal information.
+You can use the forms to change your personal information.
 
 # Data integration
 
-AskOmics convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files.
+AskOmics will convert project specific data into RDF triples automatically. It can convert CSV/TSV, GFF and BED files.
 
 !!! Hands-on
     Download the files for the tutorial using the following links:<br />
@@ -55,9 +59,9 @@ You can upload files from your computer, or distant files using an URL.
 !!! Tip
     You can also copy files URL and use the <navbar><i class="fa fa-upload"></i> URL</navbar> button.
 
-Uploaded files are displayed into the files table. Filenames can be change by clicking on it.
+Uploaded files are displayed into the files table. Filenames can be changed by clicking on it.
 
-![files_table](img/files_table.png "files_table")
+![Files table](img/files_table.png "files_table"){: .center}
 
 Next step is to convert this files into RDF triples. This step is called *Integration*. Integration will produce a RDF description of your data: the *Abstraction*.
 
@@ -67,18 +71,22 @@ Next step is to convert this files into RDF triples. This step is called *Integr
 
 ## Integration
 
+Detailed information regarding the *Integration* step can be found [here](data.md).
+
 The *integration* convert input files into RDF triples, and load them into an RDF triplestore. AskOmics can convert CSV/TSV, GFF3 and BED files. During the step of integration, AskOmics show a preview of each files. We can choose how the file will be integrated at this step.
+
+More information about data integration is available [here](data.md)
 
 ### GFF
 
-GFF files contain genetic coordinate of entities. Each entities contained in the GFF file are displayed on the preview page. We can Select the entities that will be integrated.
+GFF files contain genetic coordinate of entities. Each entity contained in the GFF file is displayed on the preview page. We can Select the entities that will be integrated.
 
 !!! Hands-on
     1. Search for `Mus_musculus.GRCm38.98.subset.gff3 (preview)`
     2. Select `gene` and `mRNA`
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![De results preview](img/gff_preview.png)
+    ![Integration interface for GFF files](img/gff_preview.png){: .center}
 
 
 ### CSV/TSV
@@ -86,7 +94,7 @@ GFF files contain genetic coordinate of entities. Each entities contained in the
 The TSV preview show an HTML table representing the TSV file. During integration, AskOmics will convert the file using the header.
 
 <!-- First col: entity, then, attribute -->
-The first column of a TSV file will be the *entity* name. Other columns of the file will be *attributes* of the *entity*. *Labels* of the *entity* and *attributes* will be set by the header. This *labels* can be edited by clicking on it.  
+The first column of a TSV file will be the *entity* name. Other columns of the file will be *attributes* of the *entity*. *Labels* of the *entity* and *attributes* will be set by the header. The column names can be edited by clicking on it.  
 
 <!-- Attribute types -->
 Entity and attributes can have special types. The types are defined with the select below the header. An *entity* can be a *start entity* or an *entity*. A *start entity* mean that the entity may be used to start a query.
@@ -95,6 +103,7 @@ Attributes can take the following types:
 
 - Numeric: if all the values are numeric
 - Text: if all the values are strings
+- Date: if all the values are dates
 - Category: if there is a limited number of repeated values
 
 If the entity describe a locatable element on a genome:
@@ -116,7 +125,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - Keep the other column names and set their types to *numeric*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![De results preview](img/de_results_preview.png)
+    ![Integration interface for CSV files](img/de_results_preview.png){: .center}
 
 !!! Hands-on
     1. Search for `symbol-ensembl.tsv (preview)`
@@ -125,7 +134,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - change `ensembl` to `linkedTo@gene` and set type to *Directed relation*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![Symbol to Ensembl preview](img/symbol_to_ensembl_preview.png)
+    ![Modifying the name and type of a column](img/symbol_to_ensembl_preview.png){: .center}
 
 !!! Hands-on
     1. Search for `MGIBatchReport_Qtl_Subset.txt (preview)`
@@ -136,7 +145,7 @@ A columns can also be a relation between the *entity* to another. In this case, 
         - set `End` type to *End*
     3. <btn>Integrate (Private dataset)</btn>
 
-    ![QTL preview](img/qtl_preview.png)
+    ![Preview of the QTL file](img/qtl_preview.png){: .center}
 
 
 ### Manage integrated datasets
@@ -148,11 +157,11 @@ Integration can take some times depending on the file size. The <navbar><i class
     1. Go to <navbar><i class="fa fa-database"></i> Datasets</navbar> page
     2. Wait for all datasets to be *success*
 
-    ![dataset](img/datasets.png "Datasets table")
+    ![Table of datasets](img/datasets.png "Datasets table"){: .center}
 
 
 
-The table show all integrated datasets. The *status* column show if the datasets is fully integrated or in the process of being integrated.
+The table show all integrated datasets. The *status* column show if the datasets are fully integrated or in the process of being integrated.
 
 
 
@@ -160,13 +169,15 @@ The table show all integrated datasets. The *status* column show if the datasets
 
 Once all the data of interest is integrated (converted to RDF graphs), its time to query them. Querying RDF data is done by using the SPARQL language. Fortunately, AskOmics provides a user-friendly interface to build SPARQL queries without having to learn the SPARQL language.
 
+More information about the query building process is available [here](query.md)
+
 ## Query builder overview
 
 ### Simple query
 
 The first step to build a query is to choose a start point for the query.
 
-![ask](img/startpoint.png)
+![List of startpoints](img/startpoint.png){: .center}
 
 
 !!! Hands-on
@@ -178,19 +189,19 @@ The first step to build a query is to choose a start point for the query.
 Once the start entity is chosen, the query builder is displayed.
 
 
-The query builder is composed of a graph. Nodes represents *entities* and links represents *relations* between entities. The selected entity is surrounded by a red circle. links and other entities are dotted and lighter because there are not instantiated.
+The query builder is composed of a graph. Nodes represents *entities* and links represents *relations* between entities. The selected entity is surrounded by a red circle. Links and other entities are dotted and lighter because there are not instantiated.
 
-![query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity")
+![The query builder](img/query_builder.png "Query builder, Differential Expression is the selected entity, GeneLink is a suggested entity"){: .center}
 
 On the right, attributes of the selected entity are displayed as attribute boxes. Each boxes have an eye icon. Open eye mean the attribute will be displayed on the results.
 
 !!! Hands-on
     1. Display `logFC` and `adj.P.val` by clicking on the <i class="fa fa-eye"></i> eye icon
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-![preview results](img/preview_results.png "Results preview")
+![Preview of results](img/preview_results.png "Results preview"){: .center}
 
-<btn><i class="fa fa-table"></i> Run & Preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
+<btn><i class="fa fa-table"></i> Run & preview</btn> launch the query with a limit of 30 rows returned. We use this button to get an idea of the results returned.
 
 
 ### Filter on attributes
@@ -200,38 +211,39 @@ Next query will search for all over-expressed genes. Genes are considered over-e
 !!! Hands-on
     1. Filter `logFC` with `>` `2`
     2. Filter `adj.P.val` with `≤` `0.05`
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 Results show only significantly over-expressed genes.
 
 
 ### Filter on relations
 
-Now that we have our genes if interest, we will link these genes to the reference genome to get information about location.
+Now that we have our genes if interest, we will link these genes to the reference genome to get information about the location.
 
-To constraint on relation, we have to click on suggested nodes, linked to our entity of interest.
+To constraint on a relation, we have to click on any suggested nodes linked to our entity of interest.
 
 !!! Hands-on
     1. First, hide `Label`, `logFC` and `adj.P.val` of `Differential Expression`
     2. Instantiate `GeneLink`, and hide `Label`
     3. Instantiate `gene`
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. for example, we can filter on chromosome and display chromosome and strand to get information about gene location.
+Results now show the Ensembl id of our over-expressed genes. We have now access to all the information about the `gene` entity containing on the GFF file. For example, we can filter on chromosome and display chromosome and strand to get information about the gene location.
 
 !!! Hands-on
     1. Show `reference` and `strand` using the eye icon
     2. Filter `reference` to select `X` and `Y` chromosomes (use `ctrl`+`click` to multiple selection)
-    2. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    2. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 ### Use FALDO ontology to query on the position of elements on the genome.
 
-The [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) ontology describe sequence feature positions and regions. AskOmics use FALDO ontology to represent entity positions. GFF are using FALDO, as well as TSV entities with chromosome, strand, start and end.
+The [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) ontology describe sequence features's positions and regions. AskOmics use the FALDO ontology to represent entity positions.  
+All entities extracted from GFF and BED files use this ontology, in addition to any entity extracted from a CSV/TSV file with a reference, strand, start and end columns.
 
-The FALDO ontology are used in AskOmics to perform special queries between 2 FALDO entities. These queries are:
+The FALDO ontology is used in AskOmics to perform special queries between 2 FALDO entities. These queries are:
 
-- Entity included in another entity
-- Entity overlapping another one
+- Entity is included in another entity
+- Entity is overlapping another entity
 
 On the query builder interface, FALDO entities are represented with a green circle and FALDO relations have a green arrow.
 
@@ -241,19 +253,19 @@ On the query builder interface, FALDO entities are represented with a green circ
     3. Instantiate `QTL`
     4. Click on the link between `gene` and `QTL` to edit the relation
     5. check that the relation is `gene` `included in` `QTL` `on the same reference` with `strict` ticked
-    7. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    7. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
 
 To go further, we can filter on `QTL` to refine the results.
 
 
 !!! Hands-on
-    1. got back to the `QTL` node
+    1. Go back to the `QTL` node
     2. Show the `Name` attribute using the eye icon
     3. Filter the name with a `regexp` with `growth`
-    4. <btn><i class="fa fa-table"></i> Run & Preview</btn>
+    4. <btn><i class="fa fa-table"></i> Run & preview</btn>
 
-From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. So we can save it.
+From now, our query is "All Genes that are over-expressed (logFC > 2 and FDR ≤ 0.05) and located on a QTL that are related to growth" This is the results that we are looking for. We can now save it.
 
 !!! Hands-on
     1. <btn><i class="fa fa-table"></i> Run & save</btn>
@@ -266,21 +278,36 @@ The results page store the saved queries. A table show some useful information a
 
 !!! Hands-on
     1. Click on the name and enter `Over-expressed genes on a growth QTL`
-    2. press `enter` key
+    2. Press the `Enter` key
 
-    ![results table](img/results_table.png)
+    ![Table of results](img/results_table.png){: .center}
 
-The **Action** column contain button to perform certain action:
+The **Action** column contain buttons to perform certain action:
 
-- Preview: show a results preview on the bottom of the table
+- Preview: Show a results preview on the bottom of the table
 - Download: Download the results (TSV file)
 - Edit: Edit the query with the query builder
-- SPARQL: edit the query with a SPARQL editor for advanced users
+- SPARQL: Access the generated SPARQL query for the result
+
+For more information about the Results page, please head [here](results.md)
 
 !!! Hands-on
-    1. Download the results file on your computer using <btn class="white">Download</btn> button
+    1. Download the results file on your computer using the <btn class="white">Download</btn> button.
 
+The <btn class="white">Edit</btn> button can be used to simply replay the query after changing some parameters.
+
+!!! Hands-on
+    1. Edit the query, and replace "growth" with another term of interest (such as "anxiety").
+    2. Preview the results
+
+
+## Advanced queries
+
+Advanced queries, including *UNION* and *MINUS* SPARQL queries are also available to further your queries.  
+Please head [here](query.md#minus-and-union-nodes) for more information.
 
 # Conclusion
 
-In this tutorial we have seen how to use AskOmics Interactive Tool to Build a complex SPARQL query to interrogate 4 different datasets and answer a biological question.
+In this tutorial we have seen how to use the AskOmics Interactive Tool, building a complex SPARQL query to interrogate 4 different datasets and answer a biological question.
+
+This tutorial was a brief overview of AskOmics's functionalities. Please check the other categories on the left-side for more information.
