@@ -79,7 +79,8 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2264,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }]
         }
 
