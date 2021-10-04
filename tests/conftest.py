@@ -273,6 +273,24 @@ class Client(object):
             "file_date": filedate
         }
 
+    def upload_file_url(self, file_url):
+        """Summary
+
+        Parameters
+        ----------
+        file_path : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+
+        files = FilesHandler(self.app, self.session)
+        files.download_url(file_url, "1")
+        return files.date
+
     def integrate_file(self, info, public=False):
         """Summary
 
