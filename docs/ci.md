@@ -1,4 +1,4 @@
-AskOmics continuous integration is composed of code linting and unit tests on the Python API. CI is launched automaticaly on the [askomics](https://github.com/askomics/flaskomics) repository on every pull requests. No PR will be merged if the CI fail.
+AskOmics continuous integration includes code linting and unit tests on the Python API. CI is launched automaticaly on the [askomics](https://github.com/askomics/flaskomics) repository on every pull requests. No PR will be merged if the CI fail.
 
 
 # Setup CI environment

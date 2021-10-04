@@ -14,7 +14,7 @@ git checkout -b my_new_feature
 
 Commit and push your modification to your [fork](https://help.github.com/articles/pushing-to-a-remote/). If your changes modify code, please ensure that is conform to [AskOmics style](#coding-style-guidlines)
 
-Write tests for your changes, and make sure that they [passes](dev-deployment.md#launch-continuous-integration-locally).
+Write tests for your changes, and make sure that they [passe](dev-deployment.md#launch-continuous-integration-locally).
 
 Open a pull request against the `dev` branch of flaskomics. The message of your pull request should describe your modifications (why and how).
 
@@ -29,10 +29,10 @@ Ensure all user-enterable strings are unicode capable. Use only English language
 
 ### Python
 
-We follow [PEP-8](https://www.python.org/dev/peps/pep-0008/), with particular emphasis on the parts about knowing when to be inconsistent, and readability being the ultimate goal.
+We follow the [PEP-8](https://www.python.org/dev/peps/pep-0008/) coding convention.
 
 - Whitespace around operators and inside parentheses
-- 4 spaces per indent, spaces, not tabs
+- 4 spaces per indent (not tabs)
 - Include docstrings on your modules, class and methods
 - Avoid from module import \*. It can cause name collisions that are tedious to track down.
 - Class should be in `CamelCase`, methods and variables in `lowercase_with_underscore`
