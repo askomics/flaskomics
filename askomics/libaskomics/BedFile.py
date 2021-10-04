@@ -218,7 +218,6 @@ class BedFile(File):
 
             # Strand
             strand = False
-            strand_type = None
             if feature.strand == "+":
                 self.category_values["strand"] = {"+", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -227,7 +226,6 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
-                strand_type = "+"
             elif feature.strand == "-":
                 self.category_values["strand"] = {"-", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -236,7 +234,6 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
-                strand_type = "-"
             else:
                 self.category_values["strand"] = {".", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -245,18 +242,17 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
-                strand_type = "."
 
             if strand:
-                if ("strand", strand_type) not in attribute_list:
-                    attribute_list.append(("strand", strand_type))
+                if "strand" not in attribute_list:
+                    attribute_list.append("strand")
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": [strand_type]
+                        "values": ["+", "-", "."]
                     })
 
             # Score

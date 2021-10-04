@@ -25,8 +25,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 2264,
-                'type': 'csv/tsv'
+                'size': 2268,
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
@@ -45,8 +46,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2555,
-                'type': 'gff/gff3'
+                'size': 2267,
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -76,8 +78,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 2264,
-                'type': 'csv/tsv'
+                'size': 2268,
+                'type': 'csv/tsv',
+                'status': 'available'
             }]
         }
 
@@ -131,8 +134,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'new name.tsv',
-                'size': 2264,
-                'type': 'csv/tsv'
+                'size': 2268,
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
@@ -151,8 +155,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2555,
-                'type': 'gff/gff3'
+                'size': 2267,
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -468,8 +473,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2555,
-                'type': 'gff/gff3'
+                'size': 2267,
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -496,8 +502,9 @@ class TestApiFile(AskomicsTestCase):
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2555,
-                'type': 'gff/gff3'
+                'size': 2267,
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
