@@ -3,6 +3,7 @@ import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
+import {Badge} from 'reactstrap'
 import WaitingDiv from '../../components/waiting'
 import Utils from '../../classes/utils'
 import PropTypes from 'prop-types'
@@ -86,6 +87,20 @@ export default class FilesTable extends Component {
       dataField: 'size',
       text: 'File size',
       formatter: (cell, row) => { return this.utils.humanFileSize(cell, true) },
+      sort: true,
+      editable: false
+    }, {
+      dataField: 'status',
+      text: 'File status',
+      formatter: (cell, row) => {
+        if (cell == 'downloading') {
+          return <Badge color="secondary">Downloading</Badge>
+        }
+        if (cell == 'available') {
+          return <Badge color="success">Available</Badge>
+        }
+        return <Badge color="danger">Error</Badge>
+      },
       sort: true,
       editable: false
     }]

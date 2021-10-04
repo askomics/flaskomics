@@ -26,31 +26,36 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2264,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -74,7 +79,8 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2264,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }]
         }
 
@@ -84,7 +90,30 @@ class TestApiFile(AskomicsTestCase):
             'diskSpace': client.get_size_occupied_by_user(),
             'error': False,
             'errorMessage': '',
-            'files': []
+            'files': [],
+        }
+
+    def test_get_files_upload(self, client):
+        """test the /api/files route after an url upload"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        date = client.upload_file_url("https://raw.githubusercontent.com/askomics/demo-data/master/Example/gene.tsv")
+
+        response = client.client.get('/api/files')
+
+        assert response.status_code == 200
+        assert response.json == {
+            'diskSpace': client.get_size_occupied_by_user(),
+            'error': False,
+            'errorMessage': '',
+            'files': [{
+                'date': date,
+                'id': 1,
+                'name': 'gene.tsv',
+                'size': 369,
+                'type': 'csv/tsv',
+                'status': 'available'
+            }]
         }
 
     def test_edit_file(self, client):
@@ -106,31 +135,36 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'new name.tsv',
                 'size': 2264,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -323,7 +357,6 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.get("/api/files")
         assert response.status_code == 200
-        assert len(response.json["files"]) == 1
 
     def test_get_preview(self, client):
         """Test /api/files/preview route"""
@@ -427,25 +460,29 @@ class TestApiFile(AskomicsTestCase):
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 
@@ -459,19 +496,22 @@ class TestApiFile(AskomicsTestCase):
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
-                'type': 'bed'
+                'type': 'bed',
+                'status': 'available'
             }]
         }
 

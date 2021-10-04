@@ -1,4 +1,5 @@
 """Api routes"""
+import requests
 import sys
 import traceback
 import urllib
@@ -189,8 +190,19 @@ def upload_url():
         }), 400
 
     try:
-        files = FilesHandler(current_app, session)
-        files.download_url(data["url"])
+        if session["user"]["quota"] > 0:
+            with requests.get(data["url"], stream=True) as r:
+                # Check header for total size, and check quota.
+                if r.headers.get('Content-length'):
+                    total_size = int(r.headers.get('Content-length')) + disk_space
+                    if total_size >= session["user"]["quota"]:
+                        return jsonify({
+                            'errorMessage': "File will exceed quota",
+                            "error": True
+                        }), 400
+
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('download_file', (session_dict, data["url"]))
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
