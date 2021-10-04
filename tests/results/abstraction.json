@@ -36,6 +36,10 @@
             "uri": "http://askomics.org/test/data/plus"
           },
           {
+            "label": "unknown/both",
+            "uri": "http://askomics.org/test/data/unknown/both"
+          },
+          {
             "label": "+",
             "uri": "http://askomics.org/test/data/%2B"
           },
@@ -68,6 +72,10 @@
           {
             "label": "plus",
             "uri": "http://askomics.org/test/data/plus"
+          },
+	  {
+            "label": "unknown/both",
+            "uri": "http://askomics.org/test/data/unknown/both"
           },
           {
             "label": "+",

@@ -196,7 +196,7 @@ class GffFile(File):
                 faldo_strand = None
                 faldo_start = None
                 faldo_end = None
-
+                strand_type = None
                 # Entity
                 if not feature.id:
                     if "ID" not in feature.qualifiers.keys():
@@ -286,6 +286,7 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "+"
                     # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
@@ -293,6 +294,7 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "-"
                     # self.graph_chunk.add((entity, relation, attribute))
                 else:
                     self.category_values["strand"] = {".", }
@@ -300,16 +302,17 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri(".")]
                     faldo_strand = self.get_faldo_strand(".")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "."
 
-                if (feature.type, "strand") not in attribute_list:
-                    attribute_list.append((feature.type, "strand"))
+                if (feature.type, "strand", strand_type) not in attribute_list:
+                    attribute_list.append((feature.type, "strand", strand_type))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-", "."]
+                        "values": [strand_type]
                     })
 
                 # Qualifiers (9th columns)

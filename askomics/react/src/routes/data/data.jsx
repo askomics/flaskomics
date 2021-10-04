@@ -61,7 +61,7 @@ class Data extends Component {
     let uri = this.props.match.params.uri;
 
     let columns = [{
-      dataField: 'predicat',
+      dataField: 'predicate',
       text: 'Property',
       sort: true,
       formatter: (cell, row) => {
