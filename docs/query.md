@@ -107,6 +107,9 @@ Simply type out the name you want to filter in either the "Filter links" or the 
 
 ![Filtering displayed relations](img/filters.png){: .center}
 
+!!! Tip
+    You can stop the *Included_in* relations from being displayed by toggling the *Show FALDO relations* button.
+
 ## Removing instanciated relations
 
 At any point, you can remove an instanciated node **(and any node linked to it)**, by selecting the node you wish to remove, and using the **Remove Node** button at the top of the interface.

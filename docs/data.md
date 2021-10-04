@@ -1,3 +1,11 @@
+# Uploading files
+
+You can head to the *Files* tab to manage your files. From there, you will be able to upload new files (from your local computer, or a remote endpoint), and delete them.
+
+!!! warning
+    Deleting files do not delete related datasets.
+
+
 # Data visibility
 
 By default, all your uploaded files and datasets are private.
@@ -83,7 +91,7 @@ Attributes can be of the following types :
 
 If the entity describe a locatable element on a genome (based on the FALDO ontology):
 
-- [Reference](http://biohackathon.org/resource/faldo#reference): chromosome *(Auto-detected terms : 'chr', 'ref')*
+- [Reference](http://biohackathon.org/resource/faldo#reference): chromosome *(Auto-detected terms : 'chr', 'ref', 'scaff')*
 - [Strand](http://biohackathon.org/resource/faldo#StrandedPosition): strand *(Auto-detected terms : 'strand')*
 - Start: start position *(Auto-detected term : 'start', 'begin')*
 - End: end position *(Auto-detected terms : 'end', 'stop')*
