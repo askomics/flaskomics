@@ -26,7 +26,8 @@ class TestApiFile(AskomicsTestCase):
                 'id': 1,
                 'name': 'transcripts.tsv',
                 'size': 2264,
-                'type': 'csv/tsv'
+                'type': 'csv/tsv',
+                'status': 'available'
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
@@ -501,7 +502,8 @@ class TestApiFile(AskomicsTestCase):
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
-                'type': 'gff/gff3'
+                'type': 'gff/gff3',
+                'status': 'available'
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
