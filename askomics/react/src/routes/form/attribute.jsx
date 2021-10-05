@@ -147,8 +147,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
         {form}
       </div>
@@ -216,8 +216,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
         {form}
       </div>
@@ -267,9 +267,9 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
-          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
+          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude} data-tip data-for={"excludeTooltip"}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
         {form}
       </div>
@@ -312,8 +312,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
         {form}
       </div>
@@ -389,8 +389,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label}</label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
         {form}
       </div>

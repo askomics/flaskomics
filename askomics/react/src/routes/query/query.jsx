@@ -1469,7 +1469,7 @@ export default class Query extends Component {
         <ReactTooltip id="formTooltip" place="top" effect="solid">Mark the attribute as a <i>form</i> attribute</ReactTooltip>
         <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
         <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude one or more categories, instead of including</ReactTooltip>
+        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
         <ReactTooltip id="visibleTooltip">Display the attribute value in the results</ReactTooltip>
         </div>
     )
