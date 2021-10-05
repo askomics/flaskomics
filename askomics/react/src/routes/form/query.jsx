@@ -276,6 +276,7 @@ export default class FormQuery extends Component {
       saveIcon: "play",
       waiting: waiting
     })
+    ReactTooltip.rebuild();
   }
 
   // Preview results and Launch query buttons -------
