@@ -16,6 +16,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
 ```
 <br />
 
@@ -144,12 +145,16 @@ faldo:start and faldo:end are numeric attributes.
 
 # Relations
 
-Entities are linked between them with relations. Relations are displayed with arrows between nodes on the query builder. The following turtle explain how relations are described.
+Entities are linked between them with relations. Relations are displayed with arrows between nodes on the query builder. The following turtle explain how relations are described. To avoid overwriting information, relations are described using a blank node. The relation `:RelationExample`, linking `EntitySource` to `ÈntityTarget`, with the label *relation_example*, will be defined as follows:  
 
 ```turtle
-:relation_example a askomics:AskomicsRelation .
-:relation_example a owl:ObjectProperty .
-:relation_example rdfs:label "relation_example" .
-:relation_example rdfs:domain :EntityName .
-:relation_example rdfs:range :EntityName_2 .
+_:relation_node askomics:uri :RelationExample .
+_:relation_node a askomics:AskomicsRelation .
+_:relation_node a owl:ObjectProperty .
+_:relation_node rdfs:label "relation_example" .
+_:relation_node rdfs:domain :EntitySource .
+_:relation_node rdfs:range :EntityTarget .
+# Optional information for future-proofing
+_:relation_node dcat:endpointURL <url...> .
+_:relation_node dcat:dataset <file_turtle_XXXXX_gene_tsv> .
 ```
