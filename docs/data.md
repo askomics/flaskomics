@@ -3,7 +3,7 @@
 You can head to the *Files* tab to manage your files. From there, you will be able to upload new files (from your local computer, or a remote endpoint), and delete them.
 
 !!! warning
-    Deleting files do not delete related datasets.
+    Deleting files does not delete related datasets.
 
 
 # Data visibility
