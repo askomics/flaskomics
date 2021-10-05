@@ -39,17 +39,6 @@ The first column of the file will manage the entity itself : the column name wil
 !!! Warning
     Unless you are trying to merge entities, make sure your URIs are unique across **both your personal and public datasets**.
 
-### Entity label
-
-The values of the first column will also be transformed into the generated instances's label.
-
-* If the value is an **URL**, the last non-empty value after a "/" or "#" will be the label.
-* If the value is a **CURIE**, the value after ":" will be the label
-* Else, the raw value is the label
-
-!!! node "Info"
-    For example, a one-column CSV file with the column name "Gene", and the values "gene1", "rdfs:gene2" and "http://myurl/gene3/" will create the entity *Gene*, with two instances labelled *gene1*, *gene2* and *gene3*.
-
 ### Entity type
 
 The entity type can either be "starting entity", or "entity". If "starting entity", it may be used to start a query on the AskOmics homepage. Both types will appear as a node in the AskOmics interface.
@@ -64,6 +53,23 @@ To setup inheritance, the **column name** needs to be formated as follows:
 
 !!! Warning
     The values of this column must be an URI of the *mother* entity
+
+## Entity label (first and second column)
+
+To manually set an entity label, you can set the second column as a *Label* column.  
+The values of this column will be used as labels for the generated entities.
+
+!!! Warning
+    If a value is missing in the column, the label will be created based on the entity *URI*. (See below)
+
+If there is no *Label* column, the labels will be generated based on the URIs (The first column).
+
+* If the value is an **URL**, the last non-empty value after a "/" or "#" will be the label.
+* If the value is a **CURIE**, the value after ":" will be the label
+* Else, the raw value is the label
+
+!!! node "Info"
+    For example, a one-column CSV file with the column name "Gene", and the values "gene1", "rdfs:gene2" and "http://myurl/gene3/" will create the entity *Gene*, with two instances labelled *gene1*, *gene2* and *gene3*.
 
 ## Attributes
 
