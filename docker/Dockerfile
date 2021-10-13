@@ -7,7 +7,7 @@ WORKDIR /askomics
 RUN make clean-config fast-install build
 
 # Final image
-FROM alpine:3.9
+FROM alpine:3.14
 
 WORKDIR /askomics
 RUN apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm openldap-dev
