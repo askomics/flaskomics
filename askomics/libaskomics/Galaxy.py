@@ -156,6 +156,6 @@ class Galaxy(Params):
             Content of the dataset
         """
         galaxy_instance = galaxy.GalaxyInstance(self.url, self.apikey)
-        dataset = galaxy_instance.datasets.download_dataset(dataset_id)
+        dataset = galaxy_instance.datasets.download_dataset(dataset_id).decode('utf-8')
 
         return dataset
