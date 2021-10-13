@@ -10,7 +10,7 @@ RUN make clean-config fast-install build
 FROM alpine:3.14
 
 WORKDIR /askomics
-RUN apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm openldap-dev
+RUN apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs-current npm openldap-dev
 COPY --from=builder /askomics .
 
 EXPOSE 5000
