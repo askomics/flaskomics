@@ -1,4 +1,4 @@
-FROM askomics/flaskomics-base:4.0.0-alpine3.9 AS builder
+FROM quay.io/askomics/flaskomics-base:update AS builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
