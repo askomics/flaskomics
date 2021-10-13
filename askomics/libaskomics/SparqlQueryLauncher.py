@@ -220,7 +220,7 @@ class SparqlQueryLauncher(Params):
         TYPE
             query result
         """
-        triples = self.get_triples_from_graph(ttl) if metadata else ttl.serialize(format='nt').decode("utf-8")
+        triples = self.get_triples_from_graph(ttl) if metadata else ttl.serialize(format='nt')
 
         query = '''
         INSERT {{

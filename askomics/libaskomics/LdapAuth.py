@@ -92,10 +92,10 @@ class LdapAuth(Params):
 
         return {
             'dn': ldap_user[0][0],
-            'email': ldap_user[0][1][self.mail_attribute][0].decode(),
-            'username': ldap_user[0][1][self.username_attribute][0].decode(),
-            'fname': ldap_user[0][1][self.first_name_attribute][0].decode(),
-            'lname': ldap_user[0][1][self.surname_attribute][0].decode()
+            'email': ldap_user[0][1][self.mail_attribute][0],
+            'username': ldap_user[0][1][self.username_attribute][0],
+            'fname': ldap_user[0][1][self.first_name_attribute][0],
+            'lname': ldap_user[0][1][self.surname_attribute][0]
         }
 
     def check_password(self, dn, password):
