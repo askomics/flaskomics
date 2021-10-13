@@ -176,6 +176,7 @@ install-python: check-python
 
 install-js: check-npm
 	@echo  'Installing javascript dependencies inside node_modules...    '
+	$(NPM) install -g npm
 	$(NPM) install
 	@echo '                                                             Done'
 
