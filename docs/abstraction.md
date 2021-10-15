@@ -32,11 +32,16 @@ The entity is a class. In the query builder, it is represented with a graph node
 :EntityName rdf:type owl:Class .
 :EntityName rdf:type askomics:startPoint .
 :EntityName rdfs:label "EntityName" .
+# Optional (use if no label)
+:EntityName askomics:instancesHaveNoLabels true .
 ```
 <br />
 
 !!! note "Info"
     `:EntityName rdf:type :startPoint` is not mandatory. If the entity have this triple, a query can be started with this this node.
+
+!!! note "Info"
+    `:EntityName rdfs:label "EntityName"` is optional. If your entity has no label, you can use `:EntityName askomics:instancesHaveNoLabels true` instead. In the query view, the label tab will not be displayed.
 
 # Attributes
 
