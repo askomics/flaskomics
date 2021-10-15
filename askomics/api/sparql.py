@@ -116,7 +116,7 @@ def query():
         }), 400
 
     try:
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=False)
 
         query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
@@ -209,7 +209,7 @@ def save_query():
             }), 400
 
         # Is query federated?
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=False)
         query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
         federated = query.is_federated()
@@ -222,7 +222,9 @@ def save_query():
             "graphs": graphs,
             "endpoints": endpoints,
             "federated": federated,
-            "celery_id": None
+            "celery_id": None,
+            "selects": query.selects,
+            "sparql": query.sparql
         }
 
         result = Result(current_app, session, info)
