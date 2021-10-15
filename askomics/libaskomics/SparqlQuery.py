@@ -414,10 +414,12 @@ class SparqlQuery(Params):
         query = '''
         SELECT DISTINCT ?graph ?endpoint
         WHERE {{
+          ?graph_abstraction askomics:public ?public .
+          ?graph_abstraction dc:creator ?creator .
           ?graph askomics:public ?public .
           ?graph dc:creator ?creator .
           GRAPH ?graph_abstraction {{
-            ?graph prov:atLocation ?endpoint .
+            ?graph_abstraction prov:atLocation ?endpoint .
             ?entity_uri a askomics:entity .
           }}
           GRAPH ?graph {{
