@@ -29,7 +29,8 @@ export default class Ask extends Component {
       dropdownOpen: false,
       selectedEndpoint: [],
       frontMessage: "",
-      redirectFormBuilder: false
+      redirectFormBuilder: false,
+      console_enabled: false
     }
     this.utils = new Utils()
     this.cancelRequest
@@ -155,6 +156,7 @@ export default class Ask extends Component {
             graphs: response.data.graphs,
             endpoints_sparql: response.data.endpoints,
             diskSpace: response.data.diskSpace,
+            console_enabled: response.data.console_enabled
           })
         }
       })
@@ -276,7 +278,8 @@ export default class Ask extends Component {
           graphs: this.state.graphs,
           endpoints: this.state.endpoints_sparql,
           diskSpace: this.state.diskSpace,
-          config: this.props.config
+          config: this.props.config,
+          console_enabled: this.state.console_enabled
         }
       }} />
     }
