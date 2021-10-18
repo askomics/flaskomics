@@ -222,9 +222,7 @@ def save_query():
             "graphs": graphs,
             "endpoints": endpoints,
             "federated": federated,
-            "celery_id": None,
-            "selects": query.selects,
-            "sparql": query.sparql
+            "celery_id": None
         }
 
         result = Result(current_app, session, info)

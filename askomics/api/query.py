@@ -188,13 +188,16 @@ def save_result():
 
         query = SparqlQuery(current_app, session, data["graphState"], get_graphs=False)
         query.build_query_from_json(preview=False, for_editor=False)
+        federated = query.is_federated()
 
         info = {
             "graph_state": data["graphState"],
             "query": query.sparql,
             "graphs": query.graphs,
             "endpoints": query.endpoints,
-            "celery_id": None
+            "federated": federated,
+            "celery_id": None,
+            "selects": query.selects,
         }
 
         result = Result(current_app, session, info)

@@ -160,7 +160,7 @@ def query(self, session, info):
         results = []
         if query.graphs:
             query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
-            headers, results = query_launcher.process_query(info["sparql"], isql_api=True)
+            headers, results = query_launcher.process_query(info["query"], isql_api=True)
 
         # write result to a file
         file_size = result.save_result_in_file(headers, results)
