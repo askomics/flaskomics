@@ -9,6 +9,7 @@
   },
   "error": false,
   "errorMessage": "",
+  "console_enabled": true,
   "graphState": {
     "attr": [
       {
