@@ -1,5 +1,5 @@
 # Build AskOmics
-FROM askomics/flaskomics-base:4.0.0-alpine3.9 AS askomics_builder
+FROM quay.io/askomics/flaskomics-base:4.0.0-alpine3.14 AS askomics_builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
@@ -14,7 +14,7 @@ FROM xgaia/corese:20.6.11 AS corese_builder
 FROM askomics/virtuoso:7.2.5.1 AS virtuoso_builder
 
 # Final image
-FROM alpine:3.8
+FROM alpine:3.14
 
 ENV MODE="prod" \
     NTASKS="5" \
@@ -35,7 +35,7 @@ RUN apk add --no-cache openssl py-pip && \
     apk --no-cache add --update openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community && \
     mkdir /corese && \
     apk add --no-cache redis sqlite && \
-    apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs nodejs-npm openldap-dev
+    apk add --no-cache make python3 bash git libc-dev libstdc++ nodejs-current nodejs openldap-dev
 
 COPY --from=virtuoso_builder /usr/local/virtuoso-opensource /usr/local/virtuoso-opensource
 COPY --from=virtuoso_builder /virtuoso /virtuoso

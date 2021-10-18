@@ -81,7 +81,7 @@ test-js: eslint
 
 eslint: check-node-modules
 	@echo -n 'Linting javascript...                                        '
-	$(NODEDIR)/.bin/eslint --config $(BASEDIR)/.eslintrc.yml "$(BASEDIR)/askomics/react/src/**"
+	$(NODEDIR)/.bin/eslint --config $(BASEDIR)/.eslintrc.yml "$(BASEDIR)/askomics/react/src/**" || { echo "ERROR"; exit 1; }
 	@echo "Done"
 
 test-python: pylint pytest
@@ -94,7 +94,7 @@ pytest: check-venv
 pylint: check-venv
 	@echo -n 'Linting python...                                            '
 	. $(ACTIVATE)
-	flake8 $(BASEDIR)/askomics $(BASEDIR)/tests --ignore=E501,W504
+	flake8 $(BASEDIR)/askomics $(BASEDIR)/tests --ignore=E501,W504 || { echo "ERROR"; exit 1; }
 	@echo "Done"
 
 serve: check-venv build-config create-user
@@ -126,32 +126,32 @@ check-node-modules:
 
 build-config:
 	@echo -n 'Building config file...                                      '
-	bash cli/set_config.sh
+	bash cli/set_config.sh || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 
 create-user:
 	@echo -n 'Creating first user...                                       '
 	. $(ACTIVATE)
-	bash cli/set_user.sh
+	bash cli/set_user.sh || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 
 update-base-url: check-venv
 	@echo 'Updating base url...'
 	. $(ACTIVATE)
-	bash cli/update_base_url.sh
+	bash cli/update_base_url.sh || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 
 clear-cache: check-venv
 	@echo 'Clearing abstraction cache...'
 	. $(ACTIVATE)
-	bash cli/clear_cache.sh
+	bash cli/clear_cache.sh || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 
 build: build-js
 
 build-js: check-node-modules
 	@echo 'Building askomics.js...                                        '
-	$(NPM) run --silent $(NPMOPTS)
+	$(NPM) run --silent $(NPMOPTS) || { echo "ERROR"; exit 1; }
 	@echo '                                                             Done'
 
 install: install-python install-js
@@ -161,22 +161,22 @@ fast-install:
 
 install-python: check-python
 	@echo -n 'Building python virtual environment...                       '
-	$(PYTHON) -m venv $(VENVDIR)
+	$(PYTHON) -m venv $(VENVDIR) || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 	@echo -n 'Sourcing Python virtual environment...                       '
-	. $(ACTIVATE)
+	. $(ACTIVATE) || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 	@echo -n 'Upgrading pip...                                             '
-	$(PIP) install --upgrade pip > /dev/null
+	$(PIP) install --upgrade pip > /dev/null || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 	@echo 'Installing Python dependencies inside virtual environment... '
-	$(PIP) install -e . > /dev/null
-	PIPENV_VERBOSITY=-1 $(PIPENV) install $(PIPENVOPTS)
+	$(PIP) install -e . > /dev/null || { echo "ERROR"; exit 1; }
+	PIPENV_VERBOSITY=-1 $(PIPENV) install $(PIPENVOPTS) || { echo "ERROR"; exit 1; }
 	@echo '                                                             Done'
 
 install-js: check-npm
 	@echo  'Installing javascript dependencies inside node_modules...    '
-	$(NPM) install --silent
+	$(NPM) install || { echo "ERROR"; exit 1; }
 	@echo '                                                             Done'
 
 clean: clean-js clean-python
