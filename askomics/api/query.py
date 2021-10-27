@@ -125,7 +125,7 @@ def get_preview():
                     'errorMessage': "Missing graphState parameter"
                 }), 400
 
-            query = SparqlQuery(current_app, session, data["graphState"])
+            query = SparqlQuery(current_app, session, data["graphState"], get_graphs=False)
             query.build_query_from_json(preview=True, for_editor=False)
 
             endpoints = query.endpoints
@@ -186,15 +186,18 @@ def save_result():
                 'errorMessage': "Missing graphState parameter"
             }), 400
 
-        query = SparqlQuery(current_app, session, data["graphState"])
+        query = SparqlQuery(current_app, session, data["graphState"], get_graphs=False)
         query.build_query_from_json(preview=False, for_editor=False)
+        federated = query.is_federated()
 
         info = {
-            "graph_state": query.json,
+            "graph_state": data["graphState"],
             "query": query.sparql,
             "graphs": query.graphs,
             "endpoints": query.endpoints,
-            "celery_id": None
+            "federated": federated,
+            "celery_id": None,
+            "selects": query.selects,
         }
 
         result = Result(current_app, session, info)

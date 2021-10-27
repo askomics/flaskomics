@@ -18,7 +18,7 @@ class SparqlQuery(Params):
         all public graph
     """
 
-    def __init__(self, app, session, json_query=None):
+    def __init__(self, app, session, json_query=None, get_graphs=True):
         """init
 
         Parameters
@@ -44,8 +44,9 @@ class SparqlQuery(Params):
             self.local_endpoint_f = self.settings.get('federation', 'local_endpoint')
         except Exception:
             pass
-
-        self.set_graphs_and_endpoints()
+        # No need to call this twice if we need it later (sparql queries)
+        if get_graphs:
+            self.set_graphs_and_endpoints()
 
     def set_graphs(self, graphs):
         """Set graphs
@@ -413,11 +414,16 @@ class SparqlQuery(Params):
         query = '''
         SELECT DISTINCT ?graph ?endpoint
         WHERE {{
+          ?graph_abstraction askomics:public ?public .
+          ?graph_abstraction dc:creator ?creator .
           ?graph askomics:public ?public .
           ?graph dc:creator ?creator .
-          GRAPH ?graph {{
-            ?graph prov:atLocation ?endpoint .
+          GRAPH ?graph_abstraction {{
+            ?graph_abstraction prov:atLocation ?endpoint .
             ?entity_uri a askomics:entity .
+          }}
+          GRAPH ?graph {{
+            [] a ?entity_uri .
           }}
           {}
           {}
@@ -432,7 +438,7 @@ class SparqlQuery(Params):
             if not graphs or res["graph"] in graphs:
                 self.graphs.append(res["graph"])
 
-            # If local triplestore url is not accessible by federetad query engine
+            # If local triplestore url is not accessible by federated query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
                 endpoint = self.local_endpoint_f
             else:

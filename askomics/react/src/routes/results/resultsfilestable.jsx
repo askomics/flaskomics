@@ -28,7 +28,8 @@ export default class ResultsFilesTable extends Component {
       status: null,
       modalTracebackTitle: "",
       modalTracebackContent: "",
-      modalTraceback: false
+      modalTraceback: false,
+      console_enabled: false
     }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)

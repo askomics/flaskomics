@@ -600,5 +600,4 @@ class TestApiFile(AskomicsTestCase):
         response = client.client.get('/api/files/ttl/1/jdoe/{}'.format(filename))
 
         assert response.status_code == 200
-        # print(response.data.decode("utf-8"))
         assert response.data.decode("utf-8") == content

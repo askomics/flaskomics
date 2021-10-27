@@ -166,6 +166,7 @@ def get_graph_and_sparql_query():
         # Get all graphs and endpoint, and mark as selected the used one
         query = SparqlQuery(current_app, session)
         graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
+        console_enabled = can_access(session['user'])
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -186,7 +187,8 @@ def get_graph_and_sparql_query():
         'endpoints': endpoints,
         'diskSpace': disk_space,
         'error': False,
-        'errorMessage': ''
+        'errorMessage': '',
+        'console_enabled': console_enabled
     })
 
 
