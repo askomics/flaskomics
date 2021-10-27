@@ -461,7 +461,7 @@ class File(Params):
 
         return rdflib.XSD.string
 
-    def convert_type(self, value):
+    def convert_type(self, value, try_date=False):
         """Convert a value to a date, an int or float or text
 
         Parameters
@@ -480,9 +480,11 @@ class File(Params):
             try:
                 return float(value)
             except ValueError:
+                if not try_date:
+                    return value
                 try:
                     return parser.parse(value, dayfirst=True).date()
-                except parser.ParserError:
+                except Exception:
                     return value
 
         return value

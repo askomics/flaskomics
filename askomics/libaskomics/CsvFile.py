@@ -299,7 +299,7 @@ class CsvFile(File):
         try:
             parser.parse(value, dayfirst=True).date()
             return True
-        except parser.ParserError:
+        except Exception:
             return False
 
     @property
@@ -617,7 +617,7 @@ class CsvFile(File):
 
                     elif current_type == "date":
                         relation = self.rdfize(current_header)
-                        attribute = rdflib.Literal(self.convert_type(cell))
+                        attribute = rdflib.Literal(self.convert_type(cell, try_date=True))
 
                     # default is text
                     else:
