@@ -212,6 +212,12 @@ export default class Query extends Component {
     })
   }
 
+  isOntoEntity (entityUri) {
+    return this.state.abstraction.entities.some(entity => {
+      return (entity.uri == entityUri && entity.ontology)
+    })
+  }
+
   attributeExist (attrUri, nodeId) {
     return this.graphState.attr.some(attr => {
       return (attr.uri == attrUri && attr.nodeId == nodeId)
@@ -398,6 +404,7 @@ export default class Query extends Component {
       specialPreviousIds: specialPreviousIds,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
+      onto: this.isOntoEntity(uri),
       selected: selected,
       suggested: suggested
     }
