@@ -420,7 +420,8 @@ class SparqlQuery(Params):
           ?graph dc:creator ?creator .
           GRAPH ?graph_abstraction {{
             ?graph_abstraction prov:atLocation ?endpoint .
-            ?entity_uri a askomics:entity .
+            ?entity_uri a ?askomics_type .
+            VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           }}
           GRAPH ?graph {{
             [] a ?entity_uri .
@@ -1085,6 +1086,16 @@ class SparqlQuery(Params):
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids)
 
+                elif link["type"] == "ontoLink":
+                    relation = "<{}>".format(link["uri"])
+                    triple = {
+                        "subject": source,
+                        "predicate": relation,
+                        "object": target,
+                        "optional": False
+                    }
+
+                    self.store_triple(triple, block_id, sblock_id, pblock_ids)
                 # Classic relation
                 else:
                     relation = "<{}>".format(link["uri"])

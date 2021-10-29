@@ -529,7 +529,8 @@ export default class Query extends Component {
               target: targetId,
               selected: false,
               suggested: true,
-              directed: true
+              directed: true,
+              onto_type: "specific"
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -573,7 +574,8 @@ export default class Query extends Component {
               target: node.id,
               selected: false,
               suggested: true,
-              directed: true
+              directed: true,
+              onto_type: "specific"
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -601,7 +603,8 @@ export default class Query extends Component {
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
-            suggested: true
+            suggested: true,
+            onto_type: "specific"
           })
           // push suggested link
           this.graphState.links.push({
@@ -616,7 +619,8 @@ export default class Query extends Component {
             target: new_id,
             selected: false,
             suggested: true,
-            directed: true
+            directed: true,
+            onto_type: "specific"
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -654,7 +658,8 @@ export default class Query extends Component {
           target: node2.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: true,
+          onto_type: "specific"
         }
       }
 
@@ -673,7 +678,8 @@ export default class Query extends Component {
           target: node1.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: true,
+          onto_type: "specific"
         }
       }
     })
@@ -1306,7 +1312,7 @@ export default class Query extends Component {
   handleChangeOntologyType (event) {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
-        link.uri = event.target.value
+        link.onto_type = event.target.value
       }
     })
     this.updateGraphState()
