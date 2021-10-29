@@ -740,7 +740,7 @@ export default class Query extends Component {
 
   handleLinkSelection (clickedLink) {
     // Only position link are clickabl
-    if (clickedLink.type == "posLink") {
+    if (clickedLink.type == "posLink" || clickedLink.type == "ontoLink") {
       // case 1: link is selected, so deselect it
       if (clickedLink.selected) {
         // Update current and previous
@@ -1307,7 +1307,6 @@ export default class Query extends Component {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
-        link.label = event.target.value == 'specific' ? "specific" : event.target.value + " of"
       }
     })
     this.updateGraphState()
