@@ -9,6 +9,7 @@ import ReactTooltip from "react-tooltip";
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
+import OntoLinkView from './ontolinkview'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
@@ -518,7 +519,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: "link",
+              type: this.isOntoEntity(relation.target) ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
@@ -563,7 +564,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: "link",
+              type: this.isOntoEntity(relation.target) ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
               sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
               id: this.getId(),
@@ -641,7 +642,9 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -658,7 +661,9 @@ export default class Query extends Component {
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -1296,6 +1301,18 @@ export default class Query extends Component {
     return result
   }
 
+  // Ontology link methods -----------------------------
+
+  handleChangeOntologyType (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.uri = event.target.value
+        link.label = event.target.value == 'specific' ? "specific" : event.target.value + " of"
+      }
+    })
+    this.updateGraphState()
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -1533,6 +1550,24 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+          />
+        }
+
+        if (this.currentSelected.type == "ontoLink") {
+
+          let link = Object.assign(this.currentSelected)
+          this.state.graphState.nodes.map(node => {
+            if (node.id == this.currentSelected.target) {
+              link.target = node
+            }
+            if (node.id == this.currentSelected.source) {
+              link.source = node
+            }
+          })
+
+          linkView = <OntoLinkView
+            link={link}
+            handleChangeOntologyType={p => this.handleChangeOntologyType(p)}
           />
         }
       }
