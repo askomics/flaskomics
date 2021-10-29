@@ -967,6 +967,8 @@ class SparqlQuery(Params):
         start_end = []
         strands = []
 
+        ontological_nodes = []
+
         var_to_replace = []
 
         # Browse attributes to get entities
@@ -1087,6 +1089,26 @@ class SparqlQuery(Params):
                         ), block_id, sblock_id, pblock_ids)
 
                 elif link["type"] == "ontoLink":
+                    # If its specific, proceed as usual
+                    if link["onto_type"] == "specific":
+                        relation = "<{}>".format(link["uri"])
+                        triple = {
+                            "subject": source,
+                            "predicate": relation,
+                            "object": target,
+                            "optional": False
+                        }
+
+                        self.store_triple(triple, block_id, sblock_id, pblock_ids)
+                        continue
+
+                    # Else, Manage hierarchical search
+                    # Add the ontological node to a list to avoid managing attributes later
+
+                    target_id = link["target"]["id"]
+                    ontological_nodes.append(target_id)
+
+                    common_block = self.format_sparql_variable("block_{}_{}".format(link["source"]["id"], link["target"]["id"]))
                     relation = "<{}>".format(link["uri"])
                     triple = {
                         "subject": source,
@@ -1094,8 +1116,83 @@ class SparqlQuery(Params):
                         "object": target,
                         "optional": False
                     }
-
                     self.store_triple(triple, block_id, sblock_id, pblock_ids)
+
+                    triple = {
+                        "subject": target,
+                        "predicate": "rdfs:subClassOf*",
+                        "object": common_block,
+                        "optional": False
+                    }
+                    self.store_triple(triple, block_id, sblock_id, pblock_ids)
+
+                    for attribute in [attrib for attrib in self.json["attr"] if attrib["nodeId"] == target_id]:
+                        if attribute["type"] == "uri":
+                            subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                            predicate = attribute["uri"]
+                            obj = "<{}>".format(attribute["entityUris"][0])
+                            if not self.is_bnode(attribute["entityUris"][0], self.json["nodes"]):
+                                self.store_triple({
+                                    "subject": subject,
+                                    "predicate": predicate,
+                                    "object": obj,
+                                    "optional": False
+                                }, block_id, sblock_id, pblock_ids)
+                                self.store_triple({
+                                    "subject": common_block,
+                                    "predicate": predicate,
+                                    "object": obj,
+                                    "optional": False
+                                }, block_id, sblock_id, pblock_ids)
+
+                            if attribute["visible"]:
+                                self.selects.append(subject)
+                            # filters/values
+                            if attribute["filterValue"] != "":
+                                filter_value = self.get_uri_filter_value(attribute["filterValue"])
+                                if attribute["filterType"] == "regexp":
+                                    negative_sign = ""
+                                    if attribute["negative"]:
+                                        negative_sign = "!"
+                                        self.store_filter("FILTER ({}regex({}, {}, 'i'))".format(negative_sign, common_block, filter_value), block_id, sblock_id, pblock_ids)
+                                elif attribute["filterType"] == "exact":
+                                    if attribute["negative"]:
+                                        self.store_filter("FILTER (str({}) != {}) .".format(common_block, filter_value), block_id, sblock_id, pblock_ids)
+                                    else:
+                                        self.store_value("VALUES {} {{ {} }} .".format(common_block, filter_value), block_id, sblock_id, pblock_ids)
+
+                        if attribute["type"] == "text":
+                            if attribute["visible"] or attribute["filterValue"] != "":
+                                subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
+                                predicate = attribute["uri"]
+                                obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
+                                onto_obj = self.format_sparql_variable("{}{}_{}".format(common_block, attribute["humanNodeId"], attribute["label"]))
+                                if attribute["visible"]:
+                                    self.store_triple({
+                                        "subject": subject,
+                                        "predicate": predicate,
+                                        "object": obj,
+                                        "optional": True if attribute["optional"] else False
+                                    }, block_id, sblock_id, pblock_ids)
+                                    self.selects.append(obj)
+                            # filters/values
+                            if attribute["filterValue"] != "" and not attribute["optional"]:
+                                self.store_triple({
+                                    "subject": common_block,
+                                    "predicate": predicate,
+                                    "object": onto_obj,
+                                    "optional": True if attribute["optional"] else False
+                                }, block_id, sblock_id, pblock_ids)
+                                if attribute["filterType"] == "regexp":
+                                    negative_sign = ""
+                                    if attribute["negative"]:
+                                        negative_sign = "!"
+                                    self.store_filter("FILTER ({}regex({}, '{}', 'i'))".format(negative_sign, onto_obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
+                                elif attribute["filterType"] == "exact":
+                                    if attribute["negative"]:
+                                        self.store_filter("FILTER (str({}) != '{}') .".format(onto_obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
+                                    else:
+                                        self.store_value("VALUES {} {{ '{}' }} .".format(onto_obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                 # Classic relation
                 else:
                     relation = "<{}>".format(link["uri"])
@@ -1120,7 +1217,8 @@ class SparqlQuery(Params):
 
         # Browse attributes
         for attribute in self.json["attr"]:
-
+            if attribute["nodeId"] in ontological_nodes:
+                continue
             # Get blockid and sblockid of the attribute node
             block_id, sblock_id, pblock_ids = self.get_block_ids(attribute["nodeId"])
 
