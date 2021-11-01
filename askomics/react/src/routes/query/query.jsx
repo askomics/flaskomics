@@ -492,6 +492,8 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
+    let isOnto = this.isOntoRelation(relation.source, relation.target)
+
     this.state.abstraction.relations.map(relation => {
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
@@ -521,7 +523,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: this.isOntoRelation(relation.source, relation.target) ? "ontoLink" : "link",
+              type: isOnto ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
@@ -538,7 +540,7 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri) {
+      if (relation.target == node.uri && ! isOnto) {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
@@ -566,7 +568,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: this.isOntoRelation(relation.source, relation.target) &&  ? "ontoLink" : "link",
+              type: "link",
               sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
               sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
               id: this.getId(),
