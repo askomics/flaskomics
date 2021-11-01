@@ -213,9 +213,12 @@ export default class Query extends Component {
     })
   }
 
-  isOntoEntity (entityUri) {
+  isOntoRelation (currentUri, targetUri) {
+    if (! currentUri == targetUri){
+      return false
+    }
     return this.state.abstraction.entities.some(entity => {
-      return (entity.uri == entityUri && entity.ontology)
+      return (entity.uri == currentUri && entity.ontology)
     })
   }
 
@@ -405,7 +408,6 @@ export default class Query extends Component {
       specialPreviousIds: specialPreviousIds,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
-      onto: this.isOntoEntity(uri),
       selected: selected,
       suggested: suggested
     }
@@ -519,7 +521,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: this.isOntoEntity(relation.target) ? "ontoLink" : "link",
+              type: this.isOntoRelation(relation.source, relation.target) ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
@@ -530,7 +532,6 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              onto_type: "specific"
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -565,7 +566,7 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: this.isOntoEntity(relation.target) ? "ontoLink" : "link",
+              type: this.isOntoRelation(relation.source, relation.target) &&  ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
               sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
               id: this.getId(),
@@ -575,7 +576,6 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              onto_type: "specific"
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -604,7 +604,6 @@ export default class Query extends Component {
             faldo: entity.faldo,
             selected: false,
             suggested: true,
-            onto_type: "specific"
           })
           // push suggested link
           this.graphState.links.push({
@@ -620,7 +619,6 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
-            onto_type: "specific"
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -659,7 +657,6 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: true,
-          onto_type: "specific"
         }
       }
 
@@ -679,7 +676,6 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: true,
-          onto_type: "specific"
         }
       }
     })
