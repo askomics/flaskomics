@@ -492,9 +492,8 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
-    let isOnto = this.isOntoRelation(relation.source, relation.target)
-
     this.state.abstraction.relations.map(relation => {
+      let isOnto = this.isOntoRelation(relation.source, relation.target)
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -528,7 +527,7 @@ export default class Query extends Component {
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: isOnto ? getOntoLabel(relation.uri) : relation.label,
+              label: isOnto ? this.getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
@@ -1308,19 +1307,24 @@ export default class Query extends Component {
   // Ontology link methods -----------------------------
 
   handleChangeOntologyType (event) {
-    let labels = {subClassOf: "Children of", subClassOf*: "Descendants of", ^subClassOf: "Parents of", ^subClassOf*:"Ancestors of"}
-
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
-        link.label = getOntoLabel(event.target.value)
+        link.label = this.getOntoLabel(event.target.value)
       }
     })
     this.updateGraphState()
   }
 
   getOntoLabel (uri) {
-      let labels = {subClassOf: "Children of", subClassOf*: "Descendants of", ^subClassOf: "Parents of", ^subClassOf*:"Ancestors of"}
+      let labels = {}
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of" 
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of" 
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
+
+      console.log(uri)
+      console.log(labels)
       return labels[uri]
   }
 

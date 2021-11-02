@@ -25,10 +25,10 @@ export default class OntoLinkView extends Component {
           <tr>
             <td>
              <CustomInput type="select" id={this.props.link.id} name="ontology_position" onChange={this.handleChangeOntologyType}>
-                <option selected={this.props.link.uri == 'subClassOf' ? true : false} value="subClassOf">children of</option>
-                <option selected={this.props.link.uri == 'subClassOf*' ? true : false} value="subClassOf*">descendants of</option>
-                <option selected={this.props.link.uri == '^subClassOf' ? true : false} value="^subClassOf">parents of</option>
-                <option selected={this.props.link.uri == '^subClassOf*' ? true : false} value="^subClassOf*">ancestors of</option>
+                <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf">children of</option>
+                <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf*">descendants of</option>
+                <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf">parents of</option>
+                <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf*">ancestors of</option>
               </CustomInput>
             </td>
             <td> a term</td>
