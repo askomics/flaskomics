@@ -25,11 +25,10 @@ export default class OntoLinkView extends Component {
           <tr>
             <td>
              <CustomInput type="select" id={this.props.link.id} name="ontology_position" onChange={this.handleChangeOntologyType}>
-                <option selected={this.props.link.uri == 'specific' ? true : false} value="specific">a specific</option>
-                <option selected={this.props.link.uri == 'children' ? true : false} value="children">children of</option>
-                <option selected={this.props.link.uri == 'descendants' ? true : false} value="descendants">descendants of</option>
-                <option selected={this.props.link.uri == 'parents' ? true : false} value="parents">parents of</option>
-                <option selected={this.props.link.uri == 'ancestors' ? true : false} value="ancestors">ancestors of</option>
+                <option selected={this.props.link.uri == 'subClassOf' ? true : false} value="subClassOf">children of</option>
+                <option selected={this.props.link.uri == 'subClassOf*' ? true : false} value="subClassOf*">descendants of</option>
+                <option selected={this.props.link.uri == '^subClassOf' ? true : false} value="^subClassOf">parents of</option>
+                <option selected={this.props.link.uri == '^subClassOf*' ? true : false} value="^subClassOf*">ancestors of</option>
               </CustomInput>
             </td>
             <td> a term</td>

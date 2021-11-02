@@ -528,7 +528,7 @@ export default class Query extends Component {
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: relation.label,
+              label: isOnto ? getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
@@ -1308,12 +1308,20 @@ export default class Query extends Component {
   // Ontology link methods -----------------------------
 
   handleChangeOntologyType (event) {
+    let labels = {subClassOf: "Children of", subClassOf*: "Descendants of", ^subClassOf: "Parents of", ^subClassOf*:"Ancestors of"}
+
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
-        link.onto_type = event.target.value
+        link.uri = event.target.value
+        link.label = getOntoLabel(event.target.value)
       }
     })
     this.updateGraphState()
+  }
+
+  getOntoLabel (uri) {
+      let labels = {subClassOf: "Children of", subClassOf*: "Descendants of", ^subClassOf: "Parents of", ^subClassOf*:"Ancestors of"}
+      return labels[uri]
   }
 
   // ------------------------------------------------
