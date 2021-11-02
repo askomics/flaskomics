@@ -222,6 +222,12 @@ export default class Query extends Component {
     })
   }
 
+  isOntoEndNode (currentId) {
+    return this.graphState.links.some(link => {
+      return (link.type == "ontoLink" && link.target == currentId)
+    })
+  }
+
   attributeExist (attrUri, nodeId) {
     return this.graphState.attr.some(attr => {
       return (attr.uri == attrUri && attr.nodeId == nodeId)
@@ -491,6 +497,10 @@ export default class Query extends Component {
     let reLink = new RegExp(node.filterLink.toLowerCase(), 'g')
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
+
+    if this.isOntoEndNode(node.id){
+        return
+    }
 
     this.state.abstraction.relations.map(relation => {
       let isOnto = this.isOntoRelation(relation.source, relation.target)
@@ -1319,8 +1329,8 @@ export default class Query extends Component {
   getOntoLabel (uri) {
       let labels = {}
       labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Children of"
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of" 
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of" 
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
 
       console.log(uri)
