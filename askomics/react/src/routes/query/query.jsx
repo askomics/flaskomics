@@ -223,8 +223,9 @@ export default class Query extends Component {
   }
 
   isOntoEndNode (currentId) {
-    return this.graphState.links.some(link => {
-      return (link.type == "ontoLink" && link.target == currentId)
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology)
     })
   }
 
@@ -498,7 +499,7 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
-    if this.isOntoEndNode(node.id){
+    if (this.isOntoEndNode(node.id)){
         return
     }
 
@@ -527,7 +528,8 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
-              suggested: true
+              suggested: true,
+              ontology: isOnto
             })
             // push suggested link
             this.graphState.links.push({
@@ -1332,9 +1334,6 @@ export default class Query extends Component {
       labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
-
-      console.log(uri)
-      console.log(labels)
       return labels[uri]
   }
 
@@ -1507,6 +1506,7 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let isOnto
     let linkView
     let previewButton
     let faldoButton
@@ -1526,6 +1526,7 @@ export default class Query extends Component {
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
       if (this.currentSelected) {
+        isOnto = this.isOntoEndNode(this.currentSelected.id)
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
@@ -1549,6 +1550,7 @@ export default class Query extends Component {
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
                 config={this.state.config}
+                isOnto={isOnto}
               />
             )
           }
