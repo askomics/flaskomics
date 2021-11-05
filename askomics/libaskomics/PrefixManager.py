@@ -1,3 +1,4 @@
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 
 import rdflib
@@ -79,4 +80,42 @@ class PrefixManager(Params):
         try:
             return prefix_cc[prefix]
         except Exception:
+            prefixes = self.get_custom_namespaces(prefix)
+            if prefixes:
+                return prefixes[0]["namespace"]
             return ""
+
+    def get_custom_namespaces(self, prefix=None):
+        """Get custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query_args = ()
+        subquery = ""
+
+        if prefix:
+            query_args = (prefix, )
+            subquery = "WHERE prefix = ?"
+
+        query = '''
+        SELECT prefix, namespace
+        FROM prefixes
+        {}
+        '''.format(subquery)
+
+        rows = database.execute_sql_query(query, query_args)
+
+        prefixes = []
+        for row in rows:
+            prefix = {
+                'prefix': row[0],
+                'namespace': row[1],
+            }
+            prefixes.append(prefix)
+
+        return prefixes

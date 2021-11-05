@@ -76,6 +76,7 @@ class Database(Params):
         self.create_files_table()
         self.create_datasets_table()
         self.create_abstraction_table()
+        self.create_prefixes_table()
 
     def create_user_table(self):
         """Create the user table"""
@@ -383,3 +384,17 @@ class Database(Params):
         )
         """
         self.execute_sql_query(query)
+
+    def create_prefixes_table(self):
+        """Create the prefix table"""
+        query = '''
+        CREATE TABLE IF NOT EXISTS prefixes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prefix text NOT NULL,
+            namespace text NOT NULL
+        )
+        '''
+        self.execute_sql_query(query)
+
+    def create_ontologies_table(self):
+        pass
