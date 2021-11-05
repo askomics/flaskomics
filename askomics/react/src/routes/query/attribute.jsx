@@ -151,15 +151,32 @@ export default class AttributeBox extends Component {
       )
     }
 
-    return (
-      <div className="attribute-box">
-        <label className="attr-label">{this.props.attribute.label}</label>
+
+    let attrIcons
+
+    if (this.props.isOnto){
+      attrIcons = (
+        <div className="attr-icons">
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+        </div>
+      )
+
+    } else {
+      attrIcons = (
         <div className="attr-icons">
           {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
           {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
+      )
+    }
+
+
+    return (
+      <div className="attribute-box">
+        <label className="attr-label">{this.props.attribute.label}</label>
+        {attrIcons}
         {form}
       </div>
     )
@@ -476,5 +493,6 @@ AttributeBox.propTypes = {
   handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
-  config: PropTypes.object
+  config: PropTypes.object,
+  isOnto: PropTypes.bool
 }

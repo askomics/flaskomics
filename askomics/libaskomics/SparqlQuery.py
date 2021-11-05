@@ -1088,7 +1088,20 @@ class SparqlQuery(Params):
 
                 # Classic relation
                 else:
-                    relation = "<{}>".format(link["uri"])
+                    # Manage ontology stuff
+                    inverse = ""
+                    recurrence = ""
+                    relation = link["uri"]
+
+                    if relation.startswith("^"):
+                        inverse = "^"
+                        relation = relation.lstrip("^")
+
+                    if relation.endswith("*"):
+                        recurrence = "*"
+                        relation = relation.rstrip("*")
+
+                    relation = inverse + "<{}>".format(relation) + recurrence
                     triple = {
                         "subject": source,
                         "predicate": relation,

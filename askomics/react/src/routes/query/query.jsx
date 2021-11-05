@@ -222,6 +222,13 @@ export default class Query extends Component {
     })
   }
 
+  isOntoEndNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology)
+    })
+  }
+
   attributeExist (attrUri, nodeId) {
     return this.graphState.attr.some(attr => {
       return (attr.uri == attrUri && attr.nodeId == nodeId)
@@ -492,9 +499,12 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
-    let isOnto = this.isOntoRelation(relation.source, relation.target)
+    if (this.isOntoEndNode(node.id)){
+        return
+    }
 
     this.state.abstraction.relations.map(relation => {
+      let isOnto = this.isOntoRelation(relation.source, relation.target)
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -518,7 +528,8 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
-              suggested: true
+              suggested: true,
+              ontology: isOnto
             })
             // push suggested link
             this.graphState.links.push({
@@ -528,7 +539,7 @@ export default class Query extends Component {
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: relation.label,
+              label: isOnto ? this.getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
@@ -1310,10 +1321,20 @@ export default class Query extends Component {
   handleChangeOntologyType (event) {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
-        link.onto_type = event.target.value
+        link.uri = event.target.value
+        link.label = this.getOntoLabel(event.target.value)
       }
     })
     this.updateGraphState()
+  }
+
+  getOntoLabel (uri) {
+      let labels = {}
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
+      return labels[uri]
   }
 
   // ------------------------------------------------
@@ -1485,6 +1506,7 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let isOnto
     let linkView
     let previewButton
     let faldoButton
@@ -1504,6 +1526,7 @@ export default class Query extends Component {
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
       if (this.currentSelected) {
+        isOnto = this.isOntoEndNode(this.currentSelected.id)
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
@@ -1527,6 +1550,7 @@ export default class Query extends Component {
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
                 config={this.state.config}
+                isOnto={isOnto}
               />
             )
           }
