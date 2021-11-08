@@ -7,6 +7,7 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
+from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 
@@ -507,6 +508,133 @@ def delete_datasets():
 
     return jsonify({
         'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/get_prefixes", methods=["GET"])
+@api_auth
+@admin_required
+def get_prefixes():
+    """Get all custom prefixes
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        pm = PrefixManager()
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/add_prefix", methods=["POST"])
+@api_auth
+@admin_required
+def add_prefix():
+    """Create a new prefix
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not (data.get("prefix") and data.get("namespace")):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Missing parameter"
+        }), 400
+
+    pm = PrefixManager()
+    prefixes = pm.get_custom_prefixes()
+
+    prefix = data.get("prefix")
+    namespace = data.get("namespace")
+
+    if any([prefix == custom['prefix'] for custom in prefixes]):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Prefix {} is already in use".format(prefix)
+        }), 400
+
+    try:
+        pm = PrefixManager()
+        pm.add_custom_prefix(prefix, namespace)
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/delete_prefix", methods=["POST"])
+@api_auth
+@admin_required
+def delete_prefix():
+    """Delete a prefix
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not data.get("prefix_id"):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Missing prefix_id parameter"
+        }), 400
+
+    pm = PrefixManager()
+    try:
+        pm = PrefixManager()
+        pm.delete_custom_prefix(data.get("prefix_id"))
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
         'error': False,
         'errorMessage': ''
     })

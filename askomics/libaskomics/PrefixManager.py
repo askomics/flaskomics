@@ -80,12 +80,12 @@ class PrefixManager(Params):
         try:
             return prefix_cc[prefix]
         except Exception:
-            prefixes = self.get_custom_namespaces(prefix)
+            prefixes = self.get_custom_prefixes(prefix)
             if prefixes:
                 return prefixes[0]["namespace"]
             return ""
 
-    def get_custom_namespaces(self, prefix=None):
+    def get_custom_prefixes(self, prefix=None):
         """Get custom (admin-defined) prefixes
 
         Returns
@@ -119,3 +119,40 @@ class PrefixManager(Params):
             prefixes.append(prefix)
 
         return prefixes
+
+    def add_custom_prefix(self, prefix, namespace):
+        """Create a new custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        INSERT INTO prefixes VALUES(
+            NULL,
+            ?,
+            ?
+        )
+        '''
+
+        database.execute_sql_query(query, (prefix, namespace))
+
+    def remove_custom_prefix(self, prefix_id):
+        """Create a new custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        DELETE FROM prefixes
+        WHERE id = ?
+        '''
+
+        database.execute_sql_query(query, (prefix_id))
