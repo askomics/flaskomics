@@ -513,7 +513,7 @@ def delete_datasets():
     })
 
 
-@admin_bp.route("/api/admin/get_prefixes", methods=["GET"])
+@admin_bp.route("/api/admin/getprefixes", methods=["GET"])
 @api_auth
 @admin_required
 def get_prefixes():
@@ -544,7 +544,7 @@ def get_prefixes():
     })
 
 
-@admin_bp.route("/api/admin/add_prefix", methods=["POST"])
+@admin_bp.route("/api/admin/addprefix", methods=["POST"])
 @api_auth
 @admin_required
 def add_prefix():
@@ -598,7 +598,7 @@ def add_prefix():
     })
 
 
-@admin_bp.route("/api/admin/delete_prefix", methods=["POST"])
+@admin_bp.route("/api/admin/delete_prefixes", methods=["POST"])
 @api_auth
 @admin_required
 def delete_prefix():
@@ -613,17 +613,17 @@ def delete_prefix():
     """
 
     data = request.get_json()
-    if not data or not data.get("prefix_id"):
+    if not data or not data.get("prefixesIdToDelete"):
         return jsonify({
             'prefixes': [],
             'error': True,
-            'errorMessage': "Missing prefix_id parameter"
+            'errorMessage': "Missing prefixesIdToDelete parameter"
         }), 400
 
     pm = PrefixManager()
     try:
         pm = PrefixManager()
-        pm.delete_custom_prefix(data.get("prefix_id"))
+        pm.delete_custom_prefixes(data.get("prefixesIdToDelete"))
         prefixes = pm.get_custom_prefixes()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

@@ -103,7 +103,7 @@ class PrefixManager(Params):
             subquery = "WHERE prefix = ?"
 
         query = '''
-        SELECT prefix, namespace
+        SELECT id, prefix, namespace
         FROM prefixes
         {}
         '''.format(subquery)
@@ -113,8 +113,9 @@ class PrefixManager(Params):
         prefixes = []
         for row in rows:
             prefix = {
-                'prefix': row[0],
-                'namespace': row[1],
+                'id': row[0],
+                'prefix': row[1],
+                'namespace': row[2],
             }
             prefixes.append(prefix)
 
@@ -140,7 +141,7 @@ class PrefixManager(Params):
 
         database.execute_sql_query(query, (prefix, namespace))
 
-    def remove_custom_prefix(self, prefix_id):
+    def remove_custom_prefixes(self, prefixes_id):
         """Create a new custom (admin-defined) prefixes
 
         Returns
@@ -155,4 +156,5 @@ class PrefixManager(Params):
         WHERE id = ?
         '''
 
-        database.execute_sql_query(query, (prefix_id))
+        for prefix_id in prefixes_id:
+            database.execute_sql_query(query, (prefix_id))
