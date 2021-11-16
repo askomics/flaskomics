@@ -261,7 +261,9 @@ export default class Admin extends Component {
         newprefixStatus: error.response.status,
       })
       if (!response.data.error) {
-        this.loadUsers()
+          this.setState({
+            prefixes: response.data.prefixes
+          })
       }
     })
     .catch(error => {
@@ -535,6 +537,7 @@ export default class Admin extends Component {
         </div>
         <PrefixesTable config={this.props.config} prefixes={this.state.prefixes} setStatePrefixes={p => this.setState(p)} prefixesLoading={this.state.prefixesLoading} />
         <br />
+        <Button disabled={this.isPrefixesDisabled()} onClick={this.deleteSelectedPrefixes} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.prefixStatus} error={this.state.prefixError} errorMessage={this.state.prefixErrorMessage} />
 
       </div>
