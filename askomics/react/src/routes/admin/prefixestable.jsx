@@ -19,12 +19,13 @@ export default class PrefixesTable extends Component {
   }
 
   handlePrefixSelection (row, isSelect) {
+    console.log('triggered')
     if (isSelect) {
-      this.props.setStateUsers({
+      this.props.setStatePrefixes({
         prefixesSelected: [...this.props.prefixesSelected, row.id]
       })
     } else {
-      this.props.setStateUsers({
+      this.props.setStatePrefixes({
         prefixesSelected: this.props.prefixesSelected.filter(x => x !== row.id)
       })
     }
@@ -33,11 +34,11 @@ export default class PrefixesTable extends Component {
   handlePrefixSelectionAll (isSelect, rows) {
     const prefixes = rows.map(r => r.id)
     if (isSelect) {
-      this.props.setStateUsers({
+      this.props.setStatePrefixes({
         prefixesSelected: prefixes
       })
     } else {
-      this.props.setStateUsers({
+      this.props.setStatePrefixes({
         prefixesSelected: []
       })
     }
@@ -65,9 +66,8 @@ export default class PrefixesTable extends Component {
       mode: 'checkbox',
       clickToSelect: false,
       selected: this.props.prefixesSelected,
-      onSelect: this.handleUserSelection,
-      onSelectAll: this.handleUserSelectionAll,
-      nonSelectable: [this.props.config.user.username]
+      onSelect: this.handlePrefixSelection,
+      onSelectAll: this.handlePrefixSelectionAll
     }
 
     let prefixesNoDataIndication = 'No custom prefixes'
@@ -82,7 +82,7 @@ export default class PrefixesTable extends Component {
             wrapperClasses="asko-table-wrapper"
             tabIndexCell
             bootstrap4
-            keyField='prefix'
+            keyField='id'
             data={this.props.prefixes}
             columns={prefixesColumns}
             defaultSorted={prefixesDefaultSorted}

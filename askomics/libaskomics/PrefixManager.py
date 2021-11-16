@@ -139,7 +139,7 @@ class PrefixManager(Params):
         )
         '''
 
-        database.execute_sql_query(query, (prefix, namespace))
+        database.execute_sql_query(query, (prefix, namespace,))
 
     def remove_custom_prefixes(self, prefixes_id):
         """Create a new custom (admin-defined) prefixes
@@ -157,4 +157,4 @@ class PrefixManager(Params):
         '''
 
         for prefix_id in prefixes_id:
-            database.execute_sql_query(query, (prefix_id))
+            database.execute_sql_query(query, (prefix_id,))

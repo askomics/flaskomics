@@ -258,13 +258,8 @@ export default class Admin extends Component {
         newprefixError: response.data.error,
         newprefixErrorMessage: response.data.errorMessage,
         prefixes: response.data.prefixes,
-        newprefixStatus: error.response.status,
+        newprefixStatus: response.status,
       })
-      if (!response.data.error) {
-          this.setState({
-            prefixes: response.data.prefixes
-          })
-      }
     })
     .catch(error => {
       console.log(error, error.response.data.errorMessage)
@@ -535,7 +530,7 @@ export default class Admin extends Component {
         <ErrorDiv status={this.state.newprefixstatus} error={this.state.newprefixerror} errorMessage={this.state.newprefixerrorMessage} />
         <br />
         </div>
-        <PrefixesTable config={this.props.config} prefixes={this.state.prefixes} setStatePrefixes={p => this.setState(p)} prefixesLoading={this.state.prefixesLoading} />
+        <PrefixesTable config={this.props.config} prefixes={this.state.prefixes} setStatePrefixes={p => this.setState(p)} prefixesSelected={this.state.prefixesSelected} prefixesLoading={this.state.prefixesLoading} />
         <br />
         <Button disabled={this.isPrefixesDisabled()} onClick={this.deleteSelectedPrefixes} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.prefixStatus} error={this.state.prefixError} errorMessage={this.state.prefixErrorMessage} />

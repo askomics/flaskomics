@@ -621,7 +621,7 @@ def delete_prefix():
 
     pm = PrefixManager(current_app, session)
     try:
-        pm.delete_custom_prefixes(data.get("prefixesIdToDelete"))
+        pm.remove_custom_prefixes(data.get("prefixesIdToDelete"))
         prefixes = pm.get_custom_prefixes()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
