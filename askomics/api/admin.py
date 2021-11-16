@@ -527,7 +527,7 @@ def get_prefixes():
         errorMessage: the error message of error, else an empty string
     """
     try:
-        pm = PrefixManager()
+        pm = PrefixManager(current_app, session)
         prefixes = pm.get_custom_prefixes()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
@@ -566,7 +566,7 @@ def add_prefix():
             'errorMessage': "Missing parameter"
         }), 400
 
-    pm = PrefixManager()
+    pm = PrefixManager(current_app, session)
     prefixes = pm.get_custom_prefixes()
 
     prefix = data.get("prefix")
@@ -580,7 +580,6 @@ def add_prefix():
         }), 400
 
     try:
-        pm = PrefixManager()
         pm.add_custom_prefix(prefix, namespace)
         prefixes = pm.get_custom_prefixes()
     except Exception as e:
@@ -620,9 +619,8 @@ def delete_prefix():
             'errorMessage': "Missing prefixesIdToDelete parameter"
         }), 400
 
-    pm = PrefixManager()
+    pm = PrefixManager(current_app, session)
     try:
-        pm = PrefixManager()
         pm.delete_custom_prefixes(data.get("prefixesIdToDelete"))
         prefixes = pm.get_custom_prefixes()
     except Exception as e:

@@ -87,7 +87,7 @@ export default class PrefixesTable extends Component {
             columns={prefixesColumns}
             defaultSorted={prefixesDefaultSorted}
             pagination={paginationFactory()}
-            noDataIndication={datasetsNoDataIndication}
+            noDataIndication={prefixesNoDataIndication}
             selectRow={ prefixesSelectRow }
           />
         </div>
@@ -99,6 +99,6 @@ PrefixesTable.propTypes = {
     setStatePrefixes: PropTypes.func,
     prefixesSelected: PropTypes.object,
     prefixesLoading: PropTypes.bool,
-    prefixes: PropTypes.list,
+    prefixes: PropTypes.array,
     config: PropTypes.object
 }

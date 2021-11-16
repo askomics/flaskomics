@@ -38,6 +38,7 @@ export default class Admin extends Component {
       datasets: [],
       files: [],
       queries: [],
+      prefixes: [],
       fname: "",
       lname: "",
       prefix: "",
@@ -200,7 +201,7 @@ export default class Admin extends Component {
   validatePrefixForm () {
     return (
       this.state.prefix.length > 0 &&
-      this.state.namespace.length > 0 &&
+      this.state.namespace.length > 0
     )
   }
 
