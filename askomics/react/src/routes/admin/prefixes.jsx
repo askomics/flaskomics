@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import {Button, Form, FormGroup, Label, Input, Alert, Row, Col, CustomInput } from 'reactstrap'
+import BootstrapTable from 'react-bootstrap-table-next'
+import paginationFactory from 'react-bootstrap-table2-paginator'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
@@ -26,7 +28,6 @@ export default class Prefixes extends Component {
     this.handleChangePrefix = this.handleChangePrefix.bind(this)
     this.handleChangeNamespace = this.handleChangeNamespace.bind(this)
     this.handleAddPrefix = this.handleAddPrefix.bind(this)
-    this.dismissMessage = this.dismissMessage.bind(this)
     this.deleteSelectedPrefixes = this.deleteSelectedPrefixes.bind(this)
     this.handlePrefixSelection = this.handlePrefixSelection.bind(this)
     this.handlePrefixSelectionAll = this.handlePrefixSelectionAll.bind(this)
@@ -226,7 +227,7 @@ export default class Prefixes extends Component {
         <ErrorDiv status={this.state.newprefixstatus} error={this.state.newprefixerror} errorMessage={this.state.newprefixerrorMessage} />
         <br />
         </div>
-        <hr>
+        <hr />
         <div className="asko-table-height-div">
           <BootstrapTable
             classes="asko-table"
