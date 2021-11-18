@@ -77,6 +77,7 @@ class Database(Params):
         self.create_datasets_table()
         self.create_abstraction_table()
         self.create_prefixes_table()
+        self.create_ontologies_table()
 
     def create_user_table(self):
         """Create the user table"""
@@ -397,4 +398,14 @@ class Database(Params):
         self.execute_sql_query(query)
 
     def create_ontologies_table(self):
-        pass
+        """Create the ontologies table"""
+        query = '''
+        CREATE TABLE IF NOT EXISTS ontologies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name text NOT NULL,
+            uri text NOT NULL,
+            full_name text NOT NULL,
+            type text DEFAULT 'local',
+        )
+        '''
+        self.execute_sql_query(query)

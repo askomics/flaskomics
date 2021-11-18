@@ -8,6 +8,7 @@ from askomics.api.auth import login_required, api_auth
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.RdfFile import RdfFile
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
@@ -237,6 +238,9 @@ def get_preview():
         }), 400
 
     try:
+        ontologies_manager = OntologyManager(current_app, session)
+        ontologies = ontologies_manager.list_ontologies()
+
         files_handler = FilesHandler(current_app, session)
         files_handler.handle_files(data['filesId'])
 
@@ -249,12 +253,14 @@ def get_preview():
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             'previewFiles': [],
+            'ontologies': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         'previewFiles': results,
+        'ontologies': ontologies,
         'error': False,
         'errorMessage': ''
     })
