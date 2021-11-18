@@ -497,7 +497,7 @@ class TestApiAdmin(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jsmith")
 
-        response = client.client.get('/api/admin/api/admin/getprefixes')
+        response = client.client.get('/api/admin/getprefixes')
         assert response.status_code == 401
 
         client.log_user("jdoe")
@@ -508,13 +508,13 @@ class TestApiAdmin(AskomicsTestCase):
             "prefixes": []
         }
 
-        response = client.client.get('/api/admin/api/admin/getprefixes')
+        response = client.client.get('/api/admin/getprefixes')
         assert response.status_code == 200
         assert response.json == expected_empty
 
         client.create_prefix()
 
-        response = client.client.get('/api/admin/api/admin/getprefixes')
+        response = client.client.get('/api/admin/getprefixes')
 
         expected = {
             "error": False,
