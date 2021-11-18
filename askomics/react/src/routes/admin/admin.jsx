@@ -6,7 +6,6 @@ import DatasetsTable from './datasetstable'
 import FilesTable from './filestable'
 import QueriesTable from './queriestable'
 import UsersTable from './userstable'
-import PrefixesTable from './prefixestable'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
 import WaitingDiv from '../../components/waiting'
@@ -30,19 +29,12 @@ export default class Admin extends Component {
       datasetErrorMessage: '',
       queryError: false,
       queryErrorMessage: '',
-      prefixError: false,
-      prefixErrorMessage: '',
-      newprefixError: false,
-      newprefixErrorMessage: '',
       users: [],
       datasets: [],
       files: [],
       queries: [],
-      prefixes: [],
       fname: "",
       lname: "",
-      prefix: "",
-      namespace: "",
       username: "",
       email: "",
       newUser: {},
@@ -52,20 +44,15 @@ export default class Admin extends Component {
       usersSelected: [],
       filesSelected: [],
       datasetsSelected: [],
-      prefixesSelected: []
     }
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
     this.handleChangeLname = this.handleChangeLname.bind(this)
     this.handleAddUser = this.handleAddUser.bind(this)
-    this.handleChangePrefix = this.handleChangePrefix.bind(this)
-    this.handleChangeNamespace = this.handleChangeNamespace.bind(this)
-    this.handleAddPrefix = this.handleAddPrefix.bind(this)
     this.dismissMessage = this.dismissMessage.bind(this)
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
     this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
     this.deleteSelectedDatasets = this.deleteSelectedDatasets.bind(this)
-    this.deleteSelectedPrefixes = this.deleteSelectedPrefixes.bind(this)
     this.cancelRequest
   }
 
@@ -79,10 +66,6 @@ export default class Admin extends Component {
 
   isDatasetsDisabled () {
     return this.state.datasetsSelected.length == 0
-  }
-
-  isPrefixesDisabled () {
-    return this.state.prefixesSelected.length == 0
   }
 
   deleteSelectedUsers () {
@@ -130,21 +113,6 @@ export default class Admin extends Component {
       })
   }
 
-  deleteSelectedPrefixes () {
-    let requestUrl = '/api/admin/delete_prefixes'
-    let data = {
-      prefixesIdToDelete: this.state.prefixesSelected
-    }
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          prefixes: response.data.prefixes,
-          prefixesSelected: [],
-        })
-      })
-  }
-
   dismissMessage () {
     this.setState({
       newUser: {},
@@ -172,18 +140,6 @@ export default class Admin extends Component {
     })
   }
 
-  handleChangePrefix (event) {
-    this.setState({
-      prefix: event.target.value
-    })
-  }
-
-  handleChangeNamespace (event) {
-    this.setState({
-      namespace: event.target.value
-    })
-  }
-
   validateEmail (email) {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
@@ -195,13 +151,6 @@ export default class Admin extends Component {
       this.state.lname.length > 0 &&
       this.validateEmail(this.state.email) &&
       this.state.username.length > 0
-    )
-  }
-
-  validatePrefixForm () {
-    return (
-      this.state.prefix.length > 0 &&
-      this.state.namespace.length > 0
     )
   }
 
@@ -243,42 +192,12 @@ export default class Admin extends Component {
     event.preventDefault()
   }
 
-  handleAddPrefix(event) {
-
-    let requestUrl = "/api/admin/addprefix"
-    let data = {
-      prefix: this.state.prefix,
-      namespace: this.state.namespace,
-    }
-
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.setState({
-        newprefixError: response.data.error,
-        newprefixErrorMessage: response.data.errorMessage,
-        prefixes: response.data.prefixes,
-        newprefixStatus: response.status,
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.setState({
-        newprefixError: true,
-        newprefixErrorMessage: error.response.data.errorMessage,
-        newprefixStatus: error.response.status,
-      })
-    })
-    event.preventDefault()
-  }
-
   componentDidMount () {
     if (!this.props.waitForStart) {
       this.loadUsers()
       this.loadDataSets()
       this.loadFiles()
       this.loadQueries()
-      this.loadPrefixes()
       this.interval = setInterval(() => {
         this.loadDataSets()
       }, 5000)
@@ -368,27 +287,6 @@ export default class Admin extends Component {
           queryError: true,
           queryErrorMessage: error.response.data.errorMessage,
           queryStatus: error.response.status,
-          success: !error.response.data.error
-        })
-      })
-  }
-
-  loadPrefixes() {
-    let requestUrl = '/api/admin/getprefixes'
-    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        this.setState({
-          prefixesLoading: false,
-          prefixes: response.data.prefixes
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          prefixError: true,
-          prefixErrorMessage: error.response.data.errorMessage,
-          prefixStatus: error.response.status,
           success: !error.response.data.error
         })
       })
@@ -506,34 +404,6 @@ export default class Admin extends Component {
         <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesLoading={this.state.queriesLoading} />
         <br />
         <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
-
-        <h4>Prefixes</h4>
-        <h5>Add a prefix</h5>
-        <div>
-        <Form onSubmit={this.handleAddPrefix}>
-          <Row form>
-            <Col md={6}>
-              <FormGroup>
-                <Label for="fname">Prefix</Label>
-                <Input type="text" name="prefix" id="prefix" placeholder="prefix" value={this.state.prefix} onChange={this.handleChangePrefix} />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup>
-                <Label for="lname">Namespace</Label>
-                <Input type="text" name="namespace" id="namespace" placeholder="namespace" value={this.state.namespace} onChange={this.handleChangeNamespace} />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Button disabled={!this.validatePrefixForm()}>Create</Button>
-        </Form>
-        <ErrorDiv status={this.state.newprefixstatus} error={this.state.newprefixerror} errorMessage={this.state.newprefixerrorMessage} />
-        <br />
-        </div>
-        <PrefixesTable config={this.props.config} prefixes={this.state.prefixes} setStatePrefixes={p => this.setState(p)} prefixesSelected={this.state.prefixesSelected} prefixesLoading={this.state.prefixesLoading} />
-        <br />
-        <Button disabled={this.isPrefixesDisabled()} onClick={this.deleteSelectedPrefixes} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
-        <ErrorDiv status={this.state.prefixStatus} error={this.state.prefixError} errorMessage={this.state.prefixErrorMessage} />
 
       </div>
     )
