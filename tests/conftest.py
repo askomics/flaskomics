@@ -14,6 +14,7 @@ from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.LocalAuth import LocalAuth
+from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
@@ -573,6 +574,11 @@ class Client(object):
         """Delete the galaxy history"""
         galaxy = GalaxyInstance(self.gurl, self.gkey)
         galaxy.histories.delete_history(self.galaxy_history["id"], purge=True)
+
+    def create_prefix(self):
+        """Create custom prefix"""
+        pm = PrefixManager(self.app, self.session)
+        pm.add_custom_prefix("OBO", "http://purl.obolibrary.org/obo/")
 
     @staticmethod
     def get_random_string(number):

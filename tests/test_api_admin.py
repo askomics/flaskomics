@@ -491,3 +491,91 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.json["datasets"][0]["status"] == "queued"
         assert response.json["datasets"][1]["status"] == "queued"
         assert response.json["datasets"][2]["status"] == "queued"
+
+    def test_view_custom_prefixes(self, client):
+        """test /api/admin/getprefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/api/admin/getprefixes')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        response = client.client.get('/api/admin/api/admin/getprefixes')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        client.create_prefix()
+
+        response = client.client.get('/api/admin/api/admin/getprefixes')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_custom_prefix(self, client):
+        """test /api/admin/addprefix route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefix": "OBO", "namespace": "http://purl.obolibrary.org/obo/"}
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_custom_prefix(self, client):
+        """test /api/admin/delete_prefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefixesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_prefix()
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
