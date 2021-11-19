@@ -393,7 +393,8 @@ class TestApiFile(AskomicsTestCase):
         assert response.json == {
             'error': False,
             'errorMessage': '',
-            'previewFiles': []
+            'previewFiles': [],
+            'ontologies': []
         }
 
         response = client.client.post('/api/files/preview', json=malformed_data)
@@ -421,7 +422,8 @@ class TestApiFile(AskomicsTestCase):
                 'type': 'gff/gff3',
                 'error': False,
                 'error_message': ''
-            }]
+            }],
+            'ontologies': []
         }
 
     def test_delete_files(self, client):
