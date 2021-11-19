@@ -76,7 +76,7 @@ export default class Integration extends Component {
           this.state.previewFiles.map(file => {
             console.log(file)
             if (file.type == 'csv/tsv') {
-              return <CsvTable config={this.state.config} key={file.name} file={file} ontologies={ontologies} />
+              return <CsvTable config={this.state.config} key={file.name} file={file} ontologies={this.state.ontologies} />
             }
             if (["rdf/ttl", "rdf/xml", "rdf/nt"].includes(file.type)) {
               return <RdfPreview config={this.state.config} file={file} />

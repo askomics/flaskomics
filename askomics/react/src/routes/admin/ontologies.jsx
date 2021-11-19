@@ -23,7 +23,7 @@ export default class Ontologies extends Component {
       ontologies: [],
       name: "",
       uri: "",
-      shortName:,
+      shortName: "",
       ontologiesSelected: []
     }
     this.handleChangeValue = this.handleChangeValue.bind(this)

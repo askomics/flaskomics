@@ -399,7 +399,7 @@ class CsvFile(File):
 
         available_ontologies = {}
         for ontology in OntologyManager(self.app, self.session).list_ontologies():
-            available_ontologies[ontology['name']] = ontology['uri']
+            available_ontologies[ontology['short_name']] = ontology['uri']
 
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
@@ -520,6 +520,10 @@ class CsvFile(File):
         """
         total_lines = sum(1 for line in open(self.path))
 
+        available_ontologies = {}
+        for ontology in OntologyManager(self.app, self.session).list_ontologies():
+            available_ontologies[ontology['short_name']] = ontology['uri']
+
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
 
@@ -595,6 +599,12 @@ class CsvFile(File):
                         symetric_relation = True if current_type == 'symetric_relation' else False
                         splitted = current_header.split('@')
                         relation = self.rdfize(splitted[0])
+                        attribute = self.rdfize(cell)
+
+                    # Ontology
+                    if current_type in available_ontologies:
+                        symetric_relation = False
+                        relation = self.rdfize(current_header)
                         attribute = self.rdfize(cell)
 
                     # Category
