@@ -405,7 +405,7 @@ class Database(Params):
             name text NOT NULL,
             uri text NOT NULL,
             full_name text NOT NULL,
-            type text DEFAULT 'local',
+            type text DEFAULT 'local'
         )
         '''
         self.execute_sql_query(query)

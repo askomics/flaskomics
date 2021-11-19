@@ -82,12 +82,12 @@ class OntologyManager(Params):
 
         ontology = rows[0]
         return {
-                'id': ontology[0],
-                'name': ontology[1],
-                'uri': ontology[2],
-                'full_name': ontology[3],
-                'type': ontology[4]
-            }
+            'id': ontology[0],
+            'name': ontology[1],
+            'uri': ontology[2],
+            'full_name': ontology[3],
+            'type': ontology[4]
+        }
 
     def add_ontology(self, name, uri, full_name, type="local"):
         """Create a new ontology
