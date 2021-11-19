@@ -97,7 +97,7 @@ export default class CsvTable extends Component {
       ontoInput = (
         <optgroup label="Ontologies">
         {this.props.ontologies.map(onto => {
-          return <option value={onto.short_name}>{onto.name}</option>
+          return <option key={onto.id} value={onto.short_name}>{onto.name}</option>
         })}
         </optgroup>
       )
