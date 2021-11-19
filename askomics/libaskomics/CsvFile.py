@@ -602,7 +602,7 @@ class CsvFile(File):
                         attribute = self.rdfize(cell)
 
                     # Ontology
-                    if current_type in available_ontologies:
+                    elif current_type in available_ontologies:
                         symetric_relation = False
                         relation = self.rdfize(current_header)
                         attribute = self.rdfize(cell)
