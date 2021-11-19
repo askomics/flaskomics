@@ -19,7 +19,8 @@ export default class Integration extends Component {
       errorMessage: null,
       config: this.props.location.state.config,
       filesId: this.props.location.state.filesId,
-      previewFiles: []
+      previewFiles: [],
+      ontologies: []
     }
     this.cancelRequest
   }
@@ -35,6 +36,7 @@ export default class Integration extends Component {
           console.log(requestUrl, response.data)
           this.setState({
             previewFiles: response.data.previewFiles,
+            ontologies: response.data.ontologies,
             waiting: false,
             error: response.data.error,
             errorMessage: response.data.errorMessage
@@ -74,7 +76,7 @@ export default class Integration extends Component {
           this.state.previewFiles.map(file => {
             console.log(file)
             if (file.type == 'csv/tsv') {
-              return <CsvTable config={this.state.config} key={file.name} file={file} />
+              return <CsvTable config={this.state.config} key={file.name} file={file} ontologies={ontologies} />
             }
             if (["rdf/ttl", "rdf/xml", "rdf/nt"].includes(file.type)) {
               return <RdfPreview config={this.state.config} file={file} />

@@ -91,6 +91,18 @@ export default class CsvTable extends Component {
       )
     }
 
+    let ontoInput
+
+    if (props.ontologies.length > 0){
+      ontoInput = (
+        <optgroup label="Ontologies">
+        {props.ontologies.map(onto => {
+          return <option value={onto.short_name}>{onto.name}</option>
+        })}
+        </optgroup>
+      )
+    }
+
     if (colIndex == 1) {
       return (
         <div>
@@ -117,6 +129,7 @@ export default class CsvTable extends Component {
                 <option value="general_relation" >Directed</option>
                 <option value="symetric_relation" >Symetric</option>
               </optgroup>
+              {ontoInput}
             </CustomInput>
           </FormGroup>
         </div>
@@ -145,6 +158,7 @@ export default class CsvTable extends Component {
               <option value="general_relation" >Directed</option>
               <option value="symetric_relation" >Symetric</option>
             </optgroup>
+            {ontoInput}
           </CustomInput>
         </FormGroup>
       </div>
@@ -297,5 +311,6 @@ export default class CsvTable extends Component {
 
 CsvTable.propTypes = {
   file: PropTypes.object,
-  config: PropTypes.object
+  config: PropTypes.object,
+  ontologies: PropTypes.array
 }

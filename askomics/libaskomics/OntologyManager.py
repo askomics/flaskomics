@@ -39,7 +39,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, full_name, type
+        SELECT id, name, uri, short_name, type
         FROM ontologies
         '''
 
@@ -51,15 +51,15 @@ class OntologyManager(Params):
                 'id': row[0],
                 'name': row[1],
                 'uri': row[2],
-                'full_name': row[3],
+                'short_name': row[3],
                 'type': row[4]
             }
             ontologies.append(prefix)
 
         return ontologies
 
-    def get_ontology(self, ontology_name):
-        """Get a specific ontology based on name
+    def get_ontology(self, short_name):
+        """Get a specific ontology based on short name
 
         Returns
         -------
@@ -70,12 +70,12 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, full_name, type
+        SELECT id, name, uri, short_name, type
         FROM ontologies
-        WHERE name = ?
+        WHERE short_name = ?
         '''
 
-        rows = database.execute_sql_query(query, (ontology_name,))
+        rows = database.execute_sql_query(query, (short_name,))
 
         if not rows:
             return None
@@ -85,11 +85,11 @@ class OntologyManager(Params):
             'id': ontology[0],
             'name': ontology[1],
             'uri': ontology[2],
-            'full_name': ontology[3],
+            'short_name': ontology[3],
             'type': ontology[4]
         }
 
-    def add_ontology(self, name, uri, full_name, type="local"):
+    def add_ontology(self, name, uri, short_name, type="local"):
         """Create a new ontology
 
         Returns
@@ -109,7 +109,7 @@ class OntologyManager(Params):
         )
         '''
 
-        database.execute_sql_query(query, (name, uri, full_name, type,))
+        database.execute_sql_query(query, (name, uri, short_name, type,))
 
     def remove_ontologies(self, ontology_ids):
         """Remove ontologies

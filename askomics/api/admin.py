@@ -8,6 +8,7 @@ from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
 from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 
@@ -633,6 +634,132 @@ def delete_prefix():
 
     return jsonify({
         'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/getontologies", methods=["GET"])
+@api_auth
+@admin_required
+def get_ontologies():
+    """Get all ontologies
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        om = OntologyManager(current_app, session)
+        ontologies = om.list_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/addontology", methods=["POST"])
+@api_auth
+@admin_required
+def add_ontology():
+    """Create a new ontology
+
+    Returns
+    -------
+    json
+        ontologies: list of all ontologies
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not (data.get("name") and data.get("uri") and data.get("shortName")):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Missing parameter"
+        }), 400
+
+    om = OntologyManager(current_app, session)
+    ontologies = om.list_ontologies()
+
+    name = data.get("name")
+    uri = data.get("uri")
+    short_name = data.get("shortName")
+
+    if any([name == onto['name'] or short_name == onto['short_name'] for onto in ontologies]):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Name and short name must be unique"
+        }), 400
+
+    try:
+        om.add_ontology(name, uri, short_name)
+        ontologies = om.list_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/delete_ontologies", methods=["POST"])
+@api_auth
+@admin_required
+def delete_ontologies():
+    """Delete one or more ontologies
+
+    Returns
+    -------
+    json
+        ontologies: list of all ontologies
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not data.get("ontologiesIdToDelete"):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Missing ontologiesIdToDelete parameter"
+        }), 400
+
+    om = OntologyManager(current_app, session)
+    try:
+        om.remove_ontologies(data.get("ontologiesIdToDelete"))
+        ontologies = om.list_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
         'error': False,
         'errorMessage': ''
     })

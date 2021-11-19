@@ -404,7 +404,7 @@ class Database(Params):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name text NOT NULL,
             uri text NOT NULL,
-            full_name text NOT NULL,
+            short_name text NOT NULL,
             type text DEFAULT 'local'
         )
         '''

@@ -44,6 +44,7 @@ export default class AskoNavbar extends Component {
             <DropdownItem className="bg-dark" tag="Link">
               <Link className="nav-link" to="/admin"><i className="fas fa-chess-king"></i> Admin</Link>
               <Link className="nav-link" to="/prefixes"><i className="fas fa-chess-king"></i> Prefixes</Link>
+              <Link className="nav-link" to="/ontologies"><i className="fas fa-chess-king"></i> Ontologies</Link>
             </DropdownItem>
           )
         }
