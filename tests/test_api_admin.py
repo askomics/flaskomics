@@ -579,3 +579,95 @@ class TestApiAdmin(AskomicsTestCase):
 
         assert response.status_code == 200
         assert response.json == expected
+
+    def test_view_ontologies(self, client):
+        """test /api/admin/getontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        client.create_ontology()
+
+        response = client.client.get('/api/admin/getontologies')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "Open Biological and Biomedical Ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "OBO",
+                "type": "local"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_ontology(self, client):
+        """test /api/admin/addontology route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology"}
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "Open Biological and Biomedical Ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "OBO",
+                "type": "local"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_ontologies(self, client):
+        """test /api/admin/delete_ontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"ontologiesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_ontology()
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected

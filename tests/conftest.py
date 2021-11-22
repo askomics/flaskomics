@@ -15,6 +15,7 @@ from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
@@ -579,6 +580,11 @@ class Client(object):
         """Create custom prefix"""
         pm = PrefixManager(self.app, self.session)
         pm.add_custom_prefix("OBO", "http://purl.obolibrary.org/obo/")
+
+    def create_ontology(self):
+        """Create ontology"""
+        om = OntologyManager(self.app, self.session)
+        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO")
 
     @staticmethod
     def get_random_string(number):
