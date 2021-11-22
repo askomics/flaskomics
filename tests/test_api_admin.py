@@ -626,12 +626,12 @@ class TestApiAdmin(AskomicsTestCase):
 
         data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology"}
 
-        response = client.client.post('/api/admin/addprefix', json=data)
+        response = client.client.post('/api/admin/addontology', json=data)
         assert response.status_code == 401
 
         client.log_user("jdoe")
 
-        response = client.client.post('/api/admin/addprefix', json=data)
+        response = client.client.post('/api/admin/addontology', json=data)
 
         expected = {
             "error": False,
