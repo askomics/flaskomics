@@ -129,7 +129,7 @@ class OntologyManager(Params):
         for ontology_id in ontology_ids:
             database.execute_sql_query(query, (ontology_id,))
 
-    def autocomplete(self, ontology_uri, ontology_type, query):
+    def autocomplete(self, ontology_uri, ontology_type, query_term):
         """Search in ontology
 
         Returns
@@ -140,5 +140,5 @@ class OntologyManager(Params):
         if ontology_type == "local":
             query = SparqlQuery(self.app, self.session, get_graphs=False)
             # TODO: Actually store the graph in the ontology to quicken search
-            graphs, endpoints = query.set_graphs_and_endpoints(entities=[ontology_uri])
-            return query.autocomplete_local_ontology(ontology_uri, ontology_type, endpoints)
+            query.set_graphs_and_endpoints(entities=[ontology_uri])
+            return query.autocomplete_local_ontology(ontology_uri, query_term, query.endpoints)
