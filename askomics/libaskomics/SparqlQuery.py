@@ -523,6 +523,46 @@ class SparqlQuery(Params):
 
         return formated_data
 
+    def autocomplete_local_ontology(self, uri, query, endpoints):
+        """Get results for a specific query
+
+        Parameters
+        ----------
+        uri : string
+            ontology uri
+        query : string
+            query to search
+
+        Returns
+        -------
+        dict
+            The corresponding parameters
+        """
+        raw_query = '''
+        SELECT DISTINCT ?label ?uri
+        WHERE {{
+          ?uri rdf:type <{}> .
+          ?uri rdfs:label ?label .
+          FILTER(contains(?label, "{}"))
+        }}
+        '''.format(uri, query)
+
+        raw_query = self.prefix_query(raw_query)
+
+        sparql = self.format_query(raw_query, limit=5, replace_froms=True, federated=False)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False, endpoints=endpoints)
+        _, data = query_launcher.process_query(sparql)
+
+        formated_data = []
+        for row in data:
+            formated_data.append({
+                'uri': row['uri'],
+                'label': row['label']
+            })
+
+        return formated_data
+
     def format_sparql_variable(self, name):
         """Format a name into a sparql variable by remove spacial char and add a ?
 
