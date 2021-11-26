@@ -73,8 +73,7 @@ class TestApi(AskomicsTestCase):
             "quota": 0,
             'apikey': "0000000001",
             'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
-            'last_action': None,
-            "ontologies": []
+            'last_action': None
         }
         response = client.client.get('/api/start')
 
@@ -102,8 +101,7 @@ class TestApi(AskomicsTestCase):
             "quota": 0,
             'apikey': "0000000002",
             'galaxy': None,
-            'last_action': None,
-            "ontologies": []
+            'last_action': None
         }
         response = client.client.get('/api/start')
 
