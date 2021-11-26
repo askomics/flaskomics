@@ -43,6 +43,7 @@ export default class Query extends Component {
       // Preview icons
       disablePreview: false,
       previewIcon: "table",
+      ontologies: this.props.location.state.config.ontologies
     }
 
     this.graphState = {

@@ -42,7 +42,8 @@ class TestApi(AskomicsTestCase):
             "namespaceInternal": client.get_config('triplestore', 'namespace_internal'),
             "proxyPath": "/",
             "user": {},
-            "logged": False
+            "logged": False,
+            "ontologies": []
         }
         response = client.client.get('/api/start')
         assert response.status_code == 200
@@ -72,7 +73,8 @@ class TestApi(AskomicsTestCase):
             "quota": 0,
             'apikey': "0000000001",
             'galaxy': {"url": "http://localhost:8081", "apikey": "fakekey"},
-            'last_action': None
+            'last_action': None,
+            "ontologies": []
         }
         response = client.client.get('/api/start')
 
@@ -100,7 +102,8 @@ class TestApi(AskomicsTestCase):
             "quota": 0,
             'apikey': "0000000002",
             'galaxy': None,
-            'last_action': None
+            'last_action': None,
+            "ontologies": []
         }
         response = client.client.get('/api/start')
 

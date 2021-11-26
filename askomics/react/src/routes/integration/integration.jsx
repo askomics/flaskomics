@@ -20,7 +20,7 @@ export default class Integration extends Component {
       config: this.props.location.state.config,
       filesId: this.props.location.state.filesId,
       previewFiles: [],
-      ontologies: []
+      ontologies: this.props.location.state.config.ontologies
     }
     this.cancelRequest
   }
@@ -36,7 +36,6 @@ export default class Integration extends Component {
           console.log(requestUrl, response.data)
           this.setState({
             previewFiles: response.data.previewFiles,
-            ontologies: response.data.ontologies,
             waiting: false,
             error: response.data.error,
             errorMessage: response.data.errorMessage
