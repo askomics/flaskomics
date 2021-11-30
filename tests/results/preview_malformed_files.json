@@ -22,6 +22,5 @@
       "error": true,
       "error_message": "Malformated CSV/TSV (Empty column in header)"
     }
-],
-  "ontologies": []
+]
 }
