@@ -1551,6 +1551,7 @@ export default class Query extends Component {
                 handleDateFilter={p => this.handleDateFilter(p)}
                 config={this.state.config}
                 isOnto={isOnto}
+                entityUri={this.currentSelected.uri}
               />
             )
           }

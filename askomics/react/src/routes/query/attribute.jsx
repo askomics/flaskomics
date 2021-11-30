@@ -46,6 +46,23 @@ export default class AttributeBox extends Component {
     return newStr
   }
 
+
+  isRegisteredOnto () {
+      return this.props.config.ontologies.some(onto => {
+        return (onto.uri == this.props.entityUri)
+      })
+  }
+
+  getAutoComplete(){
+      return this.props.config.ontologies.map(onto => {
+        if (onto.uri == this.props.entityUri) {
+          return onto.short_name
+        } else {
+          return null
+        }
+      })
+  }
+
   renderLinker () {
     let options = []
 
@@ -494,5 +511,6 @@ AttributeBox.propTypes = {
   attribute: PropTypes.object,
   graph: PropTypes.object,
   config: PropTypes.object,
-  isOnto: PropTypes.bool
+  isOnto: PropTypes.bool,
+  entityUri: PropTypes.string
 }
