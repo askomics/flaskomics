@@ -544,7 +544,7 @@ class SparqlQuery(Params):
         if query:
             subquery = 'FILTER(contains(?label, "{}"))'.format(query)
         raw_query = '''
-        SELECT DISTINCT ?label ?uri
+        SELECT DISTINCT ?label
         WHERE {{
           ?uri rdf:type <{}> .
           ?uri rdfs:label ?label .
@@ -563,10 +563,7 @@ class SparqlQuery(Params):
 
         formated_data = []
         for row in data:
-            formated_data.append({
-                'uri': row['uri'],
-                'label': row['label']
-            })
+            formated_data.append(row['label'])
 
         return formated_data
 

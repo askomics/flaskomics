@@ -70,9 +70,8 @@ export default class AttributeBox extends Component {
       })
   }
 
-  autocompleteOntology (event) {
-    this.handleFilterValue(event)
-    let userInput = event.target
+  autocompleteOntology (value) {
+    let userInput = value
     let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
     axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -181,9 +180,13 @@ export default class AttributeBox extends Component {
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
       )
-      input = (
-          <TextInput Component="input" options={this.state.options} onSelect={this.handleFilterValue} id={this.props.attribute.id} value={this.props.attribute.filterValue} onRequestOptions={this.autocompleteOntology}/>
-      )
+      if (this.props.attribute.uri == "rdfs:label"){
+        input = (
+          <TextInput id={this.props.attribute.id} trigger="" matchAny={true} spacer="" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleFilterValue({target: {value: e, id: this.props.attribute.id}})} id={this.props.attribute.id} value={this.props.attribute.filterValue} onRequestOptions={this.autocompleteOntology}/>
+        )
+      } else {
+        input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
+      }
 
     } else {
       attrIcons = (
