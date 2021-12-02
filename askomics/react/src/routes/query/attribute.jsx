@@ -12,15 +12,13 @@ import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import TextInput from 'react-autocomplete-input';
 import 'react-autocomplete-input/dist/bundle.css';
+import Autocomplete from '../../components/autocomplete'
 
 export default class AttributeBox extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.state = {
-        ontologyShort: this.getAutoComplete(),
-        options: []
-    }
+    this.state = {}
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.handleNegative = this.props.handleNegative.bind(this)
@@ -58,40 +56,6 @@ export default class AttributeBox extends Component {
       return this.props.config.ontologies.some(onto => {
         return (onto.uri == this.props.entityUri)
       })
-  }
-
-  getAutoComplete () {
-      return this.props.config.ontologies.map(onto => {
-        if (onto.uri == this.props.entityUri) {
-          return onto.short_name
-        } else {
-          return null
-        }
-      })
-  }
-
-  autocompleteOntology (value) {
-    let userInput = value
-    let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
-    axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-      .then(response => {
-        console.log(requestUrl, response.data)
-        // set state of resultsPreview
-        this.setState({
-          options: response.data.results
-        })
-      })
-      .catch(error => {
-        console.log(error, error.response.data.errorMessage)
-        this.setState({
-          error: true,
-          errorMessage: error.response.data.errorMessage,
-          status: error.response.status,
-          waiting: false
-        })
-      })
-
-
   }
 
   renderLinker () {
@@ -182,7 +146,7 @@ export default class AttributeBox extends Component {
       )
       if (this.props.attribute.uri == "rdfs:label"){
         input = (
-          <TextInput id={this.props.attribute.id} trigger="" matchAny={true} spacer="" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleFilterValue({target: {value: e, id: this.props.attribute.id}})} id={this.props.attribute.id} value={this.props.attribute.filterValue} onRequestOptions={this.autocompleteOntology}/>
+          <Autocomplete entityUri={this.props.entityUri} attributeId={this.props.attribute.id} filterValue={this.props.attribute.filterValue} handleFilterValue={p => this.handleChangePosition(p)}/>
         )
       } else {
         input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
