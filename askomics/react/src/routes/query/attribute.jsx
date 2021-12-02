@@ -36,7 +36,6 @@ export default class AttributeBox extends Component {
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
-    this.autocompleteOntology = this.autocompleteOntology.bind(this)
     this.cancelRequest
   }
 
@@ -146,7 +145,7 @@ export default class AttributeBox extends Component {
       )
       if (this.props.attribute.uri == "rdfs:label"){
         input = (
-          <Autocomplete entityUri={this.props.entityUri} attributeId={this.props.attribute.id} filterValue={this.props.attribute.filterValue} handleFilterValue={p => this.handleChangePosition(p)}/>
+          <Autocomplete config={this.props.config} entityUri={this.props.entityUri} attributeId={this.props.attribute.id} filterValue={this.props.attribute.filterValue} handleFilterValue={p => this.handleFilterValue(p)}/>
         )
       } else {
         input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)

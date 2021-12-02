@@ -276,4 +276,9 @@ button.input-with-icon {
     display: block;
 }
 
+.react-autocomplete-input {
+  left: auto !important;
+  top: auto !important;
+}
+
 /***********************************************************************/

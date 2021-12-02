@@ -1,22 +1,12 @@
 import React, { Component} from 'react'
 import axios from 'axios'
-import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
-import { Redirect } from 'react-router-dom'
-import DatePicker from "react-datepicker";
-import ReactTooltip from "react-tooltip";
-import ErrorDiv from '../error/error'
-import WaitingDiv from '../../components/waiting'
-import update from 'react-addons-update'
-import Visualization from './visualization'
 import PropTypes from 'prop-types'
-import Utils from '../../classes/utils'
 import TextInput from 'react-autocomplete-input';
 import 'react-autocomplete-input/dist/bundle.css';
 
 export default class Autocomplete extends Component {
   constructor (props) {
     super(props)
-    this.utils = new Utils()
     this.state = {
         ontologyShort: this.getAutoComplete(),
         options: []
@@ -60,9 +50,10 @@ export default class Autocomplete extends Component {
   }
 
   renderAutocomplete () {
-    let input = (
+    
+    let input = (<div>
       <TextInput trigger="" matchAny={true} spacer="" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleFilterValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue} onRequestOptions={this.autocompleteOntology}/>
-    )
+    </div>)
 
     return input
   }
@@ -75,6 +66,7 @@ export default class Autocomplete extends Component {
 Autocomplete.propTypes = {
   handleFilterValue: PropTypes.func,
   entityUri: PropTypes.string,
-  attributeId: PropTypes.string,
-  filterValue: PropTypes.string
+  attributeId: PropTypes.number,
+  filterValue: PropTypes.string,
+  config: PropTypes.object,
 }
