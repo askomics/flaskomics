@@ -538,14 +538,21 @@ class SparqlQuery(Params):
         dict
             The corresponding parameters
         """
+
+        subquery = ""
+
+        if query:
+            subquery = 'FILTER(contains(?label, "{}"))'.format(query)
         raw_query = '''
         SELECT DISTINCT ?label ?uri
         WHERE {{
           ?uri rdf:type <{}> .
           ?uri rdfs:label ?label .
-          FILTER(contains(?label, "{}"))
+          {}
         }}
-        '''.format(uri, query)
+
+        LIMIT 5
+        '''.format(uri, subquery)
 
         raw_query = self.prefix_query(raw_query)
 

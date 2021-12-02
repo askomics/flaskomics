@@ -10,12 +10,17 @@ import update from 'react-addons-update'
 import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import TextInput from 'react-autocomplete-input';
+import 'react-autocomplete-input/dist/bundle.css';
 
 export default class AttributeBox extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.state = {}
+    this.state = {
+        ontologyShort: this.getAutoComplete(),
+        options: []
+    }
 
     this.toggleVisibility = this.props.toggleVisibility.bind(this)
     this.handleNegative = this.props.handleNegative.bind(this)
@@ -33,6 +38,8 @@ export default class AttributeBox extends Component {
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
+    this.autocompleteOntology = this.autocompleteOntology.bind(this)
+    this.cancelRequest
   }
 
   subNums (id) {
@@ -53,7 +60,7 @@ export default class AttributeBox extends Component {
       })
   }
 
-  getAutoComplete(){
+  getAutoComplete () {
       return this.props.config.ontologies.map(onto => {
         if (onto.uri == this.props.entityUri) {
           return onto.short_name
@@ -61,6 +68,31 @@ export default class AttributeBox extends Component {
           return null
         }
       })
+  }
+
+  autocompleteOntology (event) {
+    this.handleFilterValue(event)
+    let userInput = event.target
+    let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
+    axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        // set state of resultsPreview
+        this.setState({
+          options: response.data.results
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+
+
   }
 
   renderLinker () {
@@ -140,6 +172,32 @@ export default class AttributeBox extends Component {
 
     let form
 
+    let input
+    let attrIcons
+
+    if (this.props.isOnto){
+      attrIcons = (
+        <div className="attr-icons">
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+        </div>
+      )
+      input = (
+          <TextInput Component="input" options={this.state.options} onSelect={this.handleFilterValue} id={this.props.attribute.id} value={this.props.attribute.filterValue} onRequestOptions={this.autocompleteOntology}/>
+      )
+
+    } else {
+      attrIcons = (
+        <div className="attr-icons">
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+        </div>
+      )
+      input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
+    }
+
+
     if (this.props.attribute.linked) {
       form = this.renderLinker()
     } else {
@@ -161,34 +219,12 @@ export default class AttributeBox extends Component {
               </CustomInput>
             </td>
             <td>
-              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              {input}
             </td>
           </tr>
         </table>
       )
     }
-
-
-    let attrIcons
-
-    if (this.props.isOnto){
-      attrIcons = (
-        <div className="attr-icons">
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
-        </div>
-      )
-
-    } else {
-      attrIcons = (
-        <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
-        </div>
-      )
-    }
-
 
     return (
       <div className="attribute-box">

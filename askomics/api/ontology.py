@@ -19,13 +19,6 @@ def autocomplete(short_ontology):
     json
     """
 
-    if not request.args.get("q"):
-        return jsonify({
-            "error": True,
-            "errorMessage": "Missing q parameter",
-            "results": []
-        }), 400
-
     try:
         # Disk space
         om = OntologyManager(current_app, session)
