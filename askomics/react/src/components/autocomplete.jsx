@@ -15,6 +15,7 @@ export default class Autocomplete extends Component {
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.autocompleteOntology = this.autocompleteOntology.bind(this)
     this.cancelRequest
+    this.handleOntoValue = this.handleOntoValue.bind(this)
   }
 
   getAutoComplete () {
@@ -32,7 +33,6 @@ export default class Autocomplete extends Component {
     let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
     axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
-        console.log(requestUrl, response.data)
         // set state of resultsPreview
         this.setState({
           options: response.data.results
@@ -49,10 +49,16 @@ export default class Autocomplete extends Component {
       })
   }
 
+  handleOntoValue (event) {
+    this.handleFilterValue(event)
+    this.autocompleteOntology(event.target.value)
+  }
+
+
   renderAutocomplete () {
     
     let input = (<div>
-      <TextInput trigger="" matchAny={true} spacer="" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleFilterValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue} onRequestOptions={this.autocompleteOntology}/>
+      <TextInput trigger="" matchAny={true} spacer="" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleOntoValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue}/>
     </div>)
 
     return input
