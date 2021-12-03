@@ -53,7 +53,7 @@ export default class AttributeBox extends Component {
 
   isRegisteredOnto () {
       return this.props.config.ontologies.some(onto => {
-        return (onto.uri == this.props.entityUri)
+        return (onto.uri == this.props.entityUri && onto.type == "local")
       })
   }
 

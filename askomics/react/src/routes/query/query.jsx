@@ -545,7 +545,7 @@ export default class Query extends Component {
               target: targetId,
               selected: false,
               suggested: true,
-              directed: true,
+              directed: isOnto ? false : true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -670,7 +670,7 @@ export default class Query extends Component {
           target: node2.id,
           selected: false,
           suggested: false,
-          directed: true,
+          directed: link.directed,
         }
       }
 
@@ -689,7 +689,7 @@ export default class Query extends Component {
           target: node1.id,
           selected: false,
           suggested: false,
-          directed: true,
+          directed: link.direct,
         }
       }
     })
