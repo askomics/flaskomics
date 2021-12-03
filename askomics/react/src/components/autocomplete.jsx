@@ -31,6 +31,9 @@ export default class Autocomplete extends Component {
   autocompleteOntology (value) {
     let userInput = value
     let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
+
+    if (value.length < 3) { return }
+
     axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         // set state of resultsPreview
