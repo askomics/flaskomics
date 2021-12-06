@@ -242,7 +242,8 @@ export default class Ontologies extends Component {
               </FormGroup>
             </Col>
             <Col md={3}>
-              <FormGroup>Autocomplete type</Label>
+              <FormGroup>
+                <Label for="type">Autocomplete type</Label>
                 <CustomInput type="select" name="type" id="type" placeholder="type" value={this.state.type} onChange={this.handleChangeValue}>
                   <option value="none" >none</option>
                   <option value="local" >local</option>
