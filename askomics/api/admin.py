@@ -698,6 +698,14 @@ def add_ontology():
     name = data.get("name")
     uri = data.get("uri")
     short_name = data.get("shortName")
+    type = data.get("type")
+
+    if type not in ["none", "local", "ols"]:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Invalid type"
+        }), 400
 
     if any([name == onto['name'] or short_name == onto['short_name'] for onto in ontologies]):
         return jsonify({
@@ -707,7 +715,7 @@ def add_ontology():
         }), 400
 
     try:
-        om.add_ontology(name, uri, short_name)
+        om.add_ontology(name, uri, short_name, type)
         ontologies = om.list_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

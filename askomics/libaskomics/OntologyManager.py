@@ -1,3 +1,5 @@
+import requests
+
 from askomics.libaskomics.Database import Database
 from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.Params import Params
@@ -129,7 +131,7 @@ class OntologyManager(Params):
         for ontology_id in ontology_ids:
             database.execute_sql_query(query, (ontology_id,))
 
-    def autocomplete(self, ontology_uri, ontology_type, query_term):
+    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name):
         """Search in ontology
 
         Returns
@@ -142,3 +144,50 @@ class OntologyManager(Params):
             # TODO: Actually store the graph in the ontology to quicken search
             query.set_graphs_and_endpoints(entities=[ontology_uri])
             return query.autocomplete_local_ontology(ontology_uri, query_term, query.endpoints)
+        elif ontology_type == "ols":
+            base_url = "https://www.ebi.ac.uk/ols/api/search"
+            arguments = {
+                "q": query_term,
+                "ontology": onto_short_name,
+                "rows": 5,
+                "queryFields": "label",
+                "type": "class",
+                "fieldList": "label"
+            }
+
+            r = requests.get(base_url, params=arguments)
+
+            data = []
+
+            if not r.status_code == 200:
+                return data
+
+            res = r.json()
+            if res['response']['docs']:
+                data = [term['label'] for term in res['response']['docs']]
+
+            return data
+
+        elif ontology_type == "ols":
+            base_url = "https://www.ebi.ac.uk/ols/api/search"
+            arguments = {
+                "q": query_term,
+                "ontology": onto_short_name,
+                "rows": 5,
+                "queryFields": "label",
+                "type": "class",
+                "fieldList": "label"
+            }
+
+            r = requests.get(base_url, params=arguments)
+
+            data = []
+
+            if not r.status_code == 200:
+                return data
+
+            res = r.json()
+            if res['response']['docs']:
+                data = [term['label'] for term in res['response']['docs']]
+
+            return data

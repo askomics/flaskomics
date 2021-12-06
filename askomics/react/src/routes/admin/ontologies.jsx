@@ -24,6 +24,7 @@ export default class Ontologies extends Component {
       name: "",
       uri: "",
       shortName: "",
+      type: "local",
       ontologiesSelected: []
     }
     this.handleChangeValue = this.handleChangeValue.bind(this)
@@ -98,7 +99,8 @@ export default class Ontologies extends Component {
     let data = {
       name: this.state.name,
       uri: this.state.uri,
-      shortName: this.state.shortName
+      shortName: this.state.shortName,
+      type: this.state.type
     }
 
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -109,6 +111,10 @@ export default class Ontologies extends Component {
         newontologyErrorMessage: response.data.errorMessage,
         ontologies: response.data.ontologies,
         newontologyStatus: response.status,
+        name: "",
+        uri: "",
+        shortName: "",
+        type: "local"
       })
     })
     .catch(error => {
@@ -182,7 +188,13 @@ export default class Ontologies extends Component {
       dataField: 'uri',
       text: 'Uri',
       sort: true
+    }, {
+      editable: false,
+      dataField: 'type',
+      text: 'Autocomplete type',
+      sort: true
     }
+
   ]
 
     let ontologiesDefaultSorted = [{
@@ -211,22 +223,31 @@ export default class Ontologies extends Component {
         <div>
         <Form onSubmit={this.handleAddOntology}>
           <Row form>
-            <Col md={4}>
+            <Col md={3}>
               <FormGroup>
                 <Label for="name">Ontology name</Label>
                 <Input type="text" name="name" id="name" placeholder="Ontology name" value={this.state.name} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <FormGroup>
                 <Label for="shortName">Ontology short name</Label>
                 <Input type="text" name="shortName" id="shortName" placeholder="shortName" value={this.state.shortName} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <FormGroup>
                 <Label for="uri">Ontology uri</Label>
                 <Input type="text" name="uri" id="uri" placeholder="uri" value={this.state.uri} onChange={this.handleChangeValue} />
+              </FormGroup>
+            </Col>
+            <Col md={3}>
+              <FormGroup>Autocomplete type</Label>
+                <CustomInput type="select" name="type" id="type" placeholder="type" value={this.state.type} onChange={this.handleChangeValue}>
+                  <option value="none" >none</option>
+                  <option value="local" >local</option>
+                  <option value="ols" >ols</option>
+                </CustomInput>
               </FormGroup>
             </Col>
           </Row>
