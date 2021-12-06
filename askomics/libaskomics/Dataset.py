@@ -93,7 +93,8 @@ class Dataset(Params):
             ?,
             NULL,
             NULL,
-            NULL
+            NULL,
+            0
         )
         '''
 
