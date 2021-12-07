@@ -583,8 +583,9 @@ class Client(object):
 
     def create_ontology(self):
         """Create ontology"""
+        self.upload_and_integrate()
         om = OntologyManager(self.app, self.session)
-        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO")
+        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO", 1, "mygraph", "local")
 
     @staticmethod
     def get_random_string(number):

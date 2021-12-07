@@ -21,10 +21,12 @@ export default class Ontologies extends Component {
       newontologyError: false,
       newontologyErrorMessage: '',
       ontologies: [],
+      datasets: [],
       name: "",
       uri: "",
       shortName: "",
       type: "local",
+      datasetId: "",
       ontologiesSelected: []
     }
     this.handleChangeValue = this.handleChangeValue.bind(this)
@@ -64,7 +66,8 @@ export default class Ontologies extends Component {
     return (
       this.state.name.length > 0 &&
       this.state.uri.length > 0 &&
-      this.state.shortName.length > 0
+      this.state.shortName.length > 0 &&
+      this.state.datasetId.length > 0
     )
   }
 
@@ -93,6 +96,16 @@ export default class Ontologies extends Component {
     }
   }
 
+  getDatasetName (datasetId) {
+    return this.state.datasets.map(dataset => {
+      if (dataset.id == datasetId) {
+        return dataset.name
+      } else {
+        return null
+      }
+    }).reduce(name=> name)
+  }
+
   handleAddOntology(event) {
 
     let requestUrl = "/api/admin/addontology"
@@ -100,7 +113,8 @@ export default class Ontologies extends Component {
       name: this.state.name,
       uri: this.state.uri,
       shortName: this.state.shortName,
-      type: this.state.type
+      type: this.state.type,
+      datasetId: this.state.datasetId
     }
 
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -131,6 +145,7 @@ export default class Ontologies extends Component {
   componentDidMount () {
     if (!this.props.waitForStart) {
       this.loadOntologies()
+      this.loadDatasets()
     }
   }
 
@@ -149,6 +164,22 @@ export default class Ontologies extends Component {
           ontologyError: true,
           ontologyErrorMessage: error.response.data.errorMessage,
           ontologyStatus: error.response.status,
+          success: !error.response.data.error
+        })
+      })
+  }
+
+  loadDatasets() {
+    let requestUrl = '/api/datasets'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        this.setState({
+          datasets: response.data.datasets
+        })
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
           success: !error.response.data.error
         })
       })
@@ -190,6 +221,12 @@ export default class Ontologies extends Component {
       sort: true
     }, {
       editable: false,
+      dataField: 'dataset_id',
+      text: 'Dataset',
+      formatter: (cell, row) => { return this.getDatasetName(cell)},
+      sort: true
+    }, {
+      editable: false,
       dataField: 'type',
       text: 'Autocomplete type',
       sort: true
@@ -223,35 +260,49 @@ export default class Ontologies extends Component {
         <div>
         <Form onSubmit={this.handleAddOntology}>
           <Row form>
-            <Col md={3}>
+            <Col md={4}>
               <FormGroup>
                 <Label for="name">Ontology name</Label>
                 <Input type="text" name="name" id="name" placeholder="Ontology name" value={this.state.name} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <FormGroup>
                 <Label for="shortName">Ontology short name</Label>
                 <Input type="text" name="shortName" id="shortName" placeholder="shortName" value={this.state.shortName} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <FormGroup>
                 <Label for="uri">Ontology uri</Label>
                 <Input type="text" name="uri" id="uri" placeholder="uri" value={this.state.uri} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
-            <Col md={3}>
-              <FormGroup>
-                <Label for="type">Autocomplete type</Label>
-                <CustomInput type="select" name="type" id="type" placeholder="type" value={this.state.type} onChange={this.handleChangeValue}>
-                  <option value="none" >none</option>
-                  <option value="local" >local</option>
-                  <option value="ols" >ols</option>
-                </CustomInput>
-              </FormGroup>
-            </Col>
           </Row>
+          <Row>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="type">Linked public dataset</Label>
+              <CustomInput type="select" name="datasetId" id="datasetId" value={this.state.datasetId} onChange={this.handleChangeValue}>
+              {this.state.datasets.map(dataset => {
+                if (dataset.public == 1){
+                  return <option key={dataset.id} value={dataset.id}>{dataset.name}</option>
+                }
+              })}
+              </CustomInput>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="type">Autocomplete type</Label>
+              <CustomInput type="select" name="type" id="type" value={this.state.datasetId} onChange={this.handleChangeValue}>
+                <option value="none" >none</option>
+                <option value="local" >local</option>
+                <option value="ols" >ols</option>
+              </CustomInput>
+            </FormGroup>
+          </Col>
+          <Row>
           <Button disabled={!this.validateOntologyForm()}>Create</Button>
         </Form>
         <ErrorDiv status={this.state.newontologystatus} error={this.state.newontologyerror} errorMessage={this.state.newontologyerrorMessage} />

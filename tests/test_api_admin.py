@@ -612,7 +612,9 @@ class TestApiAdmin(AskomicsTestCase):
                 "name": "Open Biological and Biomedical Ontology",
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
                 "short_name": "OBO",
-                "type": "local"
+                "type": "local",
+                "dataset_id": 1,
+                "graph": "mygraph"
             }]
         }
 
@@ -624,7 +626,7 @@ class TestApiAdmin(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jsmith")
 
-        data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology", "type": "local"}
+        data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology", "type": "local", "datasetId": 1}
 
         response = client.client.post('/api/admin/addontology', json=data)
         assert response.status_code == 401
@@ -641,7 +643,9 @@ class TestApiAdmin(AskomicsTestCase):
                 "name": "Open Biological and Biomedical Ontology",
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
                 "short_name": "OBO",
-                "type": "local"
+                "type": "local",
+                "dataset_id": 1,
+                "graph": "mygraph"
             }]
         }
 

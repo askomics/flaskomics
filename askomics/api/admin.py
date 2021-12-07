@@ -654,7 +654,7 @@ def get_ontologies():
     """
     try:
         om = OntologyManager(current_app, session)
-        ontologies = om.list_ontologies()
+        ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -685,20 +685,30 @@ def add_ontology():
     """
 
     data = request.get_json()
-    if not data or not (data.get("name") and data.get("uri") and data.get("shortName")):
+    if not data or not (data.get("name") and data.get("uri") and data.get("shortName") and data.get("type") and data.get("datasetId")):
         return jsonify({
             'ontologies': [],
             'error': True,
             'errorMessage': "Missing parameter"
         }), 400
 
-    om = OntologyManager(current_app, session)
-    ontologies = om.list_ontologies()
-
     name = data.get("name")
     uri = data.get("uri")
     short_name = data.get("shortName")
     type = data.get("type")
+    dataset_id = data.get("datasetId")
+
+    om = OntologyManager(current_app, session)
+
+    if type == "ols" and not om.test_ols_ontology(short_name):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "{} ontology not found in OLS".format(short_name)
+        }), 400
+
+    om = OntologyManager(current_app, session)
+    ontologies = om.list_full_ontologies()
 
     if type not in ["none", "local", "ols"]:
         return jsonify({
@@ -706,6 +716,20 @@ def add_ontology():
             'error': True,
             'errorMessage': "Invalid type"
         }), 400
+
+    datasets_info = [{'id': dataset_id}]
+
+    datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+    datasets_handler.handle_datasets()
+
+    if not len(datasets_handler.datasets) == 1 or not datasets_handler.datasets[0]['public']:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Invalid dataset id"
+        }), 400
+
+    dataset = datasets_handler.datasets[0]
 
     if any([name == onto['name'] or short_name == onto['short_name'] for onto in ontologies]):
         return jsonify({
@@ -715,8 +739,8 @@ def add_ontology():
         }), 400
 
     try:
-        om.add_ontology(name, uri, short_name, type)
-        ontologies = om.list_ontologies()
+        om.add_ontology(name, uri, short_name, dataset['id'], dataset['graph_name'], type)
+        ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -755,9 +779,13 @@ def delete_ontologies():
         }), 400
 
     om = OntologyManager(current_app, session)
+
+    ontologies = om.list_full_ontologies()
+    onto_to_delete = [{"id": ontology.id, "dataset_id": ontology.dataset_id} for ontology in ontologies if ontology.id in data.get("ontologiesIdToDelete")]
+
     try:
-        om.remove_ontologies(data.get("ontologiesIdToDelete"))
-        ontologies = om.list_ontologies()
+        om.remove_ontologies(onto_to_delete)
+        ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({

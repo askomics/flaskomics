@@ -523,7 +523,7 @@ class SparqlQuery(Params):
 
         return formated_data
 
-    def autocomplete_local_ontology(self, uri, query, endpoints):
+    def autocomplete_local_ontology(self, uri, query):
         """Get results for a specific query
 
         Parameters
@@ -558,7 +558,7 @@ class SparqlQuery(Params):
 
         sparql = self.format_query(raw_query, limit=5, replace_froms=True, federated=False)
 
-        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False, endpoints=endpoints)
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False)
         _, data = query_launcher.process_query(sparql)
 
         formated_data = []

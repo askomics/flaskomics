@@ -229,3 +229,10 @@ class Dataset(Params):
         '''.format(where_query)
 
         database.execute_sql_query(query, query_params)
+
+        query = '''
+        DELETE FROM ontologies
+        WHERE dataset_id = ?
+        '''
+
+        database.execute_sql_query(query, (self.id,))
