@@ -719,8 +719,15 @@ def add_ontology():
 
     datasets_info = [{'id': dataset_id}]
 
-    datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
-    datasets_handler.handle_datasets()
+    try:
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets()
+    except IndexError:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Dataset {} not found".format(dataset_id)
+        }), 400
 
     if not len(datasets_handler.datasets) == 1 or not datasets_handler.datasets[0]['public']:
         return jsonify({
@@ -781,7 +788,7 @@ def delete_ontologies():
     om = OntologyManager(current_app, session)
 
     ontologies = om.list_full_ontologies()
-    onto_to_delete = [{"id": ontology.id, "dataset_id": ontology.dataset_id} for ontology in ontologies if ontology.id in data.get("ontologiesIdToDelete")]
+    onto_to_delete = [{"id": ontology['id'], "dataset_id": ontology['dataset_id']} for ontology in ontologies if ontology['id'] in data.get("ontologiesIdToDelete")]
 
     try:
         om.remove_ontologies(onto_to_delete)

@@ -280,29 +280,29 @@ export default class Ontologies extends Component {
             </Col>
           </Row>
           <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="type">Linked public dataset</Label>
-              <CustomInput type="select" name="datasetId" id="datasetId" value={this.state.datasetId} onChange={this.handleChangeValue}>
-              {this.state.datasets.map(dataset => {
-                if (dataset.public == 1){
-                  return <option key={dataset.id} value={dataset.id}>{dataset.name}</option>
-                }
-              })}
-              </CustomInput>
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="type">Autocomplete type</Label>
-              <CustomInput type="select" name="type" id="type" value={this.state.datasetId} onChange={this.handleChangeValue}>
-                <option value="none" >none</option>
-                <option value="local" >local</option>
-                <option value="ols" >ols</option>
-              </CustomInput>
-            </FormGroup>
-          </Col>
-          <Row>
+            <Col md={6}>
+              <FormGroup>
+                <Label for="type">Linked public dataset</Label>
+                <CustomInput type="select" name="datasetId" id="datasetId" value={this.state.datasetId} onChange={this.handleChangeValue}>
+                {this.state.datasets.map(dataset => {
+                  if (dataset.public == 1){
+                    return <option key={dataset.id} value={dataset.id}>{dataset.name}</option>
+                  }
+                })}
+                </CustomInput>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup>
+                <Label for="type">Autocomplete type</Label>
+                <CustomInput type="select" name="type" id="type" value={this.state.datasetId} onChange={this.handleChangeValue}>
+                  <option value="none" >none</option>
+                  <option value="local" >local</option>
+                  <option value="ols" >ols</option>
+                </CustomInput>
+              </FormGroup>
+            </Col>
+          </Row>
           <Button disabled={!this.validateOntologyForm()}>Create</Button>
         </Form>
         <ErrorDiv status={this.state.newontologystatus} error={this.state.newontologyerror} errorMessage={this.state.newontologyerrorMessage} />
