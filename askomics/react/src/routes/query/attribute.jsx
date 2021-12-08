@@ -143,7 +143,7 @@ export default class AttributeBox extends Component {
           <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
         </div>
       )
-      if (this.props.attribute.uri == "rdfs:label"){
+      if (this.isRegisteredOnto() && this.props.attribute.uri == "rdfs:label"){
         input = (
           <Autocomplete config={this.props.config} entityUri={this.props.entityUri} attributeId={this.props.attribute.id} filterValue={this.props.attribute.filterValue} handleFilterValue={p => this.handleFilterValue(p)}/>
         )

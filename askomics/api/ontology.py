@@ -30,6 +30,13 @@ def autocomplete(short_ontology):
                 "results": []
             }), 404
 
+        if ontology['type'] == "none":
+            return jsonify({
+                "error": True,
+                "errorMessage": "Ontology {} does not have autocompletion".format(short_ontology),
+                "results": []
+            }), 404
+
         results = om.autocomplete(ontology["uri"], ontology["type"], request.args.get("q"), short_ontology, ontology["graph"])
 
     except Exception as e:

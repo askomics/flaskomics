@@ -1,7 +1,7 @@
 import requests
 
 from collections import defaultdict
-from urllib.parse import quote
+from urllib.parse import quote_plus
 
 
 from askomics.libaskomics.Database import Database
@@ -202,7 +202,7 @@ class OntologyManager(Params):
                 database.execute_sql_query(dataset_query, (ontology['dataset_id'],))
 
     def test_ols_ontology(self, shortname):
-        base_url = "https://www.ebi.ac.uk/ols/api/ontologies/" + quote(shortname.lower())
+        base_url = "https://www.ebi.ac.uk/ols/api/ontologies/" + quote_plus(shortname.lower())
 
         r = requests.get(base_url)
         return r.status_code == 200
@@ -221,14 +221,11 @@ class OntologyManager(Params):
             query.set_graphs([onto_graph])
             return query.autocomplete_local_ontology(ontology_uri, query_term)
         elif ontology_type == "ols":
-            base_url = "https://www.ebi.ac.uk/ols/api/search"
+            base_url = "https://www.ebi.ac.uk/ols/api/suggest"
             arguments = {
                 "q": query_term,
-                "ontology": quote(onto_short_name.lower()),
-                "rows": 5,
-                "queryFields": "label",
-                "type": "class",
-                "fieldList": "label"
+                "ontology": quote_plus(onto_short_name.lower()),
+                "rows": 5
             }
 
             r = requests.get(base_url, params=arguments)
@@ -240,6 +237,6 @@ class OntologyManager(Params):
 
             res = r.json()
             if res['response']['docs']:
-                data = [term['label'] for term in res['response']['docs']]
+                data = [term['autosuggest'] for term in res['response']['docs']]
 
             return data
