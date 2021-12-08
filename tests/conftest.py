@@ -498,6 +498,13 @@ class Client(object):
             "size": file_size
         }
 
+    def publicize_dataset(self, dataset_id, public=True):
+        """Publicize a result"""
+
+        dataset_info = {"id": dataset_id}
+        result = Dataset(self.app, self.session, dataset_info)
+        result.toggle_public(public)
+
     def publicize_result(self, result_id, public=True):
         """Publicize a result"""
 

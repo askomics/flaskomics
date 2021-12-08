@@ -177,7 +177,7 @@ class OntologyManager(Params):
         ontos_to_delete = [ontology['id'] for ontology in ontology_ids]
 
         for onto in ontologies:
-            datasets[onto.dataset_id].add(onto.id)
+            datasets[onto['dataset_id']].add(onto['id'])
 
         for key, values in datasets.items():
             if values.issubset(ontos_to_delete):

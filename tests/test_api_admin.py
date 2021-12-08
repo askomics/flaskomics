@@ -637,6 +637,13 @@ class TestApiAdmin(AskomicsTestCase):
 
         response = client.client.post('/api/admin/addontology', json=data)
 
+        # Dataset is not public
+        assert response.status_code == 400
+        assert response.json['errorMessage'] == "Invalid dataset id"
+
+        self.publicize_dataset(1, True)
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+
         expected = {
             "error": False,
             "errorMessage": "",
