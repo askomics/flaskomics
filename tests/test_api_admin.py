@@ -628,12 +628,11 @@ class TestApiAdmin(AskomicsTestCase):
 
         data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology", "type": "local", "datasetId": 1}
 
-        client.upload_and_integrate()
-
         response = client.client.post('/api/admin/addontology', json=data)
         assert response.status_code == 401
 
         client.log_user("jdoe")
+        client.upload_and_integrate(set_graph=True)
 
         response = client.client.post('/api/admin/addontology', json=data)
 
@@ -641,8 +640,8 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.status_code == 400
         assert response.json['errorMessage'] == "Invalid dataset id"
 
-        self.publicize_dataset(1, True)
-        response = client.client.post('/api/admin/delete_ontologies', json=data)
+        client.publicize_dataset(1, True)
+        response = client.client.post('/api/admin/addontology', json=data)
 
         expected = {
             "error": False,
@@ -653,13 +652,16 @@ class TestApiAdmin(AskomicsTestCase):
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
                 "short_name": "OBO",
                 "type": "local",
-                "dataset_id": 1,
-                "graph": "mygraph"
+                "dataset_id": 1
             }]
         }
 
+        # Graph name is random
+        res = response.json
+        res['ontologies'][0].pop('graph')
+
         assert response.status_code == 200
-        assert response.json == expected
+        assert res == expected
 
     def test_delete_ontologies(self, client):
         """test /api/admin/delete_ontologies route"""

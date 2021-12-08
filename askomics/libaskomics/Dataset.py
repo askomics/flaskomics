@@ -74,9 +74,31 @@ class Dataset(Params):
         self.start = rows[0][5]
         self.end = rows[0][6]
 
-    def save_in_db(self):
+    def save_in_db(self, set_graph=False):
         """Save the dataset into the database"""
         database = Database(self.app, self.session)
+
+        subquery = "NULL"
+        args = (
+            self.session["user"]["id"],
+            self.celery_id,
+            self.file_id,
+            self.name,
+            self.public,
+            0
+        )
+
+        if set_graph:
+            subquery = "?"
+            args = (
+              self.session["user"]["id"],
+              self.celery_id,
+              self.file_id,
+              self.name,
+              self.graph_name,
+              self.public,
+              0
+          )
 
         query = '''
         INSERT INTO datasets VALUES(
@@ -85,7 +107,7 @@ class Dataset(Params):
             ?,
             ?,
             ?,
-            NULL,
+            {},
             ?,
             "queued",
             strftime('%s', 'now'),
@@ -96,16 +118,9 @@ class Dataset(Params):
             NULL,
             0
         )
-        '''
+        '''.format(subquery)
 
-        self.id = database.execute_sql_query(query, (
-            self.session["user"]["id"],
-            self.celery_id,
-            self.file_id,
-            self.name,
-            self.public,
-            0
-        ), get_id=True)
+        self.id = database.execute_sql_query(query, args, get_id=True)
 
     def toggle_public(self, new_status, admin=False):
         """Change public status of a dataset (triplestore and db)

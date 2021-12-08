@@ -729,7 +729,7 @@ def add_ontology():
             'errorMessage': "Dataset {} not found".format(dataset_id)
         }), 400
 
-    if not len(datasets_handler.datasets) == 1 or not datasets_handler.datasets[0]['public']:
+    if not len(datasets_handler.datasets) == 1 or not datasets_handler.datasets[0].public:
         return jsonify({
             'ontologies': [],
             'error': True,
@@ -746,7 +746,7 @@ def add_ontology():
         }), 400
 
     try:
-        om.add_ontology(name, uri, short_name, dataset['id'], dataset['graph_name'], type)
+        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, type)
         ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
