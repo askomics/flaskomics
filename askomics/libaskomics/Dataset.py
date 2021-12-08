@@ -91,14 +91,14 @@ class Dataset(Params):
         if set_graph:
             subquery = "?"
             args = (
-              self.session["user"]["id"],
-              self.celery_id,
-              self.file_id,
-              self.name,
-              self.graph_name,
-              self.public,
-              0
-          )
+                self.session["user"]["id"],
+                self.celery_id,
+                self.file_id,
+                self.name,
+                self.graph_name,
+                self.public,
+                0
+            )
 
         query = '''
         INSERT INTO datasets VALUES(
