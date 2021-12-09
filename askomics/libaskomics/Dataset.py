@@ -45,6 +45,7 @@ class Dataset(Params):
         self.public = dataset_info["public"] if "public" in dataset_info else False
         self.start = dataset_info["start"] if "start" in dataset_info else None
         self.end = dataset_info["end"] if "end" in dataset_info else None
+        self.ontology = dataset_info["ontology"] if "ontology" in dataset_info else False
 
     def set_info_from_db(self, admin=False):
         """Set the info in from the database"""
@@ -58,7 +59,7 @@ class Dataset(Params):
             where_query = "AND user_id = ?"
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public, start, end
+        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology
         FROM datasets
         WHERE id = ?
         {}
@@ -73,6 +74,7 @@ class Dataset(Params):
         self.public = rows[0][4]
         self.start = rows[0][5]
         self.end = rows[0][6]
+        self.ontology = rows[0][7]
 
     def save_in_db(self, set_graph=False):
         """Save the dataset into the database"""

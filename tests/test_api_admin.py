@@ -139,7 +139,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -152,7 +153,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["de"]["end"] - info["de"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -165,7 +167,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["gff"]["end"],
                 'error_message': '',
@@ -178,7 +181,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["gff"]["end"] - info["gff"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["bed"]["end"],
                 'error_message': '',
@@ -191,7 +195,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["bed"]["end"] - info["bed"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }],
             'error': False,
             'errorMessage': ''

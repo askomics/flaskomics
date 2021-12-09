@@ -258,6 +258,12 @@ def toogle_public_dataset():
         datasets_handler.handle_datasets(admin=True)
 
         for dataset in datasets_handler.datasets:
+            if (not data.get("newStatus", False) and dataset.ontology):
+                return jsonify({
+                    'datasets': [],
+                    'error': True,
+                    'errorMessage': "Cannot unpublicize a dataset linked to an ontology"
+                }), 400
             current_app.logger.debug(data["newStatus"])
             dataset.toggle_public(data["newStatus"], admin=True)
 
