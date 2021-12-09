@@ -16,6 +16,8 @@ export default class Autocomplete extends Component {
     this.autocompleteOntology = this.autocompleteOntology.bind(this)
     this.cancelRequest
     this.handleOntoValue = this.handleOntoValue.bind(this)
+    this.WAIT_INTERVAL = 500
+    this.timerID
   }
 
   getAutoComplete () {
@@ -54,7 +56,10 @@ export default class Autocomplete extends Component {
 
   handleOntoValue (event) {
     this.handleFilterValue(event)
-    this.autocompleteOntology(event.target.value)
+    clearTimeout(this.timerID)
+    this.timerID = setTimeout(() => {
+        this.autocompleteOntology(event.target.value)
+    }, this.WAIT_INTERVAL)
   }
 
   renderAutocomplete () {
