@@ -217,12 +217,15 @@ export default class Query extends Component {
   isRemoteOnto (currentUri, targetUri) {
 
     let node = this.state.abstraction.entities.find(entity => {
-      return entity.uri == currentUri
+      return entity.uri == targetUri
     })
 
     if (! node){
       return false
     }
+
+    console.log(node)
+    console.log(node.ontology ? currentUri == targetUri ? "endNode" : "node" : false)
 
     return node.ontology ? currentUri == targetUri ? "endNode" : "node" : false
   }
@@ -546,12 +549,12 @@ export default class Query extends Component {
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: isOnto ? "ontoLink" : "link",
+              type: isOnto == "endNode" ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: isOnto ? this.getOntoLabel(relation.uri) : relation.label,
+              label: isOnto == "endNode" ? this.getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
