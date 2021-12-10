@@ -96,16 +96,6 @@ export default class Ontologies extends Component {
     }
   }
 
-  getDatasetName (datasetId) {
-    return this.state.datasets.map(dataset => {
-      if (dataset.id == datasetId) {
-        return dataset.name
-      } else {
-        return null
-      }
-    }).reduce(name=> name)
-  }
-
   handleAddOntology(event) {
 
     let requestUrl = "/api/admin/addontology"
@@ -221,9 +211,8 @@ export default class Ontologies extends Component {
       sort: true
     }, {
       editable: false,
-      dataField: 'dataset_id',
+      dataField: 'dataset_name',
       text: 'Dataset',
-      formatter: (cell, row) => { return this.getDatasetName(cell)},
       sort: true
     }, {
       editable: false,

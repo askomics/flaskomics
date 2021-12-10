@@ -619,6 +619,7 @@ class TestApiAdmin(AskomicsTestCase):
                 "short_name": "OBO",
                 "type": "local",
                 "dataset_id": 1,
+                "dataset_name": "transcripts.tsv",
                 "graph": "mygraph"
             }]
         }
@@ -657,7 +658,8 @@ class TestApiAdmin(AskomicsTestCase):
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
                 "short_name": "OBO",
                 "type": "local",
-                "dataset_id": 1
+                "dataset_id": 1,
+                "dataset_name": "transcripts.tsv"
             }]
         }
 

@@ -77,8 +77,9 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, short_name, type, dataset_id, graph
+        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, datasets.id, datasets.name, ontologies.graph
         FROM ontologies
+        INNER JOIN datasets ON datasets.id=ontologies.dataset_id
         '''
 
         rows = database.execute_sql_query(query)
@@ -92,7 +93,8 @@ class OntologyManager(Params):
                 'short_name': row[3],
                 'type': row[4],
                 'dataset_id': row[5],
-                'graph': row[6]
+                'dataset_name': row[6],
+                'graph': row[7]
             }
             ontologies.append(prefix)
 
