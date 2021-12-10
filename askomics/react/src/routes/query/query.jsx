@@ -214,19 +214,30 @@ export default class Query extends Component {
     })
   }
 
-  isOntoRelation (currentUri, targetUri) {
-    if (! currentUri == targetUri){
+  isRemoteOnto (currentUri, targetUri) {
+
+    let node = this.state.abstraction.entities.find(entity => {
+      return entity.uri == currentUri
+    })
+
+    if (! node){
       return false
     }
-    return this.state.abstraction.entities.some(entity => {
-      return (entity.uri == currentUri && entity.ontology)
+
+    return node.ontology ? currentUri == targetUri ? "endNode" : "node" : false
+  }
+
+  isOntoNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology)
     })
   }
 
   isOntoEndNode (currentId) {
 
     return this.graphState.nodes.some(node => {
-      return (node.id == currentId && node.ontology)
+      return (node.id == currentId && node.ontology == "endNode")
     })
   }
 
@@ -505,7 +516,7 @@ export default class Query extends Component {
     }
 
     this.state.abstraction.relations.map(relation => {
-      let isOnto = this.isOntoRelation(relation.source, relation.target)
+      let isOnto = this.isRemoteOnto(relation.source, relation.target)
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -1527,7 +1538,7 @@ export default class Query extends Component {
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
       if (this.currentSelected) {
-        isOnto = this.isOntoEndNode(this.currentSelected.id)
+        isOnto = this.isOntoNode(this.currentSelected.id)
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
