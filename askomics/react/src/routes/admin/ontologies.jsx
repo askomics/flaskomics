@@ -109,10 +109,9 @@ export default class Ontologies extends Component {
 
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
-      console.log(requestUrl, response.data)
       this.setState({
         newontologyError: response.data.error,
-        newontologyErrorMessage: response.data.errorMessage,
+        newontologyErrorMessage: [response.data.errorMessage],
         ontologies: response.data.ontologies,
         newontologyStatus: response.status,
         name: "",
@@ -125,7 +124,7 @@ export default class Ontologies extends Component {
       console.log(error, error.response.data.errorMessage)
       this.setState({
         newontologyError: true,
-        newontologyErrorMessage: error.response.data.errorMessage,
+        newontologyErrorMessage: [error.response.data.errorMessage],
         newontologyStatus: error.response.status,
       })
     })
@@ -295,8 +294,8 @@ export default class Ontologies extends Component {
           </Row>
           <Button disabled={!this.validateOntologyForm()}>Create</Button>
         </Form>
-        <ErrorDiv status={this.state.newontologystatus} error={this.state.newontologyerror} errorMessage={this.state.newontologyerrorMessage} />
         <br />
+        <ErrorDiv status={this.state.newontologyStatus} error={this.state.newontologyError} errorMessage={this.state.newontologyErrorMessage} />
         </div>
         <hr />
         <div className="asko-table-height-div">
