@@ -561,7 +561,7 @@
     "entities": [
       {
         "endpoints": [
-          "http://localhost:8891/sparql"
+          "http://localhost:8891/sparql-auth"
         ],
         "faldo": true,
         "graphs": [
@@ -575,7 +575,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql"
+          "http://localhost:8891/sparql-auth"
         ],
         "faldo": true,
         "graphs": [
@@ -589,7 +589,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql"
+          "http://localhost:8891/sparql-auth"
         ],
         "faldo": true,
         "graphs": [
@@ -602,7 +602,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql"
+          "http://localhost:8891/sparql-auth"
         ],
         "faldo": false,
         "graphs": [
