@@ -30,6 +30,7 @@ This changelog was started for release 4.2.0.
 - Changed abstraction building method for relations. (Please refer to #248 and #268)
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
+- Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
 
 ### Removed
 
