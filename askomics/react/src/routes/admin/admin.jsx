@@ -43,7 +43,7 @@ export default class Admin extends Component {
       instanceUrl: "",
       usersSelected: [],
       filesSelected: [],
-      datasetsSelected: []
+      datasetsSelected: [],
     }
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
@@ -404,6 +404,7 @@ export default class Admin extends Component {
         <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesLoading={this.state.queriesLoading} />
         <br />
         <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
+
       </div>
     )
   }

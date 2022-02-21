@@ -1,3 +1,4 @@
+from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 
 import rdflib
@@ -79,4 +80,81 @@ class PrefixManager(Params):
         try:
             return prefix_cc[prefix]
         except Exception:
+            prefixes = self.get_custom_prefixes(prefix)
+            if prefixes:
+                return prefixes[0]["namespace"]
             return ""
+
+    def get_custom_prefixes(self, prefix=None):
+        """Get custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query_args = ()
+        subquery = ""
+
+        if prefix:
+            query_args = (prefix, )
+            subquery = "WHERE prefix = ?"
+
+        query = '''
+        SELECT id, prefix, namespace
+        FROM prefixes
+        {}
+        '''.format(subquery)
+
+        rows = database.execute_sql_query(query, query_args)
+
+        prefixes = []
+        for row in rows:
+            prefix = {
+                'id': row[0],
+                'prefix': row[1],
+                'namespace': row[2],
+            }
+            prefixes.append(prefix)
+
+        return prefixes
+
+    def add_custom_prefix(self, prefix, namespace):
+        """Create a new custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        INSERT INTO prefixes VALUES(
+            NULL,
+            ?,
+            ?
+        )
+        '''
+
+        database.execute_sql_query(query, (prefix, namespace,))
+
+    def remove_custom_prefixes(self, prefixes_id):
+        """Create a new custom (admin-defined) prefixes
+
+        Returns
+        -------
+        list of dict
+            Prefixes information
+        """
+        database = Database(self.app, self.session)
+
+        query = '''
+        DELETE FROM prefixes
+        WHERE id = ?
+        '''
+
+        for prefix_id in prefixes_id:
+            database.execute_sql_query(query, (prefix_id,))

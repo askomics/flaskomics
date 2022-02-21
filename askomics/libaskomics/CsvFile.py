@@ -8,6 +8,7 @@ from dateutil import parser
 from rdflib import BNode
 
 from askomics.libaskomics.File import File
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.Utils import cached_property
 
 
@@ -396,6 +397,10 @@ class CsvFile(File):
         if self.columns_type[0] == 'start_entity':
             self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal['startPoint']))
 
+        available_ontologies = {}
+        for ontology in OntologyManager(self.app, self.session).list_ontologies():
+            available_ontologies[ontology['short_name']] = ontology['uri']
+
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
 
@@ -433,6 +438,28 @@ class CsvFile(File):
                 if symetric_relation:
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+
+                continue
+
+            # Manage ontologies
+            if self.columns_type[index] in available_ontologies:
+
+                attribute = self.rdfize(attribute_name)
+                label = rdflib.Literal(attribute_name)
+                rdf_range = self.rdfize(available_ontologies[self.columns_type[index]])
+                rdf_type = rdflib.OWL.ObjectProperty
+
+                # New way of storing relations (starting from 4.4.0)
+                blank = BNode()
+                endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdflib.OWL.ObjectProperty))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, label))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, entity))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, rdf_range))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.endpointURL, endpoint))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
 
                 continue
 
@@ -492,6 +519,10 @@ class CsvFile(File):
             Rdf content
         """
         total_lines = sum(1 for line in open(self.path))
+
+        available_ontologies = {}
+        for ontology in OntologyManager(self.app, self.session).list_ontologies():
+            available_ontologies[ontology['short_name']] = ontology['uri']
 
         with open(self.path, 'r', encoding='utf-8') as file:
             reader = csv.reader(file, dialect=self.dialect)
@@ -568,6 +599,12 @@ class CsvFile(File):
                         symetric_relation = True if current_type == 'symetric_relation' else False
                         splitted = current_header.split('@')
                         relation = self.rdfize(splitted[0])
+                        attribute = self.rdfize(cell)
+
+                    # Ontology
+                    elif current_type in available_ontologies:
+                        symetric_relation = False
+                        relation = self.rdfize(current_header)
                         attribute = self.rdfize(cell)
 
                     # Category

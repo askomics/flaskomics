@@ -328,7 +328,7 @@ class TriplestoreExplorer(Params):
             GRAPH ?graph {{
                 ?graph prov:atLocation ?endpoint .
                 ?entity_uri a ?entity_type .
-                VALUES ?entity_type {{ askomics:entity askomics:bnode }} .
+                VALUES ?entity_type {{ askomics:entity askomics:bnode askomics:ontology}} .
                 # Faldo
                 OPTIONAL {{
                     ?entity_uri a ?entity_faldo .
@@ -362,6 +362,7 @@ class TriplestoreExplorer(Params):
                     "label": label,
                     "instancesHaveLabels": True if "have_no_label" not in result else False if result["have_no_label"] == "1" else True,
                     "faldo": True if "entity_faldo" in result else False,
+                    "ontology": True if result["entity_type"] == "{}ontology".format(self.settings.get("triplestore", "namespace_internal")) else False,
                     "endpoints": [result["endpoint"]],
                     "graphs": [result["graph"]],
                 }

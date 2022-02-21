@@ -14,6 +14,8 @@ from askomics.libaskomics.Dataset import Dataset
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.LocalAuth import LocalAuth
+from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Start import Start
 from askomics.libaskomics.Result import Result
@@ -291,7 +293,7 @@ class Client(object):
         files.download_url(file_url, "1")
         return files.date
 
-    def integrate_file(self, info, public=False):
+    def integrate_file(self, info, public=False, set_graph=False):
         """Summary
 
         Parameters
@@ -318,7 +320,7 @@ class Client(object):
             }
 
             dataset = Dataset(self.app, self.session, dataset_info)
-            dataset.save_in_db()
+            dataset.save_in_db(set_graph=set_graph)
 
             if file.type == "csv/tsv":
                 file.integrate(dataset.id, info["columns_type"], public=public)
@@ -369,7 +371,7 @@ class Client(object):
             }
         }
 
-    def upload_and_integrate(self):
+    def upload_and_integrate(self, set_graph=False):
         """Summary
 
         Returns
@@ -388,27 +390,27 @@ class Client(object):
         int_transcripts = self.integrate_file({
             "id": 1,
             "columns_type": ["start_entity", "label", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
-        })
+        }, set_graph=set_graph)
 
         int_de = self.integrate_file({
             "id": 2,
             "columns_type": ["start_entity", "directed", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"]
-        })
+        }, set_graph=set_graph)
 
         int_qtl = self.integrate_file({
             "id": 3,
             "columns_type": ["start_entity", "ref", "start", "end"]
-        })
+        }, set_graph=set_graph)
 
         int_gff = self.integrate_file({
             "id": 4,
             "entities": ["gene", "transcript"]
-        })
+        }, set_graph=set_graph)
 
         int_bed = self.integrate_file({
             "id": 5,
             "entity_name": "gene"
-        })
+        }, set_graph=set_graph)
 
         return {
             "transcripts": {
@@ -496,6 +498,13 @@ class Client(object):
             "size": file_size
         }
 
+    def publicize_dataset(self, dataset_id, public=True):
+        """Publicize a result"""
+
+        dataset_info = {"id": dataset_id}
+        result = Dataset(self.app, self.session, dataset_info)
+        result.toggle_public(public)
+
     def publicize_result(self, result_id, public=True):
         """Publicize a result"""
 
@@ -573,6 +582,17 @@ class Client(object):
         """Delete the galaxy history"""
         galaxy = GalaxyInstance(self.gurl, self.gkey)
         galaxy.histories.delete_history(self.galaxy_history["id"], purge=True)
+
+    def create_prefix(self):
+        """Create custom prefix"""
+        pm = PrefixManager(self.app, self.session)
+        pm.add_custom_prefix("OBO", "http://purl.obolibrary.org/obo/")
+
+    def create_ontology(self):
+        """Create ontology"""
+        self.upload_and_integrate()
+        om = OntologyManager(self.app, self.session)
+        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO", 1, "mygraph", "local")
 
     @staticmethod
     def get_random_string(number):

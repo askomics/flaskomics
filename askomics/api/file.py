@@ -237,6 +237,7 @@ def get_preview():
         }), 400
 
     try:
+
         files_handler = FilesHandler(current_app, session)
         files_handler.handle_files(data['filesId'])
 

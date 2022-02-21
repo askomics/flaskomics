@@ -9,6 +9,7 @@ import ReactTooltip from "react-tooltip";
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
+import OntoLinkView from './ontolinkview'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
@@ -42,6 +43,7 @@ export default class Query extends Component {
       // Preview icons
       disablePreview: false,
       previewIcon: "table",
+      ontologies: this.props.location.state.config.ontologies
     }
 
     this.graphState = {
@@ -209,6 +211,36 @@ export default class Query extends Component {
   isFaldoEntity (entityUri) {
     return this.state.abstraction.entities.some(entity => {
       return (entity.uri == entityUri && entity.faldo)
+    })
+  }
+
+  isRemoteOnto (currentUri, targetUri) {
+
+    let node = this.state.abstraction.entities.find(entity => {
+      return entity.uri == targetUri
+    })
+
+    if (! node){
+      return false
+    }
+
+    console.log(node)
+    console.log(node.ontology ? currentUri == targetUri ? "endNode" : "node" : false)
+
+    return node.ontology ? currentUri == targetUri ? "endNode" : "node" : false
+  }
+
+  isOntoNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology)
+    })
+  }
+
+  isOntoEndNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology == "endNode")
     })
   }
 
@@ -482,7 +514,12 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
+    if (this.isOntoEndNode(node.id)){
+        return
+    }
+
     this.state.abstraction.relations.map(relation => {
+      let isOnto = this.isRemoteOnto(relation.source, relation.target)
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -506,29 +543,30 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
-              suggested: true
+              suggested: true,
+              ontology: isOnto
             })
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: "link",
+              type: isOnto == "endNode" ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: relation.label,
+              label: isOnto == "endNode" ? this.getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
               suggested: true,
-              directed: true
+              directed: isOnto ? false : true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
 
-      if (relation.target == node.uri) {
+      if (relation.target == node.uri && ! isOnto) {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
@@ -565,7 +603,7 @@ export default class Query extends Component {
               target: node.id,
               selected: false,
               suggested: true,
-              directed: true
+              directed: true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -593,7 +631,7 @@ export default class Query extends Component {
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
-            suggested: true
+            suggested: true,
           })
           // push suggested link
           this.graphState.links.push({
@@ -608,7 +646,7 @@ export default class Query extends Component {
             target: new_id,
             selected: false,
             suggested: true,
-            directed: true
+            directed: true,
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -634,7 +672,9 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -644,14 +684,16 @@ export default class Query extends Component {
           target: node2.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: link.directed,
         }
       }
 
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -661,7 +703,7 @@ export default class Query extends Component {
           target: node1.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: link.direct,
         }
       }
     })
@@ -728,7 +770,7 @@ export default class Query extends Component {
 
   handleLinkSelection (clickedLink) {
     // Only position link are clickabl
-    if (clickedLink.type == "posLink") {
+    if (clickedLink.type == "posLink" || clickedLink.type == "ontoLink") {
       // case 1: link is selected, so deselect it
       if (clickedLink.selected) {
         // Update current and previous
@@ -1289,6 +1331,27 @@ export default class Query extends Component {
     return result
   }
 
+  // Ontology link methods -----------------------------
+
+  handleChangeOntologyType (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.uri = event.target.value
+        link.label = this.getOntoLabel(event.target.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
+  getOntoLabel (uri) {
+      let labels = {}
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
+      return labels[uri]
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -1458,6 +1521,7 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let isOnto
     let linkView
     let previewButton
     let faldoButton
@@ -1477,6 +1541,7 @@ export default class Query extends Component {
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
       if (this.currentSelected) {
+        isOnto = this.isOntoNode(this.currentSelected.id)
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
@@ -1500,6 +1565,8 @@ export default class Query extends Component {
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
                 config={this.state.config}
+                isOnto={isOnto}
+                entityUri={this.currentSelected.uri}
               />
             )
           }
@@ -1526,6 +1593,24 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+          />
+        }
+
+        if (this.currentSelected.type == "ontoLink") {
+
+          let link = Object.assign(this.currentSelected)
+          this.state.graphState.nodes.map(node => {
+            if (node.id == this.currentSelected.target) {
+              link.target = node
+            }
+            if (node.id == this.currentSelected.source) {
+              link.source = node
+            }
+          })
+
+          linkView = <OntoLinkView
+            link={link}
+            handleChangeOntologyType={p => this.handleChangeOntologyType(p)}
           />
         }
       }

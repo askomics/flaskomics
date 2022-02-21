@@ -420,7 +420,8 @@ class SparqlQuery(Params):
           ?graph dc:creator ?creator .
           GRAPH ?graph_abstraction {{
             ?graph_abstraction prov:atLocation ?endpoint .
-            ?entity_uri a askomics:entity .
+            ?entity_uri a ?askomics_type .
+            VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           }}
           GRAPH ?graph {{
             [] a ?entity_uri .
@@ -519,6 +520,50 @@ class SparqlQuery(Params):
                 'predicate': row['faldo_uri'] if row.get('faldo_uri') else row['predicate'],
                 'object': row['faldo_value'] if row.get('faldo_value') else row['object'],
             })
+
+        return formated_data
+
+    def autocomplete_local_ontology(self, uri, query):
+        """Get results for a specific query
+
+        Parameters
+        ----------
+        uri : string
+            ontology uri
+        query : string
+            query to search
+
+        Returns
+        -------
+        dict
+            The corresponding parameters
+        """
+
+        subquery = ""
+
+        if query:
+            subquery = 'FILTER(contains(?label, "{}"))'.format(query)
+        raw_query = '''
+        SELECT DISTINCT ?label
+        WHERE {{
+          ?uri rdf:type <{}> .
+          ?uri rdfs:label ?label .
+          {}
+        }}
+
+        LIMIT 5
+        '''.format(uri, subquery)
+
+        raw_query = self.prefix_query(raw_query)
+
+        sparql = self.format_query(raw_query, limit=5, replace_froms=True, federated=False)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False)
+        _, data = query_launcher.process_query(sparql)
+
+        formated_data = []
+        for row in data:
+            formated_data.append(row['label'])
 
         return formated_data
 
@@ -1087,7 +1132,20 @@ class SparqlQuery(Params):
 
                 # Classic relation
                 else:
-                    relation = "<{}>".format(link["uri"])
+                    # Manage ontology stuff
+                    inverse = ""
+                    recurrence = ""
+                    relation = link["uri"]
+
+                    if relation.startswith("^"):
+                        inverse = "^"
+                        relation = relation.lstrip("^")
+
+                    if relation.endswith("*"):
+                        recurrence = "*"
+                        relation = relation.rstrip("*")
+
+                    relation = inverse + "<{}>".format(relation) + recurrence
                     triple = {
                         "subject": source,
                         "predicate": relation,
@@ -1109,7 +1167,6 @@ class SparqlQuery(Params):
 
         # Browse attributes
         for attribute in self.json["attr"]:
-
             # Get blockid and sblockid of the attribute node
             block_id, sblock_id, pblock_ids = self.get_block_ids(attribute["nodeId"])
 
