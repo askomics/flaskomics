@@ -445,59 +445,60 @@ class TriplestoreExplorer(Params):
         for result in data:
             # Attributes
             # Retrocompatibility
-            attribute_uri = result.get("attribute_uri", result.get("node"))
-            if attribute_uri and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
-                attr_tpl = (attribute_uri, result["entity_uri"])
-                if attr_tpl not in attributes_list:
-                    attributes_list.append(attr_tpl)
-                    attribute = {
-                        "uri": attribute_uri,
-                        "label": result["attribute_label"],
-                        "graphs": [result["graph"], ],
-                        "entityUri": result["entity_uri"],
-                        "type": result["attribute_range"],
-                        "faldo": result["attribute_faldo"] if "attribute_faldo" in result else None,
-                        "categories": []
-                    }
-                    attributes.append(attribute)
-                else:
-                    # if graph is different, store it
+            if 'node' in result:
+                attribute_uri = result.get("attribute_uri", result.get("node"))
+                if attribute_uri and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
+                    attr_tpl = (attribute_uri, result["entity_uri"])
+                    if attr_tpl not in attributes_list:
+                        attributes_list.append(attr_tpl)
+                        attribute = {
+                            "uri": attribute_uri,
+                            "label": result["attribute_label"],
+                            "graphs": [result["graph"], ],
+                            "entityUri": result["entity_uri"],
+                            "type": result["attribute_range"],
+                            "faldo": result["attribute_faldo"] if "attribute_faldo" in result else None,
+                            "categories": []
+                        }
+                        attributes.append(attribute)
+                    else:
+                        # if graph is different, store it
+                        index_attribute = attributes_list.index(attr_tpl)
+                        if result["graph"] not in attributes[index_attribute]["graphs"]:
+                            attributes[index_attribute]["graphs"].append(result["graph"])
+
                     index_attribute = attributes_list.index(attr_tpl)
-                    if result["graph"] not in attributes[index_attribute]["graphs"]:
-                        attributes[index_attribute]["graphs"].append(result["graph"])
 
-                index_attribute = attributes_list.index(attr_tpl)
-
-            # Categories
-            if attribute_uri and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
-                attr_tpl = (attribute_uri, result["entity_uri"])
-                if attr_tpl not in attributes_list:
-                    attributes_list.append(attr_tpl)
-                    attribute = {
-                        "uri": attribute_uri,
-                        "label": result["attribute_label"],
-                        "graphs": [result["graph"], ],
-                        "entityUri": result["entity_uri"],
-                        "type": result["attribute_type"],
-                        "faldo": result["attribute_faldo"] if "attribute_faldo" in result else None,
-                        "categories": [{
+                # Categories
+                if attribute_uri and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
+                    attr_tpl = (attribute_uri, result["entity_uri"])
+                    if attr_tpl not in attributes_list:
+                        attributes_list.append(attr_tpl)
+                        attribute = {
+                            "uri": attribute_uri,
+                            "label": result["attribute_label"],
+                            "graphs": [result["graph"], ],
+                            "entityUri": result["entity_uri"],
+                            "type": result["attribute_type"],
+                            "faldo": result["attribute_faldo"] if "attribute_faldo" in result else None,
+                            "categories": [{
+                                "uri": result["category_value_uri"],
+                                "label": result["category_value_label"]
+                            }]
+                        }
+                        attributes.append(attribute)
+                    else:
+                        # if graph diff, store it
+                        index_attribute = attributes_list.index(attr_tpl)
+                        if result["graph"] not in attributes[index_attribute]["graphs"]:
+                            attributes[index_attribute]["graphs"].append(result["graph"])
+                        # Store value if new
+                        value = {
                             "uri": result["category_value_uri"],
                             "label": result["category_value_label"]
-                        }]
-                    }
-                    attributes.append(attribute)
-                else:
-                    # if graph diff, store it
-                    index_attribute = attributes_list.index(attr_tpl)
-                    if result["graph"] not in attributes[index_attribute]["graphs"]:
-                        attributes[index_attribute]["graphs"].append(result["graph"])
-                    # Store value if new
-                    value = {
-                        "uri": result["category_value_uri"],
-                        "label": result["category_value_label"]
-                    }
-                    if value not in attributes[index_attribute]["categories"]:
-                        attributes[index_attribute]["categories"].append(value)
+                        }
+                        if value not in attributes[index_attribute]["categories"]:
+                            attributes[index_attribute]["categories"].append(value)
 
         return attributes
 
