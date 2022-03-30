@@ -108,6 +108,8 @@ class GffFile(File):
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
+        attribute_blanks = {}
+
         for attribute in self.attribute_abstraction:
             blank = BNode()
             # New way of storing relations (starting from 4.4.0)
@@ -131,6 +133,7 @@ class GffFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
 
+            attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -145,7 +148,7 @@ class GffFile(File):
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    blank = BNode()
+                    blank = attribute_blanks[value]
                     self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
                     self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 

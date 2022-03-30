@@ -396,6 +396,8 @@ class CsvFile(File):
         if self.columns_type[0] == 'start_entity':
             self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal['startPoint']))
 
+        attribute_blanks = {}
+
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
 
@@ -473,6 +475,8 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
 
+            attribute_blanks[attribute] = blank
+
             # New way of storing attributes (starting from 4.4.0)
             self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdf_type))
             self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute))
@@ -484,7 +488,7 @@ class CsvFile(File):
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    blank = BNode()
+                    blank = attribute_blanks[value]
                     self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
                     self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 
