@@ -409,6 +409,7 @@ class CsvFile(File):
             if self.columns_type[index] == "label" and index == 1:
                 continue
 
+            blank = BNode()
             # Relation
             if self.columns_type[index] in ('general_relation', 'symetric_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
@@ -420,7 +421,7 @@ class CsvFile(File):
                 rdf_type = rdflib.OWL.ObjectProperty
 
                 # New way of storing relations (starting from 4.4.0)
-                blank = BNode()
+
                 endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdflib.OWL.ObjectProperty))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
@@ -472,10 +473,12 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
 
-            self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, rdf_type))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.label, label))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, entity))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, rdf_range))
+            # New way of storing attributes (starting from 4.4.0)
+            self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdf_type))
+            self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, label))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, entity))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, rdf_range))
 
         # Faldo:
         if self.faldo_entity:

@@ -95,11 +95,14 @@ class BedFile(File):
         self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(self.entity_name)))
 
         for attribute in self.attribute_abstraction:
+            blank = BNode()
+
             for attr_type in attribute["type"]:
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+            self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
 
             # Domain Knowledge
             if "values" in attribute.keys():

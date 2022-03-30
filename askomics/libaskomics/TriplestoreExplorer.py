@@ -401,19 +401,21 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?attribute_uri ?attribute_type ?attribute_faldo ?attribute_label ?attribute_range ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?attribute_uri ?attribute_type ?attribute_faldo ?attribute_label ?attribute_range ?category_value_uri ?category_value_label ?node
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
-                ?attribute_uri a ?attribute_type .
+                ?node a ?attribute_type .
                 VALUES ?attribute_type {{ owl:DatatypeProperty askomics:AskomicsCategory }}
-                ?attribute_uri rdfs:label ?attribute_label .
-                ?attribute_uri rdfs:range ?attribute_range .
+                ?node rdfs:label ?attribute_label .
+                ?node rdfs:range ?attribute_range .
+                # Retrocompatibility
+                OPTIONAL {{?node askomics:uri ?attribute_uri}}
                 # Faldo
                 OPTIONAL {{
-                    ?attribute_uri a ?attribute_faldo .
+                    ?node a ?attribute_faldo .
                     VALUES ?attribute_faldo {{ askomics:faldoStart askomics:faldoEnd askomics:faldoStrand askomics:faldoReference }}
                 }}
                 # Categories (DK)
@@ -424,10 +426,10 @@ class TriplestoreExplorer(Params):
             }}
             # Attribute of entity (or motherclass of entity)
             {{
-                ?attribute_uri rdfs:domain ?mother .
+                ?node rdfs:domain ?mother .
                 ?entity_uri rdfs:subClassOf ?mother .
             }} UNION {{
-                ?attribute_uri rdfs:domain ?entity_uri .
+                ?node rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
@@ -442,12 +444,14 @@ class TriplestoreExplorer(Params):
 
         for result in data:
             # Attributes
-            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
-                attr_tpl = (result["attribute_uri"], result["entity_uri"])
+            # Retrocompatibility
+            attribute_uri = result.get("attribute_uri", result.get("node"))
+            if attribute_uri and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
+                attr_tpl = (attribute_uri, result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
                     attribute = {
-                        "uri": result["attribute_uri"],
+                        "uri": attribute_uri,
                         "label": result["attribute_label"],
                         "graphs": [result["graph"], ],
                         "entityUri": result["entity_uri"],
@@ -465,12 +469,12 @@ class TriplestoreExplorer(Params):
                 index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
-            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
-                attr_tpl = (result["attribute_uri"], result["entity_uri"])
+            if attribute_uri and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
+                attr_tpl = (attribute_uri, result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
                     attribute = {
-                        "uri": result["attribute_uri"],
+                        "uri": attribute_uri,
                         "label": result["attribute_label"],
                         "graphs": [result["graph"], ],
                         "entityUri": result["entity_uri"],
@@ -513,7 +517,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
