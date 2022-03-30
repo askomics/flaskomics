@@ -1,5 +1,5 @@
 # Build AskOmics
-FROM quay.io/askomics/flaskomics-base:4.0.0-alpine3.14 AS askomics_builder
+FROM quay.io/askomics/flaskomics-base:4.0.0-alpine3.13 AS askomics_builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
@@ -14,7 +14,7 @@ FROM xgaia/corese:20.6.11 AS corese_builder
 FROM askomics/virtuoso:7.2.5.1 AS virtuoso_builder
 
 # Final image
-FROM alpine:3.14
+FROM alpine:3.13
 
 ENV MODE="prod" \
     NTASKS="5" \

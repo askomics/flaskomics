@@ -247,7 +247,7 @@ class FilesHandler(FilesUtils):
             filetype = 'csv/tsv'
         elif filetype in ('text/turtle', 'ttl'):
             filetype = 'rdf/ttl'
-        elif filetype == "text/xml":
+        elif filetype in ["text/xml", "application/rdf+xml"]:
             filetype = "rdf/xml"
         elif filetype == "application/n-triples":
             filetype = "rdf/nt"
