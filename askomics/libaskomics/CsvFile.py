@@ -445,7 +445,7 @@ class CsvFile(File):
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.namespace_data["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
-                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
