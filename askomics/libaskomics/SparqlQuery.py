@@ -497,9 +497,9 @@ class SparqlQuery(Params):
             ?faldo_uri rdf:type askomics:faldoStrand .
             }}
 
-            OPTIONAL {
+            OPTIONAL {{
               ?faldo_uri askomics:uri ?node_uri
-            }
+            }}
 
             VALUES ?predicate {{faldo:location}}
           }}
