@@ -464,7 +464,7 @@ class SparqlQuery(Params):
             The corresponding parameters
         """
         raw_query = '''
-        SELECT DISTINCT ?predicate ?object ?faldo_value ?faldo_uri ?node_uri
+        SELECT DISTINCT ?predicate ?object ?faldo_value ?faldo_relation
         WHERE {{
           ?URI ?predicate ?object .
           ?URI a ?entitytype .
@@ -504,6 +504,7 @@ class SparqlQuery(Params):
             VALUES ?predicate {{faldo:location}}
           }}
           VALUES ?URI {{{}}}
+          BIND(IF(isBlank(?faldo_uri), ?node_uri ,?faldo_uri) as ?faldo_relation)
         }}
         '''.format(uri)
 
@@ -523,11 +524,8 @@ class SparqlQuery(Params):
             predicate = row['predicate']
             object = row['object']
 
-            if row.get('faldo_uri'):
-                if row.get("node_uri"):
-                    predicate = row.get("node_uri")
-                else:
-                    predicate = row.get("faldo_uri")
+            if row.get('faldo_relation'):
+                predicate = row.get("faldo_relation")
 
             if row.get('faldo_value'):
                 object = row.get('faldo_value')
