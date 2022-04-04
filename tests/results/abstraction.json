@@ -28,18 +28,6 @@
       {
         "categories": [
           {
-            "label": "minus",
-            "uri": "http://askomics.org/test/data/minus"
-          },
-          {
-            "label": "plus",
-            "uri": "http://askomics.org/test/data/plus"
-          },
-          {
-            "label": "unknown/both",
-            "uri": "http://askomics.org/test/data/unknown/both"
-          },
-          {
             "label": "+",
             "uri": "http://askomics.org/test/data/%2B"
           },
@@ -55,7 +43,6 @@
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": "http://askomics.org/test/internal/faldoStrand",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
@@ -73,7 +60,7 @@
             "label": "plus",
             "uri": "http://askomics.org/test/data/plus"
           },
-	  {
+	        {
             "label": "unknown/both",
             "uri": "http://askomics.org/test/data/unknown/both"
           },
@@ -95,7 +82,6 @@
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
         "label": "strand",
         "type": "http://askomics.org/test/internal/AskomicsCategory",
@@ -137,7 +123,6 @@
         "faldo": "http://askomics.org/test/internal/faldoReference",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
         "label": "reference",
         "type": "http://askomics.org/test/internal/AskomicsCategory",
@@ -148,8 +133,6 @@
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": "http://askomics.org/test/internal/faldoStart",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
@@ -162,10 +145,7 @@
         "entityUri": "http://askomics.org/test/data/QTL",
         "faldo": "http://askomics.org/test/internal/faldoStart",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
         "label": "start",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
@@ -177,9 +157,7 @@
         "faldo": "http://askomics.org/test/internal/faldoStart",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "start",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
@@ -191,9 +169,7 @@
         "faldo": "http://askomics.org/test/internal/faldoEnd",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "end",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
@@ -204,8 +180,6 @@
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": "http://askomics.org/test/internal/faldoEnd",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
         ],
@@ -218,10 +192,7 @@
         "entityUri": "http://askomics.org/test/data/QTL",
         "faldo": "http://askomics.org/test/internal/faldoEnd",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.bed_###BED_TIMESTAMP###"
+          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
         ],
         "label": "end",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
@@ -284,7 +255,6 @@
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": null,
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "biotype",
@@ -297,7 +267,6 @@
         "faldo": null,
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "description",
         "type": "http://www.w3.org/2001/XMLSchema#string",
@@ -308,7 +277,6 @@
         "entityUri": "http://askomics.org/test/data/gene",
         "faldo": null,
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "description",
