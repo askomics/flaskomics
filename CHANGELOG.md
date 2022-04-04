@@ -29,6 +29,7 @@ This changelog was started for release 4.2.0.
 
 - Changed "Query builder" to "Form editor" in form editing interface
 - Changed abstraction building method for relations. (Please refer to #248 and #268)
+- Changed abstraction building method for attributes. (Please refer to #321 and #324)
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
 - Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
@@ -46,7 +47,7 @@ This changelog was started for release 4.2.0.
 - Bump path-parse from 1.0.6 to 1.0.7
 - Bump prismjs from 1.23.0 to 1.27.0
 - Bump simple-get from 2.8.1 to 2.8.2
-- Bump ssri from 6.0.1 to 6.0.2 
+- Bump ssri from 6.0.1 to 6.0.2
 - Bump follow-redirects from 1.14.4 to 1.14.8
 - Bump mkdocs from 1.0.4 to 1.2.3 in /docs
 - Bump python-ldap from 3.3.1 to 3.4.0
