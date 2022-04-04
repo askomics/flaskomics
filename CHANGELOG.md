@@ -24,6 +24,7 @@ This changelog was started for release 4.2.0.
 - Added 'Status' for files (for celery upload, and later for better file management)
 - Added tooltips to buttons in the query form (and other forms)
 - Added owl integration
+- Add better error management for RDF files
 
 ### Changed
 
@@ -33,6 +34,7 @@ This changelog was started for release 4.2.0.
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
 - Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
+- Reverted base docker image to alpine-13 to solve a docker issue
 
 ### Removed
 
