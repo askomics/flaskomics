@@ -81,7 +81,7 @@
         "faldo": "http://askomics.org/test/internal/faldoStrand",
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "strand",
         "type": "http://askomics.org/test/internal/AskomicsCategory",
@@ -113,16 +113,12 @@
           {
             "label": "1",
             "uri": "http://askomics.org/test/data/1"
-          },
-          {
-            "label": "7",
-            "uri": "http://askomics.org/test/data/7"
           }
         ],
         "entityUri": "http://askomics.org/test/data/transcript",
         "faldo": "http://askomics.org/test/internal/faldoReference",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
         "label": "reference",
         "type": "http://askomics.org/test/internal/AskomicsCategory",
@@ -145,7 +141,7 @@
         "entityUri": "http://askomics.org/test/data/QTL",
         "faldo": "http://askomics.org/test/internal/faldoStart",
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:qtl.tsv_###QTL_TIMESTAMP###"
         ],
         "label": "start",
         "type": "http://www.w3.org/2001/XMLSchema#decimal",
@@ -266,7 +262,7 @@
         "entityUri": "http://askomics.org/test/data/transcript",
         "faldo": null,
         "graphs": [
-          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###",
+          "urn:sparql:askomics_test:1_jdoe:transcripts.tsv_###TRANSCRIPTS_TIMESTAMP###"
         ],
         "label": "description",
         "type": "http://www.w3.org/2001/XMLSchema#string",
