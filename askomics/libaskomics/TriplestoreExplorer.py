@@ -131,7 +131,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQuery(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session, get_graphs=False)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity ?entity_label ?creator ?public
