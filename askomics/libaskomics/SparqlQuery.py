@@ -403,7 +403,7 @@ class SparqlQuery(Params):
         filter_entity_string = ''
         if entities:
             substr = ",".join(["<{}>".format(entity) for entity in entities])
-            filter_entity_string = 'FILTER (?entity_uri IN( '  + substr + ' ))'
+            filter_entity_string = 'FILTER (?entity_uri IN( ' + substr + ' ))'
 
         filter_public_string = 'FILTER (?public = <true>)'
         if 'user' in self.session:
