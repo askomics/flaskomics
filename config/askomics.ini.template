@@ -124,6 +124,9 @@ preview_limit = 25
 # Triplestore max rows limit
 # result_set_max_rows = 10000
 
+# Single tenant means all graphs are public
+single_tenant=False
+
 [federation]
 # Query engine can be corese or fedx
 #query_engine = corese
