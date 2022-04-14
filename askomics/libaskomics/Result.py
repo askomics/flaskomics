@@ -389,7 +389,7 @@ class Result(Params):
 
         return self.id
 
-    def populate_db(self, sparql_query, graphs, endpoints):
+    def populate_db(self, graphs, endpoints):
         """Update status of results in db
 
         Parameters
@@ -404,13 +404,11 @@ class Result(Params):
 
         query = '''
         UPDATE results SET
-        sparql_query=?
         graphs_and_endpoints=?
         WHERE user_id=? AND id=?
         '''
 
         variables = [
-            sparql_query,
             json.dumps({"graphs": graphs, "endpoints": endpoints}),
             self.session["user"]["id"],
             self.id
@@ -500,7 +498,7 @@ class Result(Params):
 
     def rollback(self):
         """Delete file"""
-        self.delete_file_from_filesystem(self)
+        self.delete_file_from_filesystem()
 
     def delete_result(self):
         """Remove results from db and filesystem"""
