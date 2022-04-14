@@ -318,7 +318,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQuery(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session, get_graphs=False)
 
         query = '''
         SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label
@@ -398,7 +398,7 @@ class TriplestoreExplorer(Params):
         )
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQuery(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session, get_graphs=False)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?attribute_uri ?attribute_type ?attribute_faldo ?attribute_label ?attribute_range ?category_value_uri ?category_value_label
@@ -510,7 +510,7 @@ class TriplestoreExplorer(Params):
             filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_builder = SparqlQuery(self.app, self.session)
+        query_builder = SparqlQuery(self.app, self.session, get_graphs=False)
 
         query = '''
         SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
