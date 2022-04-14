@@ -25,7 +25,7 @@ def get_data(uri):
     """
 
     try:
-        query = SparqlQuery(current_app, session, get_graphs=True))
+        query = SparqlQuery(current_app, session, get_graphs=True)
         graphs, endpoints = query.get_graphs_and_endpoints(all_selected=True)
 
         endpoints = [val['uri'] for val in endpoints.values()]
