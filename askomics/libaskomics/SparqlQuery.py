@@ -400,12 +400,10 @@ class SparqlQuery(Params):
         entities : list, optional
             list of entity uri
         """
-        substrlst = []
         filter_entity_string = ''
         if entities:
-            for entity in entities:
-                substrlst.append("?entity_uri = <{}>".format(entity))
-            filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
+            substr = ",".join(["<{}>".format(entity) for entity in entities])
+            filter_entity_string = 'FILTER (?entity_uri IN( ' + substr + ' ))'
 
         filter_public_string = 'FILTER (?public = <true>)'
         if 'user' in self.session:
