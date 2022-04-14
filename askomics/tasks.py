@@ -16,6 +16,7 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
+from askomics.libaskomics.Sparql import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -149,6 +150,17 @@ def query(self, session, info):
     try:
         info["celery_id"] = self.request.id
         result = Result(app, session, info, force_no_db=True)
+
+        query = SparqlQuery(app, session, info["graphState"])
+        query.build_query_from_json(preview=False, for_editor=False)
+        federated = query.is_federated()
+        result.populate_db(query.sparql, query.graphs, query.endpoints)
+
+        info["query"] = query.sparql
+        info["graphs"] = query.graphs
+        info["endpoints"] = query.endpoints
+        info["federated"] = federated
+        info["selects"] = query.selects
 
         # Save job in database database
         result.set_celery_id(self.request.id)

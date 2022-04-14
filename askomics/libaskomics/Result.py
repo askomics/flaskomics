@@ -389,6 +389,35 @@ class Result(Params):
 
         return self.id
 
+    def populate_db(self, sparql_query, graphs, endpoints):
+        """Update status of results in db
+
+        Parameters
+        ----------
+        query : bool, optional
+            True if error during integration
+        error_message : bool, optional
+            Error string if error is True
+        """
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        sparql_query=?
+        graphs_and_endpoints=?
+        WHERE user_id=? AND id=?
+        '''
+
+        variables = [
+            sparql_query,
+            json.dumps({"graphs": graphs, "endpoints": endpoints}),
+            self.session["user"]["id"],
+            self.id
+        ]
+
+        database.execute_sql_query(query, tuple(variables))
+
     def update_public_status(self, public):
         """Change public status
 
