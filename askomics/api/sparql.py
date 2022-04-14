@@ -32,7 +32,7 @@ def init():
         disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
 
         # Get graphs and endpoints
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=True)
         graphs, endpoints = query.get_graphs_and_endpoints(all_selected=True)
 
         # Default query
@@ -116,7 +116,7 @@ def query():
         }), 400
 
     try:
-        query = SparqlQuery(current_app, session, get_graphs=False)
+        query = SparqlQuery(current_app, session)
 
         query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
@@ -209,7 +209,7 @@ def save_query():
             }), 400
 
         # Is query federated?
-        query = SparqlQuery(current_app, session, get_graphs=False)
+        query = SparqlQuery(current_app, session)
         query.set_graphs_and_endpoints(graphs=graphs, endpoints=endpoints)
 
         federated = query.is_federated()

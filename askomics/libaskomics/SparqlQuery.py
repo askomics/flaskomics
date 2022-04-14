@@ -18,7 +18,7 @@ class SparqlQuery(Params):
         all public graph
     """
 
-    def __init__(self, app, session, json_query=None, get_graphs=True):
+    def __init__(self, app, session, json_query=None, get_graphs=False):
         """init
 
         Parameters
