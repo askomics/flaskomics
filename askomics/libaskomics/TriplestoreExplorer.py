@@ -127,16 +127,8 @@ class TriplestoreExplorer(Params):
             Startpoints
         """
         filter_user = ""
-        if not self.settings.get("askomics", "single_tenant", fallback=False):
-            substring = ""
-            filter_user = '''
-            FILTER (
-                ?public = <true>{}
-            )
-            '''
-            if self.logged_user():
-                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
-            filter_user.format(substring)
+        if self.logged_user():
+            filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
@@ -152,7 +144,9 @@ class TriplestoreExplorer(Params):
                 ?entity a askomics:startPoint .
                 ?entity rdfs:label ?entity_label .
             }}
-            {}
+            FILTER (
+                ?public = <true>{}
+            )
         }}
         '''.format(filter_user)
 
@@ -321,18 +315,9 @@ class TriplestoreExplorer(Params):
         list
             List of entities available
         """
-
         filter_user = ""
-        if not single_tenant:
-            substring = ""
-            filter_user = '''
-            FILTER (
-                ?public = <true>{}
-            )
-            '''
-            if self.logged_user():
-                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
-            filter_user.format(substring)
+        if self.logged_user():
+            filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
@@ -355,7 +340,9 @@ class TriplestoreExplorer(Params):
                 OPTIONAL {{ ?entity_uri rdfs:label ?entity_label . }}
                 OPTIONAL {{ ?entity_uri askomics:instancesHaveNoLabels ?have_no_label . }}
             }}
-            {}
+            FILTER (
+                ?public = <true>{}
+            )
         }}
         '''.format(filter_user)
 
@@ -402,16 +389,8 @@ class TriplestoreExplorer(Params):
             AskOmics attributes
         """
         filter_user = ""
-        if not single_tenant:
-            substring = ""
-            filter_user = '''
-            FILTER (
-                ?public = <true>{}
-            )
-            '''
-            if self.logged_user():
-                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
-            filter_user.format(substring)
+        if self.logged_user():
+            filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         litterals = (
             "http://www.w3.org/2001/XMLSchema#string",
@@ -452,7 +431,9 @@ class TriplestoreExplorer(Params):
             }} UNION {{
                 ?attribute_uri rdfs:domain ?entity_uri .
             }}
-            {}
+            FILTER (
+                ?public = <true>{}
+            )
         }}
         '''.format(filter_user)
 
@@ -527,16 +508,8 @@ class TriplestoreExplorer(Params):
             Relations
         """
         filter_user = ""
-        if not single_tenant:
-            substring = ""
-            filter_user = '''
-            FILTER (
-                ?public = <true>{}
-            )
-            '''
-            if self.logged_user():
-                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
-            filter_user.format(substring)
+        if self.logged_user():
+            filter_user = " || ?creator = <{}>".format(self.session["user"]["username"])
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
@@ -563,7 +536,9 @@ class TriplestoreExplorer(Params):
             }} UNION {{
                 ?node rdfs:domain ?entity_uri .
             }}
-            {}
+            FILTER (
+                ?public = <true>{}
+            )
         }}
         '''.format(filter_user)
 
