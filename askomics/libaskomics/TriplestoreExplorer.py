@@ -128,13 +128,15 @@ class TriplestoreExplorer(Params):
         """
         filter_user = ""
         if not self.settings.get("askomics", "single_tenant", fallback=False):
+            substring = ""
             filter_user = '''
             FILTER (
                 ?public = <true>{}
             )
             '''
             if self.logged_user():
-                filter_user.format(" || ?creator = <{}>".format(self.session["user"]["username"]))
+                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
+            filter_user.format(substring)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
@@ -322,13 +324,15 @@ class TriplestoreExplorer(Params):
 
         filter_user = ""
         if not single_tenant:
+            substring = ""
             filter_user = '''
             FILTER (
                 ?public = <true>{}
             )
             '''
             if self.logged_user():
-                filter_user.format(" || ?creator = <{}>".format(self.session["user"]["username"]))
+                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
+            filter_user.format(substring)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
@@ -399,13 +403,15 @@ class TriplestoreExplorer(Params):
         """
         filter_user = ""
         if not single_tenant:
+            substring = ""
             filter_user = '''
             FILTER (
                 ?public = <true>{}
             )
             '''
             if self.logged_user():
-                filter_user.format(" || ?creator = <{}>".format(self.session["user"]["username"]))
+                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
+            filter_user.format(substring)
 
         litterals = (
             "http://www.w3.org/2001/XMLSchema#string",
@@ -522,13 +528,15 @@ class TriplestoreExplorer(Params):
         """
         filter_user = ""
         if not single_tenant:
+            substring = ""
             filter_user = '''
             FILTER (
                 ?public = <true>{}
             )
             '''
             if self.logged_user():
-                filter_user.format(" || ?creator = <{}>".format(self.session["user"]["username"]))
+                substring = " || ?creator = <{}>".format(self.session["user"]["username"])
+            filter_user.format(substring)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         query_builder = SparqlQuery(self.app, self.session)
