@@ -1376,7 +1376,7 @@ class SparqlQuery(Params):
                     ))
                     var_to_replace.append((category_value_uri, var_2))
 
-        from_string = self.get_froms_from_graphs(self.graphs)
+        from_string = "" if self.settings.get("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
 

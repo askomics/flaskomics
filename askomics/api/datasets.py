@@ -120,7 +120,7 @@ def toogle_public():
         errorMessage: the error message of error, else an empty string
     """
 
-    if current_app.iniconfig.get("single_tenant", False):
+    if current_app.iniconfig.get("askomics", "single_tenant", fallback=False):
         return jsonify({
             'files': [],
             'error': True,

@@ -170,7 +170,7 @@ def query(self, session, info):
 
         headers = info["selects"]
         results = []
-        if info["graphs"] or app.iniconfig.get("single_tenant", False):
+        if info["graphs"] or app.iniconfig.get("askomics", "single_tenant", fallback=False):
             query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
             headers, results = query_launcher.process_query(info["query"], isql_api=True)
 

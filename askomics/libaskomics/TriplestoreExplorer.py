@@ -127,7 +127,7 @@ class TriplestoreExplorer(Params):
             Startpoints
         """
         filter_user = ""
-        if not self.settings.get("single_tenant", False):
+        if not self.settings.get("askomics", "single_tenant", fallback=False):
             filter_user = '''
             FILTER (
                 ?public = <true>{}
@@ -212,7 +212,7 @@ class TriplestoreExplorer(Params):
         """
         insert, abstraction = self.get_cached_asbtraction()
 
-        single_tenant = self.settings.get("single_tenant", False)
+        single_tenant = self.settings.get("askomics", "single_tenant", fallback=False)
 
         # No abstraction entry in database, create it
         if not abstraction:
