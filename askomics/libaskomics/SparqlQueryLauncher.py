@@ -294,6 +294,7 @@ class SparqlQueryLauncher(Params):
 
             # Debug
             if self.settings.getboolean('askomics', 'debug'):
+                print(query)
                 self.log.debug("Launch {} query on {} ({})".format("ISQL" if use_isql else "SPARQL", self.triplestore, self.url_endpoint))
                 self.log.debug(query)
 

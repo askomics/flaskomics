@@ -208,7 +208,7 @@ class TriplestoreExplorer(Params):
         """
         insert, abstraction = self.get_cached_asbtraction()
 
-        single_tenant = self.settings.get("askomics", "single_tenant", fallback=False)
+        single_tenant = self.settings.getboolean("askomics", "single_tenant", fallback=False)
 
         # No abstraction entry in database, create it
         if not abstraction:
