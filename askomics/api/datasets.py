@@ -120,13 +120,6 @@ def toogle_public():
         errorMessage: the error message of error, else an empty string
     """
 
-    if current_app.iniconfig.get("askomics", "single_tenant", fallback=False):
-        return jsonify({
-            'files': [],
-            'error': True,
-            'errorMessage': 'Cannot change dataset public status: \nSingle tenant mode'
-        }), 401
-
     data = request.get_json()
     if not (data and data.get("id")):
         return jsonify({
