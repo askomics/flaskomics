@@ -339,7 +339,7 @@ def integrate():
                 "file_id": file.id,
                 "name": file.human_name,
                 "graph_name": file.file_graph,
-                "public": data.get("public") if session["user"]["admin"] else False
+                "public": (data.get("public", False) if session["user"]["admin"] else False) or current_app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
             }
 
             dataset = Dataset(current_app, session, dataset_info)
