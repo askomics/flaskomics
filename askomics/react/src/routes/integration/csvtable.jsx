@@ -240,7 +240,10 @@ export default class CsvTable extends Component {
     if (this.state.publicTick) {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
-
+    let privateButton
+    if (this.props.config.user.admin || !this.props.config.singleTenant){
+        privateButton = <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+    }
     let publicButton
     if (this.props.config.user.admin) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
@@ -276,7 +279,7 @@ export default class CsvTable extends Component {
           <br />
           <div className="center-div">
             <ButtonGroup>
-              <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+              {privateButton}
               {publicButton}
             </ButtonGroup>
           </div>
