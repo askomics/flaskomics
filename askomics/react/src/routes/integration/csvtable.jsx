@@ -245,7 +245,7 @@ export default class CsvTable extends Component {
         privateButton = <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
     }
     let publicButton
-    if (this.props.config.user.admin) {
+    if (this.props.config.user.admin || this.props.config.singleTenant) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
