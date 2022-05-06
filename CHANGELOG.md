@@ -24,6 +24,7 @@ This changelog was started for release 4.2.0.
 - Added 'Status' for files (for celery upload, and later for better file management)
 - Added tooltips to buttons in the query form (and other forms)
 - Added owl integration
+- Added 'single tenant' mode
 
 ### Changed
 
@@ -46,7 +47,7 @@ This changelog was started for release 4.2.0.
 - Bump path-parse from 1.0.6 to 1.0.7
 - Bump prismjs from 1.23.0 to 1.27.0
 - Bump simple-get from 2.8.1 to 2.8.2
-- Bump ssri from 6.0.1 to 6.0.2 
+- Bump ssri from 6.0.1 to 6.0.2
 - Bump follow-redirects from 1.14.4 to 1.14.8
 - Bump mkdocs from 1.0.4 to 1.2.3 in /docs
 - Bump python-ldap from 3.3.1 to 3.4.0
