@@ -47,7 +47,7 @@ def integrate(self, session, data, host_url):
     files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
     files_handler.handle_files([data["fileId"], ])
 
-    public = data.get("public", False) if session["user"]["admin"] else False
+    public = (data.get("public", False) if session["user"]["admin"] else False) or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
 
     for file in files_handler.files:
 
@@ -170,7 +170,7 @@ def query(self, session, info):
 
         headers = info["selects"]
         results = []
-        if info["graphs"]:
+        if info["graphs"] or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False):
             query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
             headers, results = query_launcher.process_query(info["query"], isql_api=True)
 
