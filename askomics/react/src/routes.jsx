@@ -47,7 +47,8 @@ export default class Routes extends Component {
         disableIntegration: null,
         namespaceData: null,
         namespaceInternal: null,
-        ontologies: []
+        ontologies: [],
+        singleTenant: false
       }
     }
     this.cancelRequest

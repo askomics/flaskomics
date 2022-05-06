@@ -119,6 +119,7 @@ def toogle_public():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+
     data = request.get_json()
     if not (data and data.get("id")):
         return jsonify({

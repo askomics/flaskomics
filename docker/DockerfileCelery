@@ -1,4 +1,4 @@
-FROM quay.io/askomics/flaskomics-base:4.0.0-alpine3.14 AS builder
+FROM quay.io/askomics/flaskomics-base:4.0.0-alpine3.13 AS builder
 MAINTAINER "Xavier Garnier <xavier.garnier@irisa.fr>"
 
 COPY . /askomics
@@ -7,7 +7,7 @@ WORKDIR /askomics
 RUN make clean-config fast-install
 
 # Final image
-FROM alpine:3.14
+FROM alpine:3.13
 
 WORKDIR /askomics
 RUN apk add --no-cache make python3 bash git libc-dev libstdc++ openldap-dev

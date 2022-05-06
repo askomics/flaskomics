@@ -18,7 +18,7 @@ class SparqlQuery(Params):
         all public graph
     """
 
-    def __init__(self, app, session, json_query=None, get_graphs=True):
+    def __init__(self, app, session, json_query=None, get_graphs=False):
         """init
 
         Parameters
@@ -400,12 +400,10 @@ class SparqlQuery(Params):
         entities : list, optional
             list of entity uri
         """
-        substrlst = []
         filter_entity_string = ''
         if entities:
-            for entity in entities:
-                substrlst.append("?entity_uri = <{}>".format(entity))
-            filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
+            substr = ",".join(["<{}>".format(entity) for entity in entities])
+            filter_entity_string = 'FILTER (?entity_uri IN( ' + substr + ' ))'
 
         filter_public_string = 'FILTER (?public = <true>)'
         if 'user' in self.session:
@@ -1435,7 +1433,7 @@ class SparqlQuery(Params):
                     ))
                     var_to_replace.append((category_value_uri, var_2))
 
-        from_string = self.get_froms_from_graphs(self.graphs)
+        from_string = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
 

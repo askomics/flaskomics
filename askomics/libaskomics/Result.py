@@ -389,6 +389,33 @@ class Result(Params):
 
         return self.id
 
+    def populate_db(self, graphs, endpoints):
+        """Update status of results in db
+
+        Parameters
+        ----------
+        query : bool, optional
+            True if error during integration
+        error_message : bool, optional
+            Error string if error is True
+        """
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        UPDATE results SET
+        graphs_and_endpoints=?
+        WHERE user_id=? AND id=?
+        '''
+
+        variables = [
+            json.dumps({"graphs": graphs, "endpoints": endpoints}),
+            self.session["user"]["id"],
+            self.id
+        ]
+
+        database.execute_sql_query(query, tuple(variables))
+
     def update_public_status(self, public):
         """Change public status
 
@@ -471,7 +498,7 @@ class Result(Params):
 
     def rollback(self):
         """Delete file"""
-        self.delete_file_from_filesystem(self)
+        self.delete_file_from_filesystem()
 
     def delete_result(self):
         """Remove results from db and filesystem"""

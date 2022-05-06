@@ -164,7 +164,7 @@ def get_graph_and_sparql_query():
         graphs = result.graphs
         endpoints = result.endpoints
         # Get all graphs and endpoint, and mark as selected the used one
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=True)
         graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
         console_enabled = can_access(session['user'])
 
@@ -361,7 +361,7 @@ def get_sparql_query():
                 'error': True,
                 'errorMessage': "You do not have access to this result"
             }), 401
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=True)
 
         sparql = result.get_sparql_query()
 

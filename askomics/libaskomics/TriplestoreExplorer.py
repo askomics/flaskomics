@@ -208,12 +208,14 @@ class TriplestoreExplorer(Params):
         """
         insert, abstraction = self.get_cached_asbtraction()
 
+        single_tenant = self.settings.getboolean("askomics", "single_tenant", fallback=False)
+
         # No abstraction entry in database, create it
         if not abstraction:
             abstraction = {
-                "entities": self.get_abstraction_entities(),
-                "attributes": self.get_abstraction_attributes(),
-                "relations": self.get_abstraction_relations()
+                "entities": self.get_abstraction_entities(single_tenant),
+                "attributes": self.get_abstraction_attributes(single_tenant),
+                "relations": self.get_abstraction_relations(single_tenant)
             }
 
             # Cache abstraction in DB, only for logged users
@@ -305,7 +307,7 @@ class TriplestoreExplorer(Params):
 
             database.execute_sql_query(query, sql_var)
 
-    def get_abstraction_entities(self):
+    def get_abstraction_entities(self, single_tenant=False):
         """Get abstraction entities
 
         Returns
@@ -379,7 +381,7 @@ class TriplestoreExplorer(Params):
 
         return entities
 
-    def get_abstraction_attributes(self):
+    def get_abstraction_attributes(self, single_tenant=False):
         """Get user abstraction attributes from the triplestore
 
         Returns
@@ -498,7 +500,7 @@ class TriplestoreExplorer(Params):
 
         return attributes
 
-    def get_abstraction_relations(self):
+    def get_abstraction_relations(self, single_tenant=False):
         """Get user abstraction relations from the triplestore
 
         Returns
