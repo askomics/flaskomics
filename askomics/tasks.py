@@ -16,6 +16,7 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
+from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
 
@@ -46,7 +47,7 @@ def integrate(self, session, data, host_url):
     files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
     files_handler.handle_files([data["fileId"], ])
 
-    public = data.get("public", False) if session["user"]["admin"] else False
+    public = (data.get("public", False) if session["user"]["admin"] else False) or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
 
     for file in files_handler.files:
 
@@ -150,6 +151,17 @@ def query(self, session, info):
         info["celery_id"] = self.request.id
         result = Result(app, session, info, force_no_db=True)
 
+        query = SparqlQuery(app, session, info["graph_state"])
+        query.build_query_from_json(preview=False, for_editor=False)
+        federated = query.is_federated()
+        result.populate_db(query.graphs, query.endpoints)
+
+        info["query"] = query.sparql
+        info["graphs"] = query.graphs
+        info["endpoints"] = query.endpoints
+        info["federated"] = federated
+        info["selects"] = query.selects
+
         # Save job in database database
         result.set_celery_id(self.request.id)
         result.update_db_status("started", update_celery=True, update_date=True)
@@ -158,7 +170,7 @@ def query(self, session, info):
 
         headers = info["selects"]
         results = []
-        if info["graphs"]:
+        if info["graphs"] or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False):
             query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
             headers, results = query_launcher.process_query(info["query"], isql_api=True)
 

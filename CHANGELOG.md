@@ -25,6 +25,7 @@ This changelog was started for release 4.2.0.
 - Added tooltips to buttons in the query form (and other forms)
 - Added owl integration
 - Add better error management for RDF files
+- Added 'single tenant' mode
 
 ### Changed
 

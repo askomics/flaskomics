@@ -79,7 +79,8 @@ def start():
             "namespaceInternal": current_app.iniconfig.get('triplestore', 'namespace_internal'),
             "proxyPath": proxy_path,
             "user": {},
-            "logged": False
+            "logged": False,
+            "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False)
         }
 
         json = {
