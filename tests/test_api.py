@@ -43,11 +43,8 @@ class TestApi(AskomicsTestCase):
             "proxyPath": "/",
             "user": {},
             "logged": False,
-<<<<<<< HEAD
-            "ontologies": []
-=======
+            "ontologies": [],
             "singleTenant": False
->>>>>>> dev
         }
         response = client.client.get('/api/start')
         assert response.status_code == 200
