@@ -24,15 +24,18 @@ This changelog was started for release 4.2.0.
 - Added 'Status' for files (for celery upload, and later for better file management)
 - Added tooltips to buttons in the query form (and other forms)
 - Added owl integration
+- Add better error management for RDF files
 - Added 'single tenant' mode
 
 ### Changed
 
 - Changed "Query builder" to "Form editor" in form editing interface
 - Changed abstraction building method for relations. (Please refer to #248 and #268)
+- Changed abstraction building method for attributes. (Please refer to #321 and #324)
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
 - Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
+- Reverted base docker image to alpine-13 to solve a docker issue
 
 ### Removed
 
