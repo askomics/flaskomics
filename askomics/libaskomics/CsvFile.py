@@ -396,6 +396,8 @@ class CsvFile(File):
         if self.columns_type[0] == 'start_entity':
             self.graph_abstraction_dk.add((entity, rdflib.RDF.type, self.namespace_internal['startPoint']))
 
+        attribute_blanks = {}
+
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
 
@@ -409,6 +411,7 @@ class CsvFile(File):
             if self.columns_type[index] == "label" and index == 1:
                 continue
 
+            blank = BNode()
             # Relation
             if self.columns_type[index] in ('general_relation', 'symetric_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
@@ -420,7 +423,7 @@ class CsvFile(File):
                 rdf_type = rdflib.OWL.ObjectProperty
 
                 # New way of storing relations (starting from 4.4.0)
-                blank = BNode()
+
                 endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdflib.OWL.ObjectProperty))
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
@@ -442,7 +445,7 @@ class CsvFile(File):
                 label = rdflib.Literal(attribute_name)
                 rdf_range = self.namespace_data["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
-                self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
 
             # Numeric
             elif self.columns_type[index] in ('numeric', 'start', 'end'):
@@ -472,16 +475,22 @@ class CsvFile(File):
                 rdf_range = rdflib.XSD.string
                 rdf_type = rdflib.OWL.DatatypeProperty
 
-            self.graph_abstraction_dk.add((attribute, rdflib.RDF.type, rdf_type))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.label, label))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.domain, entity))
-            self.graph_abstraction_dk.add((attribute, rdflib.RDFS.range, rdf_range))
+            attribute_blanks[attribute] = blank
+
+            # New way of storing attributes (starting from 4.4.0)
+            self.graph_abstraction_dk.add((blank, rdflib.RDF.type, rdf_type))
+            self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, label))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, entity))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, rdf_range))
 
         # Faldo:
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    blank = attribute_blanks[value]
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 
     def generate_rdf_content(self):
         """Generator of the rdf content

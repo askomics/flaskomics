@@ -462,7 +462,7 @@ class SparqlQuery(Params):
             The corresponding parameters
         """
         raw_query = '''
-        SELECT DISTINCT ?predicate ?object ?faldo_value ?faldo_uri
+        SELECT DISTINCT ?predicate ?object ?faldo_value ?faldo_relation
         WHERE {{
           ?URI ?predicate ?object .
           ?URI a ?entitytype .
@@ -495,9 +495,14 @@ class SparqlQuery(Params):
             ?faldo_uri rdf:type askomics:faldoStrand .
             }}
 
+            OPTIONAL {{
+              ?faldo_uri askomics:uri ?node_uri
+            }}
+
             VALUES ?predicate {{faldo:location}}
           }}
           VALUES ?URI {{{}}}
+          BIND(IF(isBlank(?faldo_uri), ?node_uri ,?faldo_uri) as ?faldo_relation)
         }}
         '''.format(uri)
 
@@ -513,9 +518,19 @@ class SparqlQuery(Params):
 
         formated_data = []
         for row in data:
+
+            predicate = row['predicate']
+            object = row['object']
+
+            if row.get('faldo_relation'):
+                predicate = row.get("faldo_relation")
+
+            if row.get('faldo_value'):
+                object = row.get('faldo_value')
+
             formated_data.append({
-                'predicate': row['faldo_uri'] if row.get('faldo_uri') else row['predicate'],
-                'object': row['faldo_value'] if row.get('faldo_value') else row['object'],
+                'predicate': predicate,
+                'object': object,
             })
 
         return formated_data

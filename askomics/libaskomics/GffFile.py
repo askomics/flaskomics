@@ -108,10 +108,12 @@ class GffFile(File):
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
+        attribute_blanks = {}
+
         for attribute in self.attribute_abstraction:
+            blank = BNode()
             # New way of storing relations (starting from 4.4.0)
             if attribute.get("relation"):
-                blank = BNode()
                 endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
                 for attr_type in attribute["type"]:
                     self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
@@ -123,12 +125,15 @@ class GffFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
 
             else:
+                # New way of storing attributes (starting from 4.4.0)
                 for attr_type in attribute["type"]:
-                    self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
 
+            attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -143,7 +148,9 @@ class GffFile(File):
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    blank = attribute_blanks[value]
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 
     def format_gff_entity(self, entity):
         """Format a gff entity name by removing type (type:entity --> entity)
