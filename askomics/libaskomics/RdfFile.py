@@ -69,6 +69,12 @@ class RdfFile(File):
             for x in range(1, 100):
                 head += ttl_file.readline()
 
+        location = None
+        try:
+            location = self.get_location()
+        except Exception as e:
+            self.error_message = str(e)
+
         return {
             'type': self.type,
             'id': self.id,
@@ -77,7 +83,7 @@ class RdfFile(File):
             'error_message': self.error_message,
             'data': {
                 'preview': head,
-                'location': self.get_location()
+                'location': location
             }
         }
 

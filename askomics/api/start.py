@@ -84,7 +84,8 @@ def start():
             "proxyPath": proxy_path,
             "user": {},
             "logged": False,
-            "ontologies": ontologies
+            "ontologies": ontologies,
+            "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False)
         }
 
         json = {

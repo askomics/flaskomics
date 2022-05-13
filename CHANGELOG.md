@@ -23,14 +23,19 @@ This changelog was started for release 4.2.0.
 - Remote upload is now sent in a Celery task
 - Added 'Status' for files (for celery upload, and later for better file management)
 - Added tooltips to buttons in the query form (and other forms)
+- Added owl integration
+- Add better error management for RDF files
+- Added 'single tenant' mode
 
 ### Changed
 
 - Changed "Query builder" to "Form editor" in form editing interface
 - Changed abstraction building method for relations. (Please refer to #248 and #268)
+- Changed abstraction building method for attributes. (Please refer to #321 and #324)
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
 - Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
+- Reverted base docker image to alpine-13 to solve a docker issue
 
 ### Removed
 
@@ -39,11 +44,16 @@ This changelog was started for release 4.2.0.
 
 ### Security
 
-- Bump prismjs from 1.23.0 to 1.25.0
 - Bump axios from 0.21.1 to 0.21.2
 - Bump tar from 6.1.0 to 6.1.11
 - Bump @npmcli/git from 2.0.6 to 2.1.0
 - Bump path-parse from 1.0.6 to 1.0.7
+- Bump prismjs from 1.23.0 to 1.27.0
+- Bump simple-get from 2.8.1 to 2.8.2
+- Bump ssri from 6.0.1 to 6.0.2
+- Bump follow-redirects from 1.14.4 to 1.14.8
+- Bump mkdocs from 1.0.4 to 1.2.3 in /docs
+- Bump python-ldap from 3.3.1 to 3.4.0
 
 ## [4.3.1] - 2021-06-16
 
