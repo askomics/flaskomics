@@ -361,8 +361,7 @@ class CsvFile(File):
     def set_rdf_domain_knowledge(self):
         """Set the domain knowledge"""
         for index, attribute in enumerate(self.header):
-
-            if self.columns_type[index] in ('category', 'reference', 'strand'):
+            if self.columns_type[index] in ('category', 'reference', 'strand') and self.header[index] in self.category_values:
                 s = self.namespace_data["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
