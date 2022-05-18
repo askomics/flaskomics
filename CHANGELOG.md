@@ -28,6 +28,7 @@ This changelog was started for release 4.2.0.
 - Add better error management for RDF files
 - Added 'single tenant' mode: Send queries to all graphs to speed up
 
+
 ### Changed
 
 - Changed "Query builder" to "Form editor" in form editing interface
