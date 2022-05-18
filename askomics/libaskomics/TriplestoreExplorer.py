@@ -415,8 +415,8 @@ class TriplestoreExplorer(Params):
                 ?node rdfs:label ?attribute_label .
                 ?node rdfs:range ?attribute_range .
                 # Retrocompatibility
-                OPTIONAL {{?node askomics:uri ?attribute_uri}}
-                BIND( IF(isBlank(?node),?attribute_uri, ?node) as ?attribute_uri )
+                OPTIONAL {{?node askomics:uri ?new_attribute_uri}}
+                BIND( IF(isBlank(?node),?new_attribute_uri, ?node) as ?attribute_uri )
                 # Faldo
                 OPTIONAL {{
                     ?node a ?attribute_faldo .
@@ -531,8 +531,8 @@ class TriplestoreExplorer(Params):
                 ?node rdfs:label ?property_label .
                 ?node rdfs:range ?range_uri .
                 # Retrocompatibility
-                OPTIONAL {{?node askomics:uri ?property_uri}}
-                BIND( IF(isBlank(?node), ?property_uri, ?node) as ?property_uri)
+                OPTIONAL {{?node askomics:uri ?new_property_uri}}
+                BIND( IF(isBlank(?node), ?new_property_uri, ?node) as ?property_uri)
             }}
             # Relation of entity (or motherclass of entity)
             {{

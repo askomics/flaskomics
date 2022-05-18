@@ -13,6 +13,7 @@ This changelog was started for release 4.2.0.
 
 - Fixed an issue with forms (missing field and entity name for label & uri fields) (Issue #255)
 - Fixed an issue with the data endpoint for FALDO entities (Issue #279)
+- Fixed an issue where integration would fail when setting a category type on a empty column (#334)
 
 ### Added
 
@@ -25,7 +26,8 @@ This changelog was started for release 4.2.0.
 - Added tooltips to buttons in the query form (and other forms)
 - Added owl integration
 - Add better error management for RDF files
-- Added 'single tenant' mode
+- Added 'single tenant' mode: Send queries to all graphs to speed up
+
 
 ### Changed
 
@@ -54,6 +56,7 @@ This changelog was started for release 4.2.0.
 - Bump follow-redirects from 1.14.4 to 1.14.8
 - Bump mkdocs from 1.0.4 to 1.2.3 in /docs
 - Bump python-ldap from 3.3.1 to 3.4.0
+- Bump minimist from 1.2.5 to 1.2.6
 
 ## [4.3.1] - 2021-06-16
 
