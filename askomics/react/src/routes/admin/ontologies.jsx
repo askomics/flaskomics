@@ -41,17 +41,35 @@ export default class Ontologies extends Component {
     return this.state.ontologiesSelected.length == 0
   }
 
+  cleanupOntologies (newOntologies) {
+    let cleanOntologies = []
+    newOntologies.map(onto => {
+      cleanOntologies.push({
+          id:onto.id,
+          name:onto.name,
+          uri:onto.uri,
+          short_name: onto.short_name,
+          type: onto.type
+      })
+    })
+    return cleanOntologies
+  }
+
   deleteSelectedOntologies () {
     let requestUrl = '/api/admin/delete_ontologies'
     let data = {
       ontologiesIdToDelete: this.state.ontologiesSelected
     }
+
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
         console.log(requestUrl, response.data)
         this.setState({
           ontologies: response.data.ontologies,
           ontologiesSelected: [],
+        })
+        this.props.setStateNavbar({
+          config: update(this.props.config, {ontologies: {$set: cleanupOntologies(response.data.ontologies)}})
         })
       })
   }
@@ -118,6 +136,9 @@ export default class Ontologies extends Component {
         uri: "",
         shortName: "",
         type: "local"
+      })
+      this.props.setStateNavbar({
+        config: update(this.props.config, {ontologies: {$set: cleanupOntologies(response.data.ontologies)}})
       })
     })
     .catch(error => {
@@ -322,6 +343,7 @@ export default class Ontologies extends Component {
 }
 
 Ontologies.propTypes = {
+  setStateNavbar: PropTypes.func,
   waitForStart: PropTypes.bool,
   config: PropTypes.object
 }
