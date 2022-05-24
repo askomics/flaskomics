@@ -29,7 +29,6 @@ This changelog was started for release 4.2.0.
 - Added 'single tenant' mode: Send queries to all graphs to speed up
 - Added ontologies management
 
-
 ### Changed
 
 - Changed "Query builder" to "Form editor" in form editing interface
