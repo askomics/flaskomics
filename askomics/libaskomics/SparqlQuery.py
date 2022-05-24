@@ -276,7 +276,7 @@ class SparqlQuery(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True, federated=False):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False, ignore_single_tenant=True):
         """Format the Sparql query
 
         - remove all FROM
@@ -296,7 +296,7 @@ class SparqlQuery(Params):
             formatted sparql query
         """
         froms = ''
-        if replace_froms:
+        if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False) or ignore_single_tenant):
             froms = self.get_froms()
 
         if federated:
@@ -536,7 +536,7 @@ class SparqlQuery(Params):
 
         return formated_data
 
-    def autocomplete_local_ontology(self, uri, query):
+    def autocomplete_local_ontology(self, uri, query, max_terms):
         """Get results for a specific query
 
         Parameters
@@ -555,7 +555,7 @@ class SparqlQuery(Params):
         subquery = ""
 
         if query:
-            subquery = 'FILTER(contains(?label, "{}"))'.format(query)
+            subquery = 'FILTER(contains(lcase(?label), "{}"))'.format(query.lower())
         raw_query = '''
         SELECT DISTINCT ?label
         WHERE {{
@@ -563,13 +563,11 @@ class SparqlQuery(Params):
           ?uri rdfs:label ?label .
           {}
         }}
-
-        LIMIT 5
         '''.format(uri, subquery)
 
         raw_query = self.prefix_query(raw_query)
 
-        sparql = self.format_query(raw_query, limit=5, replace_froms=True, federated=False)
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=False, ignore_single_tenant=True)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False)
         _, data = query_launcher.process_query(sparql)

@@ -21,16 +21,16 @@ export default class Autocomplete extends Component {
   }
 
   getAutoComplete () {
-      return this.props.config.ontologies.map(onto => {
-        if (onto.uri == this.props.entityUri) {
-          return onto.short_name
-        } else {
-          return null
-        }
-      })
+      let selectedOnto =  this.props.config.ontologies.find(onto => onto.uri == this.props.entityUri)
+      if (selectedOnto){
+        return selectedOnto.short_name
+      }
+      return ""
   }
 
   autocompleteOntology (value) {
+    if (this.state.ontologyShort.length == 0){ return }
+
     let userInput = value
     let requestUrl = '/api/ontology/' + this.state.ontologyShort + "/autocomplete"
 

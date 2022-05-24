@@ -27,7 +27,7 @@ This changelog was started for release 4.2.0.
 - Added owl integration
 - Add better error management for RDF files
 - Added 'single tenant' mode: Send queries to all graphs to speed up
-
+- Added ontologies management
 
 ### Changed
 
