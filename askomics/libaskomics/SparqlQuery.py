@@ -536,7 +536,7 @@ class SparqlQuery(Params):
 
         return formated_data
 
-    def autocomplete_local_ontology(self, uri, query):
+    def autocomplete_local_ontology(self, uri, query, max_terms):
         """Get results for a specific query
 
         Parameters
@@ -563,13 +563,11 @@ class SparqlQuery(Params):
           ?uri rdfs:label ?label .
           {}
         }}
-
-        LIMIT 5
         '''.format(uri, subquery)
 
         raw_query = self.prefix_query(raw_query)
 
-        sparql = self.format_query(raw_query, limit=5, replace_froms=True, federated=False, ignore_single_tenant=True)
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=False, ignore_single_tenant=True)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False)
         _, data = query_launcher.process_query(sparql)
