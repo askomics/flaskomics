@@ -1188,14 +1188,14 @@ class SparqlQuery(Params):
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = "<{}>".format(attribute["entityUris"][0])
-                if not (self.is_bnode(attribute["entityUris"][0], self.json["nodes"]) or attribute["ontology"] is True):
+                if not (self.is_bnode(attribute["entityUris"][0], self.json["nodes"]) or attribute.get("ontology", False) is True):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
                         "optional": False
                     }, block_id, sblock_id, pblock_ids)
-                if attribute["ontology"] is True:
+                if attribute.get("ontology", False) is True:
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
