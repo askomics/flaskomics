@@ -410,7 +410,7 @@ class SparqlQuery(Params):
             filter_public_string = 'FILTER (?public = <true> || ?creator = <{}>)'.format(self.session["user"]["username"])
 
         query = '''
-        SELECT DISTINCT ?graph ?endpoint
+        SELECT DISTINCT ?graph ?endpoint ?entity_uri
         WHERE {{
           ?graph_abstraction askomics:public ?public .
           ?graph_abstraction dc:creator ?creator .
@@ -422,7 +422,9 @@ class SparqlQuery(Params):
             VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           }}
           GRAPH ?graph {{
-            [] a ?entity_uri .
+            {{ [] a ?entity_uri . }}
+            UNION
+            {{ ?entity_uri a askomics:ontology . }}
           }}
           {}
           {}
@@ -1186,11 +1188,18 @@ class SparqlQuery(Params):
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = "<{}>".format(attribute["entityUris"][0])
-                if not self.is_bnode(attribute["entityUris"][0], self.json["nodes"]):
+                if not (self.is_bnode(attribute["entityUris"][0], self.json["nodes"]) or attribute["ontology"] is True):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
+                        "optional": False
+                    }, block_id, sblock_id, pblock_ids)
+                if attribute["ontology"] is True:
+                    self.store_triple({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": "owl:Class",
                         "optional": False
                     }, block_id, sblock_id, pblock_ids)
 

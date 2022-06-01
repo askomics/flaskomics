@@ -224,9 +224,6 @@ export default class Query extends Component {
       return false
     }
 
-    console.log(node)
-    console.log(node.ontology ? currentUri == targetUri ? "endNode" : "node" : false)
-
     return node.ontology ? currentUri == targetUri ? "endNode" : "node" : false
   }
 
@@ -276,6 +273,8 @@ export default class Query extends Component {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
 
+    let isOnto = this.isOntoNode(nodeId)
+
     // if bnode without uri, first attribute is visible
     let firstAttrVisibleForBnode = isBnode
 
@@ -303,7 +302,8 @@ export default class Query extends Component {
         form: false,
         negative: false,
         linked: false,
-        linkedWith: null
+        linkedWith: null,
+        ontology: isOnto
       })
     }
 
