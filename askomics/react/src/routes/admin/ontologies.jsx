@@ -28,7 +28,7 @@ export default class Ontologies extends Component {
       shortName: "",
       type: "local",
       datasetId: "",
-      label_uri: "rdfs:label",
+      labelUri: "rdfs:label",
       ontologiesSelected: []
     }
     this.handleChangeValue = this.handleChangeValue.bind(this)
@@ -87,7 +87,8 @@ export default class Ontologies extends Component {
       this.state.name.length > 0 &&
       this.state.uri.length > 0 &&
       this.state.shortName.length > 0 &&
-      this.state.datasetId.length > 0
+      this.state.datasetId.length > 0 &&
+      this.state.labelUri.length > 0
     )
   }
 
@@ -125,7 +126,7 @@ export default class Ontologies extends Component {
       shortName: this.state.shortName,
       type: this.state.type,
       datasetId: this.state.datasetId,
-      label_uri: this.state.label_uri
+      labelUri: this.state.labelUri
     }
 
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -139,7 +140,7 @@ export default class Ontologies extends Component {
         uri: "",
         shortName: "",
         type: "local",
-        label_uri: "rdfs:label"
+        labelUri: "rdfs:label"
       })
       this.props.setStateNavbar({
         config: update(this.props.config, {ontologies: {$set: this.cleanupOntologies(response.data.ontologies)}})
@@ -314,7 +315,7 @@ export default class Ontologies extends Component {
             <Col md={3}>
               <FormGroup>
                 <Label for="type">Label uri</Label>
-                <Input type="text" name="label_uri" id="label_uri" value={this.state.label_uri} onChange={this.handleChangeValue} />
+                <Input type="text" name="labelUri" id="labelUri" value={this.state.labelUri} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
             <Col md={3}>

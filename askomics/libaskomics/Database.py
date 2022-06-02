@@ -425,7 +425,7 @@ class Database(Params):
         self.execute_sql_query(query)
 
         query = '''
-        ALTER TABLE files
+        ALTER TABLE ontologies
         ADD label_uri text NOT NULL
         DEFAULT('rdfs:label')
         '''

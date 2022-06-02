@@ -703,7 +703,7 @@ def add_ontology():
     short_name = data.get("shortName")
     type = data.get("type")
     dataset_id = data.get("datasetId")
-    label_uri = data.get("datasetId")
+    label_uri = data.get("labelUri", "rdfs:label")
 
     om = OntologyManager(current_app, session)
 
