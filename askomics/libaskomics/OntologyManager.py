@@ -5,7 +5,6 @@ from urllib.parse import quote_plus
 
 
 from askomics.libaskomics.Database import Database
-from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.Params import Params
 
 
@@ -231,7 +230,8 @@ class OntologyManager(Params):
         list of dict
             Results
         """
-
+        # Circular import
+        from askomics.libaskomics.SparqlQuery import SparqlQuery
         max_results = self.settings.getint("askomics", "autocomplete_max_results", fallback=10)
 
         if ontology_type == "local":

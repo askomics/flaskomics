@@ -1,8 +1,6 @@
 import re
 import textwrap
 
-import askomics.libaskomics.OntologyManager
-
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -1015,6 +1013,8 @@ class SparqlQuery(Params):
         for_editor : bool, optional
             Remove FROMS and @federate
         """
+        # Circular import
+        from askomics.libaskomics.OntologyManager import OntologyManager
         entities = []
         attributes = {}
         linked_attributes = []
@@ -1033,7 +1033,7 @@ class SparqlQuery(Params):
         var_to_replace = []
 
         ontologies = {}
-        om = askomics.libaskomics.OntologyManager.OntologyManager(self.app, self.session)
+        om = OntologyManager(self.app, self.session)
 
         # Browse attributes to get entities
         for attr in self.json["attr"]:
