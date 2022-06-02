@@ -1,7 +1,8 @@
 import re
 import textwrap
 
-from askomics.libaskomics.OntologyManager import OntologyManager
+import askomics.libaskomics.OntologyManager
+
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -1032,7 +1033,7 @@ class SparqlQuery(Params):
         var_to_replace = []
 
         ontologies = {}
-        om = OntologyManager(self.app, self.session)
+        om = askomics.libaskomics.OntologyManager.OntologyManager(self.app, self.session)
 
         # Browse attributes to get entities
         for attr in self.json["attr"]:

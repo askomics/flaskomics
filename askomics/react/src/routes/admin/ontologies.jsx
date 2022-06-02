@@ -313,7 +313,7 @@ export default class Ontologies extends Component {
             </Col>
             <Col md={3}>
               <FormGroup>
-                <Label for="type">Label uri/Label>
+                <Label for="type">Label uri</Label>
                 <Input type="text" name="label_uri" id="label_uri" value={this.state.label_uri} onChange={this.handleChangeValue} />
               </FormGroup>
             </Col>
