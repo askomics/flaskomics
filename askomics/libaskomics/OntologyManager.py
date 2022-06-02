@@ -77,7 +77,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, datasets.id, datasets.name, ontologies.graph
+        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph
         FROM ontologies
         INNER JOIN datasets ON datasets.id=ontologies.dataset_id
         '''
@@ -92,16 +92,17 @@ class OntologyManager(Params):
                 'uri': row[2],
                 'short_name': row[3],
                 'type': row[4],
-                'dataset_id': row[5],
-                'dataset_name': row[6],
-                'graph': row[7]
+                'label_uri': row[5],
+                'dataset_id': row[6],
+                'dataset_name': row[7],
+                'graph': row[8]
             }
             ontologies.append(prefix)
 
         return ontologies
 
-    def get_ontology(self, short_name):
-        """Get a specific ontology based on short name
+    def get_ontology(self, short_name="", uri=""):
+        """Get a specific ontology based on short name or uri
 
         Returns
         -------
@@ -109,15 +110,26 @@ class OntologyManager(Params):
             ontology
         """
 
+        if not (short_name or uri):
+            return None
+
+        if short_name:
+            where_clause = "WHERE short_name = ?"
+            args = (short_name,)
+
+        if uri:
+            where_clause = "WHERE uri = ?"
+            args = (uri,)
+
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, short_name, type, dataset_id, graph
+        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri
         FROM ontologies
-        WHERE short_name = ?
-        '''
+        {}
+        '''.format(where_clause)
 
-        rows = database.execute_sql_query(query, (short_name,))
+        rows = database.execute_sql_query(query, args)
 
         if not rows:
             return None
@@ -130,10 +142,11 @@ class OntologyManager(Params):
             'short_name': ontology[3],
             'type': ontology[4],
             'dataset_id': ontology[5],
-            'graph': ontology[6]
+            'graph': ontology[6],
+            'label_uri': ontology[7]
         }
 
-    def add_ontology(self, name, uri, short_name, dataset_id, graph, type="local"):
+    def add_ontology(self, name, uri, short_name, dataset_id, graph, type="local", label_uri="rdfs:label"):
         """Create a new ontology
 
         Returns
@@ -151,11 +164,12 @@ class OntologyManager(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
 
-        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph))
+        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph, label_uri))
 
         query = '''
         UPDATE datasets SET

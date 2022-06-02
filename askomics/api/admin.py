@@ -703,6 +703,7 @@ def add_ontology():
     short_name = data.get("shortName")
     type = data.get("type")
     dataset_id = data.get("datasetId")
+    label_uri = data.get("datasetId")
 
     om = OntologyManager(current_app, session)
 
@@ -751,8 +752,15 @@ def add_ontology():
             'errorMessage': "Name and short name must be unique"
         }), 400
 
+    if any([dataset_id == onto['dataset_id'] for onto in ontologies]):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Dataset is already linked to another ontology"
+        }), 400
+
     try:
-        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, type)
+        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, type, label_uri)
         ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

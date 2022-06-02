@@ -28,6 +28,7 @@ export default class Ontologies extends Component {
       shortName: "",
       type: "local",
       datasetId: "",
+      label_uri: "rdfs:label",
       ontologiesSelected: []
     }
     this.handleChangeValue = this.handleChangeValue.bind(this)
@@ -123,7 +124,8 @@ export default class Ontologies extends Component {
       uri: this.state.uri,
       shortName: this.state.shortName,
       type: this.state.type,
-      datasetId: this.state.datasetId
+      datasetId: this.state.datasetId,
+      label_uri: this.state.label_uri
     }
 
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
@@ -136,7 +138,8 @@ export default class Ontologies extends Component {
         name: "",
         uri: "",
         shortName: "",
-        type: "local"
+        type: "local",
+        label_uri: "rdfs:label"
       })
       this.props.setStateNavbar({
         config: update(this.props.config, {ontologies: {$set: this.cleanupOntologies(response.data.ontologies)}})
@@ -237,6 +240,11 @@ export default class Ontologies extends Component {
       sort: true
     }, {
       editable: false,
+      dataField: 'label_uri',
+      text: 'Label uri',
+      sort: true
+  }, {
+      editable: false,
       dataField: 'type',
       text: 'Autocomplete type',
       sort: true
@@ -303,7 +311,13 @@ export default class Ontologies extends Component {
                 </CustomInput>
               </FormGroup>
             </Col>
-            <Col md={6}>
+            <Col md={3}>
+              <FormGroup>
+                <Label for="type">Label uri/Label>
+                <Input type="text" name="label_uri" id="label_uri" value={this.state.label_uri} onChange={this.handleChangeValue} />
+              </FormGroup>
+            </Col>
+            <Col md={3}>
               <FormGroup>
                 <Label for="type">Autocomplete type</Label>
                 <CustomInput type="select" name="type" id="type" value={this.state.type} onChange={this.handleChangeValue}>

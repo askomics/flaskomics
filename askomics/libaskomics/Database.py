@@ -416,10 +416,21 @@ class Database(Params):
             name text NOT NULL,
             uri text NOT NULL,
             short_name text NOT NULL,
-            type text DEFAULT 'local',
+            type text DEFAULT 'sparql',
             dataset_id INTEGER NOT NULL,
             graph text NOT NULL,
             FOREIGN KEY(dataset_id) REFERENCES datasets(id)
         )
         '''
         self.execute_sql_query(query)
+
+        query = '''
+        ALTER TABLE files
+        ADD label_uri text NOT NULL
+        DEFAULT('rdfs:label')
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass

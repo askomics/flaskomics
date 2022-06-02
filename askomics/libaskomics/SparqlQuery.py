@@ -1,6 +1,7 @@
 import re
 import textwrap
 
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
@@ -392,7 +393,7 @@ class SparqlQuery(Params):
 
         return endpoints_string
 
-    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None):
+    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None, ontologies={}):
         """Get all public and private graphs containing the given entities
 
         Parameters
@@ -437,7 +438,11 @@ class SparqlQuery(Params):
         self.endpoints = []
         for res in results:
             if not graphs or res["graph"] in graphs:
-                self.graphs.append(res["graph"])
+                # Override with onto graph if matching uri
+                if ontologies.get(res['uri']):
+                    self.graphs.append(ontologies[res['uri']]['graph'])
+                else:
+                    self.graphs.append(res["graph"])
 
             # If local triplestore url is not accessible by federated query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
@@ -1026,14 +1031,19 @@ class SparqlQuery(Params):
 
         var_to_replace = []
 
+        ontologies = {}
+        om = OntologyManager(self.app, self.session)
+
         # Browse attributes to get entities
         for attr in self.json["attr"]:
             entities = entities + attr["entityUris"]
+            if attr["type"] == "uri" and attr.get("ontology", False) is True and not attr["entityUris"][0] in ontologies:
+                ontologies[attr["entityUris"][0]] = om.get_ontology(uri=attr["entityUris"][0])
 
         entities = list(set(entities))  # uniq list
 
         # Set graphs in function of entities needed
-        self.set_graphs_and_endpoints(entities=entities)
+        self.set_graphs_and_endpoints(entities=entities, ontologies=ontologies)
 
         # self.log.debug(self.json)
 
@@ -1196,6 +1206,8 @@ class SparqlQuery(Params):
                         "optional": False
                     }, block_id, sblock_id, pblock_ids)
                 if attribute.get("ontology", False) is True:
+                    if ontologies.get(attribute["entityUris"][0]):
+                        predicate = ontologies[attribute["entityUris"][0]]["label_uri"]
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,

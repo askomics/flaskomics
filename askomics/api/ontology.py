@@ -22,7 +22,7 @@ def autocomplete(short_ontology):
     try:
         # Disk space
         om = OntologyManager(current_app, session)
-        ontology = om.get_ontology(short_ontology)
+        ontology = om.get_ontology(short_name=short_ontology)
         if not ontology:
             return jsonify({
                 "error": True,
