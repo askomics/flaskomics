@@ -438,8 +438,8 @@ class SparqlQuery(Params):
         for res in results:
             if not graphs or res["graph"] in graphs:
                 # Override with onto graph if matching uri
-                if ontologies.get(res['uri']):
-                    self.graphs.append(ontologies[res['uri']]['graph'])
+                if ontologies.get(res['entity_uri']):
+                    self.graphs.append(ontologies[res['entity_uri']]['graph'])
                 else:
                     self.graphs.append(res["graph"])
 
