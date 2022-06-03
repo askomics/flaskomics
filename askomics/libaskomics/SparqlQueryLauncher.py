@@ -310,8 +310,8 @@ class SparqlQueryLauncher(Params):
                 if self.endpoint.isSparqlUpdateRequest():
                     self.endpoint.setMethod('POST')
                     # Virtuoso hack
-                    if self.triplestore == 'virtuoso':
-                        self.endpoint.queryType = "SELECT"
+                    #if self.triplestore == 'virtuoso':
+                    #    self.endpoint.queryType = "SELECT"
 
                     results = self.endpoint.query()
                 # Select
