@@ -419,13 +419,13 @@ class SparqlQuery(Params):
           GRAPH ?graph_abstraction {{
             ?graph_abstraction prov:atLocation ?endpoint .
             ?entity_uri a ?askomics_type .
-            VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           }}
           GRAPH ?graph {{
             {{ [] a ?entity_uri . }}
             UNION
-            {{ ?entity_uri a askomics:ontology . }}
+            {{ ?entity_uri a ?askomics_type . }}
           }}
+          VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           {}
           {}
         }}
