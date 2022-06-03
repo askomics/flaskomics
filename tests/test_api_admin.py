@@ -620,7 +620,8 @@ class TestApiAdmin(AskomicsTestCase):
                 "type": "local",
                 "dataset_id": 1,
                 "dataset_name": "transcripts.tsv",
-                "graph": "mygraph"
+                "graph": "mygraph",
+                "label_uri": "rdfs:label"
             }]
         }
 
@@ -659,7 +660,8 @@ class TestApiAdmin(AskomicsTestCase):
                 "short_name": "OBO",
                 "type": "local",
                 "dataset_id": 1,
-                "dataset_name": "transcripts.tsv"
+                "dataset_name": "transcripts.tsv",
+                "label_uri": "rdfs:label"
             }]
         }
 
