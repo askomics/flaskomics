@@ -167,6 +167,7 @@ class Database(Params):
             end int,
             ntriples int,
             error_message text,
+            endpoint text,
             FOREIGN KEY(user_id) REFERENCES users(user_id),
             FOREIGN KEY(file_id) REFERENCES files(id)
         )
@@ -201,6 +202,17 @@ class Database(Params):
         query = '''
         ALTER TABLE datasets
         ADD ontology boolean NULL
+        DEFAULT(0)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE datasets
+        ADD endpoint text NULL
         DEFAULT(0)
         '''
 
@@ -428,6 +440,7 @@ class Database(Params):
         ALTER TABLE ontologies
         ADD label_uri text NOT NULL
         DEFAULT('rdfs:label')
+        ADD endpoint text NOT NULL
         '''
 
         try:

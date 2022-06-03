@@ -59,7 +59,7 @@ class Dataset(Params):
             where_query = "AND user_id = ?"
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology
+        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology, endpoint
         FROM datasets
         WHERE id = ?
         {}
@@ -75,8 +75,9 @@ class Dataset(Params):
         self.start = rows[0][5]
         self.end = rows[0][6]
         self.ontology = rows[0][7]
+        self.endpoint = rows[0][8]
 
-    def save_in_db(self, set_graph=False):
+    def save_in_db(self, endpoint, set_graph=False):
         """Save the dataset into the database"""
         database = Database(self.app, self.session)
 
@@ -87,7 +88,8 @@ class Dataset(Params):
             self.file_id,
             self.name,
             self.public,
-            0
+            0,
+            endpoint
         )
 
         if set_graph:
@@ -99,7 +101,8 @@ class Dataset(Params):
                 self.name,
                 self.graph_name,
                 self.public,
-                0
+                0,
+                endpoint
             )
 
         query = '''
@@ -118,7 +121,8 @@ class Dataset(Params):
             NULL,
             NULL,
             NULL,
-            0
+            0,
+            ?
         )
         '''.format(subquery)
 

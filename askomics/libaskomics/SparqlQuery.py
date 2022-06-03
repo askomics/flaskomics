@@ -573,9 +573,11 @@ class SparqlQuery(Params):
 
         raw_query = self.prefix_query(raw_query)
 
-        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=False, ignore_single_tenant=True)
+        is_federated = self.is_federated()
 
-        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=False)
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated, ignore_single_tenant=True)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=is_federated)
         _, data = query_launcher.process_query(sparql)
 
         formated_data = []

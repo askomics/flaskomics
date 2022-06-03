@@ -343,8 +343,10 @@ def integrate():
                 "public": (data.get("public", False) if session["user"]["admin"] else False) or current_app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
             }
 
+            endpoint = data["externalEndpoint"] or current_app.iniconfig.get('triplestore', 'endpoint')
+
             dataset = Dataset(current_app, session, dataset_info)
-            dataset.save_in_db()
+            dataset.save_in_db(endpoint)
             data["dataset_id"] = dataset.id
             dataset_ids.append(dataset.id)
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
