@@ -1207,8 +1207,6 @@ class SparqlQuery(Params):
                         "optional": False
                     }, block_id, sblock_id, pblock_ids)
                 if attribute.get("ontology", False) is True:
-                    if ontologies.get(attribute["entityUris"][0]):
-                        predicate = ontologies[attribute["entityUris"][0]]["label_uri"]
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
@@ -1282,6 +1280,8 @@ class SparqlQuery(Params):
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["uri"] == "rdfs:label":
                         predicate = attribute["uri"]
+                        if ontologies.get(attribute["entityUris"][0]):
+                            predicate = ontologies[attribute["entityUris"][0]]["label_uri"]
                     else:
                         predicate = "<{}>".format(attribute["uri"])
 
