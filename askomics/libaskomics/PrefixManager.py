@@ -42,7 +42,8 @@ class PrefixManager(Params):
             'rdfs:': str(rdflib.RDFS),
             'owl:': str(rdflib.OWL),
             'xsd:': str(rdflib.XSD),
-            'skos:': str(rdflib.SKOS)
+            'skos:': str(rdflib.SKOS),
+            'dcat:': str(rdflib.DCAT)
         }
 
     def get_prefix(self):

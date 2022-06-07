@@ -6,6 +6,8 @@ from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
+from collections import defaultdict
+
 
 class SparqlQuery(Params):
     """Format a sparql query
@@ -33,8 +35,9 @@ class SparqlQuery(Params):
         self.json = json_query
         self.sparql = None
 
-        self.graphs = []
-        self.endpoints = []
+        self.graphs = set()
+        self.endpoints = set()
+        self.remote_graphs = defaultdict(set)
         self.selects = []
         self.federated = False
 
@@ -378,6 +381,23 @@ class SparqlQuery(Params):
 
         return from_string
 
+    def get_federated_remote_from_graphs(self):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = ""
+
+        for endpoint in self.endpoints:
+            remote_graphs = self.remote_graphs.get(endpoint)
+            if len(remote_graphs) == 1:
+                from_string += "\n@graph <{}> <{}>".format(endpoint, remote_graphs[0])
+
+        return from_string
+
     def get_endpoints_string(self):
         """get endpoint strngs for the federated query engine
 
@@ -410,7 +430,7 @@ class SparqlQuery(Params):
             filter_public_string = 'FILTER (?public = <true> || ?creator = <{}>)'.format(self.session["user"]["username"])
 
         query = '''
-        SELECT DISTINCT ?graph ?endpoint ?entity_uri
+        SELECT DISTINCT ?graph ?endpoint ?entity_uri ?remote_graph
         WHERE {{
           ?graph_abstraction askomics:public ?public .
           ?graph_abstraction dc:creator ?creator .
@@ -418,6 +438,7 @@ class SparqlQuery(Params):
           ?graph dc:creator ?creator .
           GRAPH ?graph_abstraction {{
             ?graph_abstraction prov:atLocation ?endpoint .
+            OPTIONAL {{?graph_abstraction dcat:Dataset ?remote_graph .}}
             ?entity_uri a ?askomics_type .
           }}
           GRAPH ?graph {{
@@ -433,15 +454,17 @@ class SparqlQuery(Params):
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         header, results = query_launcher.process_query(self.prefix_query(query))
-        self.graphs = []
-        self.endpoints = []
+        self.graphs = set()
+        self.endpoints = set()
+        self.remote_graphs = defaultdict(set)
         for res in results:
             if not graphs or res["graph"] in graphs:
                 # Override with onto graph if matching uri
                 if ontologies.get(res['entity_uri']):
-                    self.graphs.append(ontologies[res['entity_uri']]['graph'])
+                    graph = ontologies[res['entity_uri']]['graph']
                 else:
-                    self.graphs.append(res["graph"])
+                    graph = res["graph"]
+                self.graphs.add(graph)
 
             # If local triplestore url is not accessible by federated query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
@@ -450,9 +473,10 @@ class SparqlQuery(Params):
                 endpoint = res["endpoint"]
 
             if not endpoints or endpoint in endpoints:
-                self.endpoints.append(endpoint)
+                self.endpoints.add(endpoint)
+                if res.get("remote_graph"):
+                    self.remote_graphs[endpoint] = res.get("remote_graph")
 
-        self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1
 
     def get_uri_parameters(self, uri, endpoints):
@@ -1473,6 +1497,7 @@ class SparqlQuery(Params):
         from_string = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
+        federated_graphs_string = self.get_federated_remote_from_graphs()
 
         # Linked attributes: replace SPARQL variable target by source
         self.replace_variables_in_blocks(var_to_replace)
@@ -1502,6 +1527,7 @@ WHERE {{
             query = """
 {endpoints}
 {federated}
+{remote_graphs}
 
 SELECT DISTINCT {selects}
 WHERE {{
@@ -1513,6 +1539,7 @@ WHERE {{
             """.format(
                 endpoints=endpoints_string,
                 federated=federated_from_string,
+                remote_graphs=federated_graphs_string,
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
                 blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
