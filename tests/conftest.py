@@ -481,7 +481,7 @@ class Client(object):
         # Save job in database database
         result = Result(self.app, self.session, info)
 
-        result.save_in_db("http://virtuoso:8890/sparql")
+        result.save_in_db()
 
         # Execute query and write result to file
         headers, results = query_launcher.process_query(query.sparql)

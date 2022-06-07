@@ -35,8 +35,8 @@ class SparqlQuery(Params):
         self.json = json_query
         self.sparql = None
 
-        self.graphs = set()
-        self.endpoints = set()
+        self.graphs = []
+        self.endpoints = []
         self.remote_graphs = defaultdict(set)
         self.selects = []
         self.federated = False
@@ -392,7 +392,7 @@ class SparqlQuery(Params):
         from_string = ""
 
         for endpoint in self.endpoints:
-            remote_graphs = self.remote_graphs.get(endpoint)
+            remote_graphs = self.remote_graphs.get(endpoint, [])
             if len(remote_graphs) == 1:
                 from_string += "\n@graph <{}> <{}>".format(endpoint, remote_graphs[0])
 
@@ -454,8 +454,8 @@ class SparqlQuery(Params):
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
         header, results = query_launcher.process_query(self.prefix_query(query))
-        self.graphs = set()
-        self.endpoints = set()
+        self.graphs = []
+        self.endpoints = []
         self.remote_graphs = defaultdict(set)
         for res in results:
             if not graphs or res["graph"] in graphs:
@@ -464,7 +464,7 @@ class SparqlQuery(Params):
                     graph = ontologies[res['entity_uri']]['graph']
                 else:
                     graph = res["graph"]
-                self.graphs.add(graph)
+                self.graphs.append(graph)
 
             # If local triplestore url is not accessible by federated query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
@@ -473,10 +473,11 @@ class SparqlQuery(Params):
                 endpoint = res["endpoint"]
 
             if not endpoints or endpoint in endpoints:
-                self.endpoints.add(endpoint)
+                self.endpoints.append(endpoint)
                 if res.get("remote_graph"):
                     self.remote_graphs[endpoint] = res.get("remote_graph")
 
+        self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1
 
     def get_uri_parameters(self, uri, endpoints):
