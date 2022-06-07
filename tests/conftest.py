@@ -320,7 +320,7 @@ class Client(object):
             }
 
             dataset = Dataset(self.app, self.session, dataset_info)
-            dataset.save_in_db(set_graph=set_graph)
+            dataset.save_in_db("http://virtuoso:8890/sparql", set_graph=set_graph)
 
             if file.type == "csv/tsv":
                 file.integrate(dataset.id, info["columns_type"], public=public)
@@ -481,7 +481,7 @@ class Client(object):
         # Save job in database database
         result = Result(self.app, self.session, info)
 
-        result.save_in_db()
+        result.save_in_db("http://virtuoso:8890/sparql")
 
         # Execute query and write result to file
         headers, results = query_launcher.process_query(query.sparql)
