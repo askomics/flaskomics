@@ -40,6 +40,7 @@ class RdfGraph(Params):
         self.graph.bind('faldo', "http://biohackathon.org/resource/faldo/")
         self.graph.bind('dc', 'http://purl.org/dc/elements/1.1/')
         self.graph.bind('prov', 'http://www.w3.org/ns/prov#')
+        self.graph.bind('dcat', 'http://www.w3.org/ns/dcat#')
         self.ntriple = 0
         self.percent = None
 

@@ -24,6 +24,7 @@ export default class RdfPreview extends Component {
       privateTick: false,
       customUri: "",
       externalEndpoint: props.file.data.location ? props.file.data.location : "",
+      externalGraph: props.file.data.remote_graph ? props.file.data.remote_graph : "",
       error: false,
       errorMessage: null,
       status: null
@@ -49,7 +50,8 @@ export default class RdfPreview extends Component {
       public: event.target.value == 'public',
       type: this.props.file.type,
       customUri: this.state.customUri,
-      externalEndpoint: this.state.externalEndpoint
+      externalEndpoint: this.state.externalEndpoint,
+      remoteGraph: this.state.remoteGraph
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -80,6 +82,14 @@ export default class RdfPreview extends Component {
   handleChangeEndpoint (event) {
     this.setState({
       externalEndpoint: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeRemoteGraph (event) {
+    this.setState({
+      remoteGraph: event.target.value,
       publicTick: false,
       privateTick: false
     })
@@ -142,6 +152,8 @@ export default class RdfPreview extends Component {
           config={this.props.config}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
           externalEndpoint={this.state.externalEndpoint}
+          handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+          externalGraph={this.state.externalGraph}
           handleChangeUri={p => this.handleChangeUri(p)}
         />
         <br />

@@ -44,7 +44,7 @@ def integrate(self, session, data, host_url):
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
+    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"], external_graph=data['externalGraph'])
     files_handler.handle_files([data["fileId"], ])
 
     public = (data.get("public", False) if session["user"]["admin"] else False) or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)

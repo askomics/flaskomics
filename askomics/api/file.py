@@ -333,6 +333,7 @@ def integrate():
         for file in files_handler.files:
 
             data["externalEndpoint"] = data["externalEndpoint"] if (data.get("externalEndpoint") and isinstance(file, RdfFile)) else None
+            data["externalGraph"] = data["externalGraph"] if (data.get("externalGraph") and isinstance(file, RdfFile)) else None
             data["customUri"] = data["customUri"] if (data.get("customUri") and not isinstance(file, RdfFile)) else None
 
             dataset_info = {
