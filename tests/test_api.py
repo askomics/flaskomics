@@ -43,6 +43,7 @@ class TestApi(AskomicsTestCase):
             "proxyPath": "/",
             "user": {},
             "logged": False,
+            "ontologies": [],
             "singleTenant": False
         }
         response = client.client.get('/api/start')

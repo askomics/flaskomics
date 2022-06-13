@@ -125,7 +125,11 @@ preview_limit = 25
 # result_set_max_rows = 10000
 
 # Single tenant means all graphs are public
+# All queries are launched on all graphes (speedup queries)
 single_tenant=False
+
+# Max results returned for autocompletion
+autocomplete_max_results = 10
 
 [federation]
 # Query engine can be corese or fedx

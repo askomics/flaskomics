@@ -7,6 +7,8 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Mailer import Mailer
+from askomics.libaskomics.PrefixManager import PrefixManager
+from askomics.libaskomics.OntologyManager import OntologyManager
 from askomics.libaskomics.Result import Result
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 
@@ -256,6 +258,12 @@ def toogle_public_dataset():
         datasets_handler.handle_datasets(admin=True)
 
         for dataset in datasets_handler.datasets:
+            if (not data.get("newStatus", False) and dataset.ontology):
+                return jsonify({
+                    'datasets': [],
+                    'error': True,
+                    'errorMessage': "Cannot unpublicize a dataset linked to an ontology"
+                }), 400
             current_app.logger.debug(data["newStatus"])
             dataset.toggle_public(data["newStatus"], admin=True)
 
@@ -507,6 +515,308 @@ def delete_datasets():
 
     return jsonify({
         'datasets': datasets,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/getprefixes", methods=["GET"])
+@api_auth
+@admin_required
+def get_prefixes():
+    """Get all custom prefixes
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        pm = PrefixManager(current_app, session)
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/addprefix", methods=["POST"])
+@api_auth
+@admin_required
+def add_prefix():
+    """Create a new prefix
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not (data.get("prefix") and data.get("namespace")):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Missing parameter"
+        }), 400
+
+    pm = PrefixManager(current_app, session)
+    prefixes = pm.get_custom_prefixes()
+
+    prefix = data.get("prefix")
+    namespace = data.get("namespace")
+
+    if any([prefix == custom['prefix'] for custom in prefixes]):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Prefix {} is already in use".format(prefix)
+        }), 400
+
+    try:
+        pm.add_custom_prefix(prefix, namespace)
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/delete_prefixes", methods=["POST"])
+@api_auth
+@admin_required
+def delete_prefix():
+    """Delete a prefix
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not data.get("prefixesIdToDelete"):
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': "Missing prefixesIdToDelete parameter"
+        }), 400
+
+    pm = PrefixManager(current_app, session)
+    try:
+        pm.remove_custom_prefixes(data.get("prefixesIdToDelete"))
+        prefixes = pm.get_custom_prefixes()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'prefixes': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'prefixes': prefixes,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/getontologies", methods=["GET"])
+@api_auth
+@admin_required
+def get_ontologies():
+    """Get all ontologies
+
+    Returns
+    -------
+    json
+        prefixes: list of all custom prefixes
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        om = OntologyManager(current_app, session)
+        ontologies = om.list_full_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/addontology", methods=["POST"])
+@api_auth
+@admin_required
+def add_ontology():
+    """Create a new ontology
+
+    Returns
+    -------
+    json
+        ontologies: list of all ontologies
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not (data.get("name") and data.get("uri") and data.get("shortName") and data.get("type") and data.get("datasetId") and data.get("labelUri")):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Missing parameter"
+        }), 400
+
+    name = data.get("name")
+    uri = data.get("uri")
+    short_name = data.get("shortName")
+    type = data.get("type")
+    dataset_id = data.get("datasetId")
+    label_uri = data.get("labelUri")
+
+    om = OntologyManager(current_app, session)
+
+    if type == "ols" and not om.test_ols_ontology(short_name):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "{} ontology not found in OLS".format(short_name)
+        }), 400
+
+    om = OntologyManager(current_app, session)
+    ontologies = om.list_full_ontologies()
+
+    if type not in ["none", "local", "ols"]:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Invalid type"
+        }), 400
+
+    datasets_info = [{'id': dataset_id}]
+
+    try:
+        datasets_handler = DatasetsHandler(current_app, session, datasets_info=datasets_info)
+        datasets_handler.handle_datasets()
+    except IndexError:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Dataset {} not found".format(dataset_id)
+        }), 400
+
+    if not len(datasets_handler.datasets) == 1 or not datasets_handler.datasets[0].public:
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Invalid dataset id"
+        }), 400
+
+    dataset = datasets_handler.datasets[0]
+
+    if any([name == onto['name'] or short_name == onto['short_name'] for onto in ontologies]):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Name and short name must be unique"
+        }), 400
+
+    if any([dataset_id == onto['dataset_id'] for onto in ontologies]):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Dataset is already linked to another ontology"
+        }), 400
+
+    try:
+        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, dataset.endpoint, type, label_uri)
+        ontologies = om.list_full_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
+@admin_bp.route("/api/admin/delete_ontologies", methods=["POST"])
+@api_auth
+@admin_required
+def delete_ontologies():
+    """Delete one or more ontologies
+
+    Returns
+    -------
+    json
+        ontologies: list of all ontologies
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+
+    data = request.get_json()
+    if not data or not data.get("ontologiesIdToDelete"):
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': "Missing ontologiesIdToDelete parameter"
+        }), 400
+
+    om = OntologyManager(current_app, session)
+
+    ontologies = om.list_full_ontologies()
+    onto_to_delete = [{"id": ontology['id'], "dataset_id": ontology['dataset_id']} for ontology in ontologies if ontology['id'] in data.get("ontologiesIdToDelete")]
+
+    try:
+        om.remove_ontologies(onto_to_delete)
+        ontologies = om.list_full_ontologies()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'ontologies': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'ontologies': ontologies,
         'error': False,
         'errorMessage': ''
     })

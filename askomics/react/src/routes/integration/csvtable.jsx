@@ -26,7 +26,8 @@ export default class CsvTable extends Component {
       externalEndpoint: "",
       error: false,
       errorMessage: null,
-      status: null
+      status: null,
+      externalGraph: ""
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -91,6 +92,18 @@ export default class CsvTable extends Component {
       )
     }
 
+    let ontoInput
+
+    if (this.props.ontologies.length > 0){
+      ontoInput = (
+        <optgroup label="Ontologies">
+        {this.props.ontologies.map(onto => {
+          return <option key={onto.id} value={onto.short_name}>{onto.name}</option>
+        })}
+        </optgroup>
+      )
+    }
+
     if (colIndex == 1) {
       return (
         <div>
@@ -117,6 +130,7 @@ export default class CsvTable extends Component {
                 <option value="general_relation" >Directed</option>
                 <option value="symetric_relation" >Symetric</option>
               </optgroup>
+              {ontoInput}
             </CustomInput>
           </FormGroup>
         </div>
@@ -145,6 +159,7 @@ export default class CsvTable extends Component {
               <option value="general_relation" >Directed</option>
               <option value="symetric_relation" >Symetric</option>
             </optgroup>
+            {ontoInput}
           </CustomInput>
         </FormGroup>
       </div>
@@ -194,6 +209,14 @@ export default class CsvTable extends Component {
   handleChangeEndpoint (event) {
     this.setState({
       externalEndpoint: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
       publicTick: false,
       privateTick: false
     })
@@ -274,6 +297,8 @@ export default class CsvTable extends Component {
             hideDistantEndpoint={true}
             handleChangeUri={p => this.handleChangeUri(p)}
             handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+            externalGraph={this.state.externalGraph}
             customUri={this.state.customUri}
           />
           <br />
@@ -300,5 +325,6 @@ export default class CsvTable extends Component {
 
 CsvTable.propTypes = {
   file: PropTypes.object,
-  config: PropTypes.object
+  config: PropTypes.object,
+  ontologies: PropTypes.array
 }

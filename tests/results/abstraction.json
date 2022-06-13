@@ -535,6 +535,7 @@
         "instancesHaveLabels": true,
         "label": "transcript",
         "type": "node",
+        "ontology": false,
         "uri": "http://askomics.org/test/data/transcript"
       },
       {
@@ -549,6 +550,7 @@
         "instancesHaveLabels": true,
         "label": "gene",
         "type": "node",
+        "ontology": false,
         "uri": "http://askomics.org/test/data/gene"
       },
       {
@@ -562,6 +564,7 @@
         "instancesHaveLabels": true,
         "label": "QTL",
         "type": "node",
+        "ontology": false,
         "uri": "http://askomics.org/test/data/QTL"
       },
       {
@@ -575,6 +578,7 @@
         "instancesHaveLabels": true,
         "label": "DifferentialExpression",
         "type": "node",
+        "ontology": false,
         "uri": "http://askomics.org/test/data/DifferentialExpression"
       }
     ],

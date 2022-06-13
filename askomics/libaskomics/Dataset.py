@@ -45,6 +45,7 @@ class Dataset(Params):
         self.public = dataset_info["public"] if "public" in dataset_info else False
         self.start = dataset_info["start"] if "start" in dataset_info else None
         self.end = dataset_info["end"] if "end" in dataset_info else None
+        self.ontology = dataset_info["ontology"] if "ontology" in dataset_info else False
 
     def set_info_from_db(self, admin=False):
         """Set the info in from the database"""
@@ -58,7 +59,7 @@ class Dataset(Params):
             where_query = "AND user_id = ?"
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public, start, end
+        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology, endpoint
         FROM datasets
         WHERE id = ?
         {}
@@ -73,10 +74,36 @@ class Dataset(Params):
         self.public = rows[0][4]
         self.start = rows[0][5]
         self.end = rows[0][6]
+        self.ontology = rows[0][7]
+        self.endpoint = rows[0][8]
 
-    def save_in_db(self):
+    def save_in_db(self, endpoint, set_graph=False):
         """Save the dataset into the database"""
         database = Database(self.app, self.session)
+
+        subquery = "NULL"
+        args = (
+            self.session["user"]["id"],
+            self.celery_id,
+            self.file_id,
+            self.name,
+            self.public,
+            0,
+            endpoint
+        )
+
+        if set_graph:
+            subquery = "?"
+            args = (
+                self.session["user"]["id"],
+                self.celery_id,
+                self.file_id,
+                self.name,
+                self.graph_name,
+                self.public,
+                0,
+                endpoint
+            )
 
         query = '''
         INSERT INTO datasets VALUES(
@@ -85,7 +112,7 @@ class Dataset(Params):
             ?,
             ?,
             ?,
-            NULL,
+            {},
             ?,
             "queued",
             strftime('%s', 'now'),
@@ -93,18 +120,13 @@ class Dataset(Params):
             ?,
             NULL,
             NULL,
-            NULL
+            NULL,
+            0,
+            ?
         )
-        '''
+        '''.format(subquery)
 
-        self.id = database.execute_sql_query(query, (
-            self.session["user"]["id"],
-            self.celery_id,
-            self.file_id,
-            self.name,
-            self.public,
-            0
-        ), get_id=True)
+        self.id = database.execute_sql_query(query, args, get_id=True)
 
     def toggle_public(self, new_status, admin=False):
         """Change public status of a dataset (triplestore and db)
@@ -228,3 +250,10 @@ class Dataset(Params):
         '''.format(where_query)
 
         database.execute_sql_query(query, query_params)
+
+        query = '''
+        DELETE FROM ontologies
+        WHERE dataset_id = ?
+        '''
+
+        database.execute_sql_query(query, (self.id,))

@@ -99,7 +99,7 @@ render () {
         return (
           <FormGroup>
             <div>
-              <CustomInput type="switch" id={"dataset-" + row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
+              <CustomInput disabled={row.ontology == 0 ? false: true}type="switch" id={"dataset-" + row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )

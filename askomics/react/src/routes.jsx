@@ -14,6 +14,8 @@ import Logout from './routes/login/logout'
 import PasswordReset from './routes/login/passwordreset'
 import Account from './routes/account/account'
 import Admin from './routes/admin/admin'
+import Prefixes from './routes/admin/prefixes'
+import Ontologies from './routes/admin/ontologies'
 import Sparql from './routes/sparql/sparql'
 import FormQuery from './routes/form/query'
 import FormEditQuery from './routes/form_edit/query'
@@ -45,6 +47,7 @@ export default class Routes extends Component {
         disableIntegration: null,
         namespaceData: null,
         namespaceInternal: null,
+        ontologies: [],
         singleTenant: false
       }
     }
@@ -114,6 +117,8 @@ export default class Routes extends Component {
             <Route path="/password_reset" component={(props) => <PasswordReset config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} {...props}/>}/>
             <Route path="/account" exact component={() => (<Account config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/admin" exact component={() => (<Admin config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/prefixes" exact component={() => (<Prefixes config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+            <Route path="/ontologies" exact component={() => (<Ontologies config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
             <Route path="/form" exact component={FormQuery} />
             <Route path="/form_edit" exact component={FormEditQuery} />

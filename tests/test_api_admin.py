@@ -139,7 +139,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -152,7 +153,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["de"]["end"] - info["de"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -165,7 +167,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["gff"]["end"],
                 'error_message': '',
@@ -178,7 +181,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["gff"]["end"] - info["gff"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["bed"]["end"],
                 'error_message': '',
@@ -191,7 +195,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["bed"]["end"] - info["bed"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }],
             'error': False,
             'errorMessage': ''
@@ -491,3 +496,202 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.json["datasets"][0]["status"] == "queued"
         assert response.json["datasets"][1]["status"] == "queued"
         assert response.json["datasets"][2]["status"] == "queued"
+
+    def test_view_custom_prefixes(self, client):
+        """test /api/admin/getprefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getprefixes')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        response = client.client.get('/api/admin/getprefixes')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        client.create_prefix()
+
+        response = client.client.get('/api/admin/getprefixes')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_custom_prefix(self, client):
+        """test /api/admin/addprefix route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefix": "OBO", "namespace": "http://purl.obolibrary.org/obo/"}
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_custom_prefix(self, client):
+        """test /api/admin/delete_prefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefixesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_prefix()
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_view_ontologies(self, client):
+        """test /api/admin/getontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        client.create_ontology()
+
+        response = client.client.get('/api/admin/getontologies')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "Open Biological and Biomedical Ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "OBO",
+                "type": "local",
+                "dataset_id": 1,
+                "dataset_name": "transcripts.tsv",
+                "graph": "mygraph",
+                "label_uri": "rdfs:label"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_ontology(self, client):
+        """test /api/admin/addontology route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology", "type": "local", "datasetId": 1, "labelUri": "rdfs:label"}
+
+        response = client.client.post('/api/admin/addontology', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.upload_and_integrate(set_graph=True)
+
+        response = client.client.post('/api/admin/addontology', json=data)
+
+        # Dataset is not public
+        assert response.status_code == 400
+        assert response.json['errorMessage'] == "Invalid dataset id"
+
+        client.publicize_dataset(1, True)
+        response = client.client.post('/api/admin/addontology', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "Open Biological and Biomedical Ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "OBO",
+                "type": "local",
+                "dataset_id": 1,
+                "dataset_name": "transcripts.tsv",
+                "label_uri": "rdfs:label"
+            }]
+        }
+
+        # Graph name is random
+        res = response.json
+        res['ontologies'][0].pop('graph')
+
+        assert response.status_code == 200
+        assert res == expected
+
+    def test_delete_ontologies(self, client):
+        """test /api/admin/delete_ontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"ontologiesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_ontology()
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
