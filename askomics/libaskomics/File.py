@@ -280,7 +280,7 @@ class File(Params):
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
         if self.external_graph:
-            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dcat.Dataset, self.external_graph))
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dcat.Dataset, rdflib.Literal(self.external_graph)))
 
         if self.public:
             self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(True)))

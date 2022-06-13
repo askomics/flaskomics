@@ -51,7 +51,7 @@ export default class RdfPreview extends Component {
       type: this.props.file.type,
       customUri: this.state.customUri,
       externalEndpoint: this.state.externalEndpoint,
-      remoteGraph: this.state.remoteGraph
+      externalGraph: this.state.externalGraph
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -87,9 +87,9 @@ export default class RdfPreview extends Component {
     })
   }
 
-  handleChangeRemoteGraph (event) {
+  handleChangeExternalGraph (event) {
     this.setState({
-      remoteGraph: event.target.value,
+      externalGraph: event.target.value,
       publicTick: false,
       privateTick: false
     })

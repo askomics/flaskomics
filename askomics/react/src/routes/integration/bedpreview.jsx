@@ -82,6 +82,14 @@ export default class BedPreview extends Component {
     })
   }
 
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   render () {
 
     let privateIcon = <i className="fas fa-lock"></i>

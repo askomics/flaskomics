@@ -37,7 +37,7 @@ class SparqlQuery(Params):
 
         self.graphs = []
         self.endpoints = []
-        self.remote_graphs = defaultdict(set)
+        self.remote_graphs = defaultdict(list)
         self.selects = []
         self.federated = False
 
@@ -456,7 +456,7 @@ class SparqlQuery(Params):
         header, results = query_launcher.process_query(self.prefix_query(query))
         self.graphs = []
         self.endpoints = []
-        self.remote_graphs = defaultdict(set)
+        self.remote_graphs = defaultdict(list)
         for res in results:
             if not graphs or res["graph"] in graphs:
                 # Override with onto graph if matching uri
@@ -475,7 +475,7 @@ class SparqlQuery(Params):
             if not endpoints or endpoint in endpoints:
                 self.endpoints.append(endpoint)
                 if res.get("remote_graph"):
-                    self.remote_graphs[endpoint] = res.get("remote_graph")
+                    self.remote_graphs[endpoint].append(res.get("remote_graph"))
 
         self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1

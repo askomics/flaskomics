@@ -99,9 +99,9 @@ export default class GffPreview extends Component {
     })
   }
 
-  handleChangeRemoteGraph (event) {
+  handleChangeExternalGraph (event) {
     this.setState({
-      remoteGraph: event.target.value,
+      externalGraph: event.target.value,
       publicTick: false,
       privateTick: false
     })
