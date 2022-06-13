@@ -26,7 +26,8 @@ export default class CsvTable extends Component {
       externalEndpoint: "",
       error: false,
       errorMessage: null,
-      status: null
+      status: null,
+      externalGraph: ""
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -213,6 +214,14 @@ export default class CsvTable extends Component {
     })
   }
 
+  handleChangeRemoteGraph (event) {
+    this.setState({
+      remoteGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   toggleHeaderForm(event) {
     this.setState({
       header: update(this.state.header, { [event.target.id]: { input: { $set: true } } })
@@ -288,6 +297,8 @@ export default class CsvTable extends Component {
             hideDistantEndpoint={true}
             handleChangeUri={p => this.handleChangeUri(p)}
             handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+            externalGraph={this.state.externalGraph}
             customUri={this.state.customUri}
           />
           <br />
