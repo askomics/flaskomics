@@ -64,3 +64,4 @@ AdvancedOptions.propTypes = {
   externalEndpoint: PropTypes.string,
   handleChangeExternalGraph: PropTypes.function,
   externalGraph: PropTypes.string
+}
