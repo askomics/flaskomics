@@ -76,7 +76,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph
+        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph, ontologies.endpoint
         FROM ontologies
         INNER JOIN datasets ON datasets.id=ontologies.dataset_id
         '''
@@ -94,7 +94,8 @@ class OntologyManager(Params):
                 'label_uri': row[5],
                 'dataset_id': row[6],
                 'dataset_name': row[7],
-                'graph': row[8]
+                'graph': row[8],
+                'endpoint': row[9]
             }
             ontologies.append(prefix)
 
@@ -123,7 +124,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri
+        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri, endpoint
         FROM ontologies
         {}
         '''.format(where_clause)
@@ -142,7 +143,8 @@ class OntologyManager(Params):
             'type': ontology[4],
             'dataset_id': ontology[5],
             'graph': ontology[6],
-            'label_uri': ontology[7]
+            'label_uri': ontology[7],
+            'endpoint': ontology[8]
         }
 
     def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, type="local", label_uri="rdfs:label"):

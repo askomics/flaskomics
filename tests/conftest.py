@@ -328,7 +328,8 @@ class Client(object):
                 file.integrate(dataset.id, info["entities"], public=public)
             elif file.type == "bed":
                 file.integrate(dataset.id, info["entity_name"], public=public)
-
+            elif file.type in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
+                file.integrate(public=public)
             # done
             dataset.update_in_db("success")
             dataset.set_info_from_db()
@@ -336,7 +337,9 @@ class Client(object):
             return {
                 "timestamp": file.timestamp,
                 "start": dataset.start,
-                "end": dataset.end
+                "end": dataset.end,
+                "graph": dataset.graph_name,
+                "endpoint": dataset.endpoint
             }
 
     def upload(self):
@@ -443,6 +446,33 @@ class Client(object):
                 "start": int_bed["start"],
                 "end": int_bed["end"]
             }
+        }
+
+    def upload_and_integrate_ontology(self):
+        """Summary
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        # upload
+        up_ontology = self.upload_file("test-data/agro_min.ttl")
+
+        # integrate
+        int_ontology = self.integrate_file({
+            "id": 1,
+        })
+
+        return {
+            "ontology": {
+                "upload": up_ontology,
+                "timestamp": int_ontology["timestamp"],
+                "start": int_ontology["start"],
+                "end": int_ontology["end"],
+                "graph": int_ontology["graph"],
+                "endpoint": int_ontology["endpoint"]
+            },
         }
 
     def create_result(self, has_form=False):
@@ -590,9 +620,10 @@ class Client(object):
 
     def create_ontology(self):
         """Create ontology"""
-        self.upload_and_integrate()
+        data = self.upload_and_integrate_ontology()
         om = OntologyManager(self.app, self.session)
-        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO", 1, "mygraph", "local")
+        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], "local")
+        return data["graph"], data["endpoint"]
 
     @staticmethod
     def get_random_string(number):
