@@ -1046,13 +1046,13 @@ class LocalAuth(Params):
             body = textwrap.dedent("""
             Welcome {username}!
 
-            We heard that administrators of {url} create an account for you.
+            An account with this email adress was created by the administrators of {url}.
 
-            To use it, use the following link to create your password. Then, login with you email adress ({email}) or username ({username}).
+            To use it, please use the following link to create your password. You will then be able to log in with your username ({username}).
 
             {url}/password_reset?token={token}
 
-            If you don’t use this link within 3 hours, it will expire. To get a new password creation link, visit {url}/password_reset
+            This link will expire after 3 hours. To get a new password creation link, please visit {url}/password_reset
 
             Thanks,
 
