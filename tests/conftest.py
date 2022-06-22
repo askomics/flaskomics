@@ -463,7 +463,7 @@ class Client(object):
         # integrate
         int_ontology = self.integrate_file({
             "id": 1,
-        })
+        }, set_graph=True)
 
         return {
             "upload": up_ontology,
