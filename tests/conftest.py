@@ -466,14 +466,12 @@ class Client(object):
         })
 
         return {
-            "ontology": {
-                "upload": up_ontology,
-                "timestamp": int_ontology["timestamp"],
-                "start": int_ontology["start"],
-                "end": int_ontology["end"],
-                "graph": int_ontology["graph"],
-                "endpoint": int_ontology["endpoint"]
-            },
+            "upload": up_ontology,
+            "timestamp": int_ontology["timestamp"],
+            "start": int_ontology["start"],
+            "end": int_ontology["end"],
+            "graph": int_ontology["graph"],
+            "endpoint": int_ontology["endpoint"]
         }
 
     def create_result(self, has_form=False):
