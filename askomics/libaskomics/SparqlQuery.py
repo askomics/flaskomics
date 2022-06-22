@@ -590,11 +590,11 @@ class SparqlQuery(Params):
         raw_query = '''
         SELECT DISTINCT ?label
         WHERE {{
-          ?uri rdf:type <{}> .
+          ?uri rdf:type owl:Class .
           ?uri rdfs:label ?label .
           {}
         }}
-        '''.format(uri, subquery)
+        '''.format(subquery)
 
         raw_query = self.prefix_query(raw_query)
 
