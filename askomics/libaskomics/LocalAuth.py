@@ -1059,7 +1059,6 @@ class LocalAuth(Params):
             The AskOmics Team
             """.format(
                 username=user["username"],
-                email=user["email"],
                 url=self.settings.get('askomics', 'instance_url'),
                 token=token
             ))
@@ -1105,7 +1104,7 @@ class LocalAuth(Params):
                     Dear {user},
 
                     A password reset request has been received for your {url} account.
-                    
+
                     If you did not initiate this request, feel free to ignore this message.
 
                     You can use the following link to reset your password:
