@@ -251,7 +251,8 @@ class Client(object):
             ".tsv": "text/tab-separated-values",
             ".csv": "text/tab-separated-values",
             ".gff3": "null",
-            ".bed": "null"
+            ".bed": "null",
+            ".ttl": "rdf/ttl"
         }
 
         with open(file_path, 'r') as file_content:

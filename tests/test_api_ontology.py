@@ -1,5 +1,3 @@
-import json
-
 from . import AskomicsTestCase
 
 
@@ -30,7 +28,8 @@ class TestApiOntology(AskomicsTestCase):
             "reduced tillage process",
             "laser land levelling process",
             "chemical pest control process",
-            "no-till","puddling process",
+            "no-till",
+            "puddling process",
             "mulch-till",
             "ridge-till"
         ]
