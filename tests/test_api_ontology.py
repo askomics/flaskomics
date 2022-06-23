@@ -4,6 +4,24 @@ from . import AskomicsTestCase
 class TestApiOntology(AskomicsTestCase):
     """Test AskOmics API /api/ontology/<someting>"""
 
+    def test_local_autocompletion_protected(self, client):
+        """ Test autocompletion on missing ontology"""
+        query = "blabla"
+        client.set_config("askomics", "protect_public", "true")
+        response = client.client.get('/api/ontology/AGRO/autocomplete?q={}'.format(query))
+
+        assert response.status_code == 401
+        assert len(response.json["results"]) == 0
+
+    def test_local_autocompletion_missing_ontology(self, client):
+        """ Test autocompletion on missing ontology"""
+        query = "blabla"
+        response = client.client.get('/api/ontology/AGRO/autocomplete?q={}'.format(query))
+
+        assert response.status_code == 404
+        assert len(response.json["results"]) == 0
+
+
     def test_local_autocompletion(self, client):
         """test /api/ontology/AGRO/autocomplete route"""
         client.create_two_users()

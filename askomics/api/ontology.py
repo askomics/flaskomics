@@ -10,7 +10,6 @@ onto_bp = Blueprint('ontology', __name__, url_prefix='/')
 
 @onto_bp.route("/api/ontology/<short_ontology>/autocomplete", methods=["GET"])
 @api_auth
-@login_required
 def autocomplete(short_ontology):
     """Get the default sparql query
 
@@ -19,8 +18,13 @@ def autocomplete(short_ontology):
     json
     """
 
+    if "user" not in session and current_app.iniconfig.getboolean("askomics", "protect_public"):
+        return jsonify({
+                "error": True,
+                "errorMessage": "Ontology {} not found".format(short_ontology),
+                "results": []
+            }), 401
     try:
-        # Disk space
         om = OntologyManager(current_app, session)
         ontology = om.get_ontology(short_name=short_ontology)
         if not ontology:
