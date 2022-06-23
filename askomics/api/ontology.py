@@ -45,7 +45,7 @@ def autocomplete(short_ontology):
             "error": True,
             "errorMessage": str(e),
             "results": []
-        }), 404
+        }), 500
 
     return jsonify({
         "error": False,

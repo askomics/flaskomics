@@ -294,7 +294,7 @@ class Client(object):
         files.download_url(file_url, "1")
         return files.date
 
-    def integrate_file(self, info, public=False, set_graph=False):
+    def integrate_file(self, info, public=False, set_graph=False, graph=""):
         """Summary
 
         Parameters
@@ -310,6 +310,9 @@ class Client(object):
         files_handler = FilesHandler(self.app, self.session)
         files_handler.handle_files([info["id"], ])
 
+        # TODO: Fix this. Why do we need the virtuoso url?
+        graph = graph or "http://virtuoso:8890/sparql"
+
         for file in files_handler.files:
 
             dataset_info = {
@@ -321,7 +324,7 @@ class Client(object):
             }
 
             dataset = Dataset(self.app, self.session, dataset_info)
-            dataset.save_in_db("http://virtuoso:8890/sparql", set_graph=set_graph)
+            dataset.save_in_db(graph, set_graph=set_graph)
 
             if file.type == "csv/tsv":
                 file.integrate(dataset.id, info["columns_type"], public=public)
@@ -463,7 +466,7 @@ class Client(object):
         # integrate
         int_ontology = self.integrate_file({
             "id": 1,
-        }, set_graph=True)
+        }, set_graph=True, graph="http://localhost:8891/sparql-auth")
 
         return {
             "upload": up_ontology,
@@ -621,7 +624,7 @@ class Client(object):
         """Create ontology"""
         data = self.upload_and_integrate_ontology()
         om = OntologyManager(self.app, self.session)
-        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], "local")
+        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], data['endpoint'], "local")
         return data["graph"], data["endpoint"]
 
     @staticmethod

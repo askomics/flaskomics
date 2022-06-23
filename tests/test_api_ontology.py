@@ -31,12 +31,17 @@ class TestApiOntology(AskomicsTestCase):
             "no-till",
             "puddling process",
             "mulch-till",
-            "ridge-till"
+            "ridge-till",
+            "strip-till",
+            "aerial application"
         ]
 
         assert response.status_code == 200
-        assert len(response.json["results"]) == 10
-        assert response.json["results"] == expected
+        assert len(response.json["results"]) == 12
+
+        # SPARQL order is not reliable, so we make sure to return everything
+        # If it fails, skip this
+        assert self.equal_objects(response.json["results"], expected)
 
         query = "irrigation"
         response = client.client.get('/api/ontology/AGRO/autocomplete?q={}'.format(query))
@@ -48,4 +53,4 @@ class TestApiOntology(AskomicsTestCase):
 
         assert response.status_code == 200
         assert len(response.json["results"]) == 2
-        assert response.json["results"] == expected
+        assert self.equal_objects(response.json["results"], expected)
