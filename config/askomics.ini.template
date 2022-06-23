@@ -83,6 +83,10 @@ ldap_mail_attribute = mail
 #ldap_password_reset_link =
 #ldap_account_link =
 
+# Max results returned for autocompletion
+autocomplete_max_results = 10
+
+
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
@@ -127,9 +131,6 @@ preview_limit = 25
 # Single tenant means all graphs are public
 # All queries are launched on all graphes (speedup queries)
 single_tenant=False
-
-# Max results returned for autocompletion
-autocomplete_max_results = 10
 
 [federation]
 # Query engine can be corese or fedx
