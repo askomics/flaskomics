@@ -21,7 +21,6 @@ class TestApiOntology(AskomicsTestCase):
         assert response.status_code == 404
         assert len(response.json["results"]) == 0
 
-
     def test_local_autocompletion(self, client):
         """test /api/ontology/AGRO/autocomplete route"""
         client.create_two_users()
