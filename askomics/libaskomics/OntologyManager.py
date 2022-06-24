@@ -76,7 +76,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph, ontologies.endpoint
+        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph, ontologies.endpoint, ontologies.remote_graph
         FROM ontologies
         INNER JOIN datasets ON datasets.id=ontologies.dataset_id
         '''
@@ -95,7 +95,8 @@ class OntologyManager(Params):
                 'dataset_id': row[6],
                 'dataset_name': row[7],
                 'graph': row[8],
-                'endpoint': row[9]
+                'endpoint': row[9],
+                'remote_graph': row[10]
             }
             ontologies.append(prefix)
 
@@ -124,7 +125,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri, endpoint
+        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri, endpoint, remote_graph
         FROM ontologies
         {}
         '''.format(where_clause)
@@ -144,7 +145,8 @@ class OntologyManager(Params):
             'dataset_id': ontology[5],
             'graph': ontology[6],
             'label_uri': ontology[7],
-            'endpoint': ontology[8]
+            'endpoint': ontology[8],
+            'remote_graph': ontology[9]
         }
 
     def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, remote_graph=None, type="local", label_uri="rdfs:label"):

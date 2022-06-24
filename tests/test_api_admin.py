@@ -622,6 +622,7 @@ class TestApiAdmin(AskomicsTestCase):
                 "dataset_name": "agro_min.ttl",
                 "graph": graph,
                 "endpoint": endpoint,
+                "remote_graph": None,
                 "label_uri": "rdfs:label"
             }]
         }
@@ -666,7 +667,8 @@ class TestApiAdmin(AskomicsTestCase):
                 "dataset_name": "agro_min.ttl",
                 "label_uri": "rdfs:label",
                 "graph": graph,
-                "endpoint": endpoint
+                "endpoint": endpoint,
+                "remote_graph": None
             }]
         }
 
