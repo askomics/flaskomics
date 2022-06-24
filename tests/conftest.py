@@ -624,7 +624,7 @@ class Client(object):
         """Create ontology"""
         data = self.upload_and_integrate_ontology()
         om = OntologyManager(self.app, self.session)
-        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], data['endpoint'], "local")
+        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], data['endpoint'], type="local")
         return data["graph"], data["endpoint"]
 
     @staticmethod

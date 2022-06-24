@@ -760,7 +760,7 @@ def add_ontology():
         }), 400
 
     try:
-        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, dataset.endpoint, data.remote_graph, type, label_uri)
+        om.add_ontology(name, uri, short_name, dataset.id, dataset.graph_name, dataset.endpoint, remote_graph=dataset.remote_graph, type=type, label_uri=label_uri)
         ontologies = om.list_full_ontologies()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
