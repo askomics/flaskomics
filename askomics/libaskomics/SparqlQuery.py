@@ -279,7 +279,7 @@ class SparqlQuery(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True, federated=False, ignore_single_tenant=True):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False):
         """Format the Sparql query
 
         - remove all FROM
@@ -299,11 +299,12 @@ class SparqlQuery(Params):
             formatted sparql query
         """
         froms = ''
-        if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False) or ignore_single_tenant):
-            froms = self.get_froms()
 
         if federated:
             federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+        else:
+            if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False)):
+                froms = self.get_froms()
 
         query_lines = query.split('\n')
 
@@ -600,7 +601,7 @@ class SparqlQuery(Params):
 
         is_federated = self.is_federated()
 
-        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated, ignore_single_tenant=True)
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=is_federated)
         _, data = query_launcher.process_query(sparql)
