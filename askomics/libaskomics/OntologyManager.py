@@ -147,7 +147,7 @@ class OntologyManager(Params):
             'endpoint': ontology[8]
         }
 
-    def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, type="local", label_uri="rdfs:label"):
+    def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, remote_graph=None, type="local", label_uri="rdfs:label"):
         """Create a new ontology
 
         Returns
@@ -169,11 +169,12 @@ class OntologyManager(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
 
-        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph, label_uri, endpoint))
+        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph, label_uri, endpoint, remote_graph))
 
         query = '''
         UPDATE datasets SET
@@ -227,7 +228,7 @@ class OntologyManager(Params):
         r = requests.get(base_url)
         return r.status_code == 200
 
-    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint, custom_label):
+    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint, custom_label, remote_graph):
         """Search in ontology
 
         Returns
@@ -244,6 +245,9 @@ class OntologyManager(Params):
             # TODO: Actually store the graph in the ontology to quicken search
             query.set_graphs([onto_graph])
             query.set_endpoints(set([self.settings.get('triplestore', 'endpoint'), onto_endpoint]))
+            if remote_graph:
+                query.set_remote_graph({onto_endpoint: [remote_graph]})
+
             return query.autocomplete_local_ontology(ontology_uri, query_term, max_results, custom_label)
         elif ontology_type == "ols":
             base_url = "https://www.ebi.ac.uk/ols/api/suggest"

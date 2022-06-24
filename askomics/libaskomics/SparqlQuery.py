@@ -71,6 +71,16 @@ class SparqlQuery(Params):
         """
         self.endpoints = endpoints
 
+    def set_remote_graph(self, remote_graphs):
+        """Set endpoints
+
+        Parameters
+        ----------
+        endpoints : list
+            Endpoints
+        """
+        self.remote_graphs = remote_graphs
+
     def is_federated(self):
         """Return True if there is more than 1 endpoint
 

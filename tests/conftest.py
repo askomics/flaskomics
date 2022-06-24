@@ -294,7 +294,7 @@ class Client(object):
         files.download_url(file_url, "1")
         return files.date
 
-    def integrate_file(self, info, public=False, set_graph=False, graph=""):
+    def integrate_file(self, info, public=False, set_graph=False, endpoint=""):
         """Summary
 
         Parameters
@@ -311,7 +311,7 @@ class Client(object):
         files_handler.handle_files([info["id"], ])
 
         # TODO: Fix this. Why do we need the virtuoso url?
-        graph = graph or "http://virtuoso:8890/sparql"
+        endpoint = endpoint or "http://virtuoso:8890/sparql"
 
         for file in files_handler.files:
 
@@ -324,7 +324,7 @@ class Client(object):
             }
 
             dataset = Dataset(self.app, self.session, dataset_info)
-            dataset.save_in_db(graph, set_graph=set_graph)
+            dataset.save_in_db(endpoint, set_graph=set_graph)
 
             if file.type == "csv/tsv":
                 file.integrate(dataset.id, info["columns_type"], public=public)

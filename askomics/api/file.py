@@ -347,7 +347,7 @@ def integrate():
             endpoint = data["externalEndpoint"] or current_app.iniconfig.get('triplestore', 'endpoint')
 
             dataset = Dataset(current_app, session, dataset_info)
-            dataset.save_in_db(endpoint)
+            dataset.save_in_db(endpoint, data["externalGraph"])
             data["dataset_id"] = dataset.id
             dataset_ids.append(dataset.id)
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
