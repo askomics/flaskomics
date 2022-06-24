@@ -640,9 +640,9 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.status_code == 401
 
         client.log_user("jdoe")
-        data = client.upload_and_integrate_ontology()
-        graph = data["graph"]
-        endpoint = data["endpoint"]
+        graph_data = client.upload_and_integrate_ontology()
+        graph = graph_data["graph"]
+        endpoint = graph_data["endpoint"]
 
         response = client.client.post('/api/admin/addontology', json=data)
 
@@ -660,7 +660,7 @@ class TestApiAdmin(AskomicsTestCase):
                 "id": 1,
                 "name": "AgrO ontology",
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
-                "short_name": "OBO",
+                "short_name": "AGRO",
                 "type": "local",
                 "dataset_id": 1,
                 "dataset_name": "agro_min.ttl",
