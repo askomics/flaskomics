@@ -567,7 +567,7 @@ class SparqlQuery(Params):
 
         return formated_data
 
-    def autocomplete_local_ontology(self, uri, query, max_terms):
+    def autocomplete_local_ontology(self, uri, query, max_terms, label):
         """Get results for a specific query
 
         Parameters
@@ -591,10 +591,10 @@ class SparqlQuery(Params):
         SELECT DISTINCT ?label
         WHERE {{
           ?uri rdf:type owl:Class .
-          ?uri rdfs:label ?label .
+          ?uri {} ?label .
           {}
         }}
-        '''.format(subquery)
+        '''.format(label, subquery)
 
         raw_query = self.prefix_query(raw_query)
 

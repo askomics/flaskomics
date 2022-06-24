@@ -227,7 +227,7 @@ class OntologyManager(Params):
         r = requests.get(base_url)
         return r.status_code == 200
 
-    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint):
+    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint, custom_label):
         """Search in ontology
 
         Returns
@@ -244,7 +244,7 @@ class OntologyManager(Params):
             # TODO: Actually store the graph in the ontology to quicken search
             query.set_graphs([onto_graph])
             query.set_endpoints(set([self.settings.get('triplestore', 'endpoint'), onto_endpoint]))
-            return query.autocomplete_local_ontology(ontology_uri, query_term, max_results)
+            return query.autocomplete_local_ontology(ontology_uri, query_term, max_results, custom_label)
         elif ontology_type == "ols":
             base_url = "https://www.ebi.ac.uk/ols/api/suggest"
             arguments = {
