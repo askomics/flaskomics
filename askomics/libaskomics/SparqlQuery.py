@@ -301,7 +301,8 @@ class SparqlQuery(Params):
         froms = ''
 
         if federated:
-            federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_line = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_graphs_string = self.get_federated_remote_from_graphs()
         else:
             if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False)):
                 froms = self.get_froms()
@@ -315,6 +316,7 @@ class SparqlQuery(Params):
             if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT') and not line.upper().lstrip().startswith('@FEDERATE'):
                 if line.upper().lstrip().startswith('SELECT') and federated:
                     new_query += "\n{}\n".format(federated_line)
+                    new_query += "\n{}\n".format(federated_graphs_string)
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
@@ -379,7 +381,6 @@ class SparqlQuery(Params):
         from_string = "@from <{}>".format(self.local_endpoint_f)
         for graph in graphs:
             from_string += " <{}>".format(graph)
-
         return from_string
 
     def get_federated_remote_from_graphs(self):
