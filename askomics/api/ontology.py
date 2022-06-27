@@ -1,5 +1,6 @@
 import traceback
 import sys
+
 from askomics.api.auth import api_auth
 from askomics.libaskomics.OntologyManager import OntologyManager
 
@@ -40,6 +41,7 @@ def autocomplete(short_ontology):
                 "errorMessage": "Ontology {} does not have autocompletion".format(short_ontology),
                 "results": []
             }), 404
+
 
         results = om.autocomplete(ontology["uri"], ontology["type"], request.args.get("q"), short_ontology, ontology["graph"], ontology["endpoint"], ontology['label_uri'], ontology['remote_graph'])
 

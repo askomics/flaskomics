@@ -132,6 +132,9 @@ preview_limit = 25
 # All queries are launched on all graphes (speedup queries)
 single_tenant=False
 
+# Max results returned for autocompletion
+autocomplete_max_results = 10
+
 [federation]
 # Query engine can be corese or fedx
 #query_engine = corese

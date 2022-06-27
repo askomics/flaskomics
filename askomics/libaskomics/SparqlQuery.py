@@ -289,7 +289,7 @@ class SparqlQuery(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True, federated=False):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False, ignore_single_tenant=True):
         """Format the Sparql query
 
         - remove all FROM
@@ -391,6 +391,23 @@ class SparqlQuery(Params):
         from_string = "@from <{}>".format(self.local_endpoint_f)
         for graph in graphs:
             from_string += " <{}>".format(graph)
+        return from_string
+
+    def get_federated_remote_from_graphs(self):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = ""
+
+        for endpoint in self.endpoints:
+            remote_graphs = self.remote_graphs.get(endpoint, [])
+            if len(remote_graphs) == 1:
+                from_string += "\n@graph <{}> <{}>".format(endpoint, remote_graphs[0])
+
         return from_string
 
     def get_federated_remote_from_graphs(self):
