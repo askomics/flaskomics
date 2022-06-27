@@ -410,23 +410,6 @@ class SparqlQuery(Params):
 
         return from_string
 
-    def get_federated_remote_from_graphs(self):
-        """Get @from string fir the federated query engine
-
-        Returns
-        -------
-        string
-            The from string
-        """
-        from_string = ""
-
-        for endpoint in self.endpoints:
-            remote_graphs = self.remote_graphs.get(endpoint, [])
-            if len(remote_graphs) == 1:
-                from_string += "\n@graph <{}> <{}>".format(endpoint, remote_graphs[0])
-
-        return from_string
-
     def get_endpoints_string(self):
         """get endpoint strngs for the federated query engine
 

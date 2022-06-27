@@ -42,7 +42,6 @@ def autocomplete(short_ontology):
                 "results": []
             }), 404
 
-
         results = om.autocomplete(ontology["uri"], ontology["type"], request.args.get("q"), short_ontology, ontology["graph"], ontology["endpoint"], ontology['label_uri'], ontology['remote_graph'])
 
     except Exception as e:
