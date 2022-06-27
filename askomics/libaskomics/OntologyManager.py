@@ -252,11 +252,13 @@ class OntologyManager(Params):
 
             return query.autocomplete_local_ontology(ontology_uri, query_term, max_results, custom_label)
         elif ontology_type == "ols":
-            base_url = "https://www.ebi.ac.uk/ols/api/suggest"
+            base_url = "https://www.ebi.ac.uk/ols/api/select"
             arguments = {
                 "q": query_term,
                 "ontology": quote_plus(onto_short_name.lower()),
-                "rows": max_results
+                "rows": max_results,
+                "type": "class",
+                "fieldList": "label"
             }
 
             r = requests.get(base_url, params=arguments)
@@ -268,6 +270,6 @@ class OntologyManager(Params):
 
             res = r.json()
             if res['response']['docs']:
-                data = [term['autosuggest'] for term in res['response']['docs']]
+                data = [term['label'] for term in res['response']['docs']]
 
             return data

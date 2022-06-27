@@ -9,6 +9,7 @@ export default class Autocomplete extends Component {
     super(props)
     this.state = {
         ontologyShort: this.getAutoComplete(),
+        maxResults: this.props.config.autocompleteMaxResults,
         options: []
     }
 
@@ -65,7 +66,7 @@ export default class Autocomplete extends Component {
   renderAutocomplete () {
     
     let input = (<div>
-      <TextInput trigger="" matchAny={true} spacer="" regex="^[A-Za-z0-9\\-_ ]+$" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleOntoValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue}/>
+      <TextInput trigger="" matchAny={true} spacer="" regex="^[A-Za-z0-9\\-_ ]+$" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleOntoValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue} maxOptions={this.state.maxResults}/>
     </div>)
 
     return input

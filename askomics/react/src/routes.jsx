@@ -48,7 +48,8 @@ export default class Routes extends Component {
         namespaceData: null,
         namespaceInternal: null,
         ontologies: [],
-        singleTenant: false
+        singleTenant: false,
+        autocompleteMaxResults: 10
       }
     }
     this.cancelRequest

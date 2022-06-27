@@ -85,7 +85,8 @@ def start():
             "user": {},
             "logged": False,
             "ontologies": ontologies,
-            "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False)
+            "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False),
+            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10)
         }
 
         json = {
