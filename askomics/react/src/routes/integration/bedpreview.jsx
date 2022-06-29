@@ -21,7 +21,8 @@ export default class BedPreview extends Component {
       externalEndpoint: "",
       error: false,
       errorMessage: null,
-      status: null
+      status: null,
+      externalGraph: ""
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -81,6 +82,14 @@ export default class BedPreview extends Component {
     })
   }
 
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   render () {
 
     let privateIcon = <i className="fas fa-lock"></i>
@@ -122,6 +131,8 @@ export default class BedPreview extends Component {
             hideDistantEndpoint={true}
             handleChangeUri={p => this.handleChangeUri(p)}
             handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+            externalGraph={this.state.externalGraph}
             customUri={this.state.customUri}
           />
           <br />

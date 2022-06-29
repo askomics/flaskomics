@@ -118,7 +118,7 @@ export default class DatasetsTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={this.props.config.user.admin ? false : true} type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
+              <CustomInput disabled={this.props.config.user.admin && row.ontology == 0 ? false : true} type="switch" id={row.id} onChange={this.togglePublicDataset} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )

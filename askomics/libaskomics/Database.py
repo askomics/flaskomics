@@ -76,6 +76,8 @@ class Database(Params):
         self.create_files_table()
         self.create_datasets_table()
         self.create_abstraction_table()
+        self.create_prefixes_table()
+        self.create_ontologies_table()
 
     def create_user_table(self):
         """Create the user table"""
@@ -188,6 +190,39 @@ class Database(Params):
         query = '''
         ALTER TABLE datasets
         ADD percent real NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE datasets
+        ADD ontology boolean NULL
+        DEFAULT(0)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE datasets
+        ADD endpoint text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE datasets
+        ADD remote_graph text NULL
         DEFAULT(null)
         '''
 
@@ -383,3 +418,61 @@ class Database(Params):
         )
         """
         self.execute_sql_query(query)
+
+    def create_prefixes_table(self):
+        """Create the prefix table"""
+        query = '''
+        CREATE TABLE IF NOT EXISTS prefixes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prefix text NOT NULL,
+            namespace text NOT NULL
+        )
+        '''
+        self.execute_sql_query(query)
+
+    def create_ontologies_table(self):
+        """Create the ontologies table"""
+        query = '''
+        CREATE TABLE IF NOT EXISTS ontologies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name text NOT NULL,
+            uri text NOT NULL,
+            short_name text NOT NULL,
+            type text DEFAULT 'sparql',
+            dataset_id INTEGER NOT NULL,
+            graph text NOT NULL,
+            FOREIGN KEY(dataset_id) REFERENCES datasets(id)
+        )
+        '''
+        self.execute_sql_query(query)
+
+        query = '''
+        ALTER TABLE ontologies
+        ADD label_uri text NOT NULL
+        DEFAULT('rdfs:label')
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE ontologies
+        ADD endpoint text NULL
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE ontologies
+        ADD remote_graph text NULL
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass

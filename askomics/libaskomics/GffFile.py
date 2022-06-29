@@ -18,7 +18,7 @@ class GffFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -32,7 +32,7 @@ class GffFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.entities = []
         self.entities_to_integrate = []

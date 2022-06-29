@@ -1044,22 +1044,21 @@ class LocalAuth(Params):
         mailer = Mailer(self.app, self.session)
         if mailer.check_mailer():
             body = textwrap.dedent("""
-            Welcome {username}!
+            Dear {username}!
 
-            We heard that administrators of {url} create an account for you.
+            An account with this email adress was created by the administrators of {url}.
 
-            To use it, use the following link to create your password. Then, login with you email adress ({email}) or username ({username}).
+            To use it, please use the following link to create your password. You will then be able to log in with your username ({username}).
 
             {url}/password_reset?token={token}
 
-            If you don’t use this link within 3 hours, it will expire. To get a new password creation link, visit {url}/password_reset
+            This link will expire after 3 hours. To get a new password creation link, please visit {url}/password_reset
 
             Thanks,
 
             The AskOmics Team
             """.format(
                 username=user["username"],
-                email=user["email"],
                 url=self.settings.get('askomics', 'instance_url'),
                 token=token
             ))
@@ -1104,16 +1103,17 @@ class LocalAuth(Params):
                     body = textwrap.dedent("""
                     Dear {user},
 
-                    We heard that you lost your AskOmics password. Sorry about that!
+                    A password reset request has been received for your {url} account.
 
-                    But don’t worry! You can use the following link to reset your password:
+                    If you did not initiate this request, feel free to ignore this message.
+
+                    You can use the following link to reset your password:
 
                     {url}/password_reset?token={token}
 
-                    If you don’t use this link within 3 hours, it will expire. To get a new password reset link, visit {url}/password_reset
+                    This link will expire after 3 hours. To get a new password reset link, please visit {url}/password_reset
 
-
-                    Thanks,
+                    Best regards,
                     The AskOmics Team
 
                     """.format(

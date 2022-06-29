@@ -14,7 +14,7 @@ class RdfFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -28,7 +28,7 @@ class RdfFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.type_dict = {
             "rdf/ttl": "turtle",
@@ -40,7 +40,7 @@ class RdfFile(File):
         """Summary"""
         pass
 
-    def get_location(self):
+    def get_location_and_remote_graph(self):
         """Get location of data if specified
 
         Returns
@@ -50,10 +50,19 @@ class RdfFile(File):
         """
         graph = RdfGraph(self.app, self.session)
         graph.parse(self.path, format=self.type_dict[self.type])
-        triple = (None, self.prov.atLocation, None)
-        for s, p, o in graph.graph.triples(triple):
-            return str(o)
-        return None
+        triple_loc = (None, self.prov.atLocation, None)
+        triple_graph = (None, self.dcat.Dataset, None)
+        loc = None
+        remote_graph = None
+        for s, p, o in graph.graph.triples(triple_loc):
+            loc = str(o)
+            break
+
+        for s, p, o in graph.graph.triples(triple_graph):
+            remote_graph = str(o)
+            break
+
+        return loc, remote_graph
 
     def get_preview(self):
         """Get a preview of the frist 100 lines of a ttl file
@@ -71,7 +80,7 @@ class RdfFile(File):
 
         location = None
         try:
-            location = self.get_location()
+            location, remote_graph = self.get_location_and_remote_graph()
         except Exception as e:
             self.error_message = str(e)
 
@@ -83,13 +92,15 @@ class RdfFile(File):
             'error_message': self.error_message,
             'data': {
                 'preview': head,
-                'location': location
+                'location': location,
+                'remote_graph': remote_graph
             }
         }
 
     def delete_metadata_location(self):
         """Delete metadata from data"""
         self.graph_chunk.remove((None, self.prov.atLocation, None))
+        self.graph_chunk.remove((None, self.dcat.Dataset, None))
 
     def integrate(self, public=False):
         """Integrate the file into the triplestore
