@@ -698,12 +698,12 @@ def add_ontology():
             'errorMessage': "Missing parameter"
         }), 400
 
-    name = data.get("name")
-    uri = data.get("uri")
+    name = data.get("name").strip()
+    uri = data.get("uri").strip()
     short_name = data.get("shortName")
-    type = data.get("type")
+    type = data.get("type").strip()
     dataset_id = data.get("datasetId")
-    label_uri = data.get("labelUri")
+    label_uri = data.get("labelUri").strip()
 
     om = OntologyManager(current_app, session)
 
