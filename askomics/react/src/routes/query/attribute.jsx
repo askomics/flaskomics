@@ -10,6 +10,7 @@ import update from 'react-addons-update'
 import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
+import Autocomplete from '../../components/autocomplete'
 
 export default class AttributeBox extends Component {
   constructor (props) {
@@ -33,6 +34,7 @@ export default class AttributeBox extends Component {
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
+    this.cancelRequest
   }
 
   subNums (id) {
@@ -44,6 +46,13 @@ export default class AttributeBox extends Component {
       newStr += String.fromCharCode(code + 8272)
     })
     return newStr
+  }
+
+
+  isRegisteredOnto () {
+      return this.props.config.ontologies.some(onto => {
+        return (onto.uri == this.props.entityUri && onto.type != "none")
+      })
   }
 
   renderLinker () {
@@ -123,6 +132,36 @@ export default class AttributeBox extends Component {
 
     let form
 
+    let input
+    let attrIcons
+
+    if (this.props.isOnto){
+      attrIcons = (
+        <div className="attr-icons">
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+        </div>
+      )
+      if (this.isRegisteredOnto() && this.props.attribute.uri == "rdfs:label"){
+        input = (
+          <Autocomplete config={this.props.config} entityUri={this.props.entityUri} attributeId={this.props.attribute.id} filterValue={this.props.attribute.filterValue} handleFilterValue={p => this.handleFilterValue(p)}/>
+        )
+      } else {
+        input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
+      }
+
+    } else {
+      attrIcons = (
+        <div className="attr-icons">
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+        </div>
+      )
+      input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
+    }
+
+
     if (this.props.attribute.linked) {
       form = this.renderLinker()
     } else {
@@ -144,7 +183,7 @@ export default class AttributeBox extends Component {
               </CustomInput>
             </td>
             <td>
-              <Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />
+              {input}
             </td>
           </tr>
         </table>
@@ -154,12 +193,7 @@ export default class AttributeBox extends Component {
     return (
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
-        <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
-        </div>
+        {attrIcons}
         {form}
       </div>
     )
@@ -476,5 +510,7 @@ AttributeBox.propTypes = {
   handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
-  config: PropTypes.object
+  config: PropTypes.object,
+  isOnto: PropTypes.bool,
+  entityUri: PropTypes.string
 }

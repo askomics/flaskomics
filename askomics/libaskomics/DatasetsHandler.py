@@ -51,7 +51,7 @@ class DatasetsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, public, status, start, end, ntriples, error_message, traceback, percent
+        SELECT id, name, public, status, start, end, ntriples, error_message, traceback, percent, ontology
         FROM datasets
         WHERE user_id = ?
         '''
@@ -76,7 +76,8 @@ class DatasetsHandler(Params):
                 'ntriples': row[6],
                 'error_message': row[7],
                 'traceback': row[8],
-                'percent': row[9]
+                'percent': row[9],
+                'ontology': row[10]
             }
             datasets.append(dataset)
 
@@ -97,7 +98,7 @@ class DatasetsHandler(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT datasets.id, datasets.name, datasets.public, datasets.status, datasets.start, datasets.end, datasets.ntriples, datasets.error_message, datasets.traceback, datasets.percent, users.username
+        SELECT datasets.id, datasets.name, datasets.public, datasets.status, datasets.start, datasets.end, datasets.ntriples, datasets.error_message, datasets.traceback, datasets.percent, users.username, datasets.ontology
         FROM datasets
         INNER JOIN users ON datasets.user_id=users.user_id
         '''
@@ -123,7 +124,8 @@ class DatasetsHandler(Params):
                 'error_message': row[7],
                 'traceback': row[8],
                 'percent': row[9],
-                'user': row[10]
+                'user': row[10],
+                'ontology': row[11]
             }
             datasets.append(dataset)
 

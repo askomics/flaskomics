@@ -18,7 +18,8 @@ export default class GffPreview extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: ""
+      externalEndpoint: "",
+      externalGraph: ""
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -90,6 +91,22 @@ export default class GffPreview extends Component {
     })
   }
 
+  handleChangeRemoteGraph (event) {
+    this.setState({
+      remoteGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   render () {
 
     let privateIcon = <i className="fas fa-lock"></i>
@@ -129,6 +146,8 @@ export default class GffPreview extends Component {
           hideDistantEndpoint={true}
           handleChangeUri={p => this.handleChangeUri(p)}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+          handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+          externalGraph={this.state.externalGraph}
           customUri={this.state.customUri}
         />
         <br />

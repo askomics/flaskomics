@@ -169,7 +169,7 @@ export default class Visualization extends Component {
     link.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
 
     let greenArray = ["included_in", "overlap_with"]
-    let unselectedColor = greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorGrey
+    let unselectedColor = greenArray.indexOf(link.uri) >= 0 || link.type == "ontoLink" ? this.colorGreen : this.colorGrey
     let unselectedColorText = greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorDarkGrey
     ctx.strokeStyle = link.selected ? this.colorFirebrick : unselectedColor
 

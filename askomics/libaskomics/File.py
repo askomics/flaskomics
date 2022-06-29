@@ -69,7 +69,7 @@ class File(Params):
         User graph
     """
 
-    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -97,6 +97,7 @@ class File(Params):
         self.ntriples = 0
         self.timestamp = int(time.time())
         self.external_endpoint = external_endpoint
+        self.external_graph = external_graph
 
         self.default_graph = "{}".format(self.settings.get('triplestore', 'default_graph'))
         self.user_graph = "{}:{}_{}".format(
@@ -130,6 +131,7 @@ class File(Params):
         self.faldo = Namespace('http://biohackathon.org/resource/faldo/')
         self.prov = Namespace('http://www.w3.org/ns/prov#')
         self.dc = Namespace('http://purl.org/dc/elements/1.1/')
+        self.dcat = Namespace('http://www.w3.org/ns/dcat#')
 
         self.faldo_entity = False
         self.faldo_abstraction = {
@@ -277,6 +279,8 @@ class File(Params):
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.wasDerivedFrom, rdflib.Literal(self.name)))
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dc.hasVersion, rdflib.Literal(get_distribution('askomics').version)))
         self.graph_metadata.add((rdflib.Literal(self.file_graph), self.prov.describesService, rdflib.Literal(os.uname()[1])))
+        if self.external_graph:
+            self.graph_metadata.add((rdflib.Literal(self.file_graph), self.dcat.Dataset, rdflib.Literal(self.external_graph)))
 
         if self.public:
             self.graph_metadata.add((rdflib.Literal(self.file_graph), self.namespace_internal['public'], rdflib.Literal(True)))

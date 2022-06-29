@@ -41,6 +41,12 @@ export default class AdvancedOptions extends Component {
                 <Input onChange={this.handleChangeEndpoint} value={this.props.externalEndpoint} type="text" name="endpoint" id="endpoint" placeholder="External endpoint" />
               </Col>
             </FormGroup>
+            <FormGroup hidden={this.props.hideDistantEndpoint} row>
+              <Label for="endpoint" sm={2}>Distant graph</Label>
+              <Col sm={8}>
+                <Input onChange={this.handleChangeExternalGraph} value={this.props.externalGraph} type="text" name="graph" id="graph" placeholder="External graph" />
+              </Col>
+            </FormGroup>
           </Form>
         </Collapse>
       </div>
@@ -55,5 +61,7 @@ AdvancedOptions.propTypes = {
   hideCustomUri: PropTypes.bool,
   customUri: PropTypes.string,
   hideDistantEndpoint: PropTypes.bool,
-  externalEndpoint: PropTypes.string
+  externalEndpoint: PropTypes.string,
+  handleChangeExternalGraph: PropTypes.function,
+  externalGraph: PropTypes.string
 }
