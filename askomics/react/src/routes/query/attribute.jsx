@@ -10,8 +10,6 @@ import update from 'react-addons-update'
 import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
-import TextInput from 'react-autocomplete-input';
-import 'react-autocomplete-input/dist/bundle.css';
 import Autocomplete from '../../components/autocomplete'
 
 export default class AttributeBox extends Component {
