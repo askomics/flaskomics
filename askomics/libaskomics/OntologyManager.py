@@ -76,7 +76,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph
+        SELECT ontologies.id, ontologies.name, ontologies.uri, ontologies.short_name, ontologies.type, ontologies.label_uri, datasets.id, datasets.name, ontologies.graph, ontologies.endpoint, ontologies.remote_graph
         FROM ontologies
         INNER JOIN datasets ON datasets.id=ontologies.dataset_id
         '''
@@ -94,7 +94,9 @@ class OntologyManager(Params):
                 'label_uri': row[5],
                 'dataset_id': row[6],
                 'dataset_name': row[7],
-                'graph': row[8]
+                'graph': row[8],
+                'endpoint': row[9],
+                'remote_graph': row[10]
             }
             ontologies.append(prefix)
 
@@ -123,7 +125,7 @@ class OntologyManager(Params):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri
+        SELECT id, name, uri, short_name, type, dataset_id, graph, label_uri, endpoint, remote_graph
         FROM ontologies
         {}
         '''.format(where_clause)
@@ -142,10 +144,12 @@ class OntologyManager(Params):
             'type': ontology[4],
             'dataset_id': ontology[5],
             'graph': ontology[6],
-            'label_uri': ontology[7]
+            'label_uri': ontology[7],
+            'endpoint': ontology[8],
+            'remote_graph': ontology[9]
         }
 
-    def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, type="local", label_uri="rdfs:label"):
+    def add_ontology(self, name, uri, short_name, dataset_id, graph, endpoint, remote_graph=None, type="local", label_uri="rdfs:label"):
         """Create a new ontology
 
         Returns
@@ -167,11 +171,12 @@ class OntologyManager(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
 
-        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph, label_uri, endpoint))
+        database.execute_sql_query(query, (name, uri, short_name, type, dataset_id, graph, label_uri, endpoint, remote_graph))
 
         query = '''
         UPDATE datasets SET
@@ -225,7 +230,7 @@ class OntologyManager(Params):
         r = requests.get(base_url)
         return r.status_code == 200
 
-    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint):
+    def autocomplete(self, ontology_uri, ontology_type, query_term, onto_short_name, onto_graph, onto_endpoint, custom_label, remote_graph):
         """Search in ontology
 
         Returns
@@ -242,13 +247,18 @@ class OntologyManager(Params):
             # TODO: Actually store the graph in the ontology to quicken search
             query.set_graphs([onto_graph])
             query.set_endpoints(set([self.settings.get('triplestore', 'endpoint'), onto_endpoint]))
-            return query.autocomplete_local_ontology(ontology_uri, query_term, max_results)
+            if remote_graph:
+                query.set_remote_graph({onto_endpoint: [remote_graph]})
+
+            return query.autocomplete_local_ontology(ontology_uri, query_term, max_results, custom_label)
         elif ontology_type == "ols":
-            base_url = "https://www.ebi.ac.uk/ols/api/suggest"
+            base_url = "https://www.ebi.ac.uk/ols/api/select"
             arguments = {
                 "q": query_term,
                 "ontology": quote_plus(onto_short_name.lower()),
-                "rows": max_results
+                "rows": max_results,
+                "type": "class",
+                "fieldList": "label"
             }
 
             r = requests.get(base_url, params=arguments)
@@ -260,6 +270,6 @@ class OntologyManager(Params):
 
             res = r.json()
             if res['response']['docs']:
-                data = [term['autosuggest'] for term in res['response']['docs']]
+                data = [term['label'] for term in res['response']['docs']]
 
             return data

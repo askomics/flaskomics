@@ -276,9 +276,37 @@ button.input-with-icon {
     display: block;
 }
 
-.react-autocomplete-input {
-  left: auto !important;
-  top: auto !important;
+/***********************************************************************/
+
+
+.react-autosuggest__suggestions-container--open {
+  background-clip: padding-box;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  bottom: auto;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.175);
+  display: block;
+  font-size: 14px;
+  list-style: none;
+  padding: 1px;
+  position: absolute;
+  text-align: left;
+  z-index: 20000;  
 }
 
-/***********************************************************************/
+.react-autosuggest__suggestions-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.react-autosuggest__suggestion {
+  cursor: pointer;
+  padding: 10px;
+  min-width: 100px;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  background-color: #0356fc;
+  color: #fff;
+}

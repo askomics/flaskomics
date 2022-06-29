@@ -1,19 +1,23 @@
 import React, { Component} from 'react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import TextInput from 'react-autocomplete-input';
-import 'react-autocomplete-input/dist/bundle.css';
+import { Input } from 'reactstrap'
+import Autosuggest from 'react-autosuggest';
+
 
 export default class Autocomplete extends Component {
   constructor (props) {
     super(props)
     this.state = {
         ontologyShort: this.getAutoComplete(),
+        maxResults: this.props.config.autocompleteMaxResults,
         options: []
     }
 
     this.handleFilterValue = this.props.handleFilterValue.bind(this)
     this.autocompleteOntology = this.autocompleteOntology.bind(this)
+    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this)
+    this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this)
     this.cancelRequest
     this.handleOntoValue = this.handleOntoValue.bind(this)
     this.WAIT_INTERVAL = 500
@@ -38,7 +42,6 @@ export default class Autocomplete extends Component {
 
     axios.get(requestUrl, {baseURL: this.props.config.proxyPath, params:{q: userInput}, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
-        // set state of resultsPreview
         this.setState({
           options: response.data.results
         })
@@ -54,25 +57,84 @@ export default class Autocomplete extends Component {
       })
   }
 
-  handleOntoValue (event) {
-    this.handleFilterValue(event)
-    clearTimeout(this.timerID)
-    this.timerID = setTimeout(() => {
-        this.autocompleteOntology(event.target.value)
-    }, this.WAIT_INTERVAL)
+
+  handleOntoValue (event, value) {
+    this.handleFilterValue({target:{value: value.newValue, id: this.props.attributeId}})
   }
 
-  renderAutocomplete () {
-    
-    let input = (<div>
-      <TextInput trigger="" matchAny={true} spacer="" regex="^[A-Za-z0-9\\-_ ]+$" minChars={3} Component="input" options={this.state.options} onChange={(e) => this.handleOntoValue({target: {value: e, id: this.props.attributeId}})} id={this.props.attributeId} value={this.props.filterValue}/>
-    </div>)
 
-    return input
+  renderSuggestion (suggestion, {query, isHighlighted}) {
+    let textArray = suggestion.split(RegExp(query, "gi"));
+    let match = suggestion.match(RegExp(query, "gi"));
+
+    return (
+      <span>
+        {textArray.map((item, index) => (
+          <span key={index}>
+            {item}
+            {index !== textArray.length - 1 && match && (
+              <b>{match[index]}</b>
+            )}
+          </span>
+        ))}
+      </span>
+    );
+  }
+
+  onSuggestionsClearRequested () {
+    this.setState({
+          options: []
+    })
+  }
+
+  getSuggestionValue (suggestion) { 
+    return suggestion
+  };
+
+  onSuggestionsFetchRequested ( value ){
+    clearTimeout(this.timerID)
+    this.timerID = setTimeout(() => {
+        this.autocompleteOntology(value.value)
+    }, this.WAIT_INTERVAL)
+  };
+  
+
+  renderInputComponent (inputProps){
+    return(
+        <div>
+            <Input type="text" {...inputProps} />
+        </div>
+    )
+  }
+
+
+  shouldRenderSuggestions(value, reason){
+    return value.trim().length > 2;
   }
 
   render () {
-    return this.renderAutocomplete()
+
+    let value = this.props.filterValue
+
+    let inputProps = {
+      placeholder: '',
+      value,
+      onChange: this.handleOntoValue
+    };
+
+    return (
+      <Autosuggest
+        suggestions={this.state.options}
+        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        getSuggestionValue={this.getSuggestionValue}
+        renderSuggestion={this.renderSuggestion}
+        inputProps={inputProps}
+        renderInputComponent={this.renderInputComponent}
+        shouldRenderSuggestions={this.shouldRenderSuggestions}        
+      />
+    )
+
   }
 }
 

@@ -71,6 +71,16 @@ class SparqlQuery(Params):
         """
         self.endpoints = endpoints
 
+    def set_remote_graph(self, remote_graphs):
+        """Set endpoints
+
+        Parameters
+        ----------
+        endpoints : list
+            Endpoints
+        """
+        self.remote_graphs = remote_graphs
+
     def is_federated(self):
         """Return True if there is more than 1 endpoint
 
@@ -299,11 +309,13 @@ class SparqlQuery(Params):
             formatted sparql query
         """
         froms = ''
-        if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False) or ignore_single_tenant):
-            froms = self.get_froms()
 
         if federated:
-            federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_line = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_graphs_string = self.get_federated_remote_from_graphs()
+        else:
+            if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False)):
+                froms = self.get_froms()
 
         query_lines = query.split('\n')
 
@@ -314,6 +326,7 @@ class SparqlQuery(Params):
             if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT') and not line.upper().lstrip().startswith('@FEDERATE'):
                 if line.upper().lstrip().startswith('SELECT') and federated:
                     new_query += "\n{}\n".format(federated_line)
+                    new_query += "\n{}\n".format(federated_graphs_string)
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
@@ -378,7 +391,6 @@ class SparqlQuery(Params):
         from_string = "@from <{}>".format(self.local_endpoint_f)
         for graph in graphs:
             from_string += " <{}>".format(graph)
-
         return from_string
 
     def get_federated_remote_from_graphs(self):
@@ -567,7 +579,7 @@ class SparqlQuery(Params):
 
         return formated_data
 
-    def autocomplete_local_ontology(self, uri, query, max_terms):
+    def autocomplete_local_ontology(self, uri, query, max_terms, label):
         """Get results for a specific query
 
         Parameters
@@ -590,17 +602,17 @@ class SparqlQuery(Params):
         raw_query = '''
         SELECT DISTINCT ?label
         WHERE {{
-          ?uri rdf:type <{}> .
-          ?uri rdfs:label ?label .
+          ?uri rdf:type owl:Class .
+          ?uri {} ?label .
           {}
         }}
-        '''.format(uri, subquery)
+        '''.format(label, subquery)
 
         raw_query = self.prefix_query(raw_query)
 
         is_federated = self.is_federated()
 
-        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated, ignore_single_tenant=True)
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=is_federated)
         _, data = query_launcher.process_query(sparql)

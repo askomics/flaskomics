@@ -220,6 +220,17 @@ class Database(Params):
         except Exception:
             pass
 
+        query = '''
+        ALTER TABLE datasets
+        ADD remote_graph text NULL
+        DEFAULT(null)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_integration_table(self):
         """Create the integration table"""
         query = '''
@@ -449,6 +460,16 @@ class Database(Params):
         query = '''
         ALTER TABLE ontologies
         ADD endpoint text NULL
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE ontologies
+        ADD remote_graph text NULL
         '''
 
         try:

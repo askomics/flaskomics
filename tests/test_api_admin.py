@@ -605,7 +605,7 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == expected_empty
 
-        client.create_ontology()
+        graph, endpoint = client.create_ontology()
 
         response = client.client.get('/api/admin/getontologies')
 
@@ -614,13 +614,15 @@ class TestApiAdmin(AskomicsTestCase):
             "errorMessage": "",
             "ontologies": [{
                 "id": 1,
-                "name": "Open Biological and Biomedical Ontology",
+                "name": "AgrO ontology",
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
-                "short_name": "OBO",
+                "short_name": "AGRO",
                 "type": "local",
                 "dataset_id": 1,
-                "dataset_name": "transcripts.tsv",
-                "graph": "mygraph",
+                "dataset_name": "agro_min.ttl",
+                "graph": graph,
+                "endpoint": endpoint,
+                "remote_graph": None,
                 "label_uri": "rdfs:label"
             }]
         }
@@ -633,13 +635,15 @@ class TestApiAdmin(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jsmith")
 
-        data = {"shortName": "OBO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "Open Biological and Biomedical Ontology", "type": "local", "datasetId": 1, "labelUri": "rdfs:label"}
+        data = {"shortName": "AGRO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "AgrO ontology", "type": "local", "datasetId": 1, "labelUri": "rdfs:label"}
 
         response = client.client.post('/api/admin/addontology', json=data)
         assert response.status_code == 401
 
         client.log_user("jdoe")
-        client.upload_and_integrate(set_graph=True)
+        graph_data = client.upload_and_integrate_ontology()
+        graph = graph_data["graph"]
+        endpoint = graph_data["endpoint"]
 
         response = client.client.post('/api/admin/addontology', json=data)
 
@@ -655,22 +659,21 @@ class TestApiAdmin(AskomicsTestCase):
             "errorMessage": "",
             "ontologies": [{
                 "id": 1,
-                "name": "Open Biological and Biomedical Ontology",
+                "name": "AgrO ontology",
                 "uri": "http://purl.obolibrary.org/obo/agro.owl",
-                "short_name": "OBO",
+                "short_name": "AGRO",
                 "type": "local",
                 "dataset_id": 1,
-                "dataset_name": "transcripts.tsv",
-                "label_uri": "rdfs:label"
+                "dataset_name": "agro_min.ttl",
+                "label_uri": "rdfs:label",
+                "graph": graph,
+                "endpoint": endpoint,
+                "remote_graph": None
             }]
         }
 
-        # Graph name is random
-        res = response.json
-        res['ontologies'][0].pop('graph')
-
         assert response.status_code == 200
-        assert res == expected
+        assert response.json == expected
 
     def test_delete_ontologies(self, client):
         """test /api/admin/delete_ontologies route"""

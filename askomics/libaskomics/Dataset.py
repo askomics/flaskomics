@@ -46,6 +46,8 @@ class Dataset(Params):
         self.start = dataset_info["start"] if "start" in dataset_info else None
         self.end = dataset_info["end"] if "end" in dataset_info else None
         self.ontology = dataset_info["ontology"] if "ontology" in dataset_info else False
+        self.endpoint = dataset_info["endpoint"] if "endpoint" in dataset_info else False
+        self.remote_graph = dataset_info["remote_graph"] if "remote_graph" in dataset_info else False
 
     def set_info_from_db(self, admin=False):
         """Set the info in from the database"""
@@ -59,7 +61,7 @@ class Dataset(Params):
             where_query = "AND user_id = ?"
 
         query = '''
-        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology, endpoint
+        SELECT celery_id, file_id, name, graph_name, public, start, end, ontology, endpoint, remote_graph
         FROM datasets
         WHERE id = ?
         {}
@@ -76,8 +78,9 @@ class Dataset(Params):
         self.end = rows[0][6]
         self.ontology = rows[0][7]
         self.endpoint = rows[0][8]
+        self.remote_graph = rows[0][9]
 
-    def save_in_db(self, endpoint, set_graph=False):
+    def save_in_db(self, endpoint, remote_graph=None, set_graph=False):
         """Save the dataset into the database"""
         database = Database(self.app, self.session)
 
@@ -89,7 +92,8 @@ class Dataset(Params):
             self.name,
             self.public,
             0,
-            endpoint
+            endpoint,
+            remote_graph
         )
 
         if set_graph:
@@ -102,7 +106,8 @@ class Dataset(Params):
                 self.graph_name,
                 self.public,
                 0,
-                endpoint
+                endpoint,
+                remote_graph
             )
 
         query = '''
@@ -122,6 +127,7 @@ class Dataset(Params):
             NULL,
             NULL,
             0,
+            ?,
             ?
         )
         '''.format(subquery)

@@ -251,7 +251,8 @@ class Client(object):
             ".tsv": "text/tab-separated-values",
             ".csv": "text/tab-separated-values",
             ".gff3": "null",
-            ".bed": "null"
+            ".bed": "null",
+            ".ttl": "rdf/ttl"
         }
 
         with open(file_path, 'r') as file_content:
@@ -293,7 +294,7 @@ class Client(object):
         files.download_url(file_url, "1")
         return files.date
 
-    def integrate_file(self, info, public=False, set_graph=False):
+    def integrate_file(self, info, public=False, set_graph=False, endpoint=""):
         """Summary
 
         Parameters
@@ -309,6 +310,9 @@ class Client(object):
         files_handler = FilesHandler(self.app, self.session)
         files_handler.handle_files([info["id"], ])
 
+        # TODO: Fix this. Why do we need the virtuoso url?
+        endpoint = endpoint or "http://virtuoso:8890/sparql"
+
         for file in files_handler.files:
 
             dataset_info = {
@@ -320,7 +324,7 @@ class Client(object):
             }
 
             dataset = Dataset(self.app, self.session, dataset_info)
-            dataset.save_in_db("http://virtuoso:8890/sparql", set_graph=set_graph)
+            dataset.save_in_db(endpoint, set_graph=set_graph)
 
             if file.type == "csv/tsv":
                 file.integrate(dataset.id, info["columns_type"], public=public)
@@ -328,7 +332,8 @@ class Client(object):
                 file.integrate(dataset.id, info["entities"], public=public)
             elif file.type == "bed":
                 file.integrate(dataset.id, info["entity_name"], public=public)
-
+            elif file.type in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
+                file.integrate(public=public)
             # done
             dataset.update_in_db("success")
             dataset.set_info_from_db()
@@ -336,7 +341,9 @@ class Client(object):
             return {
                 "timestamp": file.timestamp,
                 "start": dataset.start,
-                "end": dataset.end
+                "end": dataset.end,
+                "graph": dataset.graph_name,
+                "endpoint": dataset.endpoint
             }
 
     def upload(self):
@@ -443,6 +450,31 @@ class Client(object):
                 "start": int_bed["start"],
                 "end": int_bed["end"]
             }
+        }
+
+    def upload_and_integrate_ontology(self):
+        """Summary
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        # upload
+        up_ontology = self.upload_file("test-data/agro_min.ttl")
+
+        # integrate
+        int_ontology = self.integrate_file({
+            "id": 1,
+        }, set_graph=True, endpoint="http://localhost:8891/sparql-auth")
+
+        return {
+            "upload": up_ontology,
+            "timestamp": int_ontology["timestamp"],
+            "start": int_ontology["start"],
+            "end": int_ontology["end"],
+            "graph": int_ontology["graph"],
+            "endpoint": int_ontology["endpoint"]
         }
 
     def create_result(self, has_form=False):
@@ -590,9 +622,10 @@ class Client(object):
 
     def create_ontology(self):
         """Create ontology"""
-        self.upload_and_integrate()
+        data = self.upload_and_integrate_ontology()
         om = OntologyManager(self.app, self.session)
-        om.add_ontology("Open Biological and Biomedical Ontology", "http://purl.obolibrary.org/obo/agro.owl", "OBO", 1, "mygraph", "local")
+        om.add_ontology("AgrO ontology", "http://purl.obolibrary.org/obo/agro.owl", "AGRO", 1, data["graph"], data['endpoint'], type="local")
+        return data["graph"], data["endpoint"]
 
     @staticmethod
     def get_random_string(number):
