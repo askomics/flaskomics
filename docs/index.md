@@ -16,14 +16,15 @@ AskOmics also support federated queries to external SPARQL endpoints.
     - [Command-line interface](cli.md): A python-based CLI for interacting with AskOmics
     - [Build an RDF abstraction](abstraction.md): Learn how to build an RDF abstraction for RDF data
     - [Perform federated queries](federation.md): How to query your own data with external resources
-    - [Link your data to ontologies](ontologies.md): How to connect add ontologies to AskOmics, and connect your data
     - [Use AskOmics with Galaxy](galaxy.md): How to connect AskOmics with your Galaxy history
+    - [Link your data to ontologies](ontologies.md): How to connect add ontologies to AskOmics, and connect your data
 <br /><br />
 
 - Administration
     - [Deploy an instance](production-deployment.md): Deploy an AskOmics instance on your server
     - [Configuration](configure.md): Configure your instance
     - [Manage](manage.md): Manage your instance
+    - [Add custom prefixes](prefixes.md): How to add custom prefixes for your users
 <br /><br />
 
 - Developer documentation
