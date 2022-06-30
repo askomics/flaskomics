@@ -10,7 +10,7 @@ This will allow users to query on an entity, or on its ancestors and descendants
 First, make sure to have the [abstraction file](/abstraction/#ontologies) ready. Upload it to AskOmics, and integrate it.
 Make sure *to set it public*.
 
-You can then head to the <navbar><i class="fa fa-project-diagram"></i> Ontologies</navbar> tab. There, you will be able to create and delete ontologies.
+You can then head to <navbar><i class="fa fa-project-diagram"></i> Ontologies</navbar> in the user tab. There, you will be able to create and delete ontologies.
 
 ## Creating an ontology
 

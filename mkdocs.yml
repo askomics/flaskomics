@@ -37,7 +37,7 @@ nav:
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
     - Manage: manage.md
-    - Custo prefixes: prefixes.md
+    - Custom prefixes: prefixes.md
   - Developer guide:
     - Dev deployment: dev-deployment.md
     - Contribute: contribute.md

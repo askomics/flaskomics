@@ -3,7 +3,7 @@ These prefixes can be used by non-admin users when integrating CSV files (for sp
 
 # Registering a prefix (admin-only)
 
-You can then head to the <navbar><i class="fa fa-edit"></i> Prefixes</navbar> tab. There, you will be able to create and delete custom prefixes.
+You can head to <navbar><i class="fa fa-edit"></i> Prefixes</navbar> in the user tab. There, you will be able to create and delete custom prefixes.
 
 ## Creating a custom prefix
 

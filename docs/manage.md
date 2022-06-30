@@ -28,7 +28,7 @@ In Virtuoso, aggregating multiples graphs (using several FROM clauses) can be ve
 Single tenant mode send all queries on all stored graphs, thus speeding up the queries. This means that **all graphs are public, and can be queried by any user**. This affect starting points, abstractions, and query.
 
 !!! warning
-    Do not use *Single tenant mode* if you are storing sensitive data on AskOmics.
+    If you are storing sensitive data on AskOmics, make sure to disable anonymous access and account creation when using *Single tenant mode*.
 
 !!! warning
     *Single tenant mode* has no effect on federated queries
