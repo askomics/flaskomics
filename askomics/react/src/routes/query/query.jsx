@@ -559,7 +559,7 @@ export default class Query extends Component {
               target: targetId,
               selected: false,
               suggested: true,
-              directed: isOnto ? false : true,
+              directed: true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -703,7 +703,7 @@ export default class Query extends Component {
           target: node1.id,
           selected: false,
           suggested: false,
-          directed: link.direct,
+          directed: link.directed,
         }
       }
     })
@@ -1345,10 +1345,10 @@ export default class Query extends Component {
 
   getOntoLabel (uri) {
       let labels = {}
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Children of"
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Descendants of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "Parents of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "Ancestors of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
       return labels[uri]
   }
 

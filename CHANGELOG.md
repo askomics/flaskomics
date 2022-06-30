@@ -28,6 +28,8 @@ This changelog was started for release 4.2.0.
 - Add better error management for RDF files
 - Added 'single tenant' mode: Send queries to all graphs to speed up
 - Added ontologies management
+- Added prefixes management
+- Added 'external graph' management for federated request: federated requests will only target this remote graph
 
 ### Changed
 
