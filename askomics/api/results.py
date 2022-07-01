@@ -14,6 +14,8 @@ results_bp = Blueprint('results', __name__, url_prefix='/')
 
 
 def can_access(user):
+    if not user:
+        return False
     login_allowed = current_app.iniconfig.getboolean('askomics', 'enable_sparql_console', fallback=False)
     return login_allowed or user['admin']
 
@@ -166,7 +168,7 @@ def get_graph_and_sparql_query():
         # Get all graphs and endpoint, and mark as selected the used one
         query = SparqlQuery(current_app, session, get_graphs=True)
         graphs, endpoints = query.get_graphs_and_endpoints(selected_graphs=graphs, selected_endpoints=endpoints)
-        console_enabled = can_access(session['user'])
+        console_enabled = can_access(session.get('user'))
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
