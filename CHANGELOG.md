@@ -14,6 +14,7 @@ This changelog was started for release 4.2.0.
 - Fixed an issue with forms (missing field and entity name for label & uri fields) (Issue #255)
 - Fixed an issue with the data endpoint for FALDO entities (Issue #279)
 - Fixed an issue where integration would fail when setting a category type on a empty column (#334)
+- Fixed an issue with saved queries for non-logged users
 
 ### Added
 
@@ -35,8 +36,8 @@ This changelog was started for release 4.2.0.
 ### Changed
 
 - Changed "Query builder" to "Form editor" in form editing interface
-- Changed abstraction building method for relations. (Please refer to #248 and #268)
-- Changed abstraction building method for attributes. (Please refer to #321 and #324)
+- Changed abstraction building method for relations. (Please refer to #248 and #268). Correct 'phantom' relations
+- Changed abstraction building method for attributes. (Please refer to #321 and #324). Correct 'attributes' relations
 - Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
 - Updated documentation
 - Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
