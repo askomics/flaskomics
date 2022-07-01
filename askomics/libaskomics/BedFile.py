@@ -17,7 +17,7 @@ class BedFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -31,7 +31,7 @@ class BedFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.entity_name = ''
         self.category_values = {}
@@ -94,13 +94,19 @@ class BedFile(File):
         self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
         self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(self.entity_name, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(self.entity_name)))
 
-        for attribute in self.attribute_abstraction:
-            for attr_type in attribute["type"]:
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
+        attribute_blanks = {}
 
+        for attribute in self.attribute_abstraction:
+            blank = BNode()
+
+            for attr_type in attribute["type"]:
+                self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+            self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+            self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
+
+            attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -115,7 +121,9 @@ class BedFile(File):
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    blank = attribute_blanks[value]
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 
     def generate_rdf_content(self):
         """Generate RDF content of the BED file
@@ -218,6 +226,7 @@ class BedFile(File):
 
             # Strand
             strand = False
+            strand_type = None
             if feature.strand == "+":
                 self.category_values["strand"] = {"+", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -226,6 +235,7 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
+                strand_type = "+"
             elif feature.strand == "-":
                 self.category_values["strand"] = {"-", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -234,6 +244,7 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
+                strand_type = "-"
             else:
                 self.category_values["strand"] = {".", }
                 relation = self.namespace_data[self.format_uri("strand")]
@@ -242,17 +253,18 @@ class BedFile(File):
                 self.faldo_abstraction["strand"] = relation
                 self.graph_chunk.add((entity, relation, attribute))
                 strand = True
+                strand_type = "."
 
             if strand:
-                if "strand" not in attribute_list:
-                    attribute_list.append("strand")
+                if ("strand", strand_type) not in attribute_list:
+                    attribute_list.append(("strand", strand_type))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-", "."]
+                        "values": [strand_type]
                     })
 
             # Score

@@ -24,7 +24,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"]
+                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
+                'ontology': False
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -36,7 +37,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["de"]["end"] - info["de"]["start"]
+                'exec_time': info["de"]["end"] - info["de"]["start"],
+                'ontology': False
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -48,7 +50,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
+                'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
+                'ontology': False
             }, {
                 'end': info["gff"]["end"],
                 'error_message': '',
@@ -60,7 +63,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["gff"]["end"] - info["gff"]["start"]
+                'exec_time': info["gff"]["end"] - info["gff"]["start"],
+                'ontology': False
             }, {
                 'end': info["bed"]["end"],
                 'error_message': '',
@@ -72,7 +76,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["bed"]["end"] - info["bed"]["start"]
+                'exec_time': info["bed"]["end"] - info["bed"]["start"],
+                'ontology': False
             }],
             'error': False,
             'errorMessage': ''
@@ -118,7 +123,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"]
+                'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
+                'ontology': False
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -130,7 +136,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["de"]["end"] - info["de"]["start"]
+                'exec_time': info["de"]["end"] - info["de"]["start"],
+                'ontology': False
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -142,7 +149,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["qtl"]["end"] - info["qtl"]["start"]
+                'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
+                'ontology': False
             }, {
                 'end': info["gff"]["end"],
                 'error_message': '',
@@ -154,7 +162,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["gff"]["end"] - info["gff"]["start"]
+                'exec_time': info["gff"]["end"] - info["gff"]["start"],
+                'ontology': False
             }, {
                 'end': info["bed"]["end"],
                 'error_message': '',
@@ -166,7 +175,8 @@ class TestApiDatasets(AskomicsTestCase):
                 'status': 'success',
                 'traceback': None,
                 'percent': 100.0,
-                'exec_time': info["bed"]["end"] - info["bed"]["start"]
+                'exec_time': info["bed"]["end"] - info["bed"]["start"],
+                'ontology': False
             }],
             'error': False,
             'errorMessage': ''

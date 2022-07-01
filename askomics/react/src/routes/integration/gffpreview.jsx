@@ -18,7 +18,8 @@ export default class GffPreview extends Component {
       publicTick: false,
       privateTick: false,
       customUri: "",
-      externalEndpoint: ""
+      externalEndpoint: "",
+      externalGraph: ""
     }
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
@@ -90,6 +91,22 @@ export default class GffPreview extends Component {
     })
   }
 
+  handleChangeRemoteGraph (event) {
+    this.setState({
+      remoteGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   render () {
 
     let privateIcon = <i className="fas fa-lock"></i>
@@ -100,8 +117,12 @@ export default class GffPreview extends Component {
     if (this.state.publicTick) {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
+    let privateButton
+    if (this.props.config.user.admin || !this.props.config.singleTenant){
+        privateButton = <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+    }
     let publicButton
-    if (this.props.config.user.admin) {
+    if (this.props.config.user.admin || this.props.config.singleTenant) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
@@ -122,14 +143,17 @@ export default class GffPreview extends Component {
           <br />
         <AdvancedOptions
           config={this.props.config}
+          hideDistantEndpoint={true}
           handleChangeUri={p => this.handleChangeUri(p)}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+          handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+          externalGraph={this.state.externalGraph}
           customUri={this.state.customUri}
         />
         <br />
           <div className="center-div">
             <ButtonGroup>
-              <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+              {privateButton}
               {publicButton}
             </ButtonGroup>
             <br />

@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
+import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
+import ReactTooltip from "react-tooltip";
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
+import OntoLinkView from './ontolinkview'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
@@ -40,7 +42,8 @@ export default class Query extends Component {
 
       // Preview icons
       disablePreview: false,
-      previewIcon: "table"
+      previewIcon: "table",
+      ontologies: this.props.location.state.config.ontologies
     }
 
     this.graphState = {
@@ -50,6 +53,8 @@ export default class Query extends Component {
     }
 
     this.divHeight = 650
+    this.showFaldo = true;
+
 
     this.idNumber = 0
     this.specialNodeIdNumber = 0
@@ -62,6 +67,7 @@ export default class Query extends Component {
     this.handleRemoveNode = this.handleRemoveNode.bind(this)
     this.handleFilterNodes = this.handleFilterNodes.bind(this)
     this.handleFilterLinks = this.handleFilterLinks.bind(this)
+    this.handleFilterFaldo = this.handleFilterFaldo.bind(this)
   }
 
   resetIcons() {
@@ -208,6 +214,33 @@ export default class Query extends Component {
     })
   }
 
+  isRemoteOnto (currentUri, targetUri) {
+
+    let node = this.state.abstraction.entities.find(entity => {
+      return entity.uri == targetUri
+    })
+
+    if (! node){
+      return false
+    }
+
+    return node.ontology ? currentUri == targetUri ? "endNode" : "node" : false
+  }
+
+  isOntoNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology)
+    })
+  }
+
+  isOntoEndNode (currentId) {
+
+    return this.graphState.nodes.some(node => {
+      return (node.id == currentId && node.ontology == "endNode")
+    })
+  }
+
   attributeExist (attrUri, nodeId) {
     return this.graphState.attr.some(attr => {
       return (attr.uri == attrUri && attr.nodeId == nodeId)
@@ -240,6 +273,8 @@ export default class Query extends Component {
     let nodeAttributes = []
     let isBnode = this.isBnode(nodeId)
 
+    let isOnto = this.isOntoNode(nodeId)
+
     // if bnode without uri, first attribute is visible
     let firstAttrVisibleForBnode = isBnode
 
@@ -255,7 +290,9 @@ export default class Query extends Component {
         humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
         label: 'Uri',
+        displayLabel: 'Uri',
         entityLabel: this.getLabel(nodeUri),
+        entityDisplayLabel: this.getLabel(nodeUri),
         entityUris: [nodeUri, ],
         type: 'uri',
         faldo: false,
@@ -265,7 +302,8 @@ export default class Query extends Component {
         form: false,
         negative: false,
         linked: false,
-        linkedWith: null
+        linkedWith: null,
+        ontology: isOnto
       })
     }
 
@@ -278,7 +316,9 @@ export default class Query extends Component {
         humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdfs:label',
         label: 'Label',
+        displayLabel: 'Label',
         entityLabel: this.getLabel(nodeUri),
+        entityDisplayLabel: this.getLabel(nodeUri),
         entityUris: [nodeUri, ],
         type: 'text',
         faldo: false,
@@ -474,7 +514,12 @@ export default class Query extends Component {
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
 
+    if (this.isOntoEndNode(node.id)){
+        return
+    }
+
     this.state.abstraction.relations.map(relation => {
+      let isOnto = this.isRemoteOnto(relation.source, relation.target)
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
           targetId = this.getId()
@@ -498,29 +543,30 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
-              suggested: true
+              suggested: true,
+              ontology: isOnto
             })
             // push suggested link
             this.graphState.links.push({
               uri: relation.uri,
-              type: "link",
+              type: isOnto == "endNode" ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: relation.label,
+              label: isOnto == "endNode" ? this.getOntoLabel(relation.uri) : relation.label,
               source: node.id,
               target: targetId,
               selected: false,
               suggested: true,
-              directed: true
+              directed: true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
         }
       }
 
-      if (relation.target == node.uri) {
+      if (relation.target == node.uri && ! isOnto) {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
@@ -557,7 +603,7 @@ export default class Query extends Component {
               target: node.id,
               selected: false,
               suggested: true,
-              directed: true
+              directed: true,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -566,7 +612,7 @@ export default class Query extends Component {
     })
 
     // Position
-    if (node.faldo) {
+    if (node.faldo && this.showFaldo) {
       this.state.abstraction.entities.map(entity => {
         if (entity.faldo) {
           let new_id = this.getId()
@@ -585,7 +631,7 @@ export default class Query extends Component {
             label: entity.label,
             faldo: entity.faldo,
             selected: false,
-            suggested: true
+            suggested: true,
           })
           // push suggested link
           this.graphState.links.push({
@@ -600,7 +646,7 @@ export default class Query extends Component {
             target: new_id,
             selected: false,
             suggested: true,
-            directed: true
+            directed: true,
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -626,7 +672,9 @@ export default class Query extends Component {
       if (link.source.id == node1.id && link.target.id == node2.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -636,14 +684,16 @@ export default class Query extends Component {
           target: node2.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: link.directed,
         }
       }
 
       if (link.source.id == node2.id && link.target.id == node1.id) {
         newLink = {
           uri: link.uri,
-          type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" : "link",
+          // What's the point of this?
+          // type: ["included_in", "overlap_with"].includes(link.uri) ? "posLink" :  "link",
+          type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
           strict: true,
@@ -653,7 +703,7 @@ export default class Query extends Component {
           target: node1.id,
           selected: false,
           suggested: false,
-          directed: true
+          directed: link.directed,
         }
       }
     })
@@ -720,7 +770,7 @@ export default class Query extends Component {
 
   handleLinkSelection (clickedLink) {
     // Only position link are clickabl
-    if (clickedLink.type == "posLink") {
+    if (clickedLink.type == "posLink" || clickedLink.type == "ontoLink") {
       // case 1: link is selected, so deselect it
       if (clickedLink.selected) {
         // Update current and previous
@@ -859,6 +909,7 @@ export default class Query extends Component {
       waiting: waiting
     })
     console.log(this.graphState)
+    ReactTooltip.rebuild();
   }
 
   initGraph () {
@@ -977,6 +1028,17 @@ export default class Query extends Component {
         node.filterLink = event.target.value
       }
     })
+    // Reset suggestion
+    this.removeAllSuggestion()
+    this.insertSuggestion(this.currentSelected)
+    this.updateGraphState()
+  }
+
+  // Filter Faldo --------------------------
+  handleFilterFaldo (event) {
+    // Toggle filter
+
+    this.showFaldo = !this.showFaldo
     // Reset suggestion
     this.removeAllSuggestion()
     this.insertSuggestion(this.currentSelected)
@@ -1269,6 +1331,27 @@ export default class Query extends Component {
     return result
   }
 
+  // Ontology link methods -----------------------------
+
+  handleChangeOntologyType (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.uri = event.target.value
+        link.label = this.getOntoLabel(event.target.value)
+      }
+    })
+    this.updateGraphState()
+  }
+
+  getOntoLabel (uri) {
+      let labels = {}
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
+      return labels[uri]
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -1438,15 +1521,27 @@ export default class Query extends Component {
     let visualizationDiv
     let uriLabelBoxes
     let AttributeBoxes
+    let isOnto
     let linkView
     let previewButton
+    let faldoButton
     let launchQueryButton
     let removeButton
     let graphFilters
+    let tooltips = (
+        <div>
+        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
+        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
+        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
+        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
+        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        </div>
+    )
 
     if (!this.state.waiting) {
       // attribute boxes (right view) only for node
       if (this.currentSelected) {
+        isOnto = this.isOntoNode(this.currentSelected.id)
         AttributeBoxes = this.state.graphState.attr.map(attribute => {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
@@ -1470,6 +1565,8 @@ export default class Query extends Component {
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
                 config={this.state.config}
+                isOnto={isOnto}
+                entityUri={this.currentSelected.uri}
               />
             )
           }
@@ -1496,6 +1593,24 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+          />
+        }
+
+        if (this.currentSelected.type == "ontoLink") {
+
+          let link = Object.assign(this.currentSelected)
+          this.state.graphState.nodes.map(node => {
+            if (node.id == this.currentSelected.target) {
+              link.target = node
+            }
+            if (node.id == this.currentSelected.source) {
+              link.source = node
+            }
+          })
+
+          linkView = <OntoLinkView
+            link={link}
+            handleChangeOntologyType={p => this.handleChangeOntologyType(p)}
           />
         }
       }
@@ -1531,6 +1646,12 @@ export default class Query extends Component {
         )
       }
 
+      faldoButton = (
+        <div>
+            <CustomInput type="switch" id="filterFaldo" onChange={this.handleFilterFaldo} checked={this.showFaldo} value={this.showFaldo} label="Show FALDO relations"  />
+        </div>
+      )
+
       // Filters
       graphFilters = (
         <GraphFilters
@@ -1558,11 +1679,14 @@ export default class Query extends Component {
         <h2>Query Builder</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
-        <Row>
+        <Row className="align-items-center">
           <Col xs="7">
             {graphFilters}
           </Col>
-          <Col xs="5">
+          <Col xs="3">
+            {faldoButton}
+          </Col>
+          <Col xs="2">
             {removeButton}
           </Col>
         </Row>
@@ -1578,6 +1702,7 @@ export default class Query extends Component {
               {uriLabelBoxes}
               {AttributeBoxes}
               {linkView}
+              {tooltips}
             </div>
           </Col>
         </Row>

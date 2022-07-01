@@ -32,7 +32,7 @@ def init():
         disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
 
         # Get graphs and endpoints
-        query = SparqlQuery(current_app, session)
+        query = SparqlQuery(current_app, session, get_graphs=True)
         graphs, endpoints = query.get_graphs_and_endpoints(all_selected=True)
 
         # Default query

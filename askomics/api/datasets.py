@@ -119,6 +119,7 @@ def toogle_public():
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
+
     data = request.get_json()
     if not (data and data.get("id")):
         return jsonify({
@@ -135,6 +136,12 @@ def toogle_public():
         datasets_handler.handle_datasets()
 
         for dataset in datasets_handler.datasets:
+            if (not data.get("newStatus", False) and dataset.ontology):
+                return jsonify({
+                    'datasets': [],
+                    'error': True,
+                    'errorMessage': "Cannot unpublicize a dataset linked to an ontology"
+                }), 400
             current_app.logger.debug(data.get("newStatus", False))
             dataset.toggle_public(data.get("newStatus", False))
 

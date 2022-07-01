@@ -208,12 +208,14 @@ class TriplestoreExplorer(Params):
         """
         insert, abstraction = self.get_cached_asbtraction()
 
+        single_tenant = self.settings.getboolean("askomics", "single_tenant", fallback=False)
+
         # No abstraction entry in database, create it
         if not abstraction:
             abstraction = {
-                "entities": self.get_abstraction_entities(),
-                "attributes": self.get_abstraction_attributes(),
-                "relations": self.get_abstraction_relations()
+                "entities": self.get_abstraction_entities(single_tenant),
+                "attributes": self.get_abstraction_attributes(single_tenant),
+                "relations": self.get_abstraction_relations(single_tenant)
             }
 
             # Cache abstraction in DB, only for logged users
@@ -305,7 +307,7 @@ class TriplestoreExplorer(Params):
 
             database.execute_sql_query(query, sql_var)
 
-    def get_abstraction_entities(self):
+    def get_abstraction_entities(self, single_tenant=False):
         """Get abstraction entities
 
         Returns
@@ -328,7 +330,7 @@ class TriplestoreExplorer(Params):
             GRAPH ?graph {{
                 ?graph prov:atLocation ?endpoint .
                 ?entity_uri a ?entity_type .
-                VALUES ?entity_type {{ askomics:entity askomics:bnode }} .
+                VALUES ?entity_type {{ askomics:entity askomics:bnode askomics:ontology}} .
                 # Faldo
                 OPTIONAL {{
                     ?entity_uri a ?entity_faldo .
@@ -362,6 +364,7 @@ class TriplestoreExplorer(Params):
                     "label": label,
                     "instancesHaveLabels": True if "have_no_label" not in result else False if result["have_no_label"] == "1" else True,
                     "faldo": True if "entity_faldo" in result else False,
+                    "ontology": True if result["entity_type"] == "{}ontology".format(self.settings.get("triplestore", "namespace_internal")) else False,
                     "endpoints": [result["endpoint"]],
                     "graphs": [result["graph"]],
                 }
@@ -378,7 +381,7 @@ class TriplestoreExplorer(Params):
 
         return entities
 
-    def get_abstraction_attributes(self):
+    def get_abstraction_attributes(self, single_tenant=False):
         """Get user abstraction attributes from the triplestore
 
         Returns
@@ -407,13 +410,16 @@ class TriplestoreExplorer(Params):
             ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
-                ?attribute_uri a ?attribute_type .
+                ?node a ?attribute_type .
                 VALUES ?attribute_type {{ owl:DatatypeProperty askomics:AskomicsCategory }}
-                ?attribute_uri rdfs:label ?attribute_label .
-                ?attribute_uri rdfs:range ?attribute_range .
+                ?node rdfs:label ?attribute_label .
+                ?node rdfs:range ?attribute_range .
+                # Retrocompatibility
+                OPTIONAL {{?node askomics:uri ?new_attribute_uri}}
+                BIND( IF(isBlank(?node),?new_attribute_uri, ?node) as ?attribute_uri )
                 # Faldo
                 OPTIONAL {{
-                    ?attribute_uri a ?attribute_faldo .
+                    ?node a ?attribute_faldo .
                     VALUES ?attribute_faldo {{ askomics:faldoStart askomics:faldoEnd askomics:faldoStrand askomics:faldoReference }}
                 }}
                 # Categories (DK)
@@ -424,10 +430,10 @@ class TriplestoreExplorer(Params):
             }}
             # Attribute of entity (or motherclass of entity)
             {{
-                ?attribute_uri rdfs:domain ?mother .
+                ?node rdfs:domain ?mother .
                 ?entity_uri rdfs:subClassOf ?mother .
             }} UNION {{
-                ?attribute_uri rdfs:domain ?entity_uri .
+                ?node rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
@@ -441,13 +447,13 @@ class TriplestoreExplorer(Params):
         attributes = []
 
         for result in data:
-            # Attributes
-            if "attribute_uri" in result and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
-                attr_tpl = (result["attribute_uri"], result["entity_uri"])
+            attribute_uri = result.get("attribute_uri")
+            if attribute_uri and "attribute_label" in result and result["attribute_type"] != "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and result["attribute_range"] in litterals:
+                attr_tpl = (attribute_uri, result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
                     attribute = {
-                        "uri": result["attribute_uri"],
+                        "uri": attribute_uri,
                         "label": result["attribute_label"],
                         "graphs": [result["graph"], ],
                         "entityUri": result["entity_uri"],
@@ -465,12 +471,12 @@ class TriplestoreExplorer(Params):
                 index_attribute = attributes_list.index(attr_tpl)
 
             # Categories
-            if "attribute_uri" in result and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
-                attr_tpl = (result["attribute_uri"], result["entity_uri"])
+            if attribute_uri and result["attribute_type"] == "{}AskomicsCategory".format(self.settings.get("triplestore", "namespace_internal")) and "category_value_uri" in result:
+                attr_tpl = (attribute_uri, result["entity_uri"])
                 if attr_tpl not in attributes_list:
                     attributes_list.append(attr_tpl)
                     attribute = {
-                        "uri": result["attribute_uri"],
+                        "uri": attribute_uri,
                         "label": result["attribute_label"],
                         "graphs": [result["graph"], ],
                         "entityUri": result["entity_uri"],
@@ -497,7 +503,7 @@ class TriplestoreExplorer(Params):
 
         return attributes
 
-    def get_abstraction_relations(self):
+    def get_abstraction_relations(self, single_tenant=False):
         """Get user abstraction relations from the triplestore
 
         Returns
@@ -513,24 +519,27 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?node_type ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
             GRAPH ?graph {{
                 # Property (relations and categories)
-                ?property_uri a owl:ObjectProperty .
-                ?property_uri a askomics:AskomicsRelation .
-                ?property_uri rdfs:label ?property_label .
-                ?property_uri rdfs:range ?range_uri .
+                ?node a owl:ObjectProperty .
+                ?node a askomics:AskomicsRelation .
+                ?node rdfs:label ?property_label .
+                ?node rdfs:range ?range_uri .
+                # Retrocompatibility
+                OPTIONAL {{?node askomics:uri ?new_property_uri}}
+                BIND( IF(isBlank(?node), ?new_property_uri, ?node) as ?property_uri)
             }}
             # Relation of entity (or motherclass of entity)
             {{
-                ?property_uri rdfs:domain ?mother .
+                ?node rdfs:domain ?mother .
                 ?entity_uri rdfs:subClassOf ?mother .
             }} UNION {{
-                ?property_uri rdfs:domain ?entity_uri .
+                ?node rdfs:domain ?entity_uri .
             }}
             FILTER (
                 ?public = <true>{}
@@ -542,15 +551,15 @@ class TriplestoreExplorer(Params):
 
         relations_list = []
         relations = []
-
         for result in data:
             # Relation
             if "property_uri" in result:
-                rel_tpl = (result["property_uri"], result["entity_uri"], result["range_uri"])
+                property_uri = result.get("property_uri")
+                rel_tpl = (property_uri, result["entity_uri"], result["range_uri"])
                 if rel_tpl not in relations_list:
                     relations_list.append(rel_tpl)
                     relation = {
-                        "uri": result["property_uri"],
+                        "uri": property_uri,
                         "label": result["property_label"],
                         "graphs": [result["graph"], ],
                         "source": result["entity_uri"],

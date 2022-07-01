@@ -44,6 +44,7 @@ class SparqlQueryLauncher(Params):
         except Exception:
             pass
 
+        local = False
         # Use the federated query engine
         if federated:
             self.federated = True
@@ -65,15 +66,19 @@ class SparqlQueryLauncher(Params):
             self.triplestore = self.settings.get('triplestore', 'triplestore')
             self.url_endpoint = self.settings.get('triplestore', 'endpoint')
             self.url_updatepoint = self.settings.get('triplestore', 'updatepoint')
+            local = True
+
+        self.endpoint = SPARQLWrapper(self.url_endpoint, self.url_updatepoint)
+
+        if local:
             try:
                 self.endpoint.setCredentials(
                     self.settings.get('triplestore', 'username'),
                     self.settings.get('triplestore', 'password')
                 )
+                self.endpoint.setHTTPAuth(self.settings.get('triplestore', 'http_auth', fallback="basic"))
             except Exception:
                 pass
-
-        self.endpoint = SPARQLWrapper(self.url_endpoint, self.url_updatepoint)
 
     def load_data(self, file_name, graph, host_url):
         """Load data in function of the triplestore
@@ -220,7 +225,7 @@ class SparqlQueryLauncher(Params):
         TYPE
             query result
         """
-        triples = self.get_triples_from_graph(ttl) if metadata else ttl.serialize(format='nt').decode("utf-8")
+        triples = self.get_triples_from_graph(ttl) if metadata else ttl.serialize(format='nt')
 
         query = '''
         INSERT {{
@@ -305,8 +310,8 @@ class SparqlQueryLauncher(Params):
                 if self.endpoint.isSparqlUpdateRequest():
                     self.endpoint.setMethod('POST')
                     # Virtuoso hack
-                    if self.triplestore == 'virtuoso':
-                        self.endpoint.queryType = "SELECT"
+                    # if self.triplestore == 'virtuoso':
+                    #    self.endpoint.queryType = "SELECT"
 
                     results = self.endpoint.query()
                 # Select

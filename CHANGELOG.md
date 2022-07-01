@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+## [4.4.0] - 2022-07-01
+
+### Fixed
+
+- Fixed an issue with forms (missing field and entity name for label & uri fields) (Issue #255)
+- Fixed an issue with the data endpoint for FALDO entities (Issue #279)
+- Fixed an issue where integration would fail when setting a category type on a empty column (#334)
+- Fixed an issue with saved queries for non-logged users
+
+### Added
+
+- Added 'scaff' for autodetection of 'reference' columns
+- Added a 'Label' column type: only for second column in CSV files. Will use this value if present, else default to old behavior
+- Added button to hide FALDO relations (*included_in*)
+- Added 'target=_blank' in query results
+- Remote upload is now sent in a Celery task
+- Added 'Status' for files (for celery upload, and later for better file management)
+- Added tooltips to buttons in the query form (and other forms)
+- Added owl integration
+- Add better error management for RDF files
+- Added 'single tenant' mode: Send queries to all graphs to speed up
+- Added ontologies management
+- Added prefixes management
+- Added 'external graph' management for federated request: federated requests will only target this remote graph
+- Added support for multithread in web server, with the *WORKERS* env variable when calling make
+
+### Changed
+
+- Changed "Query builder" to "Form editor" in form editing interface
+- Changed abstraction building method for relations. (Please refer to #248 and #268). Correct 'phantom' relations
+- Changed abstraction building method for attributes. (Please refer to #321 and #324). Correct 'attributes' relations
+- Changed abstraction building method for 'strand': only add the required strand type, and not all three types (#277)
+- Updated documentation
+- Changed the sparql endpoint: now use the authenticated SPARQL endpoint instead of public endpoint. Write permissions are not required anymore
+- Reverted base docker image to alpine-13 to solve a docker issue
+
+### Removed
+
+- Removed "Remote endpoint" field for non-ttl file
+- Removed "Custom_uri" field for ttl file
+
+### Security
+
+- Bump axios from 0.21.1 to 0.21.2
+- Bump tar from 6.1.0 to 6.1.11
+- Bump @npmcli/git from 2.0.6 to 2.1.0
+- Bump path-parse from 1.0.6 to 1.0.7
+- Bump prismjs from 1.23.0 to 1.27.0
+- Bump simple-get from 2.8.1 to 2.8.2
+- Bump ssri from 6.0.1 to 6.0.2
+- Bump follow-redirects from 1.14.4 to 1.14.8
+- Bump mkdocs from 1.0.4 to 1.2.3 in /docs
+- Bump python-ldap from 3.3.1 to 3.4.0
+- Bump minimist from 1.2.5 to 1.2.6
 
 ## [4.3.1] - 2021-06-16
 

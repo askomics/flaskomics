@@ -6,6 +6,8 @@ from askomics.libaskomics.PrefixManager import PrefixManager
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 from askomics.libaskomics.Utils import Utils
 
+from collections import defaultdict
+
 
 class SparqlQuery(Params):
     """Format a sparql query
@@ -18,7 +20,7 @@ class SparqlQuery(Params):
         all public graph
     """
 
-    def __init__(self, app, session, json_query=None):
+    def __init__(self, app, session, json_query=None, get_graphs=False):
         """init
 
         Parameters
@@ -35,6 +37,7 @@ class SparqlQuery(Params):
 
         self.graphs = []
         self.endpoints = []
+        self.remote_graphs = defaultdict(list)
         self.selects = []
         self.federated = False
 
@@ -44,8 +47,9 @@ class SparqlQuery(Params):
             self.local_endpoint_f = self.settings.get('federation', 'local_endpoint')
         except Exception:
             pass
-
-        self.set_graphs_and_endpoints()
+        # No need to call this twice if we need it later (sparql queries)
+        if get_graphs:
+            self.set_graphs_and_endpoints()
 
     def set_graphs(self, graphs):
         """Set graphs
@@ -66,6 +70,16 @@ class SparqlQuery(Params):
             Endpoints
         """
         self.endpoints = endpoints
+
+    def set_remote_graph(self, remote_graphs):
+        """Set endpoints
+
+        Parameters
+        ----------
+        endpoints : list
+            Endpoints
+        """
+        self.remote_graphs = remote_graphs
 
     def is_federated(self):
         """Return True if there is more than 1 endpoint
@@ -275,7 +289,7 @@ class SparqlQuery(Params):
             self.get_default_query()
         )
 
-    def format_query(self, query, limit=30, replace_froms=True, federated=False):
+    def format_query(self, query, limit=30, replace_froms=True, federated=False, ignore_single_tenant=True):
         """Format the Sparql query
 
         - remove all FROM
@@ -295,11 +309,13 @@ class SparqlQuery(Params):
             formatted sparql query
         """
         froms = ''
-        if replace_froms:
-            froms = self.get_froms()
 
         if federated:
-            federated_line = "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_line = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else "{}\n{}".format(self.get_federated_line(), self.get_federated_froms())
+            federated_graphs_string = self.get_federated_remote_from_graphs()
+        else:
+            if replace_froms and (not self.settings.getboolean("askomics", "single_tenant", fallback=False)):
+                froms = self.get_froms()
 
         query_lines = query.split('\n')
 
@@ -310,6 +326,7 @@ class SparqlQuery(Params):
             if not line.upper().lstrip().startswith('FROM') and not line.upper().lstrip().startswith('LIMIT') and not line.upper().lstrip().startswith('@FEDERATE'):
                 if line.upper().lstrip().startswith('SELECT') and federated:
                     new_query += "\n{}\n".format(federated_line)
+                    new_query += "\n{}\n".format(federated_graphs_string)
                 new_query += '\n{}'.format(line)
             # Add new FROM
             if line.upper().lstrip().startswith('SELECT'):
@@ -374,6 +391,22 @@ class SparqlQuery(Params):
         from_string = "@from <{}>".format(self.local_endpoint_f)
         for graph in graphs:
             from_string += " <{}>".format(graph)
+        return from_string
+
+    def get_federated_remote_from_graphs(self):
+        """Get @from string fir the federated query engine
+
+        Returns
+        -------
+        string
+            The from string
+        """
+        from_string = ""
+
+        for endpoint in self.endpoints:
+            remote_graphs = self.remote_graphs.get(endpoint, [])
+            if len(remote_graphs) == 1:
+                from_string += "\n@graph <{}> <{}>".format(endpoint, remote_graphs[0])
 
         return from_string
 
@@ -391,7 +424,7 @@ class SparqlQuery(Params):
 
         return endpoints_string
 
-    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None):
+    def set_graphs_and_endpoints(self, entities=None, graphs=None, endpoints=None, ontologies={}):
         """Get all public and private graphs containing the given entities
 
         Parameters
@@ -399,26 +432,33 @@ class SparqlQuery(Params):
         entities : list, optional
             list of entity uri
         """
-        substrlst = []
         filter_entity_string = ''
         if entities:
-            for entity in entities:
-                substrlst.append("?entity_uri = <{}>".format(entity))
-            filter_entity_string = 'FILTER (' + ' || '.join(substrlst) + ')'
+            substr = ",".join(["<{}>".format(entity) for entity in entities])
+            filter_entity_string = 'FILTER (?entity_uri IN( ' + substr + ' ))'
 
         filter_public_string = 'FILTER (?public = <true>)'
         if 'user' in self.session:
             filter_public_string = 'FILTER (?public = <true> || ?creator = <{}>)'.format(self.session["user"]["username"])
 
         query = '''
-        SELECT DISTINCT ?graph ?endpoint
+        SELECT DISTINCT ?graph ?endpoint ?entity_uri ?remote_graph
         WHERE {{
+          ?graph_abstraction askomics:public ?public .
+          ?graph_abstraction dc:creator ?creator .
           ?graph askomics:public ?public .
           ?graph dc:creator ?creator .
-          GRAPH ?graph {{
-            ?graph prov:atLocation ?endpoint .
-            ?entity_uri a askomics:entity .
+          GRAPH ?graph_abstraction {{
+            ?graph_abstraction prov:atLocation ?endpoint .
+            OPTIONAL {{?graph_abstraction dcat:Dataset ?remote_graph .}}
+            ?entity_uri a ?askomics_type .
           }}
+          GRAPH ?graph {{
+            {{ [] a ?entity_uri . }}
+            UNION
+            {{ ?entity_uri a ?askomics_type . }}
+          }}
+          VALUES ?askomics_type {{askomics:entity askomics:ontology}}
           {}
           {}
         }}
@@ -428,11 +468,17 @@ class SparqlQuery(Params):
         header, results = query_launcher.process_query(self.prefix_query(query))
         self.graphs = []
         self.endpoints = []
+        self.remote_graphs = defaultdict(list)
         for res in results:
             if not graphs or res["graph"] in graphs:
-                self.graphs.append(res["graph"])
+                # Override with onto graph if matching uri
+                if ontologies.get(res['entity_uri']):
+                    graph = ontologies[res['entity_uri']]['graph']
+                else:
+                    graph = res["graph"]
+                self.graphs.append(graph)
 
-            # If local triplestore url is not accessible by federetad query engine
+            # If local triplestore url is not accessible by federated query engine
             if res["endpoint"] == self.settings.get('triplestore', 'endpoint') and self.local_endpoint_f is not None:
                 endpoint = self.local_endpoint_f
             else:
@@ -440,9 +486,142 @@ class SparqlQuery(Params):
 
             if not endpoints or endpoint in endpoints:
                 self.endpoints.append(endpoint)
+                if res.get("remote_graph"):
+                    self.remote_graphs[endpoint].append(res.get("remote_graph"))
 
         self.endpoints = Utils.unique(self.endpoints)
         self.federated = len(self.endpoints) > 1
+
+    def get_uri_parameters(self, uri, endpoints):
+        """Get parameters for a specific data URI
+
+        Parameters
+        ----------
+        uri : string
+            URI to search
+
+        Returns
+        -------
+        dict
+            The corresponding parameters
+        """
+        raw_query = '''
+        SELECT DISTINCT ?predicate ?object ?faldo_value ?faldo_relation
+        WHERE {{
+          ?URI ?predicate ?object .
+          ?URI a ?entitytype .
+
+          FILTER(! STRSTARTS(STR(?predicate), STR(askomics:)))
+          OPTIONAL {{
+
+            ?faldo_uri rdfs:domain ?entitytype .
+            ?faldo_uri rdfs:label ?attribute_label .
+
+            OPTIONAL {{
+            ?object faldo:begin/faldo:position ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoStart
+            }}
+
+            OPTIONAL {{
+            ?object faldo:end/faldo:position ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoEnd
+            }}
+
+            OPTIONAL {{
+            ?object faldo:begin/faldo:reference/rdfs:label ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoReference
+            }}
+
+            OPTIONAL {{
+            ?object faldo:begin/rdf:type ?Gene1_strandCategory .
+            ?Gene1_strand_faldoStrand a ?Gene1_strandCategory .
+            ?Gene1_strand_faldoStrand rdfs:label ?faldo_value .
+            ?faldo_uri rdf:type askomics:faldoStrand .
+            }}
+
+            OPTIONAL {{
+              ?faldo_uri askomics:uri ?node_uri
+            }}
+
+            VALUES ?predicate {{faldo:location}}
+          }}
+          VALUES ?URI {{{}}}
+          BIND(IF(isBlank(?faldo_uri), ?node_uri ,?faldo_uri) as ?faldo_relation)
+        }}
+        '''.format(uri)
+
+        federated = self.is_federated()
+        replace_froms = self.replace_froms()
+
+        raw_query = self.prefix_query(raw_query)
+
+        sparql = self.format_query(raw_query, replace_froms=replace_froms, federated=federated)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=federated, endpoints=endpoints)
+        _, data = query_launcher.process_query(sparql)
+
+        formated_data = []
+        for row in data:
+
+            predicate = row['predicate']
+            object = row['object']
+
+            if row.get('faldo_relation'):
+                predicate = row.get("faldo_relation")
+
+            if row.get('faldo_value'):
+                object = row.get('faldo_value')
+
+            formated_data.append({
+                'predicate': predicate,
+                'object': object,
+            })
+
+        return formated_data
+
+    def autocomplete_local_ontology(self, uri, query, max_terms, label):
+        """Get results for a specific query
+
+        Parameters
+        ----------
+        uri : string
+            ontology uri
+        query : string
+            query to search
+
+        Returns
+        -------
+        dict
+            The corresponding parameters
+        """
+
+        subquery = ""
+
+        if query:
+            subquery = 'FILTER(contains(lcase(?label), "{}"))'.format(query.lower())
+        raw_query = '''
+        SELECT DISTINCT ?label
+        WHERE {{
+          ?uri rdf:type owl:Class .
+          ?uri {} ?label .
+          {}
+        }}
+        '''.format(label, subquery)
+
+        raw_query = self.prefix_query(raw_query)
+
+        is_federated = self.is_federated()
+
+        sparql = self.format_query(raw_query, limit=max_terms, replace_froms=True, federated=is_federated)
+
+        query_launcher = SparqlQueryLauncher(self.app, self.session, get_result_query=True, federated=is_federated)
+        _, data = query_launcher.process_query(sparql)
+
+        formated_data = []
+        for row in data:
+            formated_data.append(row['label'])
+
+        return formated_data
 
     def format_sparql_variable(self, name):
         """Format a name into a sparql variable by remove spacial char and add a ?
@@ -873,6 +1052,8 @@ class SparqlQuery(Params):
         for_editor : bool, optional
             Remove FROMS and @federate
         """
+        # Circular import
+        from askomics.libaskomics.OntologyManager import OntologyManager
         entities = []
         attributes = {}
         linked_attributes = []
@@ -890,14 +1071,19 @@ class SparqlQuery(Params):
 
         var_to_replace = []
 
+        ontologies = {}
+        om = OntologyManager(self.app, self.session)
+
         # Browse attributes to get entities
         for attr in self.json["attr"]:
             entities = entities + attr["entityUris"]
+            if attr["type"] == "uri" and attr.get("ontology", False) is True and not attr["entityUris"][0] in ontologies:
+                ontologies[attr["entityUris"][0]] = om.get_ontology(uri=attr["entityUris"][0])
 
         entities = list(set(entities))  # uniq list
 
         # Set graphs in function of entities needed
-        self.set_graphs_and_endpoints(entities=entities)
+        self.set_graphs_and_endpoints(entities=entities, ontologies=ontologies)
 
         # self.log.debug(self.json)
 
@@ -1009,7 +1195,20 @@ class SparqlQuery(Params):
 
                 # Classic relation
                 else:
-                    relation = "<{}>".format(link["uri"])
+                    # Manage ontology stuff
+                    inverse = ""
+                    recurrence = ""
+                    relation = link["uri"]
+
+                    if relation.startswith("^"):
+                        inverse = "^"
+                        relation = relation.lstrip("^")
+
+                    if relation.endswith("*"):
+                        recurrence = "*"
+                        relation = relation.rstrip("*")
+
+                    relation = inverse + "<{}>".format(relation) + recurrence
                     triple = {
                         "subject": source,
                         "predicate": relation,
@@ -1031,7 +1230,6 @@ class SparqlQuery(Params):
 
         # Browse attributes
         for attribute in self.json["attr"]:
-
             # Get blockid and sblockid of the attribute node
             block_id, sblock_id, pblock_ids = self.get_block_ids(attribute["nodeId"])
 
@@ -1040,11 +1238,18 @@ class SparqlQuery(Params):
                 subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                 predicate = attribute["uri"]
                 obj = "<{}>".format(attribute["entityUris"][0])
-                if not self.is_bnode(attribute["entityUris"][0], self.json["nodes"]):
+                if not (self.is_bnode(attribute["entityUris"][0], self.json["nodes"]) or attribute.get("ontology", False) is True):
                     self.store_triple({
                         "subject": subject,
                         "predicate": predicate,
                         "object": obj,
+                        "optional": False
+                    }, block_id, sblock_id, pblock_ids)
+                if attribute.get("ontology", False) is True:
+                    self.store_triple({
+                        "subject": subject,
+                        "predicate": predicate,
+                        "object": "owl:Class",
                         "optional": False
                     }, block_id, sblock_id, pblock_ids)
 
@@ -1114,6 +1319,8 @@ class SparqlQuery(Params):
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["uri"] == "rdfs:label":
                         predicate = attribute["uri"]
+                        if ontologies.get(attribute["entityUris"][0]):
+                            predicate = ontologies[attribute["entityUris"][0]]["label_uri"]
                     else:
                         predicate = "<{}>".format(attribute["uri"])
 
@@ -1300,9 +1507,10 @@ class SparqlQuery(Params):
                     ))
                     var_to_replace.append((category_value_uri, var_2))
 
-        from_string = self.get_froms_from_graphs(self.graphs)
+        from_string = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
         endpoints_string = self.get_endpoints_string()
+        federated_graphs_string = self.get_federated_remote_from_graphs()
 
         # Linked attributes: replace SPARQL variable target by source
         self.replace_variables_in_blocks(var_to_replace)
@@ -1332,6 +1540,7 @@ WHERE {{
             query = """
 {endpoints}
 {federated}
+{remote_graphs}
 
 SELECT DISTINCT {selects}
 WHERE {{
@@ -1343,6 +1552,7 @@ WHERE {{
             """.format(
                 endpoints=endpoints_string,
                 federated=federated_from_string,
+                remote_graphs=federated_graphs_string,
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
                 blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),

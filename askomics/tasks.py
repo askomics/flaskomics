@@ -44,10 +44,10 @@ def integrate(self, session, data, host_url):
         error: True if error, else False
         errorMessage: the error message of error, else an empty string
     """
-    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"])
+    files_handler = FilesHandler(app, session, host_url=host_url, external_endpoint=data["externalEndpoint"], custom_uri=data["customUri"], external_graph=data['externalGraph'])
     files_handler.handle_files([data["fileId"], ])
 
-    public = data.get("public", False) if session["user"]["admin"] else False
+    public = (data.get("public", False) if session["user"]["admin"] else False) or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
 
     for file in files_handler.files:
 
@@ -151,20 +151,28 @@ def query(self, session, info):
         info["celery_id"] = self.request.id
         result = Result(app, session, info, force_no_db=True)
 
+        query = SparqlQuery(app, session, info["graph_state"])
+        query.build_query_from_json(preview=False, for_editor=False)
+        federated = query.is_federated()
+        result.populate_db(query.graphs, query.endpoints)
+
+        info["query"] = query.sparql
+        info["graphs"] = query.graphs
+        info["endpoints"] = query.endpoints
+        info["federated"] = federated
+        info["selects"] = query.selects
+
         # Save job in database database
         result.set_celery_id(self.request.id)
         result.update_db_status("started", update_celery=True, update_date=True)
 
         # launch query
-        query = SparqlQuery(app, session, info["graph_state"])
 
-        query.build_query_from_json(for_editor=False)
-
-        headers = query.selects
+        headers = info["selects"]
         results = []
-        if query.graphs:
-            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=query.federated, endpoints=query.endpoints)
-            headers, results = query_launcher.process_query(query.sparql, isql_api=True)
+        if info["graphs"] or app.iniconfig.getboolean("askomics", "single_tenant", fallback=False):
+            query_launcher = SparqlQueryLauncher(app, session, get_result_query=True, federated=info["federated"], endpoints=info["endpoints"])
+            headers, results = query_launcher.process_query(info["query"], isql_api=True)
 
         # write result to a file
         file_size = result.save_result_in_file(headers, results)
@@ -288,3 +296,18 @@ def send_mail_new_user(self, session, user):
     """
     local_auth = LocalAuth(app, session)
     local_auth.send_mail_to_new_user(user)
+
+
+@celery.task(bind=True, name="download_file")
+def download_file(self, session, url):
+    """Send a mail to the new user
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    user : dict
+        New user
+    """
+    files = FilesHandler(app, session)
+    files.download_url(url, download_file.request.id)

@@ -68,9 +68,10 @@ class TestApiAdmin(AskomicsTestCase):
                 'date': info["transcripts"]["upload"]["file_date"],
                 'id': 1,
                 'name': 'transcripts.tsv',
-                'size': 2102,
+                'size': 2264,
                 'type': 'csv/tsv',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["de"]["upload"]["file_date"],
@@ -78,7 +79,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'de.tsv',
                 'size': 819,
                 'type': 'csv/tsv',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
@@ -86,15 +88,17 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2267,
+                'size': 2555,
                 'type': 'gff/gff3',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["bed"]["upload"]["file_date"],
@@ -102,7 +106,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
             }]
         }
 
@@ -134,7 +139,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["transcripts"]["end"] - info["transcripts"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["de"]["end"],
                 'error_message': '',
@@ -147,7 +153,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["de"]["end"] - info["de"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["qtl"]["end"],
                 'error_message': '',
@@ -160,7 +167,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["qtl"]["end"] - info["qtl"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["gff"]["end"],
                 'error_message': '',
@@ -173,7 +181,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["gff"]["end"] - info["gff"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }, {
                 'end': info["bed"]["end"],
                 'error_message': '',
@@ -186,7 +195,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'traceback': None,
                 'percent': 100.0,
                 'exec_time': info["bed"]["end"] - info["bed"]["start"],
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'ontology': False
             }],
             'error': False,
             'errorMessage': ''
@@ -437,15 +447,17 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
-                'size': 2267,
+                'size': 2555,
                 'type': 'gff/gff3',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
 
             }, {
                 'date': info["bed"]["upload"]["file_date"],
@@ -453,7 +465,8 @@ class TestApiAdmin(AskomicsTestCase):
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'user': 'jsmith'
+                'user': 'jsmith',
+                'status': 'available'
             }]
         }
 
@@ -483,3 +496,205 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.json["datasets"][0]["status"] == "queued"
         assert response.json["datasets"][1]["status"] == "queued"
         assert response.json["datasets"][2]["status"] == "queued"
+
+    def test_view_custom_prefixes(self, client):
+        """test /api/admin/getprefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getprefixes')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        response = client.client.get('/api/admin/getprefixes')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        client.create_prefix()
+
+        response = client.client.get('/api/admin/getprefixes')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_custom_prefix(self, client):
+        """test /api/admin/addprefix route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefix": "OBO", "namespace": "http://purl.obolibrary.org/obo/"}
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        response = client.client.post('/api/admin/addprefix', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": [{
+                "id": 1,
+                "namespace": "http://purl.obolibrary.org/obo/",
+                "prefix": "OBO"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_custom_prefix(self, client):
+        """test /api/admin/delete_prefixes route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"prefixesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_prefix()
+
+        response = client.client.post('/api/admin/delete_prefixes', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "prefixes": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_view_ontologies(self, client):
+        """test /api/admin/getontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+
+        expected_empty = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        response = client.client.get('/api/admin/getontologies')
+        assert response.status_code == 200
+        assert response.json == expected_empty
+
+        graph, endpoint = client.create_ontology()
+
+        response = client.client.get('/api/admin/getontologies')
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "AgrO ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "AGRO",
+                "type": "local",
+                "dataset_id": 1,
+                "dataset_name": "agro_min.ttl",
+                "graph": graph,
+                "endpoint": endpoint,
+                "remote_graph": None,
+                "label_uri": "rdfs:label"
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_add_ontology(self, client):
+        """test /api/admin/addontology route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"shortName": "AGRO", "uri": "http://purl.obolibrary.org/obo/agro.owl", "name": "AgrO ontology", "type": "local", "datasetId": 1, "labelUri": "rdfs:label"}
+
+        response = client.client.post('/api/admin/addontology', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        graph_data = client.upload_and_integrate_ontology()
+        graph = graph_data["graph"]
+        endpoint = graph_data["endpoint"]
+
+        response = client.client.post('/api/admin/addontology', json=data)
+
+        # Dataset is not public
+        assert response.status_code == 400
+        assert response.json['errorMessage'] == "Invalid dataset id"
+
+        client.publicize_dataset(1, True)
+        response = client.client.post('/api/admin/addontology', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": [{
+                "id": 1,
+                "name": "AgrO ontology",
+                "uri": "http://purl.obolibrary.org/obo/agro.owl",
+                "short_name": "AGRO",
+                "type": "local",
+                "dataset_id": 1,
+                "dataset_name": "agro_min.ttl",
+                "label_uri": "rdfs:label",
+                "graph": graph,
+                "endpoint": endpoint,
+                "remote_graph": None
+            }]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_delete_ontologies(self, client):
+        """test /api/admin/delete_ontologies route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        data = {"ontologiesIdToDelete": [1]}
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+        assert response.status_code == 401
+
+        client.log_user("jdoe")
+        client.create_ontology()
+
+        response = client.client.post('/api/admin/delete_ontologies', json=data)
+
+        expected = {
+            "error": False,
+            "errorMessage": "",
+            "ontologies": []
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected

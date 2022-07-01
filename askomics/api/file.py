@@ -1,4 +1,5 @@
 """Api routes"""
+import requests
 import sys
 import traceback
 import urllib
@@ -7,6 +8,7 @@ from askomics.api.auth import login_required, api_auth
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
+from askomics.libaskomics.RdfFile import RdfFile
 
 from flask import (Blueprint, current_app, jsonify, request, send_from_directory, session)
 
@@ -188,8 +190,19 @@ def upload_url():
         }), 400
 
     try:
-        files = FilesHandler(current_app, session)
-        files.download_url(data["url"])
+        if session["user"]["quota"] > 0:
+            with requests.get(data["url"], stream=True) as r:
+                # Check header for total size, and check quota.
+                if r.headers.get('Content-length'):
+                    total_size = int(r.headers.get('Content-length')) + disk_space
+                    if total_size >= session["user"]["quota"]:
+                        return jsonify({
+                            'errorMessage': "File will exceed quota",
+                            "error": True
+                        }), 400
+
+        session_dict = {'user': session['user']}
+        current_app.celery.send_task('download_file', (session_dict, data["url"]))
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -224,6 +237,7 @@ def get_preview():
         }), 400
 
     try:
+
         files_handler = FilesHandler(current_app, session)
         files_handler.handle_files(data['filesId'])
 
@@ -318,19 +332,22 @@ def integrate():
 
         for file in files_handler.files:
 
-            data["externalEndpoint"] = data["externalEndpoint"] if data.get("externalEndpoint") else None
-            data["customUri"] = data["customUri"] if data.get("customUri") else None
+            data["externalEndpoint"] = data["externalEndpoint"] if (data.get("externalEndpoint") and isinstance(file, RdfFile)) else None
+            data["externalGraph"] = data["externalGraph"] if (data.get("externalGraph") and isinstance(file, RdfFile)) else None
+            data["customUri"] = data["customUri"] if (data.get("customUri") and not isinstance(file, RdfFile)) else None
 
             dataset_info = {
                 "celery_id": None,
                 "file_id": file.id,
                 "name": file.human_name,
                 "graph_name": file.file_graph,
-                "public": data.get("public") if session["user"]["admin"] else False
+                "public": (data.get("public", False) if session["user"]["admin"] else False) or current_app.iniconfig.getboolean("askomics", "single_tenant", fallback=False)
             }
 
+            endpoint = data["externalEndpoint"] or current_app.iniconfig.get('triplestore', 'endpoint')
+
             dataset = Dataset(current_app, session, dataset_info)
-            dataset.save_in_db()
+            dataset.save_in_db(endpoint, data["externalGraph"])
             data["dataset_id"] = dataset.id
             dataset_ids.append(dataset.id)
             task = current_app.celery.send_task('integrate', (session_dict, data, request.host_url))
@@ -393,7 +410,7 @@ def get_column_types():
         types: list of available column types
     """
 
-    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation"]
+    data = ["numeric", "text", "category", "boolean", "date", "reference", "strand", "start", "end", "general_relation", "symetric_relation", "label"]
 
     return jsonify({
         "types": data

@@ -18,7 +18,7 @@ class GffFile(File):
         Public or private dataset
     """
 
-    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, file_info, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -32,7 +32,7 @@ class GffFile(File):
         host_url : None, optional
             AskOmics url
         """
-        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri)
+        File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.entities = []
         self.entities_to_integrate = []
@@ -108,13 +108,32 @@ class GffFile(File):
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDF.type, rdflib.OWL["Class"]))
             self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(entity, remove_space=True)], rdflib.RDFS.label, rdflib.Literal(entity)))
 
-        for attribute in self.attribute_abstraction:
-            for attr_type in attribute["type"]:
-                self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDF.type, attr_type))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.label, attribute["label"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.domain, attribute["domain"]))
-            self.graph_abstraction_dk.add((attribute["uri"], rdflib.RDFS.range, attribute["range"]))
+        attribute_blanks = {}
 
+        for attribute in self.attribute_abstraction:
+            blank = BNode()
+            # New way of storing relations (starting from 4.4.0)
+            if attribute.get("relation"):
+                endpoint = rdflib.Literal(self.external_endpoint) if self.external_endpoint else rdflib.Literal(self.settings.get('triplestore', 'endpoint'))
+                for attr_type in attribute["type"]:
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.endpointURL, endpoint))
+                self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
+
+            else:
+                # New way of storing attributes (starting from 4.4.0)
+                for attr_type in attribute["type"]:
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
+                self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], attribute["uri"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.label, attribute["label"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
+                self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
+
+            attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -129,7 +148,9 @@ class GffFile(File):
         if self.faldo_entity:
             for key, value in self.faldo_abstraction.items():
                 if value:
-                    self.graph_abstraction_dk.add((value, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    blank = attribute_blanks[value]
+                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
 
     def format_gff_entity(self, entity):
         """Format a gff entity name by removing type (type:entity --> entity)
@@ -182,7 +203,7 @@ class GffFile(File):
                 faldo_strand = None
                 faldo_start = None
                 faldo_end = None
-
+                strand_type = None
                 # Entity
                 if not feature.id:
                     if "ID" not in feature.qualifiers.keys():
@@ -272,6 +293,7 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "+"
                     # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
                     self.category_values["strand"] = {"-", }
@@ -279,6 +301,7 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "-"
                     # self.graph_chunk.add((entity, relation, attribute))
                 else:
                     self.category_values["strand"] = {".", }
@@ -286,16 +309,17 @@ class GffFile(File):
                     attribute = self.namespace_data[self.format_uri(".")]
                     faldo_strand = self.get_faldo_strand(".")
                     self.faldo_abstraction["strand"] = relation
+                    strand_type = "."
 
-                if (feature.type, "strand") not in attribute_list:
-                    attribute_list.append((feature.type, "strand"))
+                if (feature.type, "strand", strand_type) not in attribute_list:
+                    attribute_list.append((feature.type, "strand", strand_type))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
                         "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
-                        "values": ["+", "-", "."]
+                        "values": [strand_type]
                     })
 
                 # Qualifiers (9th columns)
@@ -319,7 +343,8 @@ class GffFile(File):
                                         "domain": entity_type,
                                         "range": value,
                                         "qualifier_key": qualifier_key,
-                                        "feature_type": feature.type
+                                        "feature_type": feature.type,
+                                        "relation": True
                                     })
                                     skip = True
                             else:
@@ -336,7 +361,8 @@ class GffFile(File):
                                     "label": rdflib.Literal(qualifier_key),
                                     "type": [rdflib.OWL.ObjectProperty, self.namespace_internal[self.format_uri("AskomicsRelation")]],
                                     "domain": entity_type,
-                                    "range": self.namespace_data[self.format_uri(related_type)]
+                                    "range": self.namespace_data[self.format_uri(related_type)],
+                                    "relation": True
                                 })
 
                         else:

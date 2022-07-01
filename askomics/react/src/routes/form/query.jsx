@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
+import ReactTooltip from "react-tooltip";
 import AttributeBox from './attribute'
 import Entity from './entity'
 import ResultsTable from '../sparql/resultstable'
@@ -55,7 +56,7 @@ export default class FormQuery extends Component {
 
     this.handlePreview = this.handlePreview.bind(this)
     this.handleQuery = this.handleQuery.bind(this)
-    
+
   }
 
   subNums (id) {
@@ -275,6 +276,7 @@ export default class FormQuery extends Component {
       saveIcon: "play",
       waiting: waiting
     })
+    ReactTooltip.rebuild();
   }
 
   // Preview results and Launch query buttons -------
@@ -383,7 +385,6 @@ export default class FormQuery extends Component {
           })
         }).then(response => {
           this.graphState = this.props.location.state.graphState
-          console.log(this.props.location.state.graphState)
           this.updateGraphState()
           this.setState({ waiting: false })
         })
@@ -435,12 +436,21 @@ export default class FormQuery extends Component {
     let previewButton
     let launchQueryButton
     let entityMap = new Map()
+    let tooltips = (
+        <div>
+        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
+        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
+        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
+        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
+        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        </div>
+    )
 
     if (!this.state.waiting) {
       this.state.graphState.attr.forEach(attribute => {
         if (attribute.form) {
           if (! entityMap.has(attribute.nodeId)){
-            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel, attributes:[]})
+            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel ? attribute.entityDisplayLabel : attribute.entityLabel, attributes:[]})
           }
           entityMap.get(attribute.nodeId).attributes.push(
             <AttributeBox
@@ -505,6 +515,7 @@ export default class FormQuery extends Component {
           <Col xs="12">
             <div style={{ display: 'block', 'overflow-y': 'auto' }}>
               {Entities}
+              {tooltips}
             </div>
           </Col>
         </Row>

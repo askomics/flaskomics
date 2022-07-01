@@ -24,7 +24,7 @@ class FilesHandler(FilesUtils):
         Upload path
     """
 
-    def __init__(self, app, session, host_url=None, external_endpoint=None, custom_uri=None):
+    def __init__(self, app, session, host_url=None, external_endpoint=None, custom_uri=None, external_graph=None):
         """init
 
         Parameters
@@ -47,6 +47,7 @@ class FilesHandler(FilesUtils):
         self.date = None
         self.external_endpoint = external_endpoint
         self.custom_uri = custom_uri
+        self.external_graph = external_graph
 
     def handle_files(self, files_id):
         """Handle file
@@ -60,13 +61,13 @@ class FilesHandler(FilesUtils):
 
         for file in files_infos:
             if file['type'] == 'csv/tsv':
-                self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
+                self.files.append(CsvFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri, external_graph=self.external_graph))
             elif file['type'] == 'gff/gff3':
-                self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
+                self.files.append(GffFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri, external_graph=self.external_graph))
             elif file['type'] in ('rdf/ttl', 'rdf/xml', 'rdf/nt'):
-                self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
+                self.files.append(RdfFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri, external_graph=self.external_graph))
             elif file['type'] == 'bed':
-                self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri))
+                self.files.append(BedFile(self.app, self.session, file, host_url=self.host_url, external_endpoint=self.external_endpoint, custom_uri=self.custom_uri, external_graph=self.external_graph))
 
     def get_files_infos(self, files_id=None, files_path=None, return_path=False):
         """Get files info
@@ -89,7 +90,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date
+            SELECT id, name, type, size, path, date, status
             FROM files
             WHERE user_id = ?
             AND {}
@@ -101,7 +102,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date
+            SELECT id, name, type, size, path, date, status
             FROM files
             WHERE user_id = ?
             AND {}
@@ -112,7 +113,7 @@ class FilesHandler(FilesUtils):
         else:
 
             query = '''
-            SELECT id, name, type, size, path, date
+            SELECT id, name, type, size, path, date, status
             FROM files
             WHERE user_id = ?
             '''
@@ -126,7 +127,8 @@ class FilesHandler(FilesUtils):
                 'name': row[1],
                 'type': row[2],
                 'size': row[3],
-                'date': row[5]
+                'date': row[5],
+                'status': row[6]
             }
             if return_path:
                 file['path'] = row[4]
@@ -142,7 +144,7 @@ class FilesHandler(FilesUtils):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT files.id, files.name, files.type, files.size, files.date, users.username
+        SELECT files.id, files.name, files.type, files.size, files.date, files.status, users.username
         FROM files
         INNER JOIN users ON files.user_id=users.user_id
         '''
@@ -157,7 +159,8 @@ class FilesHandler(FilesUtils):
                 'type': row[2],
                 'size': row[3],
                 'date': row[4],
-                'user': row[5]
+                'status': row[5],
+                'user': row[6]
             }
             files.append(file)
 
@@ -203,7 +206,7 @@ class FilesHandler(FilesUtils):
         with open(file_path, mode) as file:
             file.write(data)
 
-    def store_file_info_in_db(self, name, filetype, file_name, size):
+    def store_file_info_in_db(self, name, filetype, file_name, size, status="available", task_id=None):
         """Store the file info in the database
 
         Parameters
@@ -216,6 +219,12 @@ class FilesHandler(FilesUtils):
             Local file name
         size : string
             Size of file
+        status: string
+            Status of the file (downloading, available, unavailable)
+        Returns
+        -------
+        str
+            file id
         """
         file_path = "{}/{}".format(self.upload_path, file_name)
 
@@ -223,6 +232,8 @@ class FilesHandler(FilesUtils):
         query = '''
         INSERT INTO files VALUES(
             NULL,
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -237,7 +248,7 @@ class FilesHandler(FilesUtils):
             filetype = 'csv/tsv'
         elif filetype in ('text/turtle', 'ttl'):
             filetype = 'rdf/ttl'
-        elif filetype == "text/xml":
+        elif filetype in ["text/xml", "application/rdf+xml"]:
             filetype = "rdf/xml"
         elif filetype == "application/n-triples":
             filetype = "rdf/nt"
@@ -248,7 +259,57 @@ class FilesHandler(FilesUtils):
 
         self.date = int(time.time())
 
-        database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date))
+        return database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
+
+    def update_file_info(self, file_id, size=None, status="", task_id=""):
+        """Update file size and status
+
+        Parameters
+        ----------
+        file_id : str
+            File id
+        file_size : str
+            File current size
+        status : str
+            File status
+        task_id : str
+            Current task id
+        """
+
+        if not (size is not None or status or task_id):
+            return
+
+        query_vars = []
+        database = Database(self.app, self.session)
+
+        size_query = ""
+        status_query = ""
+        task_query = ""
+
+        # Should be a cleaner way of doing this...
+        if size is not None:
+            size_query = "size=?," if (status or task_id) else "size=?"
+            query_vars.append(size)
+
+        if status:
+            status_query = "status=?," if task_id else "status=?"
+            query_vars.append(status)
+
+        if task_id:
+            task_query = "task_id=?"
+            query_vars.append(task_id)
+
+        query_vars.append(file_id)
+
+        query = '''
+        UPDATE files SET
+        {}
+        {}
+        {}
+        WHERE id=?
+        '''.format(size_query, status_query, task_query)
+
+        database.execute_sql_query(query, tuple(query_vars))
 
     def persist_chunk(self, chunk_info):
         """Persist a file by chunk. Store info in db if the chunk is the last
@@ -297,7 +358,7 @@ class FilesHandler(FilesUtils):
                 pass
             raise(e)
 
-    def download_url(self, url):
+    def download_url(self, url, task_id):
         """Download a file from an URL and insert info in database
 
         Parameters
@@ -309,14 +370,33 @@ class FilesHandler(FilesUtils):
         name = url.split("/")[-1]
         file_name = self.get_file_name()
         path = "{}/{}".format(self.upload_path, file_name)
+        file_id = self.store_file_info_in_db(name, "", file_name, 0, "downloading", task_id)
 
         # Get file
-        req = requests.get(url)
-        with open(path, 'wb') as file:
-            file.write(req.content)
+        try:
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()
+                count = 0
+                with open(path, 'wb') as file:
+                    for chunk in r.iter_content(chunk_size=1024 * 1024 * 10):
+                        # Update size every ~1GO
+                        # + Check quota
+                        if count == 100:
+                            if self.session['user']['quota'] > 0:
+                                total_size = self.get_size_occupied_by_user() + os.path.getsize(path)
+                                if total_size >= self.session['user']['quota']:
+                                    raise Exception("Exceeded quota")
+                            self.update_file_info(file_id, size=os.path.getsize(path))
+                            count = 0
 
-        # insert in db
-        self.store_file_info_in_db(name, "", file_name, os.path.getsize(path))
+                        file.write(chunk)
+                        count += 1
+
+            # Update final value
+            self.update_file_info(file_id, size=os.path.getsize(path), status="available")
+
+        except Exception:
+            self.update_file_info(file_id, size=os.path.getsize(path), status="error")
 
     def get_type(self, file_ext):
         """Get files type, based on extension

@@ -1,4 +1,4 @@
-In production, AskOmics is deployed with docker and docker-compose. We provide `docker-compose.yml` templates to deploy your instance.
+In production, AskOmics is deployed using docker and docker-compose. `docker-compose.yml` templates are provided to deploy your own instance.
 
 # Prerequisites
 
@@ -81,11 +81,11 @@ All properties defined in `askomics.ini` can be configured via the environment v
 !!! warning
     Change `ASKO_flask_secret_key` and `ASKO_askomics_password_salt` to random string
 
-For more information about AskOmics configuration, see [configuration](configure.md) section.
+For more information about AskOmics configuration, see the [configuration](configure.md) section.
 
 #### First user
 
-environment variables can also be used to create a user into AskOmics at first start. For this, use `CREATE_USER=true` User information can be configured with the following environment variables:
+Environment variables can also be used to create a user into AskOmics at first start. For this, use `CREATE_USER=true` User information can be configured with the following environment variables:
 
 - `USER_FIRST_NAME`: User first name (default: Ad)
 - `USER_LAST_NAME`: User last name (default: Min)

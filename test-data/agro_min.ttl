@@ -1,0 +1,70 @@
+@prefix askomics: <https://test-192-168-100-87.vm.openstack.genouest.org/internal/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ns1: <http://www.w3.org/ns/prov#> .
+
+
+<http://purl.obolibrary.org/obo/agro.owl> a askomics:ontology ;
+	a owl:ontology ;
+	rdfs:label "AGRO".
+	
+[] a owl:ObjectProperty ;
+	a askomics:AskomicsRelation ;
+	askomics:uri rdfs:subClassOf ;
+	rdfs:label "subClassOf" ;
+	rdfs:domain <http://purl.obolibrary.org/obo/agro.owl> ;
+	rdfs:range <http://purl.obolibrary.org/obo/agro.owl>.
+	
+
+<http://purl.obolibrary.org/obo/AGRO_00000007> a owl:Class ;
+    rdfs:label "desuckering" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000027> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000008> a owl:Class ;
+    rdfs:label "irrigation water source role" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/BFO_0000023> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000010> a owl:Class ;
+    rdfs:label "irrigation water quantity" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/PATO_0000122>,
+        <http://purl.obolibrary.org/obo/PATO_0000918> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000016> a owl:Class ;
+    rdfs:label "reduced tillage process" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000002> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000020> a owl:Class ;
+    rdfs:label "laser land levelling process" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000004> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000024> a owl:Class ;
+    rdfs:label "chemical pest control process" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000023> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000026> a owl:Class ;
+    rdfs:label "no-till" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_01000015>,
+        <http://purl.obolibrary.org/obo/ENVO_02500000> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000028> a owl:Class ;
+    rdfs:label "puddling process" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000002> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000029> a owl:Class ;
+    rdfs:label "mulch-till" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000017> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000030> a owl:Class ;
+    rdfs:label "ridge-till" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000017> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000031> a owl:Class ;
+    rdfs:label "strip-till" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000017> .
+
+<http://purl.obolibrary.org/obo/AGRO_00000037> a owl:Class ;
+    rdfs:label "aerial application" ;
+    rdfs:subClassOf <http://purl.obolibrary.org/obo/AGRO_00000036> .

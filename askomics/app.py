@@ -19,6 +19,7 @@ from askomics.api.query import query_bp
 from askomics.api.view import view_bp
 from askomics.api.results import results_bp
 from askomics.api.galaxy import galaxy_bp
+from askomics.api.ontology import onto_bp
 
 from celery import Celery
 from kombu import Exchange, Queue
@@ -46,7 +47,8 @@ BLUEPRINTS = (
     datasets_bp,
     query_bp,
     results_bp,
-    galaxy_bp
+    galaxy_bp,
+    onto_bp
 )
 
 

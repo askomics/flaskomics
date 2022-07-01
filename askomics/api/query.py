@@ -186,14 +186,8 @@ def save_result():
                 'errorMessage': "Missing graphState parameter"
             }), 400
 
-        query = SparqlQuery(current_app, session, data["graphState"])
-        query.build_query_from_json(preview=False, for_editor=False)
-
         info = {
-            "graph_state": query.json,
-            "query": query.sparql,
-            "graphs": query.graphs,
-            "endpoints": query.endpoints,
+            "graph_state": data["graphState"],
             "celery_id": None
         }
 

@@ -5,6 +5,7 @@ import traceback
 from askomics.api.auth import api_auth
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Start import Start
+from askomics.libaskomics.OntologyManager import OntologyManager
 
 from flask import (Blueprint, current_app, jsonify, session)
 
@@ -64,6 +65,9 @@ def start():
         except Exception:
             pass
 
+        ontologies_manager = OntologyManager(current_app, session)
+        ontologies = ontologies_manager.list_ontologies()
+
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "frontMessage": front_message,
@@ -79,7 +83,10 @@ def start():
             "namespaceInternal": current_app.iniconfig.get('triplestore', 'namespace_internal'),
             "proxyPath": proxy_path,
             "user": {},
-            "logged": False
+            "logged": False,
+            "ontologies": ontologies,
+            "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False),
+            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10)
         }
 
         json = {

@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
+import ReactTooltip from "react-tooltip";
 import AttributeBox from './attribute'
 import Entity from './entity'
 import ResultsTable from '../sparql/resultstable'
@@ -267,6 +268,7 @@ export default class FormEditQuery extends Component {
       saveIcon: "play",
       waiting: waiting
     })
+    ReactTooltip.rebuild();
   }
 
   // Preview results and Launch query buttons -------
@@ -385,12 +387,21 @@ export default class FormEditQuery extends Component {
     let Entities = []
     let previewButton
     let entityMap = new Map()
+    let tooltips = (
+        <div>
+        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
+        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
+        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
+        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
+        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        </div>
+    )
 
     if (!this.state.waiting) {
       this.state.graphState.attr.forEach(attribute => {
         if (attribute.form) {
           if (! entityMap.has(attribute.nodeId)){
-            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel, attributes:[]})
+            entityMap.set(attribute.nodeId, {entity_label: attribute.entityDisplayLabel ? attribute.entityDisplayLabel : attribute.entityLabel, attributes:[]})
           }
           entityMap.get(attribute.nodeId).attributes.push(
             <AttributeBox
@@ -430,8 +441,8 @@ export default class FormEditQuery extends Component {
     })
 
       // buttons
-    
-    
+
+
     let saveButton = <Button onClick={this.handleSave} color="secondary" disabled={this.state.disableSave}><i className={"fas fa-" + this.state.saveIcon}></i> Save</Button>
 
     // preview
@@ -445,7 +456,7 @@ export default class FormEditQuery extends Component {
     return (
       <div className="container">
         {redirectLogin}
-        <h2>Query Builder</h2>
+        <h2>Form editor</h2>
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
@@ -453,6 +464,7 @@ export default class FormEditQuery extends Component {
           <Col xs="12">
             <div style={{ display: 'block', 'overflow-y': 'auto' }}>
               {Entities}
+              {tooltips}
             </div>
           </Col>
         </Row>

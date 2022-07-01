@@ -42,7 +42,10 @@ class TestApi(AskomicsTestCase):
             "namespaceInternal": client.get_config('triplestore', 'namespace_internal'),
             "proxyPath": "/",
             "user": {},
-            "logged": False
+            "logged": False,
+            "ontologies": [],
+            "singleTenant": False,
+            "autocompleteMaxResults": 20
         }
         response = client.client.get('/api/start')
         assert response.status_code == 200

@@ -1,4 +1,4 @@
-# Command line interface
+# Make commands
 
 Several commands are available to help manage your instance. These commands are available through `make` when launched from the same directory as the *Makefile*. (If you are running Askomics in a docker container, you will need to connect to it to launch these commands)
 
@@ -19,3 +19,46 @@ In the latter case, you will need to run the command twice (once for each namesp
 
 - `make clear-cache`
 This will clear the abstraction cache, making sure your data is synchronized with the new namespaces.
+
+# Single tenant mode
+
+Starting from release 4.4, the *Single tenant mode* is available through a configuration option.
+In Virtuoso, aggregating multiples graphs (using several FROM clauses) can be very costly for big/numerous graphs.
+
+Single tenant mode send all queries on all stored graphs, thus speeding up the queries. This means that **all graphs are public, and can be queried by any user**. This affect starting points, abstractions, and query.
+
+!!! warning
+    If you are storing sensitive data on AskOmics, make sure to disable anonymous access and account creation when using *Single tenant mode*.
+
+!!! warning
+    *Single tenant mode* has no effect on federated queries
+
+# Administrator panel
+
+Administrators have access to a specific panel in AskOmics.
+This <navbar><i class="fa fa-chess-king"></i> Admin</navbar> tab can be found after clicking on <navbar><i class="fa fa-user"></i> *Your Name &#9662;*</navbar>.
+
+## User management
+
+From the <navbar><i class="fa fa-chess-king"></i> Admin</navbar> tab, administrators are able to:
+
+- Create a new user account
+- Manage existing user accounts
+    - Blocking an user account
+    - Setting an user as an administrator
+    - Updating an user's individual storage quota
+    - Deleting an user
+
+They will also be able to check the last time of activity of an user.
+
+## Files
+
+A list of all uploaded files is available. Administrators can delete a file at any time.
+
+## Datasets
+
+All currently stored datasets are available. Administrators can publish, unpublish, and delete them.
+
+## Forms / Templates
+
+A list of **public** forms and templates is available. Administator can unpublish them if need be.

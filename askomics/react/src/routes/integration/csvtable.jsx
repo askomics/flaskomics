@@ -26,7 +26,8 @@ export default class CsvTable extends Component {
       externalEndpoint: "",
       error: false,
       errorMessage: null,
-      status: null
+      status: null,
+      externalGraph: ""
     }
     this.cancelRequest
     this.headerFormatter = this.headerFormatter.bind(this)
@@ -91,6 +92,51 @@ export default class CsvTable extends Component {
       )
     }
 
+    let ontoInput
+
+    if (this.props.ontologies.length > 0){
+      ontoInput = (
+        <optgroup label="Ontologies">
+        {this.props.ontologies.map(onto => {
+          return <option key={onto.id} value={onto.short_name}>{onto.name}</option>
+        })}
+        </optgroup>
+      )
+    }
+
+    if (colIndex == 1) {
+      return (
+        <div>
+          <FormGroup>
+            {colInput}
+            <CustomInput type="select" id="typeSelect" name="typeSelect" value={this.state.columns_type[colIndex]} onChange={boundChangeType}>
+              <optgroup label="Properties">
+                <option value="label" >Entity label</option>
+              </optgroup>
+              <optgroup label="Attributes">
+                <option value="numeric" >Numeric</option>
+                <option value="text" >Text</option>
+                <option value="category" >Category</option>
+                <option value="boolean" >Boolean</option>
+                <option value="date" >Date</option>
+              </optgroup>
+              <optgroup label="Faldo attributes">
+                <option value="reference" >Reference</option>
+                <option value="strand" >Strand</option>
+                <option value="start" >Start</option>
+                <option value="end" >End</option>
+              </optgroup>
+              <optgroup label="Relation">
+                <option value="general_relation" >Directed</option>
+                <option value="symetric_relation" >Symetric</option>
+              </optgroup>
+              {ontoInput}
+            </CustomInput>
+          </FormGroup>
+        </div>
+      )
+    }
+
     return (
       <div>
         <FormGroup>
@@ -113,6 +159,7 @@ export default class CsvTable extends Component {
               <option value="general_relation" >Directed</option>
               <option value="symetric_relation" >Symetric</option>
             </optgroup>
+            {ontoInput}
           </CustomInput>
         </FormGroup>
       </div>
@@ -167,6 +214,14 @@ export default class CsvTable extends Component {
     })
   }
 
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   toggleHeaderForm(event) {
     this.setState({
       header: update(this.state.header, { [event.target.id]: { input: { $set: true } } })
@@ -192,7 +247,7 @@ export default class CsvTable extends Component {
         formatter: (cell, row) => {
           let text = row[this.state.header[index]["name"]]
           if (this.utils.isUrl(text)) {
-            return <a href={text}>{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
+            return <a href={text} target="_blank" rel="noreferrer">{this.utils.truncate(this.utils.splitUrl(text), 25)}</a>
           } else {
             return this.utils.truncate(text, 25)
           }
@@ -208,9 +263,12 @@ export default class CsvTable extends Component {
     if (this.state.publicTick) {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
-
+    let privateButton
+    if (this.props.config.user.admin || !this.props.config.singleTenant){
+        privateButton = <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+    }
     let publicButton
-    if (this.props.config.user.admin) {
+    if (this.props.config.user.admin || this.props.config.singleTenant) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
@@ -236,14 +294,17 @@ export default class CsvTable extends Component {
           <br />
           <AdvancedOptions
             config={this.props.config}
+            hideDistantEndpoint={true}
             handleChangeUri={p => this.handleChangeUri(p)}
             handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
+            handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+            externalGraph={this.state.externalGraph}
             customUri={this.state.customUri}
           />
           <br />
           <div className="center-div">
             <ButtonGroup>
-              <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+              {privateButton}
               {publicButton}
             </ButtonGroup>
           </div>
@@ -264,5 +325,6 @@ export default class CsvTable extends Component {
 
 CsvTable.propTypes = {
   file: PropTypes.object,
-  config: PropTypes.object
+  config: PropTypes.object,
+  ontologies: PropTypes.array
 }

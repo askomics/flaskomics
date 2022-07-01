@@ -1,8 +1,8 @@
-In development mode, AskOmics dependencies can be deployed with docker-compose, but AskOmics have to be running locally, on your dev machine.
+In development mode, you can deploy AskOmics dependencies with docker-compose, but AskOmics itself should be running locally, on your development machine.
 
 # Prerequisites
 
-Install dev dependencies
+Install AskOmics dependencies
 
 
 ```bash
@@ -28,7 +28,7 @@ apt install -y docker-compose
 dnf install -y docker-compose
 ```
 
-# Deploy dependencies
+# Deploying dependencies
 
 We provide a `docker-compose` template to run external services used by AskOmics. Clone the [flaskomics-docker-compose](https://github.com/askomics/flaskomics-docker-compose) repository to use it.
 

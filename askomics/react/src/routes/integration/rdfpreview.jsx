@@ -24,6 +24,7 @@ export default class RdfPreview extends Component {
       privateTick: false,
       customUri: "",
       externalEndpoint: props.file.data.location ? props.file.data.location : "",
+      externalGraph: props.file.data.remote_graph ? props.file.data.remote_graph : "",
       error: false,
       errorMessage: null,
       status: null
@@ -49,7 +50,8 @@ export default class RdfPreview extends Component {
       public: event.target.value == 'public',
       type: this.props.file.type,
       customUri: this.state.customUri,
-      externalEndpoint: this.state.externalEndpoint
+      externalEndpoint: this.state.externalEndpoint,
+      externalGraph: this.state.externalGraph
     }
     axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
       .then(response => {
@@ -85,6 +87,14 @@ export default class RdfPreview extends Component {
     })
   }
 
+  handleChangeExternalGraph (event) {
+    this.setState({
+      externalGraph: event.target.value,
+      publicTick: false,
+      privateTick: false
+    })
+  }
+
   guess_mode(type) {
     if (type == "rdf/ttl") {
       return "turtle"
@@ -107,9 +117,12 @@ export default class RdfPreview extends Component {
     if (this.state.publicTick) {
       publicIcon = <i className="fas fa-check text-success"></i>
     }
-
+    let privateButton
+    if (this.props.config.user.admin || !this.props.config.singleTenant){
+        privateButton = <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+    }
     let publicButton
-    if (this.props.config.user.admin) {
+    if (this.props.config.user.admin || this.props.config.singleTenant) {
       publicButton = <Button onClick={this.integrate} value="public" color="secondary" disabled={this.state.publicTick}>{publicIcon} Integrate (public dataset)</Button>
     }
 
@@ -139,12 +152,14 @@ export default class RdfPreview extends Component {
           config={this.props.config}
           handleChangeEndpoint={p => this.handleChangeEndpoint(p)}
           externalEndpoint={this.state.externalEndpoint}
+          handleChangeExternalGraph={p => this.handleChangeExternalGraph(p)}
+          externalGraph={this.state.externalGraph}
           handleChangeUri={p => this.handleChangeUri(p)}
         />
         <br />
         <div className="center-div">
           <ButtonGroup>
-            <Button onClick={this.integrate} value="private" color="secondary" disabled={this.state.privateTick}>{privateIcon} Integrate (private dataset)</Button>
+            {privateButton}
             {publicButton}
           </ButtonGroup>
         </div>
