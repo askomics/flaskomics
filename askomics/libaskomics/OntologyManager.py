@@ -261,15 +261,19 @@ class OntologyManager(Params):
                 "fieldList": "label"
             }
 
-            r = requests.get(base_url, params=arguments)
-
             data = []
 
-            if not r.status_code == 200:
-                return data
+            try:
+                r = requests.get(base_url, params=arguments, timeout=10)
 
-            res = r.json()
-            if res['response']['docs']:
-                data = [term['label'] for term in res['response']['docs']]
+                if not r.status_code == 200:
+                    return data
+
+                res = r.json()
+                if res['response']['docs']:
+                    data = [term['label'] for term in res['response']['docs']]
+
+            except requests.exceptions.Timeout:
+                pass
 
             return data

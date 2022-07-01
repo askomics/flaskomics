@@ -31,7 +31,7 @@ export default class OntoLinkView extends Component {
                 <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf*">ancestors of</option>
               </CustomInput>
             </td>
-            <td> a term</td>
+            <td>&nbsp;a term</td>
           </tr>
         </table>
         <br />

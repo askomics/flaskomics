@@ -51,7 +51,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `ldap_mail_attribute` (string): Mail attribute
     - `ldap_password_reset_link` (url): Link to manage the LDAP password
     - `ldap_account_link` (url): Link to the LDAP account manager
-
+    - `autocomplete_max_results` (int): Max results queries by autocompletion
 
 - `virtuoso`
 
@@ -73,6 +73,7 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `namespace_internal` (url): AskOmics namespace for internal triples. Correspond to the `askomics:` prefix. You should change this to your instance url if you want your URIs to be resolved.
     - `preview_limit` (int): Number of line to be previewed in the results page
     - `result_set_max_rows` (int): Triplestore max row. Must be the same as SPARQL[ResultSetMaxRows] in virtuoso.ini config
+    - `single_tenant` (bool): Enable [single tenant mode](/manage/#single-tenant-mode)
 
 - `federation`
 

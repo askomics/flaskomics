@@ -20,6 +20,19 @@ In the latter case, you will need to run the command twice (once for each namesp
 - `make clear-cache`
 This will clear the abstraction cache, making sure your data is synchronized with the new namespaces.
 
+# Single tenant mode
+
+Starting from release 4.4, the *Single tenant mode* is available through a configuration option.
+In Virtuoso, aggregating multiples graphs (using several FROM clauses) can be very costly for big/numerous graphs.
+
+Single tenant mode send all queries on all stored graphs, thus speeding up the queries. This means that **all graphs are public, and can be queried by any user**. This affect starting points, abstractions, and query.
+
+!!! warning
+    If you are storing sensitive data on AskOmics, make sure to disable anonymous access and account creation when using *Single tenant mode*.
+
+!!! warning
+    *Single tenant mode* has no effect on federated queries
+
 # Administrator panel
 
 Administrators have access to a specific panel in AskOmics.
