@@ -136,10 +136,11 @@ class GffFile(File):
             attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
+                blank_category = BNode()
                 for value in attribute["values"]:
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, blank_category))
                     self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
+                    self.graph_abstraction_dk.add((blank_category, self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
 
                     if attribute["label"] == rdflib.Literal("strand"):
                         self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
