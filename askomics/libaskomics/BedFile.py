@@ -98,7 +98,6 @@ class BedFile(File):
 
         for attribute in self.attribute_abstraction:
             blank = BNode()
-            blank_category = BNode()
 
             for attr_type in attribute["type"]:
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, attr_type))
@@ -110,6 +109,7 @@ class BedFile(File):
             attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
+                blank_category = attribute["range"]
                 for value in attribute["values"]:
                     self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, blank_category))
                     self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
@@ -176,13 +176,14 @@ class BedFile(File):
             self.graph_chunk.add((entity, relation, attribute))
 
             if "reference" not in attribute_list:
+                blank_category = BNode()
                 attribute_list.append("reference")
                 self.attribute_abstraction.append({
                     "uri": self.namespace_data[self.format_uri("reference")],
                     "label": rdflib.Literal("reference"),
                     "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                     "domain": entity_type,
-                    "range": self.namespace_data[self.format_uri("{}Category".format("reference"))],
+                    "range": blank_category,
                     "values": [feature.chrom]
                 })
             else:
@@ -258,13 +259,14 @@ class BedFile(File):
 
             if strand:
                 if ("strand", strand_type) not in attribute_list:
+                    blank_category = BNode()
                     attribute_list.append(("strand", strand_type))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
+                        "range": blank_category,
                         "values": [strand_type]
                     })
 
