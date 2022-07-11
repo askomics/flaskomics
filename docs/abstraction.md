@@ -82,12 +82,12 @@ _:blank rdf:type owl:ObjectProperty .
 _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdfs:label "category_attribute" .
 _:blank rdfs:domain :EntityName .
-_:blank rdfs:range :category_attributeCategory .
+_:blank rdfs:range _:blank2 .
 _:blank askomics:uri :category_attribute_uri
 
 
-:category_attributeCategory askomics:category :value_1 .
-:category_attributeCategory askomics:category :value_2 .
+_:blank2 askomics:category :value_1 .
+_:blank2 askomics:category :value_2 .
 
 :value_1 rdf:type :category_attributeCategoryValue .
 :value_1 rdfs:label "value_1" .
@@ -122,7 +122,7 @@ _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdf:type owl:ObjectProperty .
 _:blank rdfs:label "reference_attribute" .
 _:blank rdfs:domain :EntityName .
-_:blank rdfs:range :reference_attributeCategory.
+_:blank rdfs:range _:blank2.
 _:blank askomics:uri :reference_attribute
 ```
 
@@ -136,7 +136,7 @@ _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdf:type owl:ObjectProperty .
 _:blank rdfs:label "strand_attribute" .
 _:blank rdfs:domain :EntityName .
-_:blank rdfs:range :strand_attributeCategory.
+_:blank rdfs:range _:blank2.
 _:blank askomics:uri :strand_attribute
 ```
 
