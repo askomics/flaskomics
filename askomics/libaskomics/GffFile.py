@@ -136,11 +136,10 @@ class GffFile(File):
             attribute_blanks[attribute["uri"]] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
-                blank_category = attribute["range"]
                 for value in attribute["values"]:
                     self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
                     self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((blank_category, self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
 
                     if attribute["label"] == rdflib.Literal("strand"):
                         self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
@@ -238,14 +237,13 @@ class GffFile(File):
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "reference") not in attribute_list:
-                    blank_category = BNode()
                     attribute_list.append((feature.type, "reference"))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("reference")],
                         "label": rdflib.Literal("reference"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": blank_category,
+                        "range": self.namespace_data[self.format_uri("{}Category".format("reference"))],
                         "values": [rec.id]
                     })
                 else:
@@ -314,14 +312,13 @@ class GffFile(File):
                     strand_type = "."
 
                 if (feature.type, "strand", strand_type) not in attribute_list:
-                    blank_category = BNode()
                     attribute_list.append((feature.type, "strand", strand_type))
                     self.attribute_abstraction.append({
                         "uri": self.namespace_data[self.format_uri("strand")],
                         "label": rdflib.Literal("strand"),
                         "type": [self.namespace_internal[self.format_uri("AskomicsCategory")], rdflib.OWL.ObjectProperty],
                         "domain": entity_type,
-                        "range": blank_category,
+                        "range": self.namespace_data[self.format_uri("{}Category".format("strand"))],
                         "values": [strand_type]
                     })
 
