@@ -279,7 +279,7 @@ def download_result():
             'errorMessage': str(e)
         }), 500
 
-    return(send_from_directory(dir_path, file_name))
+    return send_from_directory(dir_path, file_name)
 
 
 @results_bp.route('/api/results/delete', methods=['POST'])

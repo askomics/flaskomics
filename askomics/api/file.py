@@ -397,7 +397,7 @@ def serve_file(path, user_id, username):
         username
     )
 
-    return(send_from_directory(dir_path, path))
+    return send_from_directory(dir_path, path)
 
 
 @file_bp.route('/api/files/columns', methods=['GET'])
