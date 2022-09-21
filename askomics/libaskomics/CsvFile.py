@@ -362,8 +362,8 @@ class CsvFile(File):
     def set_rdf_domain_knowledge(self):
         """Set the domain knowledge"""
         for index, attribute in enumerate(self.header):
-            if self.columns_type[index] in ('category', 'reference', 'strand') and self.header[index] in self.category_values and self.header[index] in self.category_blank:
-                s = self.category_blank[self.header[index]]
+            if self.columns_type[index] in ('category', 'reference', 'strand') and self.header[index] in self.category_values:
+                s = self.namespace_data["{}Category".format(self.format_uri(attribute, remove_space=True))]
                 p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
                     o = self.rdfize(value)
@@ -400,7 +400,6 @@ class CsvFile(File):
         for ontology in OntologyManager(self.app, self.session).list_ontologies():
             available_ontologies[ontology['short_name']] = ontology['uri']
         attribute_blanks = {}
-        self.category_blank = {}
 
         # Attributes and relations
         for index, attribute_name in enumerate(self.header):
@@ -469,9 +468,7 @@ class CsvFile(File):
             elif self.columns_type[index] in ('category', 'reference', 'strand'):
                 attribute = self.rdfize(attribute_name)
                 label = rdflib.Literal(attribute_name)
-                category_blank = BNode()
-                self.category_blank[attribute_name] = category_blank
-                rdf_range = category_blank
+                rdf_range = self.namespace_data["{}Category".format(self.format_uri(attribute_name, remove_space=True))]
                 rdf_type = rdflib.OWL.ObjectProperty
                 self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.namespace_internal["AskomicsCategory"]))
 
