@@ -41,7 +41,7 @@ export default class Routes extends Component {
         user: {},
         logged: false,
         footerMessage: null,
-        welcomeMessage: null,
+        frontMessage: null,
         version: null,
         commit: null,
         gitUrl: null,
