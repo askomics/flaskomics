@@ -7,11 +7,12 @@ import Template from './components/template'
 export default class Contact extends Component {
   constructor (props) {
     super(props)
+    console.log("test")
   }
 
   render () {
     return (
-      <div>
+      <div className="container">
       <h2>Contact</h2>
       <hr />
       <div>

@@ -107,14 +107,10 @@ export default class Routes extends Component {
     }
 
     let contactRoute
-    if (this.state.config.contactMessage) {
-      contactRoute = (
-        <>
-        <Route path="/contact" exact component={() => (<Contact config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
-        </>
-      )
-    }
 
+    if (this.state.config.contactMessage) {
+      contactRoute = <Route path="/contact" exact component={() => (<Contact config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+    }
 
     return (
       <Router basename={this.state.config.proxyPath}>
@@ -138,8 +134,8 @@ export default class Routes extends Component {
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
             <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
             <Route path="/data/:uri" exact component={() => (<Data config={this.state.config} waitForStart={this.state.waiting} />)} />
-            {integrationRoutes}
             {contactRoute}
+            {integrationRoutes}
           </Switch>
           <br />
           <br />

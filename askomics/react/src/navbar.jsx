@@ -40,8 +40,8 @@ export default class AskoNavbar extends Component {
 
       links = (
         <>
-          <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
           {contactLink}
+          <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
           <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
         </>
       )
@@ -71,6 +71,7 @@ export default class AskoNavbar extends Component {
           <>
           <NavItem><Link className="nav-link" to="/results"><i className="fas fa-tasks"></i> Results</Link></NavItem>
           {integrationLinks}
+          {contactLink}
           <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
           <NavItem>
             <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
