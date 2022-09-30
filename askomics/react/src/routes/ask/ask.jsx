@@ -471,7 +471,7 @@ export default class Ask extends Component {
     let HtmlFrontMessage = (
       <div>
         <h2>Ask!</h2>
-        {this.state.config.frontMessage}
+        {this.props.config.frontMessage}
         <hr />
         {contactMessage}
       </div>
