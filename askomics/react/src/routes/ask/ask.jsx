@@ -28,7 +28,6 @@ export default class Ask extends Component {
       showGalaxyButton: false,
       dropdownOpen: false,
       selectedEndpoint: [],
-      frontMessage: "",
       redirectFormBuilder: false,
       console_enabled: false
     }
@@ -105,15 +104,6 @@ export default class Ask extends Component {
             status: error.response.status
           })
         })
-
-        // load welcome.html message
-        requestUrl = 'static/welcome.html'
-        axios.get(requestUrl).then(response => {
-          this.setState({
-            frontMessage: DOMPurify.sanitize(response.data)
-          })
-        })
-
     }
   }
 
@@ -467,7 +457,13 @@ export default class Ask extends Component {
       }
     }
 
-    let HtmlFrontMessage = <Template template={this.state.frontMessage}/>
+    let HtmlFrontMessage = (
+      <div>
+        <h2>Ask!</h2>
+        {this.state.config.welcomeMessage}
+        <hr />
+      </div>
+    )
 
     return (
       <div className="container">

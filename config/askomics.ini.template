@@ -17,6 +17,7 @@ debug_ttl = false
 # subtitle =
 footer_message = Welcome to AskOmics!
 #front_message=
+#welcome_message=
 
 display_commit_hash = false
 
