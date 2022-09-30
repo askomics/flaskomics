@@ -29,9 +29,19 @@ export default class AskoNavbar extends Component {
         <NavItem><Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link></NavItem>
       )
 
+      let contactLink
+      if (this.props.config.contactMessage){
+        contactLink = (
+          <>
+            <NavItem><Link className="nav-link" to="/contact"><i className="fas fa-id-badge"></i> Contact</Link></NavItem>
+          </>
+        )
+      }
+
       links = (
         <>
           <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
+          {contactLink}
           <NavItem><Link className="nav-link" to="/login"><i className="fas fa-sign-in-alt"></i> Login</Link></NavItem>
         </>
       )

@@ -14,9 +14,9 @@ class TestApi(AskomicsTestCase):
         except Exception:
             pass
 
-        contact_email = None
+        contact_message = None
         try:
-            contact_email = client.get_config('askomics', 'contact_email')
+            contact_message = client.get_config('askomics', 'contact_message')
         except Exception:
             pass
         # Get ldap password reset link if set
@@ -36,7 +36,7 @@ class TestApi(AskomicsTestCase):
         expected_config_nouser = {
             'footerMessage': client.get_config('askomics', 'footer_message'),
             'frontMessage': front_message,
-            'contactEmail': contact_email,
+            'contactMessage': contact_message,
             "version": get_distribution('askomics').version,
             "commit": None,
             "gitUrl": "https://github.com/askomics/flaskomics",

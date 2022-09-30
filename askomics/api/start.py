@@ -45,9 +45,9 @@ def start():
         except Exception:
             pass
 
-        contact_email = None
+        contact_message = None
         try:
-            contact_email = current_app.iniconfig.get('askomics', 'contact_email')
+            contact_message = current_app.iniconfig.get('askomics', 'contact_message')
         except Exception:
             pass
 
@@ -77,7 +77,7 @@ def start():
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "frontMessage": front_message,
-            "contactEmail": contact_email,
+            "contactMessage": contact_message,
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),

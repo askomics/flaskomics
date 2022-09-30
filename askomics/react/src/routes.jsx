@@ -23,6 +23,7 @@ import Query from './routes/query/query'
 import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
+import Contact from './contact'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -42,7 +43,7 @@ export default class Routes extends Component {
         logged: false,
         footerMessage: null,
         frontMessage: null,
-        contactEmail: null,
+        contactMessage: null,
         version: null,
         commit: null,
         gitUrl: null,
@@ -105,6 +106,15 @@ export default class Routes extends Component {
       )
     }
 
+    let contactRoute
+    if (this.state.config.contactMessage) {
+      contactRoute = (
+        <>
+        <Route path="/contact" exact component={() => (<Contact config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+        </>
+      )
+    }
+
 
     return (
       <Router basename={this.state.config.proxyPath}>
@@ -129,6 +139,7 @@ export default class Routes extends Component {
             <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
             <Route path="/data/:uri" exact component={() => (<Data config={this.state.config} waitForStart={this.state.waiting} />)} />
             {integrationRoutes}
+            {contactRoute}
           </Switch>
           <br />
           <br />

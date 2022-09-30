@@ -18,7 +18,7 @@ debug_ttl = false
 footer_message = Welcome to AskOmics!
 #front_message=
 
-#contact_email= 
+#contact_message= 
 
 display_commit_hash = false
 
