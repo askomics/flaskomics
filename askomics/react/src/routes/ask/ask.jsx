@@ -457,12 +457,12 @@ export default class Ask extends Component {
       }
     }
 
-    let contactMessage = ()
+    let contactMessage
 
     if (this.props.config.contactEmail){
       contactMessage = (
         <div>
-          For any query related to the data hosted on this instance, please contact <a href="{this.props.config.contactEmail}">{this.props.config.contactEmail}</a>
+          For any query related to the data hosted on this instance, please contact <a href={"mailto:" + this.props.config.contactEmail}>{this.props.config.contactEmail}</a>
           <hr />
         </div>
       )
