@@ -460,7 +460,7 @@ export default class Ask extends Component {
     let HtmlFrontMessage = (
       <div>
         <h2>Ask!</h2>
-        {this.props.config.frontMessage}
+        <Template template={this.props.config.frontMessage}/>
         <hr />
       </div>
     )
