@@ -18,6 +18,9 @@ This changelog was started for release 4.2.0.
 - Added contact_message config option, displayed in a new 'Contact' page
 - Added front_message config option, diplayed on the front page
 
+### Security
+
+- Bump markdown-captions from 2 to 2.1.2
 
 ## [4.4.0] - 2022-07-01
 
