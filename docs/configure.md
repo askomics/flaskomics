@@ -18,6 +18,8 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `reverse_proxy_path` (string): Proxy path if AskOmics is accessible under a subpath
     - `subtitle` (string): Subtitle, displayed on the browser tab
     - `footer_message` (string): Custom message displayed on the AskOmics footer
+    - `front_message` (string): Custom message displayed on the AskOmics main page
+    - `contact_message` (string): Custom message displayed on the Contact page
     - `display_commit_hash` (`true` or `false`): diplay the commit hash of the current version in the AskOmics footer
     - `data_directory` (path): Where AskOmics store the data
     - `database_path` (path): Path to the sqlite database

@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
-## [4.4.1] - Unreleased
+## [4.5.0] - Unreleased
+
+### Fixed
+
+- Fixed new linting
 
 ### Changed
 
-- Using blank node for categories values
-- Changed documentation for blank nodes
+- Added contact_message config option, displayed in a new 'Contact' page
+- Added front_message config option, diplayed on the front page
+
 
 ## [4.4.0] - 2022-07-01
 
