@@ -45,6 +45,12 @@ def start():
         except Exception:
             pass
 
+        contact_message = None
+        try:
+            contact_message = current_app.iniconfig.get('askomics', 'contact_message')
+        except Exception:
+            pass
+
         # get proxy path
         proxy_path = "/"
         try:
@@ -71,6 +77,7 @@ def start():
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "frontMessage": front_message,
+            "contactMessage": contact_message,
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
