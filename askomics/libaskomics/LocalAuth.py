@@ -1070,6 +1070,9 @@ class LocalAuth(Params):
                 pass
 
             mailer.send_mail(user["email"], "[AskOmics{}] New account".format(asko_subtitle), body)
+        else:
+            self.log.info("Account created for user {}".format(user["username"]))
+            self.log.info("Link: {url}/password_reset?token={token}".format(url=self.settings.get('askomics', 'instance_url'), token=token))
 
     def send_reset_link(self, login):
         """Send a reset link to a user
@@ -1129,6 +1132,9 @@ class LocalAuth(Params):
                         pass
 
                     mailer.send_mail(email, "[AskOmics{}] Password reset".format(asko_subtitle), body)
+                else:
+                    self.log.info("Password reset for user {}".format(username))
+                    self.log.info("Link: {url}/password_reset?token={token}".format(url=self.settings.get('askomics', 'instance_url'), token=token))
 
     def check_token(self, token):
         """Get username corresponding to the token
