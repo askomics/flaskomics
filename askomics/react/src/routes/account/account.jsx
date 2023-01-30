@@ -30,7 +30,7 @@ export default class Account extends Component {
     }
 
     let updateProfile
-    if (this.props.config.ldap == 0) {
+    if (this.props.config.user.ldap == 0) {
       updateProfile = (
         <div>
           <hr />
@@ -40,7 +40,7 @@ export default class Account extends Component {
     }
 
     let updatePassword
-    if (this.props.config.ldap == 0) {
+    if (this.props.config.user.ldap == 0) {
       updatePassword = (
         <div>
           <hr />
