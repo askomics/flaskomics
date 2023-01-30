@@ -20,6 +20,7 @@ This changelog was started for release 4.2.0.
 - Added contact_message config option, displayed in a new 'Contact' page
 - Added front_message config option, displayed on the front page
 - Now print reset link into logs if there are no mailer configured
+- Fixed markupsafe to 2.0.1
 
 ### Security
 
