@@ -29,6 +29,7 @@ tld = "*"
 argh = "*"
 python-ldap = "*"
 python-dateutil = "*"
+markupsafe = "==2.0.1"
 
 [dev-packages]
 pytest = "*"
