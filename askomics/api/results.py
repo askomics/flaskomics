@@ -1,7 +1,7 @@
 import traceback
 import sys
 
-from askomics.api.auth import api_auth, login_required, admin_required
+from askomics.api.auth import api_auth, login_required, login_required_query, admin_required
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -22,7 +22,7 @@ def can_access(user):
 
 @results_bp.route('/api/results', methods=['GET'])
 @api_auth
-@login_required
+@login_required_query
 def get_results():
     """Get ...
 

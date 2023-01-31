@@ -1635,7 +1635,7 @@ export default class Query extends Component {
         previewIcon = <Spinner size="sm" color="light" />
       }
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
-      if (this.state.config.logged) {
+      if (this.state.config.logged || this.state.config.anonymousQuery) {
         launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {

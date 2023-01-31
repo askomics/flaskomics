@@ -18,7 +18,7 @@ debug_ttl = false
 footer_message = Welcome to AskOmics!
 #front_message=
 
-#contact_message= 
+#contact_message=
 
 display_commit_hash = false
 
@@ -88,6 +88,7 @@ ldap_mail_attribute = mail
 # Max results returned for autocompletion
 autocomplete_max_results = 10
 
+anonymous_query = false
 
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki

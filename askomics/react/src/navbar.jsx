@@ -93,7 +93,16 @@ export default class AskoNavbar extends Component {
           </>
         )
       }
+  } else if (this.props.config.anonymousQuery) {
+      links = (
+        <>
+        <NavItem><Link className="nav-link" to="/results"><i className="fas fa-tasks"></i> Results</Link></NavItem>
+        {contactLink}
+        <NavItem><Link className="nav-link" to="/about"><i className="fas fa-info"></i> About</Link></NavItem>
+        </>
+      )
     }
+  }
 
     return (
       <div>
