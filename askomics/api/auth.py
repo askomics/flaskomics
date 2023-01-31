@@ -37,7 +37,7 @@ def login_required_query(f):
                 return f(*args, **kwargs)
             return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
         elif current_app.iniconfig.get('askomics', 'anonymous_query', fallback=False):
-            session['user'] = {'id': 0, 'username': "anonymous", "quota": Utils.humansize_to_bytes(current_app.config.get("askomics", "quota"))}
+            session['user'] = {'id': 0, 'username': "anonymous", "quota": Utils.humansize_to_bytes(current_app.iniconfig.get("askomics", "quota"))}
             return f(*args, **kwargs)
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
