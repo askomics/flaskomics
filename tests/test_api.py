@@ -52,7 +52,8 @@ class TestApi(AskomicsTestCase):
             "logged": False,
             "ontologies": [],
             "singleTenant": False,
-            "autocompleteMaxResults": 20
+            "autocompleteMaxResults": 20,
+            'anonymousQuery': False
         }
         response = client.client.get('/api/start')
         assert response.status_code == 200
