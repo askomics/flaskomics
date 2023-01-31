@@ -60,7 +60,7 @@ def get_results():
 
 @results_bp.route('/api/results/preview', methods=['POST'])
 @api_auth
-@login_required
+@login_required_query
 def get_preview():
     """Summary
 
@@ -250,7 +250,7 @@ def get_graph_state():
 
 @results_bp.route('/api/results/download', methods=['POST'])
 @api_auth
-@login_required
+@login_required_query
 def download_result():
     """Download result file"""
     try:
