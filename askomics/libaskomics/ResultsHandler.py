@@ -198,3 +198,29 @@ class ResultsHandler(Params):
                 'user': row[8]
             })
         return queries
+
+
+    def delete_older_results(self, delta, user_id, status=None):
+        """Delete results older than a specific delta for a specific user_id
+
+        Returns
+        -------
+        List
+           None
+        """
+
+        database = Database(self.app, self.session)
+        data_str = '"now", "-{} day"'.format(delta)
+        status_substr = ""
+        arg_tuple = (user_id, data_str)
+
+        if status:
+            status_substr = "AND status = ?"
+            arg_tuple = (user_id, data_str, status)
+
+        query = '''
+        DELETE FROM results 
+        WHERE user_id = ? AND start <= date(?) {}
+        '''.format(status_substr)
+
+        rows = database.execute_sql_query(query, arg_tuple)

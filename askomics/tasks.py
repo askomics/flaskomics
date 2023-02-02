@@ -16,9 +16,11 @@ from askomics.libaskomics.DatasetsHandler import DatasetsHandler
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.Result import Result
+from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.SparqlQuery import SparqlQuery
 from askomics.libaskomics.SparqlQueryLauncher import SparqlQueryLauncher
 
+from celery.schedules import crontab
 
 app = create_app(config='config/askomics.ini')
 celery = create_celery(app)
@@ -311,3 +313,23 @@ def download_file(self, session, url):
     """
     files = FilesHandler(app, session)
     files.download_url(url, download_file.request.id)
+
+
+@celery.on_after_configure.connect
+def cron_cleanup(sender, **kwargs):
+    print("Cron triggered")
+    sender.add_periodic_task(
+#        crontab(hour=0, minute=0, day_of_week=1),
+        crontab(minute='*/10'),
+        cleanup_anonymous_data.s(),
+    )
+
+
+@celery.task(bind=True, name="cleanup_anonymous")
+def cleanup_anonymous_data():
+    print("Cleanup triggered")
+    periodicity = app.iniconfig.getint('askomics', 'anonymous_query_cleanup', fallback=60)
+    handler = ResultsHandler(app, session)
+    handler.delete_older_results(periodicity, "0")
+    # Cleanup failed jobs
+    handler.delete_older_results(1, "0", "failure")

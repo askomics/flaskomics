@@ -38,6 +38,7 @@ class Start(Params):
         """
         self.create_data_directory()
         self.create_database()
+        self.create_anonymous()
 
     def create_data_directory(self):
         """Create the data directory if it not exists
@@ -50,3 +51,15 @@ class Start(Params):
         """
         database = Database(self.app, self.session)
         database.init_database()
+
+    def create_anonymous(self):
+        """Create anonymous data folder if required
+        """
+        if self.settings.get('askomics', 'anonymous_query', fallback=False):
+            data_path = "{}/{}_{}/results".format(
+                self.data_directory,
+                "0",
+                "anonymous"
+            )
+            if not os.path.isdir(self.data_directory):
+                os.makedirs(self.data_directory)
