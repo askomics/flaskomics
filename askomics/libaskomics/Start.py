@@ -61,5 +61,5 @@ class Start(Params):
                 "0",
                 "anonymous"
             )
-            if not os.path.isdir(self.data_directory):
-                os.makedirs(self.data_directory)
+            if not os.path.isdir(data_path):
+                os.makedirs(data_path)
