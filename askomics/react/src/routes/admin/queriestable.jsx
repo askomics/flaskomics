@@ -115,13 +115,16 @@ export default class QueriesTable extends Component {
       text: 'Public',
       sort: true,
       formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
+        if (cell){
+          return (
+            <FormGroup>
+              <div>
+                <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              </div>
+            </FormGroup>
+          )
+      }
+      return <>
       },
       editable: false
     }, {
@@ -151,7 +154,7 @@ export default class QueriesTable extends Component {
       order: 'desc'
     }]
 
-    let queriesNoDataIndication = 'No public queries'
+    let queriesNoDataIndication = 'No queries'
     if (this.props.queriesLoading) {
       queriesNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
     }

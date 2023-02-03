@@ -85,7 +85,7 @@ def get_preview():
 
         file_id = data["fileId"]
         result_info = {"id": file_id}
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'preview': [],
@@ -263,7 +263,7 @@ def download_result():
 
         file_id = data["fileId"]
         result_info = {"id": file_id}
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'error': True,
@@ -428,7 +428,7 @@ def set_description():
         result_info = {"id": data["id"]}
         new_desc = data["newDesc"]
 
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'files': [],
@@ -478,7 +478,7 @@ def publish_query():
 
         result_info = {"id": data["id"]}
 
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'files': [],
@@ -528,7 +528,7 @@ def template_query():
 
         result_info = {"id": data["id"]}
 
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'files': [],
@@ -578,7 +578,7 @@ def form_query():
 
         result_info = {"id": data["id"]}
 
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'files': [],
@@ -626,7 +626,7 @@ def send2galaxy():
             }), 400
 
         result_info = {"id": data["fileId"]}
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'error': True,
@@ -669,7 +669,7 @@ def save_form():
 
         result_info = {"id": data["formId"]}
 
-        result = Result(current_app, session, result_info)
+        result = Result(current_app, session, result_info, owner=True)
         if not result:
             return jsonify({
                 'error': True,

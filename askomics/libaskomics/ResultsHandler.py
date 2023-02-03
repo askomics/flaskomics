@@ -18,7 +18,7 @@ class ResultsHandler(Params):
         """
         Params.__init__(self, app, session)
 
-    def delete_results(self, files_id):
+    def delete_results(self, files_id, admin=False):
         """Delete files
 
         Parameters
@@ -32,9 +32,13 @@ class ResultsHandler(Params):
             list of remaining files
         """
         for file_id in files_id:
-            result = Result(self.app, self.session, {"id": file_id})
-            self.app.celery.control.revoke(result.celery_id, terminate=True)
-            result.delete_result()
+            result = Result(self.app, self.session, {"id": file_id}, owner=True, admin=admin)
+            if result.celery_id:
+                self.app.celery.control.revoke(result.celery_id, terminate=True)
+            if result.id:
+                result.delete_result()
+        if admin:
+            return self.get_admin_queries()
 
         return self.get_files_info()
 
@@ -156,7 +160,7 @@ class ResultsHandler(Params):
 
         return queries
 
-    def get_admin_public_queries(self):
+    def get_admin_queries(self):
         """Get id description, and owner of published queries
 
         Returns
@@ -171,7 +175,7 @@ class ResultsHandler(Params):
         query = '''
         SELECT results.id, results.status, results.start, results.end, results.nrows, results.public, results.description, results.size, users.username
         FROM results
-        INNER JOIN users ON results.user_id=users.user_id
+        LEFT JOIN users ON results.user_id=users.user_id
         WHERE results.public = ?
         '''
 
@@ -195,47 +199,7 @@ class ResultsHandler(Params):
                 'public': row[5],
                 'description': row[6],
                 'size': row[7],
-                'user': row[8]
-            })
-        return queries
-
-    def get_admin_anonymous_queries(self):
-        """Get id description of anonymous queries
-
-        Returns
-        -------
-        List
-            List of anonymous queries (id and description)
-        """
-
-        database = Database(self.app, self.session)
-
-        query = '''
-        SELECT id, status, start, end, nrows, public, description, size
-        FROM results
-        '''
-
-        rows = database.execute_sql_query(query)
-
-        queries = []
-
-        for row in rows:
-
-            exec_time = 0
-            if row[3] is not None and row[2] is not None:
-                exec_time = row[3] - row[2]
-
-            queries.append({
-                'id': row[0],
-                'status': row[1],
-                'start': row[2],
-                'end': row[3],
-                'execTime': exec_time,
-                'nrows': row[4],
-                'public': row[5],
-                'description': row[6],
-                'size': row[7],
-                'user': "anonymous"
+                'user': row[8] if row[8] else "anonymous"
             })
         return queries
 
@@ -258,7 +222,7 @@ class ResultsHandler(Params):
             arg_tuple = (user_id, status)
 
         query = '''
-        SELECT user_id, start, status  FROM results 
+        SELECT user_id, start, status  FROM results
         WHERE user_id = ? AND start <= strftime({}) {}
         '''.format(date_str, status_substr)
 
