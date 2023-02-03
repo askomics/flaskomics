@@ -104,7 +104,6 @@ def start():
         }
 
         if 'user' in session and not session['user'].get('fake', False):
-            raise Exception(session['user'])
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             local_auth.update_last_action(session["user"]["username"])

@@ -320,16 +320,15 @@ def cron_cleanup(sender, **kwargs):
     print("Cron triggered")
     sender.add_periodic_task(
 #        crontab(hour=0, minute=0, day_of_week=1),
-        crontab(minute='*/10'),
+        crontab(hours='*/1'),
         cleanup_anonymous_data.s(),
     )
 
-
 @celery.task(bind=True, name="cleanup_anonymous")
-def cleanup_anonymous_data():
+def cleanup_anonymous_data(self):
     print("Cleanup triggered")
     periodicity = app.iniconfig.getint('askomics', 'anonymous_query_cleanup', fallback=60)
-    handler = ResultsHandler(app, session)
+    handler = ResultsHandler(app, {})
     handler.delete_older_results(periodicity, "0")
     # Cleanup failed jobs
-    handler.delete_older_results(1, "0", "failure")
+    handler.delete_older_results(1, "0", "error")

@@ -116,7 +116,7 @@ def get_files():
 @admin_required
 def get_queries():
     """Get all public queries
-
+    (And anonymous queries)
     Returns
     -------
     json
@@ -127,17 +127,20 @@ def get_queries():
     try:
         results_handler = ResultsHandler(current_app, session)
         public_queries = results_handler.get_admin_public_queries()
+        anonymous_queries = results_handler.get_admin_anonymous_queries()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
             "queries": [],
+            "anonymousQueries": [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
         "queries": public_queries,
+        "anonymousQueries": anonymous_queries,
         'error': False,
         'errorMessage': ''
     })
@@ -519,6 +522,46 @@ def delete_datasets():
         'errorMessage': ''
     })
 
+@admin_bp.route("/api/admin/delete_queries", methods=["POST"])
+@api_auth
+@admin_required
+def delete_queries():
+    """Delete queries
+
+    Returns
+    -------
+    json
+        queries: list of all queries (either public or anonymous)
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    data = request.get_json()
+    if not data.get("queriesIdtoDelete"):
+        return jsonify({
+            'queries': [],
+            'error': True,
+            'errorMessage': "Missing queriesIdtoDelete key"
+        }), 400
+
+    try:
+        results_handler = ResultsHandler(current_app, session)
+        results_handler.delete_queries()
+        public_queries = results_handler.get_admin_public_queries()
+        anonymous_queries = results_handler.get_admin_anonymous_queries()
+        remaining_files = files.delete_files(data['filesIdToDelete'], admin=True)
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'files': [],
+            'error': True,
+            'errorMessage': str(e)
+        }), 500
+
+    return jsonify({
+        'files': remaining_files,
+        'error': False,
+        'errorMessage': ''
+    })
 
 @admin_bp.route("/api/admin/getprefixes", methods=["GET"])
 @api_auth

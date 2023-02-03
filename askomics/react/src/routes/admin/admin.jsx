@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import DatasetsTable from './datasetstable'
 import FilesTable from './filestable'
 import QueriesTable from './queriestable'
+import AnonymousQueriesTable from './anonymousqueriestable'
 import UsersTable from './userstable'
 import Utils from '../../classes/utils'
 import { Redirect } from 'react-router-dom'
@@ -33,6 +34,7 @@ export default class Admin extends Component {
       datasets: [],
       files: [],
       queries: [],
+      anonQueries: [],
       fname: "",
       lname: "",
       username: "",
@@ -44,6 +46,8 @@ export default class Admin extends Component {
       usersSelected: [],
       filesSelected: [],
       datasetsSelected: [],
+      queriesSelected: [],
+      anonQueriesSelected: [],
     }
     this.handleChangeUserInput = this.handleChangeUserInput.bind(this)
     this.handleChangeFname = this.handleChangeFname.bind(this)
@@ -109,6 +113,36 @@ export default class Admin extends Component {
         this.setState({
           datasets: response.data.datasets,
           datasetsSelected: [],
+        })
+      })
+  }
+
+  deleteSelectedQueries () {
+    let requestUrl = '/api/admin/delete_queries'
+    let data = {
+      queriesIdToDelete: this.state.queriesSelected,
+      anon: false
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        this.setState({
+          queries: response.data.queries,
+          queriesSelected: [],
+        })
+      })
+  }
+
+  deleteSelectedAnonQueries () {
+    let requestUrl = '/api/admin/delete_queries'
+    let data = {
+      queriesIdToDelete: this.state.anonQueriesSelected,
+      anon: true
+    }
+    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        this.setState({
+          anonQueries: response.data.queries,
+          anonQueriesSelected: [],
         })
       })
   }
@@ -278,7 +312,8 @@ export default class Admin extends Component {
         console.log(requestUrl, response.data)
         this.setState({
           queriesLoading: false,
-          queries: response.data.queries
+          queries: response.data.queries,
+          anonymousQueries: response.data.anonymousQueries
         })
       })
       .catch(error => {
@@ -400,8 +435,13 @@ export default class Admin extends Component {
         <ErrorDiv status={this.state.datasetStatus} error={this.state.datasetError} errorMessage={this.state.datasetErrorMessage} />
         <hr />
 
-        <h4>Queries</h4>
-        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesLoading={this.state.queriesLoading} />
+        <h4>Public queries</h4>
+        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} anonQueriesSelected={this.state.anonQueriesSelected} queriesLoading={this.state.queriesLoading} />
+        <br />
+        <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
+
+        <h4>Anonymous queries</h4>
+        <AnonymousQueriesTable config={this.props.config} queries={this.state.anonQueries} setStateAnonQueries={p => this.setState(p)} anonQueriesSelected={this.state.anonQueriesSelected} queriesLoading={this.state.queriesLoading} />
         <br />
         <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
 

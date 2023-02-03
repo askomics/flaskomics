@@ -199,6 +199,45 @@ class ResultsHandler(Params):
             })
         return queries
 
+    def get_admin_anonymous_queries(self):
+        """Get id description of anonymous queries
+
+        Returns
+        -------
+        List
+            List of anonymous queries (id and description)
+        """
+
+        database = Database(self.app, self.session)
+
+        query = '''
+        SELECT id, status, start, end, nrows, public, description, size
+        FROM results
+        '''
+
+        rows = database.execute_sql_query(query)
+
+        queries = []
+
+        for row in rows:
+
+            exec_time = 0
+            if row[3] is not None and row[2] is not None:
+                exec_time = row[3] - row[2]
+
+            queries.append({
+                'id': row[0],
+                'status': row[1],
+                'start': row[2],
+                'end': row[3],
+                'execTime': exec_time,
+                'nrows': row[4],
+                'public': row[5],
+                'description': row[6],
+                'size': row[7],
+                'user': "anonymous"
+            })
+        return queries
 
     def delete_older_results(self, delta, user_id, status=None):
         """Delete results older than a specific delta for a specific user_id
@@ -210,17 +249,18 @@ class ResultsHandler(Params):
         """
 
         database = Database(self.app, self.session)
-        data_str = '"now", "-{} day"'.format(delta)
+        date_str = '"%s", "now", "-{} day"'.format(delta)
         status_substr = ""
-        arg_tuple = (user_id, data_str)
+        arg_tuple = (user_id)
 
         if status:
             status_substr = "AND status = ?"
-            arg_tuple = (user_id, data_str, status)
+            arg_tuple = (user_id, status)
 
         query = '''
-        DELETE FROM results 
-        WHERE user_id = ? AND start <= date(?) {}
-        '''.format(status_substr)
+        SELECT user_id, start, status  FROM results 
+        WHERE user_id = ? AND start <= strftime({}) {}
+        '''.format(date_str, status_substr)
 
         rows = database.execute_sql_query(query, arg_tuple)
+        print(rows)

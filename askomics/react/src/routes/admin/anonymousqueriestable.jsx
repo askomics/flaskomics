@@ -10,23 +10,22 @@ import Utils from '../../classes/utils'
 import WaitingDiv from '../../components/waiting'
 import pretty from 'pretty-time'
 
-export default class QueriesTable extends Component {
+export default class AnonymousQueriesTable extends Component {
   constructor (props) {
     super(props)
     this.utils = new Utils()
-    this.togglePublicQuery = this.togglePublicQuery.bind(this)
     this.handleQuerySelection = this.handleQuerySelection.bind(this)
     this.handleQuerySelectionAll = this.handleQuerySelectionAll.bind(this)
   }
 
   handleQuerySelection (row, isSelect) {
     if (isSelect) {
-      this.props.setStateQueries({
-        queriesSelected: [...this.props.queriesSelected, row.id]
+      this.props.setStateAnonQueries({
+        anonQueriesSelected: [...this.props.anonQueriesSelected, row.id]
       })
     } else {
-      this.props.setStateQueries({
-        queriesSelected: this.props.queriesSelected.filter(x => x !== row.id)
+      this.props.setStateAnonQueries({
+        anonQueriesSelected: this.props.anonQueriesSelected.filter(x => x !== row.id)
       })
     }
   }
@@ -34,38 +33,16 @@ export default class QueriesTable extends Component {
   handleQuerySelectionAll (isSelect, rows) {
     const ids = rows.map(r => r.id)
     if (isSelect) {
-      this.props.setStateQueries({
-        queriesSelected: ids
+      this.props.setStateAnonQueries({
+        anonQueriesSelected: ids
       })
     } else {
-      this.props.setStateQueries({
-        queriesSelected: []
+      this.props.setStateAnonQueries({
+        anonQueriesSelected: []
       })
     }
   }
 
-  togglePublicQuery (event) {
-    let requestUrl = '/api/admin/publicize_query'
-    let data = {
-      queryId: parseInt(event.target.id.replace("query-", "")),
-      newStatus: event.target.value == 1 ? false : true
-    }
-    axios.post(requestUrl, data, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-    .then(response => {
-      console.log(requestUrl, response.data)
-      this.props.setStateQueries({
-        queries: response.data.queries
-      })
-    })
-    .catch(error => {
-      console.log(error, error.response.data.errorMessage)
-      this.props.setStateQueries({
-        queryError: true,
-        queryErrorMessage: error.response.data.errorMessage,
-        queryStatus: error.response.status,
-      })
-    })
-  }
 
   render () {
     let queriesColumns = [{
@@ -110,20 +87,6 @@ export default class QueriesTable extends Component {
         return cell ? this.utils.humanFileSize(cell, true) : ''
       },
       editable: false
-    },{
-      dataField: 'public',
-      text: 'Public',
-      sort: true,
-      formatter: (cell, row) => {
-        return (
-          <FormGroup>
-            <div>
-              <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
-            </div>
-          </FormGroup>
-        )
-      },
-      editable: false
     }, {
       dataField: 'status',
       text: 'Status',
@@ -151,7 +114,7 @@ export default class QueriesTable extends Component {
       order: 'desc'
     }]
 
-    let queriesNoDataIndication = 'No public queries'
+    let queriesNoDataIndication = 'No anonymous queries'
     if (this.props.queriesLoading) {
       queriesNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
     }
@@ -159,7 +122,7 @@ export default class QueriesTable extends Component {
     let queriesSelectRow = {
       mode: 'checkbox',
       clickToSelect: false,
-      selected: this.props.queriesSelected,
+      selected: this.props.anonQueriesSelected,
       onSelect: this.handleQuerySelection,
       onSelectAll: this.handleQuerySelectionAll,
     }
@@ -184,8 +147,8 @@ export default class QueriesTable extends Component {
   }
 }
 
-QueriesTable.propTypes = {
-    setStateQueries: PropTypes.func,
+AnonymousQueriesTable.propTypes = {
+    setStateAnonQueries: PropTypes.func,
     queriesLoading: PropTypes.bool,
     queries: PropTypes.object,
     config: PropTypes.object
