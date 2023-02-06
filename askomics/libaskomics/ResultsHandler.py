@@ -36,7 +36,7 @@ class ResultsHandler(Params):
             if result.celery_id:
                 self.app.celery.control.revoke(result.celery_id, terminate=True)
             if result.id:
-                result.delete_result()
+                result.delete_result(admin=admin)
         if admin:
             return self.get_admin_queries()
 
@@ -161,25 +161,23 @@ class ResultsHandler(Params):
         return queries
 
     def get_admin_queries(self):
-        """Get id description, and owner of published queries
+        """Get id description, and owner of all queries
 
         Returns
         -------
         List
-            List of published queries (id and description)
+            List of all queries (id and description)
         """
 
-        sql_var = (True, )
         database = Database(self.app, self.session)
 
         query = '''
         SELECT results.id, results.status, results.start, results.end, results.nrows, results.public, results.description, results.size, users.username
         FROM results
         LEFT JOIN users ON results.user_id=users.user_id
-        WHERE results.public = ?
         '''
 
-        rows = database.execute_sql_query(query, sql_var)
+        rows = database.execute_sql_query(query)
 
         queries = []
 

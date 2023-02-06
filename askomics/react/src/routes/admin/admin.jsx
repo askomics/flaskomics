@@ -54,6 +54,7 @@ export default class Admin extends Component {
     this.deleteSelectedUsers = this.deleteSelectedUsers.bind(this)
     this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
     this.deleteSelectedDatasets = this.deleteSelectedDatasets.bind(this)
+    this.deleteSelectedQueries = this.deleteSelectedQueries.bind(this)
     this.cancelRequest
   }
 
@@ -67,6 +68,10 @@ export default class Admin extends Component {
 
   isDatasetsDisabled () {
     return this.state.datasetsSelected.length == 0
+  }
+
+  isQueriesDisabled () {
+    return this.state.queriesSelected.length == 0
   }
 
   deleteSelectedUsers () {
@@ -416,10 +421,10 @@ export default class Admin extends Component {
         <hr />
 
         <h4>Queries</h4>
-        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} anonQueriesSelected={this.state.anonQueriesSelected} queriesLoading={this.state.queriesLoading} />
+        <QueriesTable config={this.props.config} queries={this.state.queries} setStateQueries={p => this.setState(p)} queriesSelected={this.state.queriesSelected} queriesLoading={this.state.queriesLoading} />
         <br />
+        <Button disabled={this.isQueriesDisabled()} onClick={this.deleteSelectedQueries} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
         <ErrorDiv status={this.state.queryStatus} error={this.state.queryError} errorMessage={this.state.queryErrorMessage} />
-
       </div>
     )
   }

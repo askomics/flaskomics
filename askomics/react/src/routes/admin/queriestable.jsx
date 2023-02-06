@@ -115,16 +115,13 @@ export default class QueriesTable extends Component {
       text: 'Public',
       sort: true,
       formatter: (cell, row) => {
-        if (cell){
-          return (
-            <FormGroup>
-              <div>
-                <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
-              </div>
-            </FormGroup>
-          )
-      }
-      return <>
+        return (
+          <FormGroup>
+            <div>
+              <CustomInput disabled={!cell} type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+            </div>
+          </FormGroup>
+        )
       },
       editable: false
     }, {
@@ -189,6 +186,7 @@ export default class QueriesTable extends Component {
 
 QueriesTable.propTypes = {
     setStateQueries: PropTypes.func,
+    queriesSelected: PropTypes.object,
     queriesLoading: PropTypes.bool,
     queries: PropTypes.object,
     config: PropTypes.object

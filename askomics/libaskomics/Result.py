@@ -509,21 +509,28 @@ class Result(Params):
         """Delete file"""
         self.delete_file_from_filesystem()
 
-    def delete_result(self):
+    def delete_result(self, admin=False):
         """Remove results from db and filesystem"""
-        self.delete_db_entry()
+        self.delete_db_entry(admin=admin)
         self.delete_file_from_filesystem()
 
-    def delete_db_entry(self):
+    def delete_db_entry(self, admin=False):
         """Delete results from db"""
         database = Database(self.app, self.session)
+        if admin:
+            query = '''
+            DELETE FROM results
+            WHERE id = ?
+            '''
+            args = (self.id,)
+        else:
+            query = '''
+            DELETE FROM results
+            WHERE id = ? AND user_id = ?
+            '''
+            args = (self.id, self.session["user"]["id"],)
 
-        query = '''
-        DELETE FROM results
-        WHERE id = ? AND user_id = ?
-        '''
-
-        database.execute_sql_query(query, (self.id, self.session["user"]["id"]))
+        database.execute_sql_query(query, args)
 
     def delete_file_from_filesystem(self):
         """Remove result file from filesystem"""

@@ -534,35 +534,28 @@ def delete_queries():
         errorMessage: the error message of error, else an empty string
     """
     data = request.get_json()
-    if not data.get("queriesIdtoDelete"):
+    if not data.get("queriesIdToDelete"):
         return jsonify({
             'queries': [],
             'error': True,
-            'errorMessage': "Missing queriesIdtoDelete key"
+            'errorMessage': "Missing queriesIdToDelete key"
         }), 400
 
     try:
-        if not (data and data.get("filesIdToDelete")):
-            return jsonify({
-                'remainingFiles': {},
-                'error': True,
-                'errorMessage': "Missing filesIdToDelete parameter"
-            }), 400
-
-        files_id = data["filesIdToDelete"]
+        queries_id = data["queriesIdToDelete"]
         results_handler = ResultsHandler(current_app, session)
-        remaining_files = results_handler.delete_results(files_id, admin=True)
+        remaining_queries = results_handler.delete_results(queries_id, admin=True)
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
-            'files': [],
+            'queries': [],
             'error': True,
             'errorMessage': str(e)
         }), 500
 
     return jsonify({
-        'files': remaining_files,
+        'queries': remaining_queries,
         'error': False,
         'errorMessage': ''
     })
