@@ -262,3 +262,33 @@ class TestApiStartpoints(AskomicsTestCase):
         assert response.status_code == 200
         assert not response.json["error"]
         assert response.json["errorMessage"] == ''
+
+    def test_save_result_anon(self, client):
+        """Test /api/query/save_result route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate(public=True)
+
+        with open("tests/data/graphState_simple_query.json", "r") as file:
+            file_content = file.read()
+
+        json_query = json.loads(file_content)
+
+        data = {
+            "graphState": json_query,
+        }
+
+        # Test anonymous
+        client.logout()
+        response = client.client.post('/api/query/save_result', json=data)
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Login required",
+        }
+        # Test anonymous with anon queries enabled
+        client.set_config("askomics", "anonymous_query", "true")
+        response = client.client.post('/api/query/save_result', json=data)
+        assert response.status_code == 200
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''

@@ -6,6 +6,49 @@ from . import AskomicsTestCase
 class TestApiResults(AskomicsTestCase):
     """Test AskOmics API /api/results/<something>"""
 
+    def test_get_results_anon(self, client):
+        """test /api/results route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate(public=True)
+        client.logout()
+
+        response = client.client.get('/api/results')
+        assert response.status_code == 401
+        assert response.json == {
+            "error": True,
+            "errorMessage": "Login required",
+        }
+
+        client.set_config("askomics", "anonymous_query", "true")
+        response = client.client.get('/api/results')
+
+        assert response.status_code == 200
+        assert response.json == {'error': False, 'errorMessage': '', 'files': [], 'triplestoreMaxRows': 10000}
+
+        result_info = client.create_result()
+
+        response = client.client.get('/api/results')
+
+        with open("tests/results/results.json", "r") as file:
+            file_content = file.read()
+        raw_results = file_content.replace("###START###", str(result_info["start"]))
+        raw_results = raw_results.replace("###END###", str(result_info["end"]))
+        raw_results = raw_results.replace("###EXECTIME###", str(int(result_info["end"] - result_info["start"])))
+        raw_results = raw_results.replace("###ID###", str(result_info["id"]))
+        raw_results = raw_results.replace("###PATH###", str(result_info["path"]))
+        raw_results = raw_results.replace("###SIZE###", str(result_info["size"]))
+        raw_results = raw_results.replace("###PUBLIC###", str(0))
+        raw_results = raw_results.replace("###TEMPLATE###", str(0))
+        raw_results = raw_results.replace("###FORM###", str(0))
+        raw_results = raw_results.replace("###HAS_FORM_ATTR###", str(0))
+        raw_results = raw_results.replace("###DESC###", "Query")
+
+        expected = json.loads(raw_results)
+
+        assert response.status_code == 200
+        assert response.json == expected
+
     def test_get_results(self, client):
         """test /api/results route"""
         client.create_two_users()
@@ -108,6 +151,29 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert self.equal_objects(response.json, expected)
 
+    def test_get_preview_anon(self, client):
+        """test /api/results/preview route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate(public=True)
+
+        client.logout()
+        client.set_config("askomics", "anonymous_query", "true")
+        result_info = client.create_result()
+
+        data = {
+            "fileId": result_info["id"]
+        }
+
+        with open("tests/results/preview.json", "r") as file:
+            file_content = file.read()
+        expected = json.loads(file_content)
+
+        response = client.client.post('/api/results/preview', json=data)
+
+        assert response.status_code == 200
+        assert self.equal_objects(response.json, expected)
+
     def test_get_preview(self, client):
         """test /api/results/preview route"""
         client.create_two_users()
@@ -172,6 +238,23 @@ class TestApiResults(AskomicsTestCase):
 
         assert response.status_code == 200
         assert response.json == expected
+
+    def test_download_anon(self, client):
+        """test /api/results/download route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload_and_integrate()
+        client.logout()
+        client.set_config("askomics", "anonymous_query", "true")
+        result_info = client.create_result()
+
+        data = {
+            "fileId": result_info["id"]
+        }
+
+        response = client.client.post('/api/results/download', json=data)
+
+        assert response.status_code == 200
 
     def test_download_result(self, client):
         """test /api/results/download route"""

@@ -289,7 +289,52 @@ class TestApiAdmin(AskomicsTestCase):
         expected = {
             'error': False,
             'errorMessage': '',
-            'queries': []
+            'queries': [{
+                'description': 'Query',
+                'end': result_info["end"],
+                'execTime': int(result_info["end"] - result_info["start"]),
+                'id': result_info["id"],
+                'nrows': 13,
+                'public': 0,
+                'size': result_info["size"],
+                'start': result_info["start"],
+                'status': 'success',
+                'user': 'jsmith'}]
+        }
+
+        assert response.status_code == 200
+        assert response.json == expected
+
+    def test_update_query_description(self, client):
+        """test the /api/admin/update_description route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.post('/api/admin/update_description')
+        assert response.status_code == 401
+
+        client.upload_and_integrate()
+        result_info = client.create_result()
+        client.publicize_result(result_info["id"], True)
+
+        client.log_user("jdoe")
+        data = {"queryId": result_info["id"], "newDesc": "MyNewDesc"}
+        response = client.client.post('/api/admin/update_description', json=data)
+
+        expected = {
+            'error': False,
+            'errorMessage': '',
+            'queries': [{
+                'description': 'MyNewDesc',
+                'end': result_info["end"],
+                'execTime': int(result_info["end"] - result_info["start"]),
+                'id': result_info["id"],
+                'nrows': 13,
+                'public': 0,
+                'size': result_info["size"],
+                'start': result_info["start"],
+                'status': 'success',
+                'user': 'jsmith'}]
         }
 
         assert response.status_code == 200
@@ -496,6 +541,28 @@ class TestApiAdmin(AskomicsTestCase):
         assert response.json["datasets"][0]["status"] == "queued"
         assert response.json["datasets"][1]["status"] == "queued"
         assert response.json["datasets"][2]["status"] == "queued"
+
+    def test_delete_queries(self, client):
+        """test /api/admin/delete_queries route"""
+        client.create_two_users()
+        client.log_user("jsmith")
+
+        response = client.client.post('/api/admin/delete_queries')
+        assert response.status_code == 401
+
+        client.upload_and_integrate()
+        result_info = client.create_result()
+
+        client.log_user("jdoe")
+
+        data = {"queriesIdToDelete": result_info["id"], "newStatus": False}
+
+        response = client.client.post('/api/admin/delete_queries', json=data)
+
+        assert response.status_code == 200
+        assert not response.json["error"]
+        assert response.json["errorMessage"] == ''
+        assert len(response.json["queries"]) == 0
 
     def test_view_custom_prefixes(self, client):
         """test /api/admin/getprefixes route"""

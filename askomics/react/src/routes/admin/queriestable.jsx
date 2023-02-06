@@ -15,6 +15,7 @@ export default class QueriesTable extends Component {
     super(props)
     this.utils = new Utils()
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
+    this.saveNewDescription = this.saveNewDescription.bind(this)
     this.handleQuerySelection = this.handleQuerySelection.bind(this)
     this.handleQuerySelectionAll = this.handleQuerySelectionAll.bind(this)
   }
@@ -42,6 +43,30 @@ export default class QueriesTable extends Component {
         queriesSelected: []
       })
     }
+  }
+
+  saveNewDescription (oldValue, newValue, row) {
+
+    if (newValue === oldValue) {return}
+
+    let requestUrl = '/api/admin/update_description'
+    let data = {
+      id: row.id,
+      newDesc: newValue
+    }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.props.setStateResults({
+        queries: response.data.queries
+      })
+    })
+    .catch(error => {
+      this.setState({
+        queryError: true,
+        queryErrorMessage: error.response.data.errorMessage,
+        queryStatus: error.response.status,
+      })
+    })
   }
 
   togglePublicQuery (event) {
@@ -76,7 +101,6 @@ export default class QueriesTable extends Component {
       dataField: 'description',
       text: 'Description',
       sort: true,
-      editable: false
     }, {
       dataField: 'start',
       text: 'Creation date',
@@ -118,7 +142,7 @@ export default class QueriesTable extends Component {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={!cell} type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
+              <CustomInput type="switch" id={"query-" + row.id} onChange={this.togglePublicQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )
@@ -178,6 +202,11 @@ export default class QueriesTable extends Component {
           pagination={paginationFactory()}
           noDataIndication={queriesNoDataIndication}
           selectRow={ queriesSelectRow }
+          cellEdit={ cellEditFactory({
+            mode: 'click',
+            autoSelectText: true,
+            beforeSaveCell: (oldValue, newValue, row) => { this.saveNewDescription(oldValue, newValue, row) },
+          })}
         />
       </div>
     )

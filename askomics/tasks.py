@@ -317,18 +317,19 @@ def download_file(self, session, url):
 
 @celery.on_after_configure.connect
 def cron_cleanup(sender, **kwargs):
-    print("Cron triggered")
-    sender.add_periodic_task(
-#        crontab(hour=0, minute=0, day_of_week=1),
-        crontab(hours='*/1'),
-        cleanup_anonymous_data.s(),
-    )
+    # If anonymous queries are allowed, add a 'cleanup' task, which run every hour
+    if app.iniconfig.get('askomics', 'anonymous_query', fallback=False):
+        sender.add_periodic_task(
+            crontab(hour='*/2'),
+            cleanup_anonymous_data.s(),
+        )
+
 
 @celery.task(bind=True, name="cleanup_anonymous")
 def cleanup_anonymous_data(self):
-    print("Cleanup triggered")
     periodicity = app.iniconfig.getint('askomics', 'anonymous_query_cleanup', fallback=60)
     handler = ResultsHandler(app, {})
-    handler.delete_older_results(periodicity, "0")
-    # Cleanup failed jobs
-    handler.delete_older_results(1, "0", "error")
+    # Cleanup jobs older than 'periodicity'
+    handler.delete_older_results(periodicity, "day", "0")
+    # Cleanup failed jobs older than 1 hour
+    handler.delete_older_results(1, "hour", "0", "error")

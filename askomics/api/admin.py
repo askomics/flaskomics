@@ -321,6 +321,57 @@ def toggle_public_query():
     })
 
 
+@admin_bp.route('/api/admin/update_description', methods=['POST'])
+@api_auth
+@admin_required
+def update_query_description():
+    """Update a query description
+
+    Returns
+    -------
+    json
+        error: True if error, else False
+        errorMessage: the error message of error, else an empty string
+    """
+    try:
+        data = request.get_json()
+        if not (data and data.get("queryId") and data.get("newDesc")):
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "Missing parameters"
+            }), 400
+
+        result_info = {"id": data["queryId"]}
+        new_desc = data["newDesc"]
+
+        result = Result(current_app, session, result_info, admin=True)
+        if not result:
+            return jsonify({
+                'files': [],
+                'error': True,
+                'errorMessage': "You do not have access to this result"
+            }), 500
+        result.update_description(new_desc)
+
+        results_handler = ResultsHandler(current_app, session)
+        queries = results_handler.get_admin_queries()
+
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+        return jsonify({
+            'queries': [],
+            'error': True,
+            'errorMessage': 'Failed to update description: \n{}'.format(str(e))
+        }), 500
+
+    return jsonify({
+        'queries': queries,
+        'error': False,
+        'errorMessage': ''
+    })
+
+
 @admin_bp.route("/api/admin/adduser", methods=["POST"])
 @api_auth
 @admin_required

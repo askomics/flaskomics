@@ -319,7 +319,7 @@ export default class ResultsFilesTable extends Component {
 
     let requestUrl = '/api/results/description'
     let data = {
-      id: row.id,
+      queryId: row.id,
       newDesc: newValue
     }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
