@@ -246,8 +246,6 @@ class TestApiStartpoints(AskomicsTestCase):
         client.logout()
         client.log_user("jdoe", quota=100)
 
-        print(client.session)
-
         response = client.client.post('/api/query/save_result', json=data)
         assert response.status_code == 400
         assert response.json == {

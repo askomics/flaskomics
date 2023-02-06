@@ -287,7 +287,7 @@ def toogle_public_dataset():
 @admin_bp.route('/api/admin/publicize_query', methods=['POST'])
 @api_auth
 @admin_required
-def togle_public_query():
+def toggle_public_query():
     """Publish a query template from a result
 
     Returns
@@ -304,7 +304,7 @@ def togle_public_query():
         result.publish_query(json["newStatus"], admin=True)
 
         results_handler = ResultsHandler(current_app, session)
-        public_queries = results_handler.get_admin_public_queries()
+        public_queries = results_handler.get_admin_queries()
 
     except Exception as e:
         traceback.print_exc(file=sys.stdout)

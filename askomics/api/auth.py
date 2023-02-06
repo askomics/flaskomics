@@ -6,7 +6,6 @@ import sys
 from functools import wraps
 
 from askomics.libaskomics.LocalAuth import LocalAuth
-from askomics.libaskomics.Utils import Utils
 
 from flask import (Blueprint, current_app, jsonify, request, session, render_template)
 
@@ -34,7 +33,7 @@ def login_required_query(f):
         """Login required decorator"""
         if 'user' in session:
             # If conf has changed, clear session
-            if not current_app.iniconfig.get('askomics', 'anonymous_query', fallback=False):
+            if session['user'].get('fake', False) and not current_app.iniconfig.get('askomics', 'anonymous_query', fallback=False):
                 session.pop('user')
                 return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
