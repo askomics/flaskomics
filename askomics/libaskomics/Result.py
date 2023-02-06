@@ -619,21 +619,32 @@ class Result(Params):
 
         database.execute_sql_query(query, sql_var)
 
-    def update_description(self, description):
+    def update_description(self, description, admin=False):
         """Change the result description"""
         database = Database(self.app, self.session)
+        if admin:
+            query = '''
+            UPDATE results SET
+            description=?
+            WHERE id=?
+            '''
 
-        query = '''
-        UPDATE results SET
-        description=?
-        WHERE user_id=? AND id=?
-        '''
+            database.execute_sql_query(query, (
+                description,
+                self.id
+            ))
+        else:
+            query = '''
+            UPDATE results SET
+            description=?
+            WHERE user_id=? AND id=?
+            '''
 
-        database.execute_sql_query(query, (
-            description,
-            self.session["user"]["id"],
-            self.id
-        ))
+            database.execute_sql_query(query, (
+                description,
+                self.session["user"]["id"],
+                self.id
+            ))
 
     def update_graph(self, newGraph):
         """Change the result description"""

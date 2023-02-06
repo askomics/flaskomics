@@ -26,7 +26,10 @@ class TestApiResults(AskomicsTestCase):
         assert response.status_code == 200
         assert response.json == {'error': False, 'errorMessage': '', 'files': [], 'triplestoreMaxRows': 10000}
 
+        # Need to force a session to create a result
+        client.log_anon()
         result_info = client.create_result()
+        client.logout()
 
         response = client.client.get('/api/results')
 
@@ -159,7 +162,11 @@ class TestApiResults(AskomicsTestCase):
 
         client.logout()
         client.set_config("askomics", "anonymous_query", "true")
+
+        # Need to force a session to create a result
+        client.log_anon()
         result_info = client.create_result()
+        client.logout()
 
         data = {
             "fileId": result_info["id"]
@@ -246,7 +253,11 @@ class TestApiResults(AskomicsTestCase):
         client.upload_and_integrate()
         client.logout()
         client.set_config("askomics", "anonymous_query", "true")
+
+        # Need to force a session to create a result
+        client.log_anon()
         result_info = client.create_result()
+        client.logout()
 
         data = {
             "fileId": result_info["id"]

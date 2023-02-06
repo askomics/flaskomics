@@ -56,7 +56,7 @@ export default class QueriesTable extends Component {
     }
     axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
     .then(response => {
-      this.props.setStateResults({
+      this.props.setStateQueries({
         queries: response.data.queries
       })
     })

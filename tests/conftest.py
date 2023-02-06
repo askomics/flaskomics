@@ -126,6 +126,29 @@ class Client(object):
         """
         return self.client
 
+    def log_anon(self):
+        """Summary
+        Log anon user
+        """
+        with self.client.session_transaction() as sess:
+            sess["user"] = {
+                'id': 0,
+                'ldap': False,
+                'fname': "",
+                'lname': "",
+                'username': "anonymous",
+                'email': "",
+                'admin': False,
+                'blocked': False,
+                'quota': 0,
+                'apikey': "0000000000",
+                "galaxy": False
+            }
+
+        self.session = sess
+        auth = LocalAuth(self.app, self.session)
+        auth.create_user_directories(0, "anonymous")
+
     def log_user(self, username, quota=0, blocked=False, ldap=False):
         """Summary
 

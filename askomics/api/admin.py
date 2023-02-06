@@ -352,7 +352,7 @@ def update_query_description():
                 'error': True,
                 'errorMessage': "You do not have access to this result"
             }), 500
-        result.update_description(new_desc)
+        result.update_description(new_desc, admin=True)
 
         results_handler = ResultsHandler(current_app, session)
         queries = results_handler.get_admin_queries()

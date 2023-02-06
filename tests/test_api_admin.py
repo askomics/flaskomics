@@ -330,7 +330,7 @@ class TestApiAdmin(AskomicsTestCase):
                 'execTime': int(result_info["end"] - result_info["start"]),
                 'id': result_info["id"],
                 'nrows': 13,
-                'public': 0,
+                'public': 1,
                 'size': result_info["size"],
                 'start': result_info["start"],
                 'status': 'success',
@@ -555,7 +555,7 @@ class TestApiAdmin(AskomicsTestCase):
 
         client.log_user("jdoe")
 
-        data = {"queriesIdToDelete": result_info["id"], "newStatus": False}
+        data = {"queriesIdToDelete": [result_info["id"]], "newStatus": False}
 
         response = client.client.post('/api/admin/delete_queries', json=data)
 
