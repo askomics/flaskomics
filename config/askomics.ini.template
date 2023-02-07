@@ -89,7 +89,7 @@ ldap_mail_attribute = mail
 autocomplete_max_results = 10
 
 anonymous_query = false
-anonymous_query_cleanup = 2
+anonymous_query_cleanup = 60
 
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki

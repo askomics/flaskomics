@@ -55,6 +55,8 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `ldap_account_link` (url): Link to the LDAP account manager
     - `autocomplete_max_results` (int): Max results queries by autocompletion
     - `single_tenant` (bool): Enable [single tenant mode](/manage/#single-tenant-mode)
+    - `anonymous_query` (bool): Enable [anonymous query mode](/manage/#anonymous-query)
+    - `anonymous_query_cleanup` (int): Number of days before a successful anonymous job is deleted
 
 - `virtuoso`
 

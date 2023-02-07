@@ -405,7 +405,7 @@ def get_sparql_query():
 
 @results_bp.route('/api/results/description', methods=['POST'])
 @api_auth
-@login_required
+@login_required_query
 def set_description():
     """Update a result description
 
