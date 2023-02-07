@@ -352,11 +352,14 @@ class Result(Params):
 
         return os.path.getsize(self.file_path)
 
-    def save_in_db(self):
+    def save_in_db(self, start=None):
         """Save results file info into the database"""
         database = Database(self.app, self.session)
 
-        self.start = int(time.time())
+        if not start:
+            self.start = int(time.time())
+        else:
+            self.start = start
 
         query = '''
         INSERT INTO results VALUES(

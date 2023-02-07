@@ -500,7 +500,7 @@ class Client(object):
             "endpoint": int_ontology["endpoint"]
         }
 
-    def create_result(self, has_form=False):
+    def create_result(self, has_form=False, start=None, status="success"):
         """Create a result entry in db
 
         Returns
@@ -536,14 +536,14 @@ class Client(object):
         # Save job in database database
         result = Result(self.app, self.session, info)
 
-        result.save_in_db()
+        result.save_in_db(start=start)
 
         # Execute query and write result to file
         headers, results = query_launcher.process_query(query.sparql)
         file_size = result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status("success", size=file_size)
+        result.update_db_status(status, size=file_size)
 
         return {
             "id": result.id,
