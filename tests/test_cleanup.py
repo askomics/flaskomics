@@ -1,5 +1,5 @@
 import datetime
-
+''
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from . import AskomicsTestCase
 
@@ -17,7 +17,7 @@ class TestCleanup(AskomicsTestCase):
         start = int((datetime.date.today() - datetime.timedelta(1)).strftime("%s"))
         client.create_result(status="error", start=start)
 
-        rh = ResultsHandler(self.app, self.session)
+        rh = ResultsHandler(client.app, client.session)
         results = rh.get_files_info()
 
         assert len(results) == 1
@@ -36,7 +36,7 @@ class TestCleanup(AskomicsTestCase):
         start = int((datetime.date.today() - datetime.timedelta(1)).strftime("%s"))
         client.create_result(start=start)
 
-        rh = ResultsHandler(self.app, self.session)
+        rh = ResultsHandler(client.app, client.session)
         results = rh.get_files_info()
 
         assert len(results) == 1
@@ -57,7 +57,7 @@ class TestCleanup(AskomicsTestCase):
         start = int((datetime.date.today() - datetime.timedelta(1)).strftime("%s"))
         client.create_result(status="error", start=start)
 
-        rh = ResultsHandler(self.app, self.session)
+        rh = ResultsHandler(client.app, client.session)
         results = rh.get_files_info()
 
         assert len(results) == 1
@@ -78,7 +78,7 @@ class TestCleanup(AskomicsTestCase):
         start = int((datetime.date.today() - datetime.timedelta(1)).strftime("%s"))
         client.create_result(start=start)
 
-        rh = ResultsHandler(self.app, self.session)
+        rh = ResultsHandler(client.app, client.session)
         results = rh.get_files_info()
 
         assert len(results) == 1
