@@ -114,9 +114,16 @@ serve-celery: check-venv build-config create-user
 	@echo 'Serving Celery...'
 	. $(ACTIVATE)
 ifeq ($(MODE), dev)
-	FLASK_ENV=development FLASK_APP=app watchmedo auto-restart -d $(BASEDIR)/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -Q default -c $(NTASKS) -n default -l info
+	FLASK_ENV=development FLASK_APP=app watchmedo auto-restart -d $(BASEDIR)/askomics --recursive -p '*.py' --ignore-patterns='*.pyc' -- celery -A askomics.tasks.celery worker -Q default -c $(NTASKS) -n default -l info -B
 else
 	FLASK_ENV=production FLASK_APP=app celery -A askomics.tasks.celery worker -Q default -c $(NTASKS) -n default -l info
+endif
+
+serve-celery-beat: check-venv build-config create-user
+	@echo 'Starting Celerybeat'
+	. $(ACTIVATE)
+ifeq ($(MODE), prod)
+	FLASK_ENV=production FLASK_APP=app celery -A askomics.tasks.celery beat -l info
 endif
 
 check-venv:
