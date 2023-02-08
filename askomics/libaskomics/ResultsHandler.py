@@ -224,4 +224,4 @@ class ResultsHandler(Params):
         WHERE user_id = ? AND start <= strftime({}) {}
         '''.format(date_str, status_substr)
 
-        rows = database.execute_sql_query(query, arg_tuple)
+        database.execute_sql_query(query, arg_tuple)
