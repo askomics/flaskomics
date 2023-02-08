@@ -15,6 +15,58 @@ export default class QueriesTable extends Component {
     super(props)
     this.utils = new Utils()
     this.togglePublicQuery = this.togglePublicQuery.bind(this)
+    this.saveNewDescription = this.saveNewDescription.bind(this)
+    this.handleQuerySelection = this.handleQuerySelection.bind(this)
+    this.handleQuerySelectionAll = this.handleQuerySelectionAll.bind(this)
+  }
+
+  handleQuerySelection (row, isSelect) {
+    if (isSelect) {
+      this.props.setStateQueries({
+        queriesSelected: [...this.props.queriesSelected, row.id]
+      })
+    } else {
+      this.props.setStateQueries({
+        queriesSelected: this.props.queriesSelected.filter(x => x !== row.id)
+      })
+    }
+  }
+
+  handleQuerySelectionAll (isSelect, rows) {
+    const ids = rows.map(r => r.id)
+    if (isSelect) {
+      this.props.setStateQueries({
+        queriesSelected: ids
+      })
+    } else {
+      this.props.setStateQueries({
+        queriesSelected: []
+      })
+    }
+  }
+
+  saveNewDescription (oldValue, newValue, row) {
+
+    if (newValue === oldValue) {return}
+
+    let requestUrl = '/api/admin/update_description'
+    let data = {
+      id: row.id,
+      newDesc: newValue
+    }
+    axios.post(requestUrl, data, {baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+    .then(response => {
+      this.props.setStateQueries({
+        queries: response.data.queries
+      })
+    })
+    .catch(error => {
+      this.setState({
+        queryError: true,
+        queryErrorMessage: error.response.data.errorMessage,
+        queryStatus: error.response.status,
+      })
+    })
   }
 
   togglePublicQuery (event) {
@@ -49,7 +101,6 @@ export default class QueriesTable extends Component {
       dataField: 'description',
       text: 'Description',
       sort: true,
-      editable: false
     }, {
       dataField: 'start',
       text: 'Creation date',
@@ -120,13 +171,21 @@ export default class QueriesTable extends Component {
     }]
 
     let queriesDefaultSorted = [{
-      dataField: 'data',
+      dataField: 'start',
       order: 'desc'
     }]
 
-    let queriesNoDataIndication = 'No public queries'
+    let queriesNoDataIndication = 'No queries'
     if (this.props.queriesLoading) {
       queriesNoDataIndication = <WaitingDiv waiting={this.props.queriesLoading} />
+    }
+
+    let queriesSelectRow = {
+      mode: 'checkbox',
+      clickToSelect: false,
+      selected: this.props.queriesSelected,
+      onSelect: this.handleQuerySelection,
+      onSelectAll: this.handleQuerySelectionAll,
     }
 
     return (
@@ -142,6 +201,12 @@ export default class QueriesTable extends Component {
           defaultSorted={queriesDefaultSorted}
           pagination={paginationFactory()}
           noDataIndication={queriesNoDataIndication}
+          selectRow={ queriesSelectRow }
+          cellEdit={ cellEditFactory({
+            mode: 'click',
+            autoSelectText: true,
+            beforeSaveCell: (oldValue, newValue, row) => { this.saveNewDescription(oldValue, newValue, row) },
+          })}
         />
       </div>
     )
@@ -150,6 +215,7 @@ export default class QueriesTable extends Component {
 
 QueriesTable.propTypes = {
     setStateQueries: PropTypes.func,
+    queriesSelected: PropTypes.object,
     queriesLoading: PropTypes.bool,
     queries: PropTypes.object,
     config: PropTypes.object

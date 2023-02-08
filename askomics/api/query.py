@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-from askomics.api.auth import api_auth, login_required
+from askomics.api.auth import api_auth, login_required_query
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.ResultsHandler import ResultsHandler
 from askomics.libaskomics.Result import Result
@@ -155,7 +155,7 @@ def get_preview():
 
 @query_bp.route('/api/query/save_result', methods=['POST'])
 @api_auth
-@login_required
+@login_required_query
 def save_result():
     """Save a query in filesystem and db, using a celery task
 
@@ -168,14 +168,14 @@ def save_result():
     """
     try:
         files_utils = FilesUtils(current_app, session)
-        disk_space = files_utils.get_size_occupied_by_user() if "user" in session else None
-
-        if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
-            return jsonify({
-                'error': True,
-                'errorMessage': "Exceeded quota",
-                'result_id': None
-            }), 400
+        if "user" in session:
+            disk_space = files_utils.get_size_occupied_by_user()
+            if session["user"]["quota"] > 0 and disk_space >= session["user"]["quota"]:
+                return jsonify({
+                    'error': True,
+                    'errorMessage': "Exceeded quota",
+                    'result_id': None
+                }), 400
 
         # Get query and endpoints and graphs of the query
         data = request.get_json()

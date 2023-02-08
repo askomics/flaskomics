@@ -93,7 +93,8 @@ def start():
             "logged": False,
             "ontologies": ontologies,
             "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False),
-            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10)
+            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10),
+            "anonymousQuery": current_app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False)
         }
 
         json = {
@@ -102,7 +103,7 @@ def start():
             "config": config
         }
 
-        if 'user' in session:
+        if 'user' in session and not session['user'].get('fake', False):
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             local_auth.update_last_action(session["user"]["username"])

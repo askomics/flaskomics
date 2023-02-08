@@ -62,3 +62,17 @@ All currently stored datasets are available. Administrators can publish, unpubli
 ## Forms / Templates
 
 A list of **public** forms and templates is available. Administator can unpublish them if need be.
+
+# Anonymous query
+
+Starting from release 4.5, the *Anonymous query mode* is available through a configuration option.
+This option allows anonymous users to create full queries (not only previews), and access the results/sparql console associated.
+
+To avoid overloading the server, anonymous queries are regularly deleted. (Every hour for failed queries, and every X days for successful jobs, as defined by the *anonymous_query_cleanup* variable (default 60)).
+
+!!! warning
+    Anonymous users cannot create forms/templates, but admin can from the admin panel.
+    Do keep in mind that anonymous jobs will be deleted at some point.
+
+!!! warning
+    If you disable the *anonymous_query*, the job cleaner will not run. You will need to delete the jobs manually from the admin panel.

@@ -9,6 +9,12 @@ This changelog was started for release 4.2.0.
 
 ## [4.5.0] - Unreleased
 
+### Added
+
+- Added 'anonymous_query' and 'anonymous_query_cleanup' variables
+    - These enable 'anonymous query' mode, allowing anonymous users to send 'full queries'. See documentation
+
+
 ### Fixed
 
 - Fixed new linting
@@ -21,10 +27,19 @@ This changelog was started for release 4.2.0.
 - Added front_message config option, displayed on the front page
 - Now print reset link into logs if there are no mailer configured
 - Fixed markupsafe to 2.0.1
+- Increased Galaxy timeout for tests
+- Fix documentation build
 
 ### Security
 
 - Bump markdown-captions from 2 to 2.1.2
+- Bump http-cache-semantics from 4.1.0 to 4.1.1
+- Bump minimatch from 3.0.4 to 3.1.2
+- Bump json5 from 1.0.1 to 1.0.2
+- Bump qs from 6.10.1 to 6.10.3
+- Bump decode-uri-component from 0.2.0 to 0.2.2
+- Bump loader-utils from 1.4.0 to 1.4.2
+
 
 ## [4.4.0] - 2022-07-01
 

@@ -1331,3 +1331,21 @@ class LocalAuth(Params):
 
         tse = TriplestoreExplorer(self.app, self.session)
         tse.uncache_abstraction(public=True, force=True)
+
+    def get_anonymous_user(self):
+        """ Return an anonymous user for queries """
+        user = {
+            'id': 0,
+            'ldap': "",
+            'fname': "",
+            'lname': "",
+            'username': "anonymous",
+            'email': "",
+            'admin': False,
+            'blocked': False,
+            'quota': Utils.humansize_to_bytes(self.settings.get("askomics", "quota")),
+            'apikey': "",
+            'galaxy': None,
+            'fake': True
+        }
+        return user
