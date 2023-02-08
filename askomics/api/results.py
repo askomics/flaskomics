@@ -324,7 +324,7 @@ def delete_result():
 
 @results_bp.route('/api/results/sparqlquery', methods=['POST'])
 @api_auth
-@login_required
+@login_required_query
 def get_sparql_query():
     """Get sparql query of result for the query editor
 
