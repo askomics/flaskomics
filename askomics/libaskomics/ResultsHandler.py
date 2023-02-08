@@ -225,4 +225,3 @@ class ResultsHandler(Params):
         '''.format(date_str, status_substr)
 
         rows = database.execute_sql_query(query, arg_tuple)
-        print(rows)
