@@ -94,7 +94,7 @@ def start():
             "ontologies": ontologies,
             "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False),
             "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10),
-            "anonymousQuery": current_app.iniconfig.get('askomics', 'anonymous_query', fallback=False)
+            "anonymousQuery": current_app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False)
         }
 
         json = {

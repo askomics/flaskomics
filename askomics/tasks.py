@@ -318,7 +318,7 @@ def download_file(self, session, url):
 @celery.on_after_configure.connect
 def cron_cleanup(sender, **kwargs):
     # If anonymous queries are allowed, add a 'cleanup' task, which run every hour
-    if app.iniconfig.get('askomics', 'anonymous_query', fallback=False):
+    if app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False):
         sender.add_periodic_task(
             crontab(hour='*/2'),
             cleanup_anonymous_data.s(),
