@@ -539,7 +539,7 @@ class Client(object):
         result.save_in_db(start=start)
 
         # Execute query and write result to file
-        headers, results = query_launcher.process_query(query.sparql)
+        headers, results = query_launcher.process_query(query.sparql, is_update=True)
         file_size = result.save_result_in_file(headers, results)
 
         # Update database status
@@ -584,7 +584,7 @@ class Client(object):
 
         query_launcher = SparqlQueryLauncher(self.app, {})
 
-        header, data = query_launcher.process_query(query)
+        header, data = query_launcher.process_query(query, is_update=True)
         for result in data:
             query_launcher.drop_dataset(result["graph"])
 

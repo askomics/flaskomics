@@ -273,7 +273,7 @@ class SparqlQuery(Params):
         '''.format(graph=graph, public=public)
 
         query_launcher = SparqlQueryLauncher(self.app, self.session)
-        query_launcher.execute_query(self.prefix_query(query))
+        query_launcher.execute_query(self.prefix_query(query), is_update=True)
 
     def get_default_query_with_prefix(self):
         """Get default query with the prefixes
