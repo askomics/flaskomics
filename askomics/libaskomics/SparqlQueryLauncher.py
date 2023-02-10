@@ -163,7 +163,7 @@ class SparqlQueryLauncher(Params):
         )
 
         query = "LOAD <{}> INTO GRAPH <{}>".format(file_url, graph)
-        return self.execute_query(query)
+        return self.execute_query(query, is_update=True)
 
     def get_triples_from_graph(self, graph):
         """Get triples from a rdflib graph
@@ -206,7 +206,7 @@ class SparqlQueryLauncher(Params):
         }}
         '''.format(graph, ttl_string)
 
-        return self.execute_query(query)
+        return self.execute_query(query, is_update=True)
 
     def insert_data(self, ttl, graph, metadata=False):
         """Insert data into the triplesotre using INSERT
@@ -235,7 +235,7 @@ class SparqlQueryLauncher(Params):
         }}
         '''.format(graph, triples)
 
-        return self.execute_query(query)
+        return self.execute_query(query, is_update=True)
 
     def drop_dataset(self, graph):
         """Drop the datasets of the triplestore and its metadata
@@ -248,9 +248,9 @@ class SparqlQueryLauncher(Params):
         query = '''
         DROP SILENT GRAPH <{}>
         '''.format(graph)
-        self.execute_query(query, disable_log=True, isql_api=True)
+        self.execute_query(query, disable_log=True, isql_api=True, is_update=True)
 
-    def process_query(self, query, isql_api=False):
+    def process_query(self, query, isql_api=False, is_update=False):
         """Execute a query and return parsed results
 
         Parameters
@@ -263,9 +263,9 @@ class SparqlQueryLauncher(Params):
         list
             Parsed results
         """
-        return self.parse_results(self.execute_query(query, isql_api=isql_api))
+        return self.parse_results(self.execute_query(query, isql_api=isql_api, is_update=is_update))
 
-    def execute_query(self, query, disable_log=False, isql_api=False):
+    def execute_query(self, query, disable_log=False, isql_api=False, is_update=False):
         """Execute a sparql query
 
         Parameters
@@ -299,7 +299,7 @@ class SparqlQueryLauncher(Params):
 
             if use_isql:
                 formatted_query = "SPARQL {}".format(query)
-                json = {"command": formatted_query, "disable_log": disable_log, "sparql_select": not self.endpoint.isSparqlUpdateRequest()}
+                json = {"command": formatted_query, "disable_log": disable_log, "sparql_select": not is_update}
                 response = requests.post(url=isql_api_url, json=json)
                 results = response.json()
                 if results["status"] == 500:
@@ -307,16 +307,17 @@ class SparqlQueryLauncher(Params):
 
             else:
                 # Update
-                if self.endpoint.isSparqlUpdateRequest():
+                if is_update:
                     self.endpoint.setMethod('POST')
-                    # Virtuoso hack
-                    # if self.triplestore == 'virtuoso':
-                    #    self.endpoint.queryType = "SELECT"
-
+                    # Force sending to secure endpoint
+                    self.endpoint.queryType = "INSERT"
                     results = self.endpoint.query()
+
                 # Select
                 else:
                     self.endpoint.setReturnFormat(JSON)
+                    # Force sending to public endpoint
+                    self.endpoint.queryType = "SELECT"
                     results = self.endpoint.query().convert()
 
                 self.query_time = time.time() - start_time
