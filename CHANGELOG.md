@@ -29,6 +29,7 @@ This changelog was started for release 4.2.0.
 - Fixed markupsafe to 2.0.1
 - Increased Galaxy timeout for tests
 - Fix documentation build
+- Force all 'user queries'(ask/sparql interfaces) to go to the unauthenticated endpoint, to increase security (no write permissions)
 
 ### Security
 
