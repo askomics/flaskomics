@@ -265,7 +265,7 @@ class SparqlQueryLauncher(Params):
         """
         return self.parse_results(self.execute_query(query, isql_api=isql_api, is_update=is_update))
 
-    def execute_query(self, query, disable_log=False, isql_api=False, is_update=False):
+    def execute_query(self, query, disable_log=False, isql_api=False, is_update=False, drop=False):
         """Execute a sparql query
 
         Parameters
@@ -311,11 +311,8 @@ class SparqlQueryLauncher(Params):
                     self.endpoint.setMethod('POST')
                     # Force sending to secure endpoint
                     self.endpoint.queryType = "INSERT"
-                    # Virtuoso hack
-                    # if self.triplestore == 'virtuoso':
-                    #    self.endpoint.queryType = "SELECT"
-
                     results = self.endpoint.query()
+
                 # Select
                 else:
                     self.endpoint.setReturnFormat(JSON)
