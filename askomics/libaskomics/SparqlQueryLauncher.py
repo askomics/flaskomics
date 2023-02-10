@@ -265,7 +265,7 @@ class SparqlQueryLauncher(Params):
         """
         return self.parse_results(self.execute_query(query, isql_api=isql_api, is_update=is_update))
 
-    def execute_query(self, query, disable_log=False, isql_api=False, is_update=False, drop=False):
+    def execute_query(self, query, disable_log=False, isql_api=False, is_update=False):
         """Execute a sparql query
 
         Parameters
