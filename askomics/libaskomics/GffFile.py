@@ -433,4 +433,3 @@ class GffFile(File):
                 if (feature_type, related_qualifier_key) not in attribute_list:
                     link['range'] = self.namespace_data[self.format_uri(entity_type)]
                     self.attribute_abstraction.append(link)
-
