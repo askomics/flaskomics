@@ -1,5 +1,5 @@
 import React, { Component} from 'react'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, Input } from 'reactstrap'
+import { Badge, Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, Input, CustomInput, FormGroup } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ReactTooltip from "react-tooltip";
 import ErrorDiv from '../error/error'
@@ -16,6 +16,30 @@ export default class OverviewModal extends Component {
       modal: false,
     }
     this.toggleModal = this.toggleModal.bind(this)
+    this.handleNodeSelection = this.props.handleNodeSelection.bind(this)
+    this.handleLinkSelection = this.props.handleLinkSelection.bind(this)
+    this.selectNode = this.selectNode.bind(this)
+    this.isSpecialLink = this.isSpecialLink.bind(this)
+  }
+
+
+  selectNode (event){
+    let node = this.props.graphState.nodes.find(node => node.id == event.target.id)
+    this.toggleModal()
+
+    if (! node.selected){
+      this.handleNodeSelection(node)
+    }
+  }
+
+  isSpecialLink (nodeId){
+    let isSpecial = this.props.graphState.links.some(link => {
+      return !link.suggested && (link.source.id == nodeId || link.target.id == nodeId) && (link.type == "posLink" || link.type == "ontoLink")
+    })
+
+    if(isSpecial){
+      return <Badge color="info" data-tip data-for={"specialTooltip"}>Special</Badge>
+    }
   }
 
   toggleModal () {
@@ -24,11 +48,25 @@ export default class OverviewModal extends Component {
     })
   }
 
+
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
   renderLinker (attribute) {
-    const linked = this.props.graphState.attributes.find(attr => attr.id == attribute.linkedWith);
+    const linked = this.props.graphState.attr.find(attr => attr.id == attribute.linkedWith);
     return (
-        <CustomInput disabled value={linked.displayLabel}/>
-      )
+      <Input value={linked.displayLabel} type="select" disabled>
+        <option selected>{linked.displayLabel}</option>
+      </Input>
+    )
   }
 
   renderIcons(attribute){
@@ -81,19 +119,27 @@ export default class OverviewModal extends Component {
       return false
     }
 
+    if (attribute.optional){
+      return false
+    }
+
     let selected_sign = attribute.negative ? "≠" : '='
 
-    return form = (
+    return (
       <table style={{ width: '100%' }}>
         <tr>
           <td>
-            <CustomInput disabled value={attribute.filterType}/>
+            <Input type="select" disabled>
+              <option selected>{attribute.filterType}</option>
+            </Input>
           </td>
           <td>
-            <CustomInput disabled value={selected_sign}/>
+            <Input type="select" disabled>
+              <option selected>{selected_sign}</option>
+            </Input>
           </td>
           <td>
-            <CustomInput disabled value={attribute.filterValue}/>
+            <Input disabled value={attribute.filterValue}/>
           </td>
         </tr>
       </table>
@@ -109,13 +155,17 @@ export default class OverviewModal extends Component {
       return false
     }
 
-    return form = (
+    if (attribute.optional){
+      return false
+    }
+
+    return (
       <FormGroup>
-        <CustomInput disabled style={{ height: '60px' }} className="attr-select" type="select" multiple>
+        <Input disabled style={{ height: '60px' }} className="attr-select" type="select" multiple>
           {attribute.filterValues.filter(val => attribute.filterSelectedValues.includes(val.uri)).map(value => {
             return (<option key={value.uri} selected>{value.label}</option>)
           })}
-        </CustomInput>
+        </Input>
       </FormGroup>
     )
   }
@@ -125,7 +175,11 @@ export default class OverviewModal extends Component {
       return this.renderLinker(attribute)
     }
 
-    if (attribute.filters.length == 0){
+    if (!attribute.filters.some(filter => {return filter.filterValue})){
+      return false
+    }
+
+    if (attribute.optional){
       return false
     }
 
@@ -138,18 +192,18 @@ export default class OverviewModal extends Component {
       '!=': '≠'
     }
 
-    return form = (
+    return (
       <table style={{ width: '100%' }}>
       {attribute.filters.map((filter, index) => {
         return (
           <tr key={index}>
             <td key={index}>
-              <CustomInput key={index} data-index={index} disabled type="select" id={attribute.id}}>
+              <Input key={index} data-index={index} disabled type="select" id={attribute.id}>
                   <option selected>{sign_display[filter.filterSign]}</option>
-              </CustomInput>
+              </Input>
             </td>
               <td>
-              <CustomInput disabled value={filter.filterValue}/>
+              <Input disabled value={filter.filterValue}/>
               </td>
           </tr>
         )
@@ -162,16 +216,16 @@ export default class OverviewModal extends Component {
     let icons = this.renderIcons(attribute)
     let form
     if (attribute.type == 'text' || attribute.type == 'uri') {
-      form = this.renderText()
+      form = this.renderTextField(attribute)
     }
     if (attribute.type == 'decimal' || attribute.type == 'date') {
-      box = this.renderNumeric()
+      form = this.renderNumField(attribute)
     }
     if (attribute.type == 'category' || attribute.type == 'boolean') {
-      box = this.renderCategory()
+      form = this.renderCatField(attribute)
     }
 
-    if (!(form && icons)){
+    if (!(form || icons)){
       return
     }
 
@@ -185,30 +239,58 @@ export default class OverviewModal extends Component {
   }
 
   renderOverview(){
-    // Iterate on attribute, store it as nodeiD = list of attr to string
-    // Need to store "Options" and "Filters"
-    // Then get the related Nodes names
-    let data = this.props.graphState.attributes.map(attr => this.attrOverview(attr)).filter(attr => attr);
-    return data
+    let data = this.props.graphState.attr.reduce((acc, attr) => {
+      let form = this.attrOverview(attr)
+      if (form){
+        let key = attr.entityDisplayLabel + " " + this.subNums(attr.humanNodeId)
+        if (acc[key]){
+          acc[key].form.push(form)
+        } else {
+          acc[key] = {nodeId: attr.nodeId, form:[form]}
+        }
+      }
+      return acc
+    }, {})
+
+    return Object.entries(data).map(([key, value]) => {
+      return (
+        <>
+        <div className="entity-box">
+          <div className="attr-icons"><Button size="sm" id={value.nodeId} onClick={this.selectNode}>Select entity</Button></div>
+          <label className="attr-label">Entity <i>{key}</i> {this.isSpecialLink(value.nodeId)}</label>
+          {value.form}
+        </div>
+        <hr/>
+        </>
+      )
+    })
   }
 
   render () {
+    let tooltips = (
+        <ReactTooltip id="specialTooltip">This node has an active faldo or ontological link</ReactTooltip>
+    )
     return(
-      <div>
-        <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
-          <ModalHeader toggle={this.toggleModal}>Query overview</ModalHeader>
-          <ModalBody>
-            {this.renderOverview()}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="secondary" onClick={this.toggleModal}>Close</Button>
-          </ModalFooter>
-        </Modal>
-      </div>
+      <>
+      <Button color="info" onClick={this.toggleModal}><i className="fas fa-info"></i> Overview</Button>
+      <Modal isOpen={this.state.modal} toggle={this.toggleModal}>
+        <ModalHeader toggle={this.toggleModal}>Query overview</ModalHeader>
+        <ModalBody style={{ display: 'block', height: this.props.divHeight + 'px', 'overflow-y': 'auto' }}>
+          {tooltips}
+          {this.renderOverview()}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={this.toggleModal}>Close</Button>
+        </ModalFooter>
+      </Modal>
+      </>
     )
   }
 }
 
 OverviewModal.propTypes = {
-  graphState: PropTypes.object
+  graphState: PropTypes.object,
+  handleNodeSelection: PropTypes.function,
+  handleLinkSelection: PropTypes.function,
+  divHeight: PropTypes.Number
 }

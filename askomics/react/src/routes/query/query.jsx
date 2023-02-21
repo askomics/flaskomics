@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
+import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner, ButtonToolbar } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
@@ -10,6 +10,7 @@ import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
 import OntoLinkView from './ontolinkview'
+import OverviewModal from './overviewModal'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
@@ -1524,6 +1525,7 @@ export default class Query extends Component {
     let isOnto
     let linkView
     let previewButton
+    let overviewButton
     let faldoButton
     let launchQueryButton
     let removeButton
@@ -1630,6 +1632,8 @@ export default class Query extends Component {
       )
 
       // buttons
+      overviewButton = (<OverviewModal divHeight={this.divHeight} graphState={this.state.graphState} handleNodeSelection={p => this.handleNodeSelection(p)} handleLinkSelection={p => this.handleLinkSelection(p)}/>)
+
       let previewIcon = <i className={"fas fa-" + this.state.previewIcon}></i>
       if (this.state.previewIcon == "spinner") {
         previewIcon = <Spinner size="sm" color="light" />
@@ -1707,10 +1711,19 @@ export default class Query extends Component {
           </Col>
         </Row>
         {warningDiskSpace}
-        <ButtonGroup>
-          {previewButton}
-          {launchQueryButton}
-        </ButtonGroup>
+        <Row>
+          <Col xs="7" style={{ paddingRight: 0 }}>
+            <ButtonToolbar className="justify-content-between">
+              <ButtonGroup>
+                {previewButton}
+                {launchQueryButton}
+              </ButtonGroup>
+              <ButtonGroup>
+                {overviewButton}
+              </ButtonGroup>
+            </ButtonToolbar>
+          </Col>
+        </Row>
         <br /> <br />
         <div>
           {resultsTable}
