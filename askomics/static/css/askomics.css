@@ -141,6 +141,14 @@ div.attribute-box {
   color: #454545;
 }
 
+div.entity-box {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #c5c5c5;
+  font-weight: normal;
+}
+
 label.attr-label {
   font-weight: 700;
 }
