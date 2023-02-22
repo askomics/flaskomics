@@ -31,6 +31,7 @@ This changelog was started for release 4.2.0.
 - Increased Galaxy timeout for tests
 - Fix documentation build
 - Force all 'user queries'(ask/sparql interfaces) to go to the unauthenticated endpoint, to increase security (no write permissions)
+- Force all queries to use 'POST' instead of 'GET' to avoid max length issues
 
 ### Security
 
