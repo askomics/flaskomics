@@ -13,13 +13,14 @@ This changelog was started for release 4.2.0.
 
 - Added 'anonymous_query' and 'anonymous_query_cleanup' variables
     - These enable 'anonymous query' mode, allowing anonymous users to send 'full queries'. See documentation
-
+- Added 'overview' button in the query page. This button will show all 'selected' attributes, and allow users to quickly select the related entity.
 
 ### Fixed
 
 - Fixed new linting
 - Fixed logs for production setup
 - Fixed profile update & password reset tab in user profile page
+- Fixed Gff Faldo integration (was only integrating the last selected entity)
 
 ### Changed
 

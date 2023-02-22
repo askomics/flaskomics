@@ -45,6 +45,13 @@ class GffFile(File):
 
         self.faldo_entity = True
 
+        self.faldo_abstraction = {
+            "start": [],
+            "end": [],
+            "strand": [],
+            "reference": []
+        }
+
     def set_preview(self):
         """Summary"""
         try:
@@ -133,7 +140,7 @@ class GffFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
 
-            attribute_blanks[attribute["uri"]] = blank
+            attribute_blanks[(attribute['domain'], attribute["uri"])] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
@@ -146,11 +153,12 @@ class GffFile(File):
 
         # Faldo:
         if self.faldo_entity:
-            for key, value in self.faldo_abstraction.items():
-                if value:
-                    blank = attribute_blanks[value]
-                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
-                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
+            for key, values in self.faldo_abstraction.items():
+                if values:
+                    for val in values:
+                        blank = attribute_blanks[val]
+                        self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                        self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], val[1]))
 
     def format_gff_entity(self, entity):
         """Format a gff entity name by removing type (type:entity --> entity)
@@ -233,7 +241,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("reference")]
                 attribute = self.namespace_data[self.format_uri(rec.id)]
                 faldo_reference = attribute
-                self.faldo_abstraction["reference"] = relation
+                self.faldo_abstraction["reference"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "reference") not in attribute_list:
@@ -256,7 +264,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
-                self.faldo_abstraction["start"] = relation
+                self.faldo_abstraction["start"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
@@ -273,7 +281,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
-                self.faldo_abstraction["end"] = relation
+                self.faldo_abstraction["end"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
@@ -292,7 +300,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "+"
                     # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
@@ -300,7 +308,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "-"
                     # self.graph_chunk.add((entity, relation, attribute))
                 else:
@@ -308,7 +316,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri(".")]
                     faldo_strand = self.get_faldo_strand(".")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "."
 
                 if (feature.type, "strand", strand_type) not in attribute_list:
