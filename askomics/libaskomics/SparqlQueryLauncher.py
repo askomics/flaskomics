@@ -307,8 +307,8 @@ class SparqlQueryLauncher(Params):
 
             else:
                 # Update
+                self.endpoint.setMethod('POST')
                 if is_update:
-                    self.endpoint.setMethod('POST')
                     # Force sending to secure endpoint
                     self.endpoint.queryType = "INSERT"
                     results = self.endpoint.query()
