@@ -29,6 +29,10 @@ export default class AskoNavbar extends Component {
         <NavItem><Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link></NavItem>
       )
 
+      overViewLink = (
+        <NavItem><Link className="nav-link" to="/overview"><i className="fas fa-play"></i> Overview</Link></NavItem>
+      )
+
       let contactLink
       if (this.props.config.contactMessage){
         contactLink = (
@@ -112,6 +116,7 @@ export default class AskoNavbar extends Component {
             <Collapse navbar>
               <Nav className="ml-auto" navbar>
                 {askLink}
+                {overViewLink}
                 {links}
               </Nav>
             </Collapse>
