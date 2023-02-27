@@ -32,9 +32,34 @@ export default class Overview extends Component {
       return {id: entity.uri, name: entity.label, value: 1, color: this.utils.stringToHexColor(entity.uri)}
     })
 
+    let counts = {}
+    let current = {}
+
+    this.state.abstraction.relations.map(link => {
+      if (counts[[link.source, link.target]]){
+        counts[[link.source, link.target]] += 1
+      } else {
+        counts[[link.source, link.target]] = 1
+      }
+      current[[link.source, link.target]] = 1
+
+    })
+
     let links = this.state.abstraction.relations.map(link => {
-      if (link.source == link.target){console.log(link)}
-      return {source: link.source, target: link.target, name: link.label}
+      let curvature = 0
+      let rotation = 0
+      if (link.source == link.target){
+          curvature = current[[link.source, link.target]] * (1 / counts[[link.source, link.target]])
+          rotation = 0
+
+      } else if (counts[[link.source, link.target]] !== 1) {
+          curvature = 0.4
+          rotation = current[[link.source, link.target]] * (Math.PI / counts[[link.source, link.target]])
+          
+      }
+
+      current[[link.source, link.target]] += 1
+      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
     })
 
     this.setState({
@@ -50,7 +75,6 @@ export default class Overview extends Component {
       let requestUrl = '/api/query/abstraction'
       axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
         .then(response => {
-          console.log(requestUrl, response.data)
           this.setState({
             waiting: false,
             abstraction: response.data.abstraction,
@@ -90,6 +114,8 @@ export default class Overview extends Component {
             height={650} 
             linkDirectionalArrowRelPos={1}
             linkDirectionalArrowLength={3.5}
+            linkCurvature="curvature"
+            linkCurveRotation="rotation"
             nodeThreeObject={node => {
               const sprite = new SpriteText(node.name);
               sprite.color = node.color;
@@ -97,21 +123,6 @@ export default class Overview extends Component {
               return sprite;
             }}
             nodeThreeObjectExtend={true}            
-            linkThreeObjectExtend={true}
-            linkThreeObject={link => {
-              // extend link with text sprite
-              const sprite = new SpriteText(link.name);
-              sprite.color = 'lightgrey';
-              sprite.textHeight = 1.5;
-              return sprite;
-            }}
-            linkPositionUpdate={(sprite, { start, end }) => {
-              const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
-                [c]: start[c] + (end[c] - start[c]) /2 // calc middle point
-              })));
-              // Position sprite
-              Object.assign(sprite.position, middlePos);
-            }}
         />
         
 
