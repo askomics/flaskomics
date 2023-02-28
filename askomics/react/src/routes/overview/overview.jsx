@@ -33,32 +33,47 @@ export default class Overview extends Component {
     })
 
     let counts = {}
-    let current = {}
 
     this.state.abstraction.relations.map(link => {
-      if (counts[[link.source, link.target]]){
-        counts[[link.source, link.target]] += 1
+      let direction = 1
+      let currentCount = 1
+      let key = [link.source, link.target]
+      let reverse_key = [link.target, link.source]
+
+      if (counts[key]){
+        if (counts[key].direction == -1){
+          counts[reverse_key].count += 1
+        } else {
+          counts[key].count += 1
+        }
       } else {
-        counts[[link.source, link.target]] = 1
+        if (counts[reverse_key]){
+          direction = -1
+          counts[reverse_key].count += 1
+        }
+        counts[key] = {count: 1, current: 1, direction: direction}
       }
-      current[[link.source, link.target]] = 1
 
     })
 
     let links = this.state.abstraction.relations.map(link => {
       let curvature = 0
       let rotation = 0
+      let key = [link.source, link.target]
+      let reverse_key = [link.target, link.source]
+      let direction = counts[key].direction
+      let current_key = counts[key].direction == 1 ? key : reverse_key
+
       if (link.source == link.target){
-          curvature = current[[link.source, link.target]] * (1 / counts[[link.source, link.target]])
+          curvature = counts[current_key].current * (1 / counts[current_key].count)
           rotation = 0
 
-      } else if (counts[[link.source, link.target]] !== 1) {
+      } else if (counts[current_key].count !== 1) {
           curvature = 0.4
-          rotation = current[[link.source, link.target]] * (Math.PI / counts[[link.source, link.target]])
-          
+          rotation = direction * counts[current_key].current * (2* Math.PI / counts[current_key].count)
       }
 
-      current[[link.source, link.target]] += 1
+      counts[current_key].current += 1
       return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
     })
 
