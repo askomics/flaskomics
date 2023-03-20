@@ -1016,7 +1016,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1031,7 +1035,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1042,7 +1050,11 @@ export default class Query extends Component {
     this.showFaldo = !this.showFaldo
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1468,7 +1480,11 @@ export default class Query extends Component {
             this.setCurrentSelected()
             if (this.currentSelected) {
               if (this.currentSelected.type != "link") {
-                this.insertSuggestion(this.currentSelected)
+                if (this.currentSelected.type == "unionNode") {
+                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+                } else {
+                  this.insertSuggestion(this.currentSelected)
+                }
               }
             }
             this.updateGraphState()
