@@ -11,7 +11,6 @@ import { ForceGraph2D, ForceGraph3D } from 'react-force-graph';
 import { SizeMe } from 'react-sizeme';
 import SpriteText from 'three-spritetext';
 
-
 export default class Overview extends Component {
 
   constructor (props) {
@@ -133,8 +132,9 @@ export default class Overview extends Component {
             linkCurveRotation="rotation"
             nodeThreeObject={node => {
               const sprite = new SpriteText(node.name);
-              sprite.color = node.color;
-              sprite.textHeight = 4;
+              sprite.color = "white";
+              sprite.position.y = 5.5;
+              sprite.textHeight = 2;
               return sprite;
             }}
             nodeThreeObjectExtend={true}            
