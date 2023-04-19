@@ -18,12 +18,60 @@ export default class Overview extends Component {
     this.utils = new Utils()
     this.state = {
       abstraction: [],
+      graphType: "2D",
       graphState: {
         nodes: [],
         links: []
       },
     }
     this.cancelRequest
+  }
+
+  getLinks3D(counts){
+    let links = this.state.abstraction.relations.map(link => {
+      let curvature = 0
+      let rotation = 0
+      let key = [link.source, link.target]
+      let reverse_key = [link.target, link.source]
+      let direction = counts[key].direction
+      let current_key = counts[key].direction == 1 ? key : reverse_key
+
+      if (link.source == link.target){
+          curvature = counts[current_key].current * (1 / counts[current_key].count)
+          rotation = 0
+
+      } else if (counts[current_key].count !== 1) {
+          curvature = 0.4
+          rotation = direction * counts[current_key].current * (2* Math.PI / counts[current_key].count)
+      }
+
+      counts[current_key].current += 1
+      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
+    })
+    return links
+  }
+
+
+  def getLinks2D(counts){
+    let links = this.state.abstraction.relations.map(link => {
+      let curvature = 0
+      let rotation = 0
+      let key = [link.source, link.target]
+      let reverse_key = [link.target, link.source]
+      let direction = counts[key].direction
+      let current_key = counts[key].direction == 1 ? key : reverse_key
+
+      if (link.source == link.target){
+          curvature = direction * counts[current_key].current * (1 / counts[current_key].count)
+
+      } else if (counts[current_key].count !== 1) {
+          curvature = direction * counts[current_key].current * (1 / counts[current_key].count)
+      }
+
+      counts[current_key].current += 1
+      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
+    })
+    return links
   }
 
   initGraph() {
@@ -55,26 +103,12 @@ export default class Overview extends Component {
 
     })
 
-    let links = this.state.abstraction.relations.map(link => {
-      let curvature = 0
-      let rotation = 0
-      let key = [link.source, link.target]
-      let reverse_key = [link.target, link.source]
-      let direction = counts[key].direction
-      let current_key = counts[key].direction == 1 ? key : reverse_key
-
-      if (link.source == link.target){
-          curvature = counts[current_key].current * (1 / counts[current_key].count)
-          rotation = 0
-
-      } else if (counts[current_key].count !== 1) {
-          curvature = 0.4
-          rotation = direction * counts[current_key].current * (2* Math.PI / counts[current_key].count)
-      }
-
-      counts[current_key].current += 1
-      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
-    })
+    let links
+    if (this.state.graphType == "3D"){
+      links = this.getLinks3D(counts)
+    } else {
+      links = this.getLinks2D(counts)
+    }
 
     this.setState({
       graphState: {nodes: nodes, links: links}
@@ -115,17 +149,15 @@ export default class Overview extends Component {
   }
 
   render () {
-    return (
-      <div className="container">
-        <h2>Abstraction visualization</h2>
-        <hr />
-        <WaitingDiv waiting={this.state.waiting} center />
-        <br />
-        <SizeMe>{({ size: { width } }) => (
-        <ForceGraph3D 
-            graphData={this.state.graphState} 
-            width={width} 
-            height={650} 
+
+    let graph
+
+    if (this.state.graphType == "3D"){
+      graph = (
+        <ForceGraph3D
+            graphData={this.state.graphState}
+            width={width}
+            height={650}
             linkDirectionalArrowRelPos={1}
             linkDirectionalArrowLength={3.5}
             linkCurvature="curvature"
@@ -137,10 +169,39 @@ export default class Overview extends Component {
               sprite.textHeight = 2;
               return sprite;
             }}
-            nodeThreeObjectExtend={true}            
+            nodeThreeObjectExtend={true}
         />
-        
+      )
+    } else {
+      graph = (
+        <ForceGraph2D
+            graphData={this.state.graphState}
+            width={width}
+            height={650}
+            linkDirectionalArrowRelPos={1}
+            linkDirectionalArrowLength={3.5}
+            linkCurvature="curvature"
+            linkCurveRotation="rotation"
+            nodeThreeObject={node => {
+              const sprite = new SpriteText(node.name);
+              sprite.color = "white";
+              sprite.position.y = 5.5;
+              sprite.textHeight = 2;
+              return sprite;
+            }}
+            nodeThreeObjectExtend={true}
+        />
+      )
+    }
 
+    return (
+      <div className="container">
+        <h2>Abstraction visualization</h2>
+        <hr />
+        <WaitingDiv waiting={this.state.waiting} center />
+        <br />
+        <SizeMe>{({ size: { width } }) => (
+          {graph}
         )}
         </SizeMe>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage}/>
