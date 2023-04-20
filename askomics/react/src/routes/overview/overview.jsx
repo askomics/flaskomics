@@ -37,7 +37,16 @@ export default class Overview extends Component {
   draw2DNode (node, ctx, globalScale){
     ctx.fillStyle = node.color
     ctx.lineWidth = 0.5
-    ctx.strokeStyle = '#808080'
+    if (node.id == this.state.hoverNode){
+      ctx.strokeStyle = 'red'
+      ctx.lineWidth = 2;
+    } else if (this.state.highlightNodes.has(node.id)){
+      ctx.strokeStyle = 'yellow'
+      ctx.lineWidth = 2;
+    } else {
+      ctx.strokeStyle = '#808080'
+    }
+
     ctx.globalAlpha = 1
     // draw node
     ctx.beginPath()
@@ -181,14 +190,14 @@ export default class Overview extends Component {
   onNodeHover(node) {
     let highlightNodes = new Set();
     let highlightLinks = new Set();
-    let hoverNode
+    let hoverNode = null
 
     if (node) {
       highlightNodes.add(node);
       node.neighbors.forEach(neighbor => highlightNodes.add(neighbor));
       node.links.forEach(link => highlightLinks.add(link));
+      hoverNode = node.id
     }
-    hoverNode = node || null;
     this.setState({
       highlightNodes: highlightNodes,
       highlightLinks: highlightLinks,
