@@ -23,8 +23,50 @@ export default class Overview extends Component {
         nodes: [],
         links: []
       },
+      highlightNodes: new Set(),
+      highlightLinks: new Set(),
+      hoverNode: null
     }
     this.cancelRequest
+    this.draw2DNode = this.draw2DNode.bind(this)
+    this.onNodeHover = this.onNodeHover.bind(this)
+    this.onLinkHover = this.onLinkHover.bind(this)
+    this.getUniqueLinkId = this.getUniqueLinkId.bind(this)
+  }
+
+  draw2DNode (node, ctx, globalScale){
+    ctx.fillStyle = node.color
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = '#808080'
+    ctx.globalAlpha = 1
+    // draw node
+    ctx.beginPath()
+    ctx.arc(node.x, node.y, 3, 0, 2 * Math.PI, false)
+    ctx.stroke()
+    ctx.fill()
+    ctx.closePath()
+    // draw text
+    ctx.beginPath()
+    ctx.fillStyle = '#404040'
+    ctx.font = '3px Sans-Serif'
+    ctx.textAlign = 'middle'
+    ctx.textBaseline = 'middle'
+    let label = node.name
+    ctx.fillText(label, node.x + 3, node.y + 3)
+    ctx.closePath()
+  }
+
+  getNeighbors(nodeId){
+    let links = []
+    const neighbors = this.state.abstraction.relations.filter(link => (link.source == nodeId || link.target == nodeId)).map(link => {
+      links.push(this.getUniqueLinkId(link, true))
+      if(link.source == nodeId){
+        return link.target
+      } else if (link.target == nodeId) {
+        return link.source
+      }
+    })
+    return {neighbors, links}
   }
 
   getLinks3D(counts){
@@ -46,13 +88,13 @@ export default class Overview extends Component {
       }
 
       counts[current_key].current += 1
-      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
+      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation, uri: link.uri}
     })
     return links
   }
 
 
-  def getLinks2D(counts){
+  getLinks2D(counts){
     let links = this.state.abstraction.relations.map(link => {
       let curvature = 0
       let rotation = 0
@@ -60,23 +102,28 @@ export default class Overview extends Component {
       let reverse_key = [link.target, link.source]
       let direction = counts[key].direction
       let current_key = counts[key].direction == 1 ? key : reverse_key
+      let step
+      let current
 
       if (link.source == link.target){
           curvature = direction * counts[current_key].current * (1 / counts[current_key].count)
 
       } else if (counts[current_key].count !== 1) {
-          curvature = direction * counts[current_key].current * (1 / counts[current_key].count)
+          step = 2 / (counts[current_key].count - 1)
+          current =  counts[current_key].current - 1
+          curvature = direction + (-direction) * current * step
       }
 
       counts[current_key].current += 1
-      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation}
+      return {source: link.source, target: link.target, name: link.label, curvature: curvature, rotation: rotation, uri: link.uri}
     })
     return links
   }
 
   initGraph() {
     let nodes = this.state.abstraction.entities.map(entity => {
-      return {id: entity.uri, name: entity.label, value: 1, color: this.utils.stringToHexColor(entity.uri)}
+      let { neighbors, links } = this.getNeighbors(entity.uri)
+      return {id: entity.uri, name: entity.label, value: 1, color: this.utils.stringToHexColor(entity.uri), neighbors: neighbors, links: links}
     })
 
     let counts = {}
@@ -115,6 +162,47 @@ export default class Overview extends Component {
     })
   }
 
+  onLinkHover(link){
+    let highlightNodes = new Set();
+    let highlightLinks = new Set();
+
+    if (link) {
+      highlightLinks.add(this.getUniqueLinkId(link));
+      highlightNodes.add(link.source.id);
+      highlightNodes.add(link.target.id);
+    }
+
+    this.setState({
+      highlightNodes: highlightNodes,
+      highlightLinks: highlightLinks
+    })
+  }
+
+  onNodeHover(node) {
+    let highlightNodes = new Set();
+    let highlightLinks = new Set();
+    let hoverNode
+
+    if (node) {
+      highlightNodes.add(node);
+      node.neighbors.forEach(neighbor => highlightNodes.add(neighbor));
+      node.links.forEach(link => highlightLinks.add(link));
+    }
+    hoverNode = node || null;
+    this.setState({
+      highlightNodes: highlightNodes,
+      highlightLinks: highlightLinks,
+      hoverNode: hoverNode
+    })
+  }
+
+  getUniqueLinkId (link, fromNode=false){
+    if(fromNode){
+      return link.uri + link.target + link.source
+    }
+    return link.uri + link.target.id + link.source.id
+  }
+
 
   // ------------------------------------------------
 
@@ -151,10 +239,15 @@ export default class Overview extends Component {
   render () {
 
     let graph
+    const highlightNodes = new Set();
+    const highlightLinks = new Set();
+    let hoverNode = null;
 
     if (this.state.graphType == "3D"){
       graph = (
-        <ForceGraph3D
+        <>
+        <SizeMe>{({ size: { width } }) => (
+          <ForceGraph3D
             graphData={this.state.graphState}
             width={width}
             height={650}
@@ -170,11 +263,16 @@ export default class Overview extends Component {
               return sprite;
             }}
             nodeThreeObjectExtend={true}
-        />
+          />       
+        )}
+        </SizeMe>
+        </>
       )
     } else {
       graph = (
-        <ForceGraph2D
+        <>
+        <SizeMe>{({ size: { width } }) => (
+          <ForceGraph2D
             graphData={this.state.graphState}
             width={width}
             height={650}
@@ -182,15 +280,17 @@ export default class Overview extends Component {
             linkDirectionalArrowLength={3.5}
             linkCurvature="curvature"
             linkCurveRotation="rotation"
-            nodeThreeObject={node => {
-              const sprite = new SpriteText(node.name);
-              sprite.color = "white";
-              sprite.position.y = 5.5;
-              sprite.textHeight = 2;
-              return sprite;
-            }}
-            nodeThreeObjectExtend={true}
-        />
+            backgroundColor="Gainsboro"
+            nodeCanvasObject={this.draw2DNode}
+            onNodeHover={this.onNodeHover}
+            onLinkHover={this.onLinkHover}
+            linkWidth={link => this.state.highlightLinks.has(this.getUniqueLinkId(link)) ? 5 : 1}
+            linkDirectionalParticles = {4}
+            linkDirectionalParticleWidth = {link => this.state.highlightLinks.has(this.getUniqueLinkId(link)) ? 4 : 0}
+          />
+        )}
+        </SizeMe>
+        </>
       )
     }
 
@@ -200,10 +300,7 @@ export default class Overview extends Component {
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
-        <SizeMe>{({ size: { width } }) => (
-          {graph}
-        )}
-        </SizeMe>
+        {graph}
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage}/>
       </div>
     )
