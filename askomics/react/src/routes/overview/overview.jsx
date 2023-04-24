@@ -331,6 +331,7 @@ export default class Overview extends Component {
             checkedChildren="2D"
             unCheckedChildren="3D"
             defaultChecked={true}
+            className="asko-switch-3d"
         />
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
