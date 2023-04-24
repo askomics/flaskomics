@@ -10,6 +10,8 @@ import PropTypes from 'prop-types'
 import { ForceGraph2D, ForceGraph3D } from 'react-force-graph';
 import { SizeMe } from 'react-sizeme';
 import SpriteText from 'three-spritetext';
+import Switch from 'rc-switch';
+import "rc-switch/assets/index.css";
 
 export default class Overview extends Component {
 
@@ -18,7 +20,7 @@ export default class Overview extends Component {
     this.utils = new Utils()
     this.state = {
       abstraction: [],
-      graphType: "2D",
+      is2D: true,
       graphState: {
         nodes: [],
         links: []
@@ -32,6 +34,13 @@ export default class Overview extends Component {
     this.onNodeHover = this.onNodeHover.bind(this)
     this.onLinkHover = this.onLinkHover.bind(this)
     this.getUniqueLinkId = this.getUniqueLinkId.bind(this)
+    this.changeType = this.changeType.bind(this)
+  }
+
+  changeType(checked){
+    this.setState({
+      is2D: checked
+    })    
   }
 
   draw2DNode (node, ctx, globalScale){
@@ -160,7 +169,7 @@ export default class Overview extends Component {
     })
 
     let links
-    if (this.state.graphType == "3D"){
+    if (!this.state.is2D){
       links = this.getLinks3D(counts)
     } else {
       links = this.getLinks2D(counts)
@@ -252,7 +261,7 @@ export default class Overview extends Component {
     const highlightLinks = new Set();
     let hoverNode = null;
 
-    if (this.state.graphType == "3D"){
+    if (!this.state.is2D){
       graph = (
         <>
         <SizeMe>{({ size: { width } }) => (
@@ -303,9 +312,26 @@ export default class Overview extends Component {
       )
     }
 
+    const options = [
+     {
+       label: "2D",
+       value: "2D"
+     },
+     {
+       label: "3D",
+       value: "3D",
+      }
+    ];
+
     return (
       <div className="container">
         <h2>Abstraction visualization</h2>
+        <Switch
+            onChange={this.changeType}
+            checkedChildren="2D"
+            unCheckedChildren="3D"
+            defaultChecked={true}
+        />
         <hr />
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
