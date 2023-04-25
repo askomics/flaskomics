@@ -30,14 +30,20 @@ export default class Overview extends Component {
       hoverNode: null
     }
     this.cancelRequest
+    this.myRef = React.createRef();
     this.draw2DNode = this.draw2DNode.bind(this)
     this.onNodeHover = this.onNodeHover.bind(this)
     this.onLinkHover = this.onLinkHover.bind(this)
     this.getUniqueLinkId = this.getUniqueLinkId.bind(this)
     this.changeType = this.changeType.bind(this)
+    this.zoom = this.zoom.bind(this)
+    this.zoomOut = this.zoomOut.bind(this)
+    this.focus = this.focus.bind(this)
+    this.firstRender = true
   }
 
   changeType(checked){
+    this.firstRender = true
     this.setState({
       is2D: checked
     })    
@@ -242,8 +248,9 @@ export default class Overview extends Component {
             status: error.response.status
           })
         }).then(response => {
+            this.firstRender = true
             this.initGraph()
-            this.setState({ waiting: false })
+            this.setState({ waiting: false }) 
         })
     }
   }
@@ -251,6 +258,29 @@ export default class Overview extends Component {
   componentWillUnmount () {
     if (!this.props.waitForStart) {
       this.cancelRequest()
+    }
+  }
+
+  zoom (){ 
+    this.firstRender && this.myRef.current.zoomToFit(1000, 80)
+    this.firstRender = false
+  }
+
+  zoomOut(){
+    if (this.state.is2D){
+      this.myRef.current.zoomToFit(1000, 80)
+    } else {
+      this.myRef.current.zoomToFit(1000, 0)
+    }
+  }
+
+  focus (node){
+    if (this.state.is2D){
+      this.myRef.current.centerAt(node.x, node.y, 2000).zoom(5,2000)
+    } else {
+      const distance = 100;
+      const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+      this.myRef.current.cameraPosition({ x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, node, 3000);
     }
   }
 
@@ -267,12 +297,16 @@ export default class Overview extends Component {
         <SizeMe>{({ size: { width } }) => (
           <ForceGraph3D
             graphData={this.state.graphState}
+            ref={this.myRef}
+            cooldownTicks={80}
+            onEngineStop={() => this.zoom()}
             width={width}
             height={650}
             linkDirectionalArrowRelPos={1}
             linkDirectionalArrowLength={3.5}
             linkCurvature="curvature"
             linkCurveRotation="rotation"
+            onNodeClick={this.focus}
             nodeThreeObject={node => {
               const sprite = new SpriteText(node.name);
               sprite.color = "white";
@@ -281,6 +315,7 @@ export default class Overview extends Component {
               return sprite;
             }}
             nodeThreeObjectExtend={true}
+            onNodeClick={this.focus}
           />       
         )}
         </SizeMe>
@@ -291,6 +326,9 @@ export default class Overview extends Component {
         <>
         <SizeMe>{({ size: { width } }) => (
           <ForceGraph2D
+            ref={this.myRef}
+            cooldownTicks={80}
+            onEngineStop={() => this.zoom()}
             graphData={this.state.graphState}
             width={width}
             height={650}
@@ -302,6 +340,7 @@ export default class Overview extends Component {
             nodeCanvasObject={this.draw2DNode}
             onNodeHover={this.onNodeHover}
             onLinkHover={this.onLinkHover}
+            onNodeClick={this.focus}
             linkWidth={link => this.state.highlightLinks.has(this.getUniqueLinkId(link)) ? 5 : 1}
             linkDirectionalParticles = {4}
             linkDirectionalParticleWidth = {link => this.state.highlightLinks.has(this.getUniqueLinkId(link)) ? 4 : 0}
@@ -325,15 +364,21 @@ export default class Overview extends Component {
 
     return (
       <div className="container">
-        <h2>Abstraction visualization</h2>
+        <h2>Abstraction visualization
+        <div style={{float:"right"}}>
         <Switch
             onChange={this.changeType}
             checkedChildren="2D"
             unCheckedChildren="3D"
             defaultChecked={true}
             className="asko-switch-3d"
-        />
+        /> 
+        </div>
+        </h2>
         <hr />
+        Drag and scroll to interact with the graph. Click on a node to focus.
+        <Button style={{float: "right"}} onClick={this.zoomOut}>Reset zoom</Button>     
+        <br/>
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
         {graph}

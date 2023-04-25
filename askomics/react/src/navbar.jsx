@@ -31,7 +31,7 @@ export default class AskoNavbar extends Component {
       )
 
       overviewLink = (
-        <NavItem><Link className="nav-link" to="/overview"><i className="fas fa-play"></i> Overview</Link></NavItem>
+        <NavItem><Link className="nav-link" to="/overview"><i className="fas fa-network-wired"></i> Abstraction</Link></NavItem>
       )
       let contactLink
       if (this.props.config.contactMessage){
