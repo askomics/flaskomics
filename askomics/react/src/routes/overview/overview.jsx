@@ -262,7 +262,9 @@ export default class Overview extends Component {
   }
 
   zoom (){ 
-    this.firstRender && this.myRef.current.zoomToFit(1000, 80)
+    if(this.state.is2D){
+      this.firstRender && this.myRef.current.zoomToFit(1000, 80)
+    } 
     this.firstRender = false
   }
 
