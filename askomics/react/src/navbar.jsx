@@ -22,6 +22,7 @@ export default class AskoNavbar extends Component {
     let links
     let askLink
     let aboutLink
+    let overviewLink
 
     // if wait is false
     if (!this.props.waitForStart) {
@@ -29,6 +30,9 @@ export default class AskoNavbar extends Component {
         <NavItem><Link className="nav-link" to="/"><i className="fas fa-play"></i> Ask!</Link></NavItem>
       )
 
+      overviewLink = (
+        <NavItem><Link className="nav-link" to="/overview"><i className="fas fa-network-wired"></i> Abstraction</Link></NavItem>
+      )
       let contactLink
       if (this.props.config.contactMessage){
         contactLink = (
@@ -112,6 +116,7 @@ export default class AskoNavbar extends Component {
             <Collapse navbar>
               <Nav className="ml-auto" navbar>
                 {askLink}
+                {overviewLink}
                 {links}
               </Nav>
             </Collapse>

@@ -24,6 +24,7 @@ import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
 import Contact from './contact'
+import Overview from './routes/overview/overview'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -130,6 +131,7 @@ export default class Routes extends Component {
             <Route path="/prefixes" exact component={() => (<Prefixes config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/ontologies" exact component={() => (<Ontologies config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
+            <Route path="/overview" exact component={ () => (<Overview config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/form" exact component={FormQuery} />
             <Route path="/form_edit" exact component={FormEditQuery} />
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />

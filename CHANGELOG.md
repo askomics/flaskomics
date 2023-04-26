@@ -14,6 +14,7 @@ This changelog was started for release 4.2.0.
 - Added 'anonymous_query' and 'anonymous_query_cleanup' variables
     - These enable 'anonymous query' mode, allowing anonymous users to send 'full queries'. See documentation
 - Added 'overview' button in the query page. This button will show all 'selected' attributes, and allow users to quickly select the related entity.
+- Added 'Abstraction' tab on the navbar. This will print the whole abstraction as a 2d/3d graph.
 
 ### Fixed
 

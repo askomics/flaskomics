@@ -33,6 +33,7 @@ nav:
     - Federated queries: federation.md
     - AskOmics and Galaxy: galaxy.md
     - AskOmics and ontologies: ontologies.md
+    - Abstraction overview: abstraction-overview.md
   - Administrator guide:
     - Deploy AskOmics: production-deployment.md
     - Configure: configure.md
