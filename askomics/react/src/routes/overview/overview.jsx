@@ -46,7 +46,7 @@ export default class Overview extends Component {
     this.firstRender = true
     this.setState({
       is2D: checked
-    })    
+    })
   }
 
   draw2DNode (node, ctx, globalScale){
@@ -250,7 +250,7 @@ export default class Overview extends Component {
         }).then(response => {
             this.firstRender = true
             this.initGraph()
-            this.setState({ waiting: false }) 
+            this.setState({ waiting: false })
         })
     }
   }
@@ -261,7 +261,7 @@ export default class Overview extends Component {
     }
   }
 
-  zoom (){ 
+  zoom (){
     this.firstRender && this.myRef.current.zoomToFit(1000, 80)
     this.firstRender = false
   }
@@ -325,8 +325,7 @@ export default class Overview extends Component {
               return sprite;
             }}
             nodeThreeObjectExtend={true}
-            onNodeClick={this.focus}
-          />       
+          />
         )}
         </SizeMe>
         </>
@@ -382,12 +381,12 @@ export default class Overview extends Component {
             unCheckedChildren="3D"
             defaultChecked={true}
             className="asko-switch-3d"
-        /> 
+        />
         </div>
         </h2>
         <hr />
         Drag and scroll to interact with the graph. Click on a node to focus.
-        <Button style={{float: "right"}} onClick={this.zoomOut}>Reset zoom</Button>     
+        <Button style={{float: "right"}} onClick={this.zoomOut}>Reset zoom</Button>
         <br/>
         <WaitingDiv waiting={this.state.waiting} center />
         <br />
