@@ -262,9 +262,7 @@ export default class Overview extends Component {
   }
 
   zoom (){ 
-    if(this.state.is2D){
-      this.firstRender && this.myRef.current.zoomToFit(1000, 80)
-    } 
+    this.firstRender && this.myRef.current.zoomToFit(1000, 80)
     this.firstRender = false
   }
 
@@ -292,6 +290,16 @@ export default class Overview extends Component {
     const highlightNodes = new Set();
     const highlightLinks = new Set();
     let hoverNode = null;
+
+    if (this.state.graphState.nodes.length == 0) {
+      return (
+        <div className="container">
+        <h2>Abstraction visualization</h2>
+        <p>No data available</p>
+        </div>
+      )
+    } 
+
 
     if (!this.state.is2D){
       graph = (
