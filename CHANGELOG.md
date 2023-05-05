@@ -22,6 +22,7 @@ This changelog was started for release 4.2.0.
 - Fixed logs for production setup
 - Fixed profile update & password reset tab in user profile page
 - Fixed Gff Faldo integration (was only integrating the last selected entity)
+- Fixed an issue when using filters and an 'UNION' node
 
 ### Changed
 

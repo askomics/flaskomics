@@ -112,14 +112,32 @@ export default class Query extends Component {
     return this.specialNodeIdNumber
   }
 
-  getLargestSpecialNodeGroupId (node) {
+  getLargestSpecialNodeGroupId (node, preRender=false) {
     let listIds = new Set()
+    let remote
+
     this.graphState.links.map(link => {
-      if (link.source.id == node.id) {
-        listIds.add(link.target.specialNodeGroupId)
-      }
-      if (link.target.id == node.id) {
-        listIds.add(link.source.specialNodeGroupId)
+      if (preRender) {
+      // Ugly, but before rendering source and target are IDs and not objects
+        if (link.source == node.id) {
+          remote = this.state.nodes.some(rem => {
+            return (link.source == rem.id )
+          })
+          listIds.add(remote.specialNodeGroupId)
+        }
+        if (link.target == node.id) {
+          remote = this.state.nodes.some(rem => {
+            return (link.target == rem.id )
+          })
+          listIds.add(remote.specialNodeGroupId)
+        }
+      } else {
+        if (link.source.id == node.id) {
+          listIds.add(link.target.specialNodeGroupId)
+        }
+        if (link.target.id == node.id) {
+          listIds.add(link.source.specialNodeGroupId)
+        }
       }
     })
     return Math.max(...listIds)
@@ -1016,7 +1034,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1031,7 +1053,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1042,7 +1068,11 @@ export default class Query extends Component {
     this.showFaldo = !this.showFaldo
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1484,7 +1514,11 @@ export default class Query extends Component {
             this.setCurrentSelected()
             if (this.currentSelected) {
               if (this.currentSelected.type != "link") {
-                this.insertSuggestion(this.currentSelected)
+                if (this.currentSelected.type == "unionNode") {
+                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, true)
+                } else {
+                  this.insertSuggestion(this.currentSelected)
+                }
               }
             }
             this.updateGraphState()
