@@ -361,7 +361,7 @@ export default class Query extends Component {
         firstAttrVisibleForBnode = false
 
         if (attributeType == 'decimal') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: "",
               filterSign: "="
@@ -370,8 +370,8 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'text') {
-          nodeAttribute.filterType = 'exact'
-          nodeAttribute.filterValue = ''
+          nodeAttribute.filterType = nodeAttribute.linkedFilterType = 'exact'
+          nodeAttribute.filterValue = nodeAttribute.linkedFilterValue = ''
         }
 
         if (attributeType == 'category') {
@@ -381,12 +381,12 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'boolean') {
-          nodeAttribute.filterValues = ["true", "false"]
-          nodeAttribute.filterSelectedValues = []
+          nodeAttribute.filterValues = nodeAttribute.linkedFilterValue = = ["true", "false"]
+          nodeAttribute.filterSelectedValues = nodeAttribute.linkedFilterSelectedValues = []
         }
 
         if (attributeType == 'date') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: null,
               filterSign: "="
@@ -1222,10 +1222,26 @@ export default class Query extends Component {
         attr.linked = !attr.linked
         if (!attr.linked) {
           attr.linkedWith = null
+          attr.linkedFilters = []
         }
       }
     })
     this.updateGraphState()
+  }
+
+  handleFilterLinked (event){
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
   }
 
   handleChangeLink (event) {

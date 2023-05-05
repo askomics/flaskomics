@@ -55,8 +55,23 @@ export default class AttributeBox extends Component {
       })
   }
 
-  renderLinker () {
+  renderLinker (type="") {
     let options = []
+    let customParams
+
+    let sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+
+    let modifier_display = {
+      '+': '+',
+      '-': '-',
+    }
 
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
@@ -69,13 +84,53 @@ export default class AttributeBox extends Component {
       }
     })
 
+    if (type == "numeric"){
+      const numberOfFilters = this.props.attribute.linkedFilters.length - 1
+      customParams = (
+        <table style={{ width: '100%' }}>
+        {this.props.attribute.linkedFilters.map((filter, index) => {
+          return (
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+                  {Object.keys(sign_display).map(sign => {
+                    return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
+                  })}
+                </CustomInput>
+              </td>
+              <td>
+              Linked value
+              </td>
+              <td>
+              <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
+                {Object.keys(modifier_display).map(sign => {
+                  return <option key={sign} selected={filter.filterModifier == sign ? true : false} value={sign}>{modifier_display[sign]}</option>
+                })}
+              </CustomInput>
+              </td>
+              <td>
+                <Input data-index={index} className="input-with-icon" disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleFilterNumericValue} />
+              </td>
+              <td>
+              {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumFilter}></i></button> : <></>}
+              </td>
+            </tr>
+          )
+        })}
+        </table>
+      )
+    }
+
     return (
+        <>
         <CustomInput type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
           <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
           {options.map(opt => {
             return opt
           })}
         </CustomInput>
+        {customParams}
+        </>
       )
   }
 
@@ -163,7 +218,7 @@ export default class AttributeBox extends Component {
 
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker()
+      form = this.renderLinker("text")
     } else {
       form = (
         <table style={{ width: '100%' }}>
@@ -234,7 +289,7 @@ export default class AttributeBox extends Component {
     let numberOfFilters = this.props.attribute.filters.length - 1
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker()
+      form = this.renderLinker("numeric")
     } else {
       form = (
         <table style={{ width: '100%' }}>
@@ -359,7 +414,7 @@ export default class AttributeBox extends Component {
     let form
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker()
+      form = this.renderLinker("boolean")
     } else {
       form = (
         <FormGroup>
@@ -419,7 +474,7 @@ export default class AttributeBox extends Component {
     let numberOfFilters = this.props.attribute.filters.length - 1
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker()
+      form = this.renderLinker("date")
     } else {
       form = (
         <table style={{ width: '100%' }}>
