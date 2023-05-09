@@ -382,7 +382,8 @@ export default class Query extends Component {
           nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: "",
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
@@ -1198,6 +1199,71 @@ export default class Query extends Component {
     }
   }
 
+  handleLinkedNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.push({
+          filterValue: "",
+          filterSign: "=",
+          filterModifier: "+"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedNumericModifierSign (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterModifier = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
   handleDateFilter (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1252,7 +1318,11 @@ export default class Query extends Component {
         attr.linked = !attr.linked
         if (!attr.linked) {
           attr.linkedWith = null
-          attr.linkedFilters = []
+          attr.linkedFilters = [{
+            filterValue: "",
+            filterSign: "=",
+            filterModifier: "+"
+          }]
         }
       }
     })
@@ -1616,6 +1686,11 @@ export default class Query extends Component {
                 toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
+                handleLinkedNumericModifierSign={p => this.handleLinkedNumericModifierSign(p)}
+                handleLinkedNumericSign={p => this.handleLinkedNumericSign(p)}
+                handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
+                toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
+                toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
                 config={this.state.config}
                 isOnto={isOnto}
                 entityUri={this.currentSelected.uri}
