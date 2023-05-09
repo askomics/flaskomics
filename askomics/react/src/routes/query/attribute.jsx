@@ -57,35 +57,38 @@ export default class AttributeBox extends Component {
 
   renderLinker (type="") {
     let options = []
+    let optionDict = {}
     let customParams
-
-    let sign_display = {
-      '=': '=',
-      '<': '<',
-      '<=': '≤',
-      '>': '>',
-      '>=': '≥',
-      '!=': '≠'
-    }
-
-    let modifier_display = {
-      '+': '+',
-      '-': '-',
-    }
 
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
         options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)
         this.props.graph.attr.map(attr => {
           if (attr.id != this.props.attribute.id && attr.nodeId == node.id && attr.type == this.props.attribute.type) {
-            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false}>{attr.label}</option>)
+            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false} label={attr.label}>{attr.label}</option>)
+            optionDict[attr.id] = attr.label
           }
         })
       }
     })
 
     if (type == "numeric"){
+      let sign_display = {
+        '=': '=',
+        '<': '<',
+        '<=': '≤',
+        '>': '>',
+        '>=': '≥',
+        '!=': '≠'
+      }
+
+      let modifier_display = {
+        '+': '+',
+        '-': '-',
+      }
       const numberOfFilters = this.props.attribute.linkedFilters.length - 1
+      if (typeof this.props.attribute.linkedWith !== "object"){
+      let selectedLabel = optionDict[this.props.attribute.linkedWith.toString()]
       customParams = (
         <table style={{ width: '100%' }}>
         {this.props.attribute.linkedFilters.map((filter, index) => {
@@ -99,7 +102,7 @@ export default class AttributeBox extends Component {
                 </CustomInput>
               </td>
               <td>
-              Linked value
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
               </td>
               <td>
               <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleFilterNumericSign}>
@@ -109,10 +112,10 @@ export default class AttributeBox extends Component {
               </CustomInput>
               </td>
               <td>
-                <Input data-index={index} className="input-with-icon" disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleFilterNumericValue} />
-              </td>
-              <td>
-              {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumFilter}></i></button> : <></>}
+                <div className="input-with-icon">
+                <Input className="input-with-icon" data-index={index} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleFilterNumericValue} />
+                {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumFilter}></i></button> : <></>}
+                </div>
               </td>
             </tr>
           )
@@ -120,18 +123,19 @@ export default class AttributeBox extends Component {
         </table>
       )
     }
+    }
 
     return (
-        <>
-        <CustomInput type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
-          <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
-          {options.map(opt => {
-            return opt
-          })}
-        </CustomInput>
-        {customParams}
-        </>
-      )
+      <>
+      <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
+        <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
+        {options.map(opt => {
+          return opt
+        })}
+      </CustomInput>
+      {customParams}
+      </>
+    )
   }
 
   checkUnvalidUri (value) {
@@ -216,8 +220,7 @@ export default class AttributeBox extends Component {
       input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
     }
 
-
-    if (this.props.attribute.linked) {
+    if (this.props.attribute.linkedWith) {
       form = this.renderLinker("text")
     } else {
       form = (

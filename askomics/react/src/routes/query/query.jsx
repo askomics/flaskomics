@@ -399,7 +399,7 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'boolean') {
-          nodeAttribute.filterValues = nodeAttribute.linkedFilterValue = = ["true", "false"]
+          nodeAttribute.filterValues = nodeAttribute.linkedFilterValue = ["true", "false"]
           nodeAttribute.filterSelectedValues = nodeAttribute.linkedFilterSelectedValues = []
         }
 
