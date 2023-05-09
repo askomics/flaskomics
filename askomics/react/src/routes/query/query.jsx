@@ -408,7 +408,8 @@ export default class Query extends Component {
           nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: null,
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
