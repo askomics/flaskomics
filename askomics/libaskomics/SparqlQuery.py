@@ -1385,7 +1385,15 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if any([filter.filterSign == "=" and not filter.filterValue for filter in attribute.get('linkedFilters', [])]):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        for filter in attribute.get('linkedFilters', []):
+                            modifier_string = ""
+                            if filter.filterValue:
+                                modifier_string = " {} {}".format(filter.filterModifier, filter.filterValue)
+                            filter_string = "FILTER ( {} {} {} ) .".format(obj, var_2, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             if attribute["type"] == "date":
                 if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in linked_attributes:
@@ -1416,7 +1424,15 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if any([filter.filterSign == "=" and not filter.filterValue for filter in attribute.get('linkedFilters', [])]):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        for filter in attribute.get('linkedFilters', []):
+                            modifier_string = ""
+                            if filter.filterValue:
+                                modifier_string = " {} {}".format(filter.filterModifier, filter.filterValue)
+                            filter_string = "FILTER ( {} {} {} ) .".format(obj, var_2, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             # Category
             if attribute["type"] == "category":
