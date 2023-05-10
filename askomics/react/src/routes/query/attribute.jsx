@@ -63,7 +63,7 @@ export default class AttributeBox extends Component {
   renderLinker (type="") {
     let options = []
     let optionDict = {}
-    let customParams
+    let content
 
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
@@ -78,10 +78,10 @@ export default class AttributeBox extends Component {
     })
 
     if (type == "numeric"){
-      let content = this.renderNumericLinker(optionDict)
+      content = this.renderNumericLinker(optionDict)
     }
     if (type == "date"){
-      let content = this.renderNumericLinker(optionDict, "date")
+      content = this.renderNumericLinker(optionDict, "date")
     }
 
     return (

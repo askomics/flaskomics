@@ -1385,14 +1385,14 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    if any([filter.filterSign == "=" and not filter.filterValue for filter in attribute.get('linkedFilters', [])]):
+                    if any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])]):
                         var_to_replace.append((obj, var_2))
                     else:
                         for filter in attribute.get('linkedFilters', []):
                             modifier_string = ""
-                            if filter.filterValue:
-                                modifier_string = " {} {}".format(filter.filterModifier, filter.filterValue)
-                            filter_string = "FILTER ( {} {} {} ) .".format(obj, var_2, modifier_string)
+                            if filter['filterValue']:
+                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(obj, filter['filterSign'], var_2, modifier_string)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             if attribute["type"] == "date":
@@ -1424,16 +1424,15 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    if any([filter.filterSign == "=" and not filter.filterValue for filter in attribute.get('linkedFilters', [])]):
+                    if any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])]):
                         var_to_replace.append((obj, var_2))
                     else:
                         for filter in attribute.get('linkedFilters', []):
                             modifier_string = ""
-                            if filter.filterValue:
-                                modifier_string = " {} {}".format(filter.filterModifier, filter.filterValue)
-                            filter_string = "FILTER ( {} {} {} ) .".format(obj, var_2, modifier_string)
+                            if filter['filterValue']:
+                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(obj, filter['filterSign'], var_2, modifier_string)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
-
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
