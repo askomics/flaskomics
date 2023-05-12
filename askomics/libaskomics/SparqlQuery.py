@@ -1430,7 +1430,11 @@ class SparqlQuery(Params):
                         for filter in attribute.get('linkedFilters', []):
                             modifier_string = ""
                             if filter['filterValue']:
-                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+                                # Issue with virtuoso: engine-specific syntax for now (convert days to seconds)
+                                if self.settings.get('triplestore', 'triplestore') == "virtuoso":
+                                    modifier_string = " {} {}".format(filter['filterModifier'], 24*3600*int(filter['filterValue']))
+                                else:
+                                    modifier_string = ' {} "P{}D"xsd:duration'.format(filter['filterModifier'], filter['filterValue'])
                             filter_string = "FILTER ( {} {} {} {} ) .".format(obj, filter['filterSign'], var_2, modifier_string)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
             # Category
