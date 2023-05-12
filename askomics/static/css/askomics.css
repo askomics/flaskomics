@@ -202,6 +202,20 @@ button.input-with-icon {
   box-sizing: border-box;
 }
 
+button.input-with-icon-two {
+  border: none;
+  background: none;
+  position: absolute;
+  right: 2.15rem;
+  top: 0.15rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
 
 /*Context menu *********************************************************/
 .react-contextmenu {

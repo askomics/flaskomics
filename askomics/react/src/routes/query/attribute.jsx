@@ -532,7 +532,7 @@ export default class AttributeBox extends Component {
                 <div className="input-with-icon">
                 <Input className="input-with-icon" data-index={index} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleLinkedNumericValue} placeholder={placeholder} />
                 {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumLinkedFilter}></i></button> : <></>}
-                {index == numberOfFilters && index > 0 ? <button className="input-with-icon"><i className="attr-icon fas fa-minus inactive" id={this.props.attribute.id} onClick={this.toggleRemoveNumLinkedFilter}></i></button> : <></>}
+                {index == numberOfFilters && index > 0 ? <button className="input-with-icon-two"><i className="attr-icon fas fa-minus inactive" id={this.props.attribute.id} onClick={this.toggleRemoveNumLinkedFilter}></i></button> : <></>}
                 </div>
               </td>
             </tr>
