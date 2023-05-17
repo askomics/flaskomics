@@ -67,6 +67,8 @@ export default class AttributeBox extends Component {
     let optionDict = {}
     let content
 
+    console.log("rendered")
+
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
         options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)
@@ -80,16 +82,16 @@ export default class AttributeBox extends Component {
     })
 
     if (this.props.attribute.type == 'text') {
-      box = this.renderTextLinker(optionDict)
+      content = this.renderTextLinker(optionDict)
     }
     if (this.props.attribute.type == 'decimal') {
       content = this.renderNumericLinker(optionDict)
     }
     if (this.props.attribute.type == 'category') {
-      box = this.renderBooleanLinker(optionDict)
+      content = this.renderBooleanLinker(optionDict)
     }
     if (this.props.attribute.type == 'boolean') {
-      box = this.renderBooleanLinker(optionDict)
+      content = this.renderBooleanLinker(optionDict)
     }
     if (this.props.attribute.type == 'date') {
       content = this.renderNumericLinker(optionDict, "date")
@@ -190,7 +192,7 @@ export default class AttributeBox extends Component {
       input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
     }
 
-    if (this.props.attribute.linkedWith) {
+    if (this.props.attribute.linked) {
       form = this.renderLinker()
     } else {
       form = (
