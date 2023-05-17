@@ -389,19 +389,22 @@ export default class Query extends Component {
         }
 
         if (attributeType == 'text') {
-          nodeAttribute.filterType = nodeAttribute.linkedFilterType = 'exact'
+          nodeAttribute.filterType = 'exact'
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterValue = nodeAttribute.linkedFilterValue = ''
         }
 
         if (attributeType == 'category') {
           nodeAttribute.exclude = false
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterValues = attr.categories
           nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'boolean') {
-          nodeAttribute.filterValues = nodeAttribute.linkedFilterValue = ["true", "false"]
-          nodeAttribute.filterSelectedValues = nodeAttribute.linkedFilterSelectedValues = []
+          nodeAttribute.filterValues = ["true", "false"]
+          nodeAttribute.linkedNegative = false
+          nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'date') {
@@ -1133,6 +1136,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  handleLinkedNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedNegative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1146,6 +1158,15 @@ export default class Query extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilterValue = event.target.value
       }
     })
     this.updateGraphState()
@@ -1658,6 +1679,7 @@ export default class Query extends Component {
         <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
         <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
         <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        <ReactTooltip id="linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</ReactTooltip>
         </div>
     )
 
@@ -1692,6 +1714,8 @@ export default class Query extends Component {
                 handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
                 toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
                 toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
+                handleLinkedNegative={p => this.handleLinkedNegative(p)}
+                handleLinkedFilterValue={p => this.handleLinkedFilterValue(p)}
                 config={this.state.config}
                 isOnto={isOnto}
                 entityUri={this.currentSelected.uri}

@@ -39,6 +39,8 @@ export default class AttributeBox extends Component {
     this.handleLinkedNumericValue = this.props.handleLinkedNumericValue.bind(this)
     this.toggleAddNumLinkedFilter = this.props.toggleAddNumLinkedFilter.bind(this)
     this.toggleRemoveNumLinkedFilter = this.props.toggleRemoveNumLinkedFilter.bind(this)
+    this.handleLinkedNegative = this.props.handleLinkedNegative.bind(this)
+    this.handleLinkedFilterValue = this.props.handleLinkedFilterValue.bind(this)
     this.cancelRequest
   }
 
@@ -60,7 +62,7 @@ export default class AttributeBox extends Component {
       })
   }
 
-  renderLinker (type="") {
+  renderLinker () {
     let options = []
     let optionDict = {}
     let content
@@ -77,10 +79,19 @@ export default class AttributeBox extends Component {
       }
     })
 
-    if (type == "numeric"){
+    if (this.props.attribute.type == 'text') {
+      box = this.renderTextLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'decimal') {
       content = this.renderNumericLinker(optionDict)
     }
-    if (type == "date"){
+    if (this.props.attribute.type == 'category') {
+      box = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'boolean') {
+      box = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'date') {
       content = this.renderNumericLinker(optionDict, "date")
     }
 
@@ -180,7 +191,7 @@ export default class AttributeBox extends Component {
     }
 
     if (this.props.attribute.linkedWith) {
-      form = this.renderLinker("text")
+      form = this.renderLinker()
     } else {
       form = (
         <table style={{ width: '100%' }}>
@@ -251,7 +262,7 @@ export default class AttributeBox extends Component {
     let numberOfFilters = this.props.attribute.filters.length - 1
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker("numeric")
+      form = this.renderLinker()
     } else {
       form = (
         <table style={{ width: '100%' }}>
@@ -376,7 +387,7 @@ export default class AttributeBox extends Component {
     let form
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker("boolean")
+      form = this.renderLinker()
     } else {
       form = (
         <FormGroup>
@@ -436,7 +447,7 @@ export default class AttributeBox extends Component {
     let numberOfFilters = this.props.attribute.filters.length - 1
 
     if (this.props.attribute.linked) {
-      form = this.renderLinker("date")
+      form = this.renderLinker()
     } else {
       form = (
         <table style={{ width: '100%' }}>
@@ -544,6 +555,78 @@ export default class AttributeBox extends Component {
     return customParams
   }
 
+  renderTextLinker (options){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()] + " as $1"
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+            <td>
+              <Input
+                disabled={this.props.attribute.optional}
+                type="text"
+                id={this.props.attribute.id}
+                value={this.props.attribute.linkedFilterValue}
+                onChange={this.handleLinkedFilterValue}
+                placeholder={placeholder}
+                data-tip data-for={"linkedTooltip"}
+              />
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderBooleanLinker (options, type="num"){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()]
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
 
   render () {
     let box = null
@@ -592,5 +675,7 @@ AttributeBox.propTypes = {
   handleLinkedNumericSign: PropTypes.func,
   handleLinkedNumericValue: PropTypes.func,
   toggleAddNumLinkedFilter: PropTypes.func,
-  toggleRemoveNumLinkedFilter: PropTypes.func
+  toggleRemoveNumLinkedFilter: PropTypes.func,
+  handleLinkedNegative: PropTypes.func,
+  handleLinkedFilterValue: PropTypes.func
 }

@@ -1311,7 +1311,11 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if not attribute.get('linkedNegative', False):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        filter_string = "FILTER ( {} {} {} ) .".format(obj, "!=", var_2)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             # Text
             if attribute["type"] == "text":
@@ -1353,6 +1357,18 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["label"]
                     ))
                     var_to_replace.append((obj, var_2))
+
+                    any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])])
+
+                    if not (attribute.get('linkedNegative', False) or attribute.get('linkedFilterValue')):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        filter = "!=" if attribute.get('linkedNegative', False) else "="
+                        regex_clause = var_2
+                        if attribute.get('linkedFilterValue'):
+                            regex_clause = "REGEX(REPLACE('{}', '\\$1', {}, 'i'))".format(attribute.get('linkedFilterValue'), var_2)
+                        filter_string = "FILTER ( {} {} {} ) .".format(obj, filter, regex_clause)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             # Numeric
             if attribute["type"] == "decimal":
@@ -1524,7 +1540,12 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((category_value_uri, var_2))
+
+                    if not attribute.get('linkedNegative', False):
+                        var_to_replace.append((category_value_uri, var_2))
+                    else:
+                        filter_string = "FILTER ( {} {} {} ) .".format(category_value_uri, "!=", var_2)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
         from_string = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)
