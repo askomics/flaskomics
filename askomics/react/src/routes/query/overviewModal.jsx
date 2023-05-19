@@ -62,10 +62,29 @@ export default class OverviewModal extends Component {
 
   renderLinker (attribute) {
     const linked = this.props.graphState.attr.find(attr => attr.id == attribute.linkedWith);
+    let content
+
+    if (attribute.type == 'text') {
+      content = this.renderTextLinker(attribute, linked.displayLabel)
+    }
+    if (attribute.type == 'decimal') {
+      content = this.renderNumericLinker(attribute, linked.displayLabel)
+    }
+    if (attribute.type == 'category') {
+      content = this.renderBooleanLinker(attribute, linked.displayLabel)
+    }
+    if (attribute.type == 'boolean') {
+      content = this.renderBooleanLinker(attribute, linked.displayLabel)
+    }
+    if (attribute.type == 'date') {
+      content = this.renderNumericLinker(attribute, linked.displayLabel)
+    }
+
     return (
       <Input value={linked.displayLabel} type="select" disabled>
         <option selected>{linked.displayLabel}</option>
       </Input>
+      {content}
     )
   }
 
@@ -265,6 +284,112 @@ export default class OverviewModal extends Component {
       )
     })
   }
+
+  renderNumericLinker (attribute, selectedLabel){
+    const sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+
+    const modifier_display = {
+      '+': '+',
+      '-': '-',
+    }
+    let customParams
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      customParams = (
+        <table style={{ width: '100%' }}>
+        {attribute.linkedFilters.map((filter, index) => {
+          return (
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={true} type="select" id={attribute.id}>
+                  <option key={filter.filterSign} selected={true}>{sign_display[filter.filterSign]}</option>
+                </CustomInput>
+              </td>
+              <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              </td>
+              <td>
+              <CustomInput key={index} data-index={index} disabled={true} type="select" id={attribute.id}>
+                  <option key={filter.filterModifier} selected={true}>{modifier_display[filter.filterModifier]}</option>
+              </CustomInput>
+              </td>
+              <td>
+                <div className="input-with-icon">
+                <Input className="input-with-icon" data-index={index} disabled={true} type="text" id={attribute.id} value={filter.filterValue}/>
+                </div>
+              </td>
+            </tr>
+          )
+        })}
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderTextLinker (attribute, selectedLabel){
+    let selected_sign = attribute.linkedNegative ? "≠" : '='
+    let customParams
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={true} type="select" id={this.props.attribute.id}>
+                  <option key={selected_sign} selected={true}>{selected_sign}</option>
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+            <td>
+              <Input
+                disabled={true}
+                type="text"
+                id={attribute.id}
+                value={attribute.linkedFilterValue}
+              />
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderBooleanLinker (attribute, selectedLabel){
+    let selected_sign = attribute.linkedNegative ? "≠" : '='
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={true} type="select" id={this.props.attribute.id}>
+                <option key={selected_sign} selected={true}>{selected_sign}</option>
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
 
   render () {
     let tooltips = (

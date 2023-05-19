@@ -67,8 +67,6 @@ export default class AttributeBox extends Component {
     let optionDict = {}
     let content
 
-    console.log("rendered")
-
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
         options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)

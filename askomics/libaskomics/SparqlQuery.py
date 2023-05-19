@@ -1364,7 +1364,7 @@ class SparqlQuery(Params):
                         filter = "!" if attribute.get('linkedNegative', False) else ""
                         regex_clause = var_2
                         if attribute.get('linkedFilterValue'):
-                            regex_clause = "REGEX({}, REPLACE('{}', '\\\$1', {}), 'i')".format(obj, attribute.get('linkedFilterValue', "$1"), var_2)
+                            regex_clause = r"REGEX({}, REPLACE('{}', '\\\$1', {}), 'i')".format(obj, attribute.get('linkedFilterValue', "$1"), var_2)
                         filter_string = "FILTER ( {} {} ) .".format(filter, regex_clause)
                         self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
