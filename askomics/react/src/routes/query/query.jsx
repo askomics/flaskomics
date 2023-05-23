@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
@@ -932,8 +932,6 @@ export default class Query extends Component {
       saveIcon: "play",
       waiting: waiting
     })
-    console.log(this.graphState)
-    ReactTooltip.rebuild();
   }
 
   initGraph () {
@@ -1674,12 +1672,12 @@ export default class Query extends Component {
     let graphFilters
     let tooltips = (
         <div>
-        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
-        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
-        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
-        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
-        <ReactTooltip id="linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</ReactTooltip>
+        <Tooltip anchorSelect=".formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</Tooltip>
+        <Tooltip anchorSelect=".linkTooltip">Link this attribute to another</Tooltip>
+        <Tooltip anchorSelect=".optionalTooltip">Show all values, including empty values.</Tooltip>
+        <Tooltip anchorSelect=".excludeTooltip">Exclude categories, instead of including</Tooltip>
+        <Tooltip anchorSelect=".visibleTooltip">Display attribute value in the results</Tooltip>
+        <Tooltip anchorSelect=".linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</Tooltip>
         </div>
     )
 
