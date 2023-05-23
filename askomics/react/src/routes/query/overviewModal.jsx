@@ -38,7 +38,7 @@ export default class OverviewModal extends Component {
     })
 
     if(isSpecial){
-      return <Badge color="info" data-tip data-for={"specialTooltip"}>Special</Badge>
+      return <Badge color="info" className="specialTooltip">Special</Badge>
     }
   }
 

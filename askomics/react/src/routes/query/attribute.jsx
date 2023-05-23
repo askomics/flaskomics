@@ -323,8 +323,8 @@ export default class AttributeBox extends Component {
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
-
-    let excludeIcon = 'attr-icon fas fa-ban inactive'
+    
+    let excludeIcon = 'attr-icon fas fa-ban inactive excludeTooltip'
     if (this.props.attribute.exclude) {
       excludeIcon = 'attr-icon fas fa-ban'
     }

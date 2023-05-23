@@ -81,22 +81,22 @@ export default class AttributeBox extends Component {
 
   renderText () {
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let negativIcon = 'attr-icon fas fa-not-equal inactive'
+    let negativIcon = 'attr-icon fas fa-not-equal inactive excludeTooltip'
     if (this.props.attribute.negative) {
       negativIcon = 'attr-icon fas fa-not-equal'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -149,8 +149,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} ></i> }
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} ></i>
         </div>
         {form}
       </div>
@@ -159,17 +159,17 @@ export default class AttributeBox extends Component {
 
   renderNumeric () {
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -218,8 +218,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} ></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} ></i>
         </div>
         {form}
       </div>
@@ -228,22 +228,22 @@ export default class AttributeBox extends Component {
 
   renderCategory () {
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
 
-    let excludeIcon = 'attr-icon fas fa-ban inactive'
+    let excludeIcon = 'attr-icon fas fa-ban inactive excludeTooltip'
     if (this.props.attribute.exclude) {
       excludeIcon = 'attr-icon fas fa-ban'
     }
@@ -269,9 +269,9 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude} data-tip data-for={"excludeTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} ></i>
+          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude} ></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} ></i>
         </div>
         {form}
       </div>
@@ -280,17 +280,17 @@ export default class AttributeBox extends Component {
 
   renderBoolean () {
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -314,8 +314,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} ></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} ></i>
         </div>
         {form}
       </div>
@@ -324,17 +324,17 @@ export default class AttributeBox extends Component {
 
   renderDate () {
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -391,8 +391,8 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label"><Input type="text" id={this.props.attribute.id} placeholder={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} value={this.props.attribute.displayLabel ? this.props.attribute.displayLabel : this.props.attribute.label} onChange={this.props.setAttributeName} /></label>
         <div className="attr-icons">
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} ></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} ></i>
         </div>
         {form}
       </div>

@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import AttributeBox from './attribute'
 import Entity from './entity'
 import ResultsTable from '../sparql/resultstable'
@@ -276,7 +276,6 @@ export default class FormQuery extends Component {
       saveIcon: "play",
       waiting: waiting
     })
-    ReactTooltip.rebuild();
   }
 
   // Preview results and Launch query buttons -------
@@ -438,11 +437,12 @@ export default class FormQuery extends Component {
     let entityMap = new Map()
     let tooltips = (
         <div>
-        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
-        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
-        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
-        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        <Tooltip anchorSelect=".formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</Tooltip>
+        <Tooltip anchorSelect=".linkTooltip">Link this attribute to another</Tooltip>
+        <Tooltip anchorSelect=".optionalTooltip">Show all values, including empty values.</Tooltip>
+        <Tooltip anchorSelect=".excludeTooltip">Exclude categories, instead of including</Tooltip>
+        <Tooltip anchorSelect=".visibleTooltip">Display attribute value in the results</Tooltip>
+        <Tooltip anchorSelect=".linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</Tooltip>
         </div>
     )
 
