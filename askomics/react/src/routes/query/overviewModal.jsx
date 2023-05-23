@@ -81,10 +81,12 @@ export default class OverviewModal extends Component {
     }
 
     return (
+      <>
       <Input value={linked.displayLabel} type="select" disabled>
         <option selected>{linked.displayLabel}</option>
       </Input>
       {content}
+      </>
     )
   }
 
@@ -301,7 +303,7 @@ export default class OverviewModal extends Component {
     }
     let customParams
 
-    if (typeof this.props.attribute.linkedWith !== "object") {
+    if (typeof attribute.linkedWith !== "object") {
       customParams = (
         <table style={{ width: '100%' }}>
         {attribute.linkedFilters.map((filter, index) => {
@@ -338,12 +340,12 @@ export default class OverviewModal extends Component {
     let selected_sign = attribute.linkedNegative ? "≠" : '='
     let customParams
 
-    if (typeof this.props.attribute.linkedWith !== "object") {
+    if (typeof attribute.linkedWith !== "object") {
       customParams = (
         <table style={{ width: '100%' }}>
           <tr>
             <td>
-              <CustomInput disabled={true} type="select" id={this.props.attribute.id}>
+              <CustomInput disabled={true} type="select" id={attribute.id}>
                   <option key={selected_sign} selected={true}>{selected_sign}</option>
               </CustomInput>
             </td>
@@ -371,12 +373,12 @@ export default class OverviewModal extends Component {
     let customParams
     const placeholder = "$1"
 
-    if (typeof this.props.attribute.linkedWith !== "object") {
+    if (typeof attribute.linkedWith !== "object") {
       customParams = (
         <table style={{ width: '100%' }}>
           <tr>
             <td>
-              <CustomInput disabled={true} type="select" id={this.props.attribute.id}>
+              <CustomInput disabled={true} type="select" id={attribute.id}>
                 <option key={selected_sign} selected={true}>{selected_sign}</option>
               </CustomInput>
             </td>
