@@ -124,6 +124,15 @@ export default class FormQuery extends Component {
     this.updateGraphState()
   }
 
+  handleLinkedNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedNegative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -137,6 +146,15 @@ export default class FormQuery extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilterValue = event.target.value
       }
     })
     this.updateGraphState()
@@ -181,6 +199,71 @@ export default class FormQuery extends Component {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.push({
+          filterValue: "",
+          filterSign: "=",
+          filterModifier: "+"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedNumericModifierSign (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterModifier = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
             if (index == event.target.dataset.index) {
               filter.filterValue = event.target.value
             }
@@ -471,6 +554,13 @@ export default class FormQuery extends Component {
               toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
               handleFilterDateValue={p => this.handleFilterDateValue(p)}
               handleDateFilter={p => this.handleDateFilter(p)}
+              handleLinkedNumericModifierSign={p => this.handleLinkedNumericModifierSign(p)}
+              handleLinkedNumericSign={p => this.handleLinkedNumericSign(p)}
+              handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
+              toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
+              toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
+              handleLinkedNegative={p => this.handleLinkedNegative(p)}
+              handleLinkedFilterValue={p => this.handleLinkedFilterValue(p)}
             />
           )
         }

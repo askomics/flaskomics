@@ -30,6 +30,13 @@ export default class AttributeBox extends Component {
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
+    this.handleLinkedNumericModifierSign = this.props.handleLinkedNumericModifierSign.bind(this)
+    this.handleLinkedNumericSign = this.props.handleLinkedNumericSign.bind(this)
+    this.handleLinkedNumericValue = this.props.handleLinkedNumericValue.bind(this)
+    this.toggleAddNumLinkedFilter = this.props.toggleAddNumLinkedFilter.bind(this)
+    this.toggleRemoveNumLinkedFilter = this.props.toggleRemoveNumLinkedFilter.bind(this)
+    this.handleLinkedNegative = this.props.handleLinkedNegative.bind(this)
+    this.handleLinkedFilterValue = this.props.handleLinkedFilterValue.bind(this)
   }
 
   subNums (id) {
@@ -45,26 +52,48 @@ export default class AttributeBox extends Component {
 
   renderLinker () {
     let options = []
+    let optionDict = {}
+    let content
 
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
         options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)
         this.props.graph.attr.map(attr => {
           if (attr.id != this.props.attribute.id && attr.nodeId == node.id && attr.type == this.props.attribute.type) {
-            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false}>{attr.label}</option>)
+            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false} label={attr.label}>{attr.label}</option>)
+            optionDict[attr.id] = attr.label
           }
         })
       }
     })
 
+    if (this.props.attribute.type == 'text') {
+      content = this.renderTextLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'decimal') {
+      content = this.renderNumericLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'category') {
+      content = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'boolean') {
+      content = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'date') {
+      content = this.renderNumericLinker(optionDict, "date")
+    }
+
     return (
-        <CustomInput type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
-          <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
-          {options.map(opt => {
-            return opt
-          })}
-        </CustomInput>
-      )
+      <>
+      <CustomInput disabled={this.props.attribute.optional || typeof this.props.attribute.linkedWith !== "object"} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
+        <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
+        {options.map(opt => {
+          return opt
+        })}
+      </CustomInput>
+      {content}
+      </>
+    )
   }
 
   checkUnvalidUri (value) {
@@ -397,6 +426,137 @@ export default class AttributeBox extends Component {
     )
   }
 
+  renderNumericLinker (options, type="num"){
+    const sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+
+    const modifier_display = {
+      '+': '+',
+      '-': '-',
+    }
+    let customParams
+    const placeholder = type === "num"? "" : "days"
+    const numberOfFilters = this.props.attribute.linkedFilters.length - 1
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()]
+      customParams = (
+        <table style={{ width: '100%' }}>
+        {this.props.attribute.linkedFilters.map((filter, index) => {
+          return (
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNumericSign}>
+                  {Object.keys(sign_display).map(sign => {
+                    return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
+                  })}
+                </CustomInput>
+              </td>
+              <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              </td>
+              <td>
+              <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNumericModifierSign}>
+                {Object.keys(modifier_display).map(sign => {
+                  return <option key={sign} selected={filter.filterModifier == sign ? true : false} value={sign}>{modifier_display[sign]}</option>
+                })}
+              </CustomInput>
+              </td>
+              <td>
+                <div className="input-with-icon">
+                <Input className="input-with-icon" data-index={index} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleLinkedNumericValue} placeholder={placeholder} />
+                {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumLinkedFilter}></i></button> : <></>}
+                {index == numberOfFilters && index > 0 ? <button className="input-with-icon-two"><i className="attr-icon fas fa-minus inactive" id={this.props.attribute.id} onClick={this.toggleRemoveNumLinkedFilter}></i></button> : <></>}
+                </div>
+              </td>
+            </tr>
+          )
+        })}
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderTextLinker (options){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()] + " as $1"
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+            <td>
+              <Input
+                className="linkedTooltip"
+                disabled={this.props.attribute.optional}
+                type="text"
+                id={this.props.attribute.id}
+                value={this.props.attribute.linkedFilterValue}
+                onChange={this.handleLinkedFilterValue}
+                placeholder={placeholder}
+              />
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderBooleanLinker (options, type="num"){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()]
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
 
   render () {
     let box = null
@@ -437,4 +597,11 @@ AttributeBox.propTypes = {
   handleDateFilter: PropTypes.func,
   attribute: PropTypes.object,
   graph: PropTypes.object,
+  handleLinkedNumericModifierSign: PropTypes.func,
+  handleLinkedNumericSign: PropTypes.func,
+  handleLinkedNumericValue: PropTypes.func,
+  toggleAddNumLinkedFilter: PropTypes.func,
+  toggleRemoveNumLinkedFilter: PropTypes.func,
+  handleLinkedNegative: PropTypes.func,
+  handleLinkedFilterValue: PropTypes.func
 }
