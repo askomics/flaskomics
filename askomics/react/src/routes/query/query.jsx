@@ -584,6 +584,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: []
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -628,6 +629,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: []
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -671,6 +673,7 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
+            faldoFilters: []
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -709,6 +712,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  []
         }
       }
 
@@ -728,6 +732,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  []
         }
       }
     })
@@ -1379,7 +1384,17 @@ export default class Query extends Component {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
-        link.label = event.target.value == 'included_in' ? "Included in" : "Overlap with"
+
+        if (event.target.value != "distance_from"){
+          link.faldoFilters = []
+        }
+        if (event.target.value == 'included_in'){
+          link.label = "Included in"
+        } else if (event.target.value == 'overlap_with'){
+          link.label = "Overlap with"
+        } else {
+          link.label = "Distant from"
+        }
       }
     })
     this.updateGraphState()
@@ -1487,6 +1502,89 @@ export default class Query extends Component {
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
       return labels[uri]
+  }
+
+  // Faldo filters -----------------------------
+
+  toggleAddFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.push({
+          filterValue: null,
+          filterSign: "=",
+          filterModifier: "+",
+          filterStart: "start",
+          filterEnd: "start"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoModifierSign (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterModifier = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterSign (event) {
+    console.log(event.target)
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            if (event.target.type == "start"){
+              filter.filterStart = event.target.value
+            } else {
+              filter.filterEnd = event.target.value
+            }
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterPosition (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterModifier = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoValue (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterValue = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
   }
 
   // ------------------------------------------------
@@ -1743,6 +1841,12 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+            toggleAddFaldoFilter={p => this.toggleAddFaldoFilter(p)}
+            toggleRemoveFaldoFilter={p => this.toggleRemoveFaldoFilter(p)}
+            handleFaldoModifierSign={p => this.handleFaldoModifierSign(p)}
+            handleFaldoFilterSign={p => this.handleFaldoFilterSign(p)}
+            handleFaldoFilterPosition={p => this.handleFaldoFilterPosition(p)}
+            handleFaldoValue={p => this.handleFaldoValue(p)}
           />
         }
 

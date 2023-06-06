@@ -1116,7 +1116,7 @@ class SparqlQuery(Params):
                     pblock_ids = link["source"]["specialPreviousIds"]
 
                 # Position
-                if link["uri"] in ('included_in', 'overlap_with'):
+                if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):
 
                     # If source of target is a special node, replace the id with the id of the concerned node
                     source_id = link["source"]["id"]
@@ -1192,6 +1192,16 @@ class SparqlQuery(Params):
                             end2=end_2,
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids)
+                    else:
+                        for filter in link.get('faldoFilters', []):
+                            modifier_string = ""
+                            if filter['filterValue']:
+                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+
+                            start = start_1 if filter['filterStart'] == "start" else end_1
+                            end = start_2 if filter['filterEnd'] == "start" else end_2
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(start, filter['filterSign'], end, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
                 # Classic relation
                 else:
