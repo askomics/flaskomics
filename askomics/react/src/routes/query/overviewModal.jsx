@@ -1,7 +1,7 @@
 import React, { Component} from 'react'
 import { Badge, Button, Modal, ModalHeader, ModalBody, ModalFooter, ButtonGroup, Input, CustomInput, FormGroup } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
@@ -395,7 +395,7 @@ export default class OverviewModal extends Component {
 
   render () {
     let tooltips = (
-        <ReactTooltip id="specialTooltip">This node has an active faldo or ontological link</ReactTooltip>
+        <Tooltip anchorSelect=".specialTooltip">This node has an active faldo or ontological link</Tooltip>
     )
     return(
       <>

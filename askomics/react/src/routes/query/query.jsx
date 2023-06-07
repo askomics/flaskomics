@@ -56,6 +56,13 @@ export default class Query extends Component {
     this.divHeight = 650
     this.showFaldo = true;
 
+    this.defaultFaldoFilters = [{
+      filterValue: null,
+      filterSign: "=",
+      filterModifier: "+",
+      filterStart: "start",
+      filterEnd: "start"
+    }]
 
     this.idNumber = 0
     this.specialNodeIdNumber = 0
@@ -584,7 +591,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              faldoFilters: []
+              faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -629,7 +636,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              faldoFilters: []
+              faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -673,7 +680,7 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
-            faldoFilters: []
+            faldoFilters: this.defaultFaldoFilters
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -712,7 +719,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
-          faldoFilters: link.faldoFilters ? link.faldoFilters :  []
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
         }
       }
 
@@ -732,7 +739,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
-          faldoFilters: link.faldoFilters ? link.faldoFilters :  []
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
         }
       }
     })
@@ -1386,7 +1393,7 @@ export default class Query extends Component {
         link.uri = event.target.value
 
         if (event.target.value != "distance_from"){
-          link.faldoFilters = []
+          link.faldoFilters = this.defaultFaldoFilters
         }
         if (event.target.value == 'included_in'){
           link.label = "Included in"
@@ -1544,16 +1551,11 @@ export default class Query extends Component {
   }
 
   handleFaldoFilterSign (event) {
-    console.log(event.target)
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.faldoFilters.map((filter, index) => {
           if (index == event.target.dataset.index) {
-            if (event.target.type == "start"){
-              filter.filterStart = event.target.value
-            } else {
-              filter.filterEnd = event.target.value
-            }
+            filter.filterSign = event.target.value
           }
         })
       }
@@ -1561,12 +1563,25 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  handleFaldoFilterPosition (event) {
+  handleFaldoFilterStart (event) {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.faldoFilters.map((filter, index) => {
           if (index == event.target.dataset.index) {
-            filter.filterModifier = event.target.value
+            filter.filterStart = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterEnd (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterEnd = event.target.value
           }
         })
       }
@@ -1701,7 +1716,7 @@ export default class Query extends Component {
             this.initId()
             this.setCurrentSelected()
             if (this.currentSelected) {
-              if (this.currentSelected.type != "link") {
+              if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {
                 if (this.currentSelected.type == "unionNode") {
                   this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, true)
                 } else {
@@ -1845,7 +1860,8 @@ export default class Query extends Component {
             toggleRemoveFaldoFilter={p => this.toggleRemoveFaldoFilter(p)}
             handleFaldoModifierSign={p => this.handleFaldoModifierSign(p)}
             handleFaldoFilterSign={p => this.handleFaldoFilterSign(p)}
-            handleFaldoFilterPosition={p => this.handleFaldoFilterPosition(p)}
+            handleFaldoFilterStart={p => this.handleFaldoFilterStart(p)}
+            handleFaldoFilterEnd={p => this.handleFaldoFilterEnd(p)}
             handleFaldoValue={p => this.handleFaldoValue(p)}
           />
         }
