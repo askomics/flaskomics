@@ -82,8 +82,9 @@ export default class OverviewModal extends Component {
 
     return (
       <>
-      <Input value={linked.displayLabel} type="select" disabled>
-        <option selected>{linked.displayLabel}</option>
+      <Tooltip id={attribute.id + "-linker"}/>
+      <Input type="select" disabled>
+        <option selected>{linked.entityDisplayLabel + " " + this.subNums(linked.humanNodeId) + " " + linked.displayLabel}</option>
       </Input>
       {content}
       </>
