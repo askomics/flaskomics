@@ -1235,7 +1235,7 @@ class SparqlQuery(Params):
                 "entity_label": attribute["entityLabel"],
                 "entity_id": attribute["nodeId"]
             }
-            if attribute["linked"]:
+            if attribute["linked"] and attribute["linkedWith"]:
                 linked_attributes.extend((attribute["id"], attribute["linkedWith"]))
 
         # Browse attributes
@@ -1279,7 +1279,7 @@ class SparqlQuery(Params):
                         else:
                             self.store_value("VALUES {} {{ {} }} .".format(subject, filter_value), block_id, sblock_id, pblock_ids)
 
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_uri".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"]
@@ -1315,7 +1315,7 @@ class SparqlQuery(Params):
 
                     if uri_val_list:
                         self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
@@ -1360,7 +1360,7 @@ class SparqlQuery(Params):
                             self.store_filter("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                         else:
                             self.store_value("VALUES {} {{ '{}' }} .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
@@ -1403,7 +1403,7 @@ class SparqlQuery(Params):
                         else:
                             filter_string = "FILTER ( {} {} {} ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
@@ -1442,7 +1442,7 @@ class SparqlQuery(Params):
                         else:
                             filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], val)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
@@ -1542,7 +1542,7 @@ class SparqlQuery(Params):
                         else:
                             self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
 
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}Category".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
