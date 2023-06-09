@@ -10,6 +10,7 @@ import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import Autocomplete from '../../components/autocomplete'
+import { Tooltip } from 'react-tooltip'
 
 export default class AttributeBox extends Component {
   constructor (props) {
@@ -72,7 +73,7 @@ export default class AttributeBox extends Component {
         this.props.graph.attr.map(attr => {
           if (attr.id != this.props.attribute.id && attr.nodeId == node.id && attr.type == this.props.attribute.type) {
             options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false} label={attr.label}>{attr.label}</option>)
-            optionDict[attr.id] = attr.label
+            optionDict[attr.id] = {label: attr.label, fullLabel:  node.label + " " + this.subNums(node.humanId) + " " + attr.label}
           }
         })
       }
@@ -96,6 +97,7 @@ export default class AttributeBox extends Component {
 
     return (
       <>
+      <Tooltip id={this.props.attribute.id + "-linker"}/>
       <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
         <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
         {options.map(opt => {
@@ -511,11 +513,12 @@ export default class AttributeBox extends Component {
       '-': '-',
     }
     let customParams
-    const placeholder = type === "num"? "" : "days"
+    const placeholder = type === "num"? "0" : "0 days"
     const numberOfFilters = this.props.attribute.linkedFilters.length - 1
 
     if (typeof this.props.attribute.linkedWith !== "object") {
-      let selectedLabel = options[this.props.attribute.linkedWith.toString()]
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
       customParams = (
         <table style={{ width: '100%' }}>
         {this.props.attribute.linkedFilters.map((filter, index) => {
@@ -529,7 +532,7 @@ export default class AttributeBox extends Component {
                 </CustomInput>
               </td>
               <td>
-              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              <Input disabled={true} data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} type="text" value={selectedLabel} size={selectedLabel.length}/>
               </td>
               <td>
               <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNumericModifierSign}>
@@ -564,7 +567,8 @@ export default class AttributeBox extends Component {
     const placeholder = "$1"
 
     if (typeof this.props.attribute.linkedWith !== "object") {
-      let selectedLabel = options[this.props.attribute.linkedWith.toString()] + " as $1"
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label + " as $1"
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
       customParams = (
         <table style={{ width: '100%' }}>
           <tr>
@@ -576,7 +580,7 @@ export default class AttributeBox extends Component {
               </CustomInput>
             </td>
             <td>
-              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              <Input disabled={true} data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} type="text" value={selectedLabel} size={selectedLabel.length}/>
             </td>
             <td>
               <Input
@@ -606,7 +610,8 @@ export default class AttributeBox extends Component {
     const placeholder = "$1"
 
     if (typeof this.props.attribute.linkedWith !== "object") {
-      let selectedLabel = options[this.props.attribute.linkedWith.toString()]
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
       customParams = (
         <table style={{ width: '100%' }}>
           <tr>
@@ -618,7 +623,7 @@ export default class AttributeBox extends Component {
               </CustomInput>
             </td>
             <td>
-              <Input disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              <Input data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
             </td>
           </tr>
         </table>
