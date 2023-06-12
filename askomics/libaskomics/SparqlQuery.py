@@ -1116,7 +1116,7 @@ class SparqlQuery(Params):
                     pblock_ids = link["source"]["specialPreviousIds"]
 
                 # Position
-                if link["uri"] in ('included_in', 'overlap_with'):
+                if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):
 
                     # If source of target is a special node, replace the id with the id of the concerned node
                     source_id = link["source"]["id"]
@@ -1192,6 +1192,16 @@ class SparqlQuery(Params):
                             end2=end_2,
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids)
+                    else:
+                        for filter in link.get('faldoFilters', []):
+                            modifier_string = ""
+                            if filter['filterValue']:
+                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+
+                            start = start_1 if filter['filterStart'] == "start" else end_1
+                            end = start_2 if filter['filterEnd'] == "start" else end_2
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(start, filter['filterSign'], end, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
                 # Classic relation
                 else:
@@ -1225,7 +1235,7 @@ class SparqlQuery(Params):
                 "entity_label": attribute["entityLabel"],
                 "entity_id": attribute["nodeId"]
             }
-            if attribute["linked"]:
+            if attribute["linked"] and attribute["linkedWith"]:
                 linked_attributes.extend((attribute["id"], attribute["linkedWith"]))
 
         # Browse attributes
@@ -1269,7 +1279,7 @@ class SparqlQuery(Params):
                         else:
                             self.store_value("VALUES {} {{ {} }} .".format(subject, filter_value), block_id, sblock_id, pblock_ids)
 
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_uri".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"]
@@ -1305,13 +1315,17 @@ class SparqlQuery(Params):
 
                     if uri_val_list:
                         self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if not attribute.get('linkedNegative', False):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        filter_string = "FILTER ( {} {} {} ) .".format(obj, "!=", var_2)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             # Text
             if attribute["type"] == "text":
@@ -1346,13 +1360,21 @@ class SparqlQuery(Params):
                             self.store_filter("FILTER (str({}) != '{}') .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
                         else:
                             self.store_value("VALUES {} {{ '{}' }} .".format(obj, attribute["filterValue"]), block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if not (attribute.get('linkedNegative', False) or attribute.get('linkedFilterValue')):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        filter = "!" if attribute.get('linkedNegative', False) else ""
+                        regex_clause = "{} = {}".format(obj, var_2)
+                        if attribute.get('linkedFilterValue'):
+                            regex_clause = r"REGEX({}, REPLACE('{}', '\\$1', {}), 'i')".format(obj, attribute.get('linkedFilterValue', "$1"), var_2)
+                        filter_string = "FILTER ( {} {} ) .".format(filter, regex_clause)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             # Numeric
             if attribute["type"] == "decimal":
@@ -1379,13 +1401,21 @@ class SparqlQuery(Params):
                         else:
                             filter_string = "FILTER ( {} {} {} ) .".format(obj, filtr["filterSign"], filtr["filterValue"])
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
+                    if any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])]):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        for filter in attribute.get('linkedFilters', []):
+                            modifier_string = ""
+                            if filter['filterValue']:
+                                modifier_string = " {} {}".format(filter['filterModifier'], filter['filterValue'])
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(obj, filter['filterSign'], var_2, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
             if attribute["type"] == "date":
                 if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in linked_attributes:
@@ -1410,14 +1440,25 @@ class SparqlQuery(Params):
                         else:
                             filter_string = "FILTER ( {} {} '{}'^^xsd:date ) .".format(obj, filtr["filterSign"], val)
                             self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((obj, var_2))
-
+                    if any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])]):
+                        var_to_replace.append((obj, var_2))
+                    else:
+                        for filter in attribute.get('linkedFilters', []):
+                            modifier_string = ""
+                            if filter['filterValue']:
+                                # Issue with virtuoso: engine-specific syntax for now (convert days to seconds)
+                                if self.settings.get('triplestore', 'triplestore') == "virtuoso":
+                                    modifier_string = " {} {}".format(filter['filterModifier'], 24 * 3600 * int(filter['filterValue']))
+                                else:
+                                    modifier_string = ' {} "P{}D"xsd:duration'.format(filter['filterModifier'], filter['filterValue'])
+                            filter_string = "FILTER ( {} {} {} {} ) .".format(obj, filter['filterSign'], var_2, modifier_string)
+                            self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
             # Category
             if attribute["type"] == "category":
                 if attribute["visible"] or attribute["filterSelectedValues"] != [] or attribute["id"] in strands or attribute["id"] in linked_attributes:
@@ -1499,13 +1540,18 @@ class SparqlQuery(Params):
                         else:
                             self.store_value("VALUES {} {{ {} }}".format(value_var, ' '.join(uri_val_list)), block_id, sblock_id, pblock_ids)
 
-                if attribute["linked"]:
+                if attribute["linked"] and attribute["linkedWith"]:
                     var_2 = self.format_sparql_variable("{}{}_{}Category".format(
                         attributes[attribute["linkedWith"]]["entity_label"],
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    var_to_replace.append((category_value_uri, var_2))
+
+                    if not attribute.get('linkedNegative', False):
+                        var_to_replace.append((category_value_uri, var_2))
+                    else:
+                        filter_string = "FILTER ( {} {} {} ) .".format(category_value_uri, "!=", var_2)
+                        self.store_filter(filter_string, block_id, sblock_id, pblock_ids)
 
         from_string = "" if self.settings.getboolean("askomics", "single_tenant", fallback=False) else self.get_froms_from_graphs(self.graphs)
         federated_from_string = self.get_federated_froms_from_graphs(self.graphs)

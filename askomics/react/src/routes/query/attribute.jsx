@@ -3,7 +3,6 @@ import axios from 'axios'
 import { Input, FormGroup, CustomInput, FormFeedback } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import DatePicker from "react-datepicker";
-import ReactTooltip from "react-tooltip";
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
@@ -11,6 +10,7 @@ import Visualization from './visualization'
 import PropTypes from 'prop-types'
 import Utils from '../../classes/utils'
 import Autocomplete from '../../components/autocomplete'
+import { Tooltip } from 'react-tooltip'
 
 export default class AttributeBox extends Component {
   constructor (props) {
@@ -34,6 +34,13 @@ export default class AttributeBox extends Component {
     this.toggleAddNumFilter = this.props.toggleAddNumFilter.bind(this)
     this.toggleAddDateFilter = this.props.toggleAddDateFilter.bind(this)
     this.handleDateFilter = this.props.handleDateFilter.bind(this)
+    this.handleLinkedNumericModifierSign = this.props.handleLinkedNumericModifierSign.bind(this)
+    this.handleLinkedNumericSign = this.props.handleLinkedNumericSign.bind(this)
+    this.handleLinkedNumericValue = this.props.handleLinkedNumericValue.bind(this)
+    this.toggleAddNumLinkedFilter = this.props.toggleAddNumLinkedFilter.bind(this)
+    this.toggleRemoveNumLinkedFilter = this.props.toggleRemoveNumLinkedFilter.bind(this)
+    this.handleLinkedNegative = this.props.handleLinkedNegative.bind(this)
+    this.handleLinkedFilterValue = this.props.handleLinkedFilterValue.bind(this)
     this.cancelRequest
   }
 
@@ -57,26 +64,49 @@ export default class AttributeBox extends Component {
 
   renderLinker () {
     let options = []
+    let optionDict = {}
+    let content
 
     this.props.graph.nodes.map(node => {
       if (!node.suggested) {
         options.push(<option style={{"background-color": "#cccccc"}} disabled>{node.label + " " + this.subNums(node.humanId)}</option>)
         this.props.graph.attr.map(attr => {
           if (attr.id != this.props.attribute.id && attr.nodeId == node.id && attr.type == this.props.attribute.type) {
-            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false}>{attr.label}</option>)
+            options.push(<option key={attr.id} value={attr.id} selected={this.props.attribute.linkedWith == attr.id ? true : false} label={attr.label}>{attr.label}</option>)
+            optionDict[attr.id] = {label: attr.label, fullLabel:  node.label + " " + this.subNums(node.humanId) + " " + attr.label}
           }
         })
       }
     })
 
+    if (this.props.attribute.type == 'text') {
+      content = this.renderTextLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'decimal') {
+      content = this.renderNumericLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'category') {
+      content = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'boolean') {
+      content = this.renderBooleanLinker(optionDict)
+    }
+    if (this.props.attribute.type == 'date') {
+      content = this.renderNumericLinker(optionDict, "date")
+    }
+
     return (
-        <CustomInput type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
-          <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
-          {options.map(opt => {
-            return opt
-          })}
-        </CustomInput>
-      )
+      <>
+      <Tooltip id={this.props.attribute.id + "-linker"}/>
+      <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
+        <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
+        {options.map(opt => {
+          return opt
+        })}
+      </CustomInput>
+      {content}
+      </>
+    )
   }
 
   checkUnvalidUri (value) {
@@ -93,27 +123,27 @@ export default class AttributeBox extends Component {
 
   renderText () {
 
-    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    let formIcon = 'attr-icon fas fa-bookmark inactive formTooltip'
     if (this.props.attribute.form) {
       formIcon = 'attr-icon fas fa-bookmark '
     }
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let negativIcon = 'attr-icon fas fa-not-equal inactive'
+    let negativIcon = 'attr-icon fas fa-not-equal inactive excludeTooltip'
     if (this.props.attribute.negative) {
       negativIcon = 'attr-icon fas fa-not-equal'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -138,7 +168,7 @@ export default class AttributeBox extends Component {
     if (this.props.isOnto){
       attrIcons = (
         <div className="attr-icons">
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
       )
       if (this.isRegisteredOnto() && this.props.attribute.uri == "rdfs:label"){
@@ -152,15 +182,14 @@ export default class AttributeBox extends Component {
     } else {
       attrIcons = (
         <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i> }
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          {this.props.attribute.uri == "rdf:type" || this.props.attribute.uri == "rdfs:label" ? <nodiv></nodiv> : <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i> }
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
       )
       input = (<Input disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={this.props.attribute.filterValue} onChange={this.handleFilterValue} />)
     }
-
 
     if (this.props.attribute.linked) {
       form = this.renderLinker()
@@ -201,22 +230,22 @@ export default class AttributeBox extends Component {
 
   renderNumeric () {
 
-    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    let formIcon = 'attr-icon fas fa-bookmark inactive formTooltip'
     if (this.props.attribute.form) {
       formIcon = 'attr-icon fas fa-bookmark '
     }
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -265,10 +294,10 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
       </div>
@@ -277,27 +306,27 @@ export default class AttributeBox extends Component {
 
   renderCategory () {
 
-    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    let formIcon = 'attr-icon fas fa-bookmark inactive formTooltip'
     if (this.props.attribute.form) {
       formIcon = 'attr-icon fas fa-bookmark '
     }
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
-
-    let excludeIcon = 'attr-icon fas fa-ban inactive'
+    
+    let excludeIcon = 'attr-icon fas fa-ban inactive excludeTooltip'
     if (this.props.attribute.exclude) {
       excludeIcon = 'attr-icon fas fa-ban'
     }
@@ -323,11 +352,11 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude} data-tip data-for={"excludeTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={excludeIcon} id={this.props.attribute.id} onClick={this.toggleExclude}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
       </div>
@@ -336,22 +365,22 @@ export default class AttributeBox extends Component {
 
   renderBoolean () {
 
-    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    let formIcon = 'attr-icon fas fa-bookmark inactive formTooltip'
     if (this.props.attribute.form) {
       formIcon = 'attr-icon fas fa-bookmark '
     }
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -375,10 +404,10 @@ export default class AttributeBox extends Component {
       <div className="attribute-box">
         <label className="attr-label">{this.props.attribute.label}</label>
         <div className="attr-icons">
-          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute} data-tip data-for={"formTooltip"}></i> : <nodiv></nodiv>}
-          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute} data-tip data-for={"linkTooltip"}></i>
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
+          <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
       </div>
@@ -387,22 +416,22 @@ export default class AttributeBox extends Component {
 
   renderDate () {
 
-    let formIcon = 'attr-icon fas fa-bookmark inactive'
+    let formIcon = 'attr-icon fas fa-bookmark inactive formTooltip'
     if (this.props.attribute.form) {
       formIcon = 'attr-icon fas fa-bookmark '
     }
 
-    let eyeIcon = 'attr-icon fas fa-eye-slash inactive'
+    let eyeIcon = 'attr-icon fas fa-eye-slash inactive visibleTooltip'
     if (this.props.attribute.visible) {
       eyeIcon = 'attr-icon fas fa-eye'
     }
 
-    let optionalIcon = 'attr-icon fas fa-question-circle inactive'
+    let optionalIcon = 'attr-icon fas fa-question-circle inactive optionalTooltip'
     if (this.props.attribute.optional) {
       optionalIcon = 'attr-icon fas fa-question-circle'
     }
 
-    let linkIcon = 'attr-icon fas fa-unlink inactive'
+    let linkIcon = 'attr-icon fas fa-unlink inactive linkTooltip'
     if (this.props.attribute.linked) {
       linkIcon = 'attr-icon fas fa-link'
     }
@@ -461,14 +490,147 @@ export default class AttributeBox extends Component {
         <div className="attr-icons">
           {this.props.config.user.admin ? <i className={formIcon} id={this.props.attribute.id} onClick={this.toggleFormAttribute}></i> : <nodiv></nodiv>}
           <i className={linkIcon} id={this.props.attribute.id} onClick={this.toggleLinkAttribute}></i>
-          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional} data-tip data-for={"optionalTooltip"}></i>
-          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility} data-tip data-for={"visibleTooltip"}></i>
+          <i className={optionalIcon} id={this.props.attribute.id} onClick={this.toggleOptional}></i>
+          <i className={eyeIcon} id={this.props.attribute.id} onClick={this.toggleVisibility}></i>
         </div>
         {form}
       </div>
     )
   }
 
+  renderNumericLinker (options, type="num"){
+    const sign_display = {
+      '=': '=',
+      '<': '<',
+      '<=': '≤',
+      '>': '>',
+      '>=': '≥',
+      '!=': '≠'
+    }
+
+    const modifier_display = {
+      '+': '+',
+      '-': '-',
+    }
+    let customParams
+    const placeholder = type === "num"? "0" : "0 days"
+    const numberOfFilters = this.props.attribute.linkedFilters.length - 1
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
+      customParams = (
+        <table style={{ width: '100%' }}>
+        {this.props.attribute.linkedFilters.map((filter, index) => {
+          return (
+            <tr key={index}>
+              <td key={index}>
+                <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNumericSign}>
+                  {Object.keys(sign_display).map(sign => {
+                    return <option key={sign} selected={filter.filterSign == sign ? true : false} value={sign}>{sign_display[sign]}</option>
+                  })}
+                </CustomInput>
+              </td>
+              <td>
+              <Input disabled={true} data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} type="text" value={selectedLabel} size={selectedLabel.length}/>
+              </td>
+              <td>
+              <CustomInput key={index} data-index={index} disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNumericModifierSign}>
+                {Object.keys(modifier_display).map(sign => {
+                  return <option key={sign} selected={filter.filterModifier == sign ? true : false} value={sign}>{modifier_display[sign]}</option>
+                })}
+              </CustomInput>
+              </td>
+              <td>
+                <div className="input-with-icon">
+                <Input className="input-with-icon" data-index={index} disabled={this.props.attribute.optional} type="text" id={this.props.attribute.id} value={filter.filterValue} onChange={this.handleLinkedNumericValue} placeholder={placeholder} />
+                {index == numberOfFilters ? <button className="input-with-icon"><i className="attr-icon fas fa-plus inactive" id={this.props.attribute.id} onClick={this.toggleAddNumLinkedFilter}></i></button> : <></>}
+                {index == numberOfFilters && index > 0 ? <button className="input-with-icon-two"><i className="attr-icon fas fa-minus inactive" id={this.props.attribute.id} onClick={this.toggleRemoveNumLinkedFilter}></i></button> : <></>}
+                </div>
+              </td>
+            </tr>
+          )
+        })}
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderTextLinker (options){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label + " as $1"
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input disabled={true} data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+            <td>
+              <Input
+                className="linkedTooltip"
+                disabled={this.props.attribute.optional}
+                type="text"
+                id={this.props.attribute.id}
+                value={this.props.attribute.linkedFilterValue}
+                onChange={this.handleLinkedFilterValue}
+                placeholder={placeholder}
+              />
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
+
+  renderBooleanLinker (options, type="num"){
+    let selected_sign = {
+      '=': !this.props.attribute.linkedNegative,
+      "≠": this.props.attribute.linkedNegative
+    }
+
+    let customParams
+    const placeholder = "$1"
+
+    if (typeof this.props.attribute.linkedWith !== "object") {
+      let selectedLabel = options[this.props.attribute.linkedWith.toString()].label
+      let fullLabel = options[this.props.attribute.linkedWith.toString()].fullLabel
+      customParams = (
+        <table style={{ width: '100%' }}>
+          <tr>
+            <td>
+              <CustomInput disabled={this.props.attribute.optional} type="select" id={this.props.attribute.id} onChange={this.handleLinkedNegative}>
+                {Object.keys(selected_sign).map(type => {
+                  return <option key={type} selected={selected_sign[type]} value={type}>{type}</option>
+                })}
+              </CustomInput>
+            </td>
+            <td>
+              <Input data-tooltip-id={this.props.attribute.id + "-linker"} data-tooltip-content={fullLabel} disabled={true} type="text" value={selectedLabel} size={selectedLabel.length}/>
+            </td>
+          </tr>
+        </table>
+      )
+    }
+    return customParams
+  }
 
   render () {
     let box = null
@@ -512,5 +674,12 @@ AttributeBox.propTypes = {
   graph: PropTypes.object,
   config: PropTypes.object,
   isOnto: PropTypes.bool,
-  entityUri: PropTypes.string
+  entityUri: PropTypes.string,
+  handleLinkedNumericModifierSign: PropTypes.func,
+  handleLinkedNumericSign: PropTypes.func,
+  handleLinkedNumericValue: PropTypes.func,
+  toggleAddNumLinkedFilter: PropTypes.func,
+  toggleRemoveNumLinkedFilter: PropTypes.func,
+  handleLinkedNegative: PropTypes.func,
+  handleLinkedFilterValue: PropTypes.func
 }

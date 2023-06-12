@@ -15,6 +15,8 @@ This changelog was started for release 4.2.0.
     - These enable 'anonymous query' mode, allowing anonymous users to send 'full queries'. See documentation
 - Added 'overview' button in the query page. This button will show all 'selected' attributes, and allow users to quickly select the related entity.
 - Added 'Abstraction' tab on the navbar. This will print the whole abstraction as a 2d/3d graph.
+- Added 'distance' notion, using attribute link. This allows user to filter a value based on another value, with an optional modifier.
+- Added 'custom distance' option for faldo relation (instead of just 'included_in' and 'overlap_with')
 
 ### Fixed
 
@@ -23,6 +25,7 @@ This changelog was started for release 4.2.0.
 - Fixed profile update & password reset tab in user profile page
 - Fixed Gff Faldo integration (was only integrating the last selected entity)
 - Fixed an issue when using filters and an 'UNION' node
+- Fixed an issue when launching a query with a 'linked' attribute toggled but unselected
 
 ### Changed
 

@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
@@ -56,6 +56,13 @@ export default class Query extends Component {
     this.divHeight = 650
     this.showFaldo = true;
 
+    this.defaultFaldoFilters = [{
+      filterValue: null,
+      filterSign: "=",
+      filterModifier: "+",
+      filterStart: "start",
+      filterEnd: "start"
+    }]
 
     this.idNumber = 0
     this.specialNodeIdNumber = 0
@@ -379,35 +386,40 @@ export default class Query extends Component {
         firstAttrVisibleForBnode = false
 
         if (attributeType == 'decimal') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: "",
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
 
         if (attributeType == 'text') {
           nodeAttribute.filterType = 'exact'
-          nodeAttribute.filterValue = ''
+          nodeAttribute.linkedNegative = false
+          nodeAttribute.filterValue = nodeAttribute.linkedFilterValue = ''
         }
 
         if (attributeType == 'category') {
           nodeAttribute.exclude = false
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterValues = attr.categories
           nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'boolean') {
           nodeAttribute.filterValues = ["true", "false"]
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'date') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: null,
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
@@ -579,6 +591,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -623,6 +636,7 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           }
@@ -666,6 +680,7 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
+            faldoFilters: this.defaultFaldoFilters
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
         }
@@ -704,6 +719,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
         }
       }
 
@@ -723,6 +739,7 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
         }
       }
     })
@@ -927,8 +944,6 @@ export default class Query extends Component {
       saveIcon: "play",
       waiting: waiting
     })
-    console.log(this.graphState)
-    ReactTooltip.rebuild();
   }
 
   initGraph () {
@@ -1131,6 +1146,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  handleLinkedNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedNegative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1144,6 +1168,15 @@ export default class Query extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilterValue = event.target.value
       }
     })
     this.updateGraphState()
@@ -1188,6 +1221,71 @@ export default class Query extends Component {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.push({
+          filterValue: "",
+          filterSign: "=",
+          filterModifier: "+"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedNumericModifierSign (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterModifier = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
             if (index == event.target.dataset.index) {
               filter.filterValue = event.target.value
             }
@@ -1252,10 +1350,30 @@ export default class Query extends Component {
         attr.linked = !attr.linked
         if (!attr.linked) {
           attr.linkedWith = null
+          attr.linkedFilters = [{
+            filterValue: "",
+            filterSign: "=",
+            filterModifier: "+"
+          }]
         }
       }
     })
     this.updateGraphState()
+  }
+
+  handleFilterLinked (event){
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
   }
 
   handleChangeLink (event) {
@@ -1273,7 +1391,17 @@ export default class Query extends Component {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
-        link.label = event.target.value == 'included_in' ? "Included in" : "Overlap with"
+
+        if (event.target.value != "distance_from"){
+          link.faldoFilters = this.defaultFaldoFilters
+        }
+        if (event.target.value == 'included_in'){
+          link.label = "Included in"
+        } else if (event.target.value == 'overlap_with'){
+          link.label = "Overlap with"
+        } else {
+          link.label = "Distant from"
+        }
       }
     })
     this.updateGraphState()
@@ -1381,6 +1509,97 @@ export default class Query extends Component {
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
       return labels[uri]
+  }
+
+  // Faldo filters -----------------------------
+
+  toggleAddFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.push({
+          filterValue: null,
+          filterSign: "=",
+          filterModifier: "+",
+          filterStart: "start",
+          filterEnd: "start"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoModifierSign (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterModifier = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterSign (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterStart (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterStart = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterEnd (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterEnd = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoValue (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterValue = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
   }
 
   // ------------------------------------------------
@@ -1497,7 +1716,7 @@ export default class Query extends Component {
             this.initId()
             this.setCurrentSelected()
             if (this.currentSelected) {
-              if (this.currentSelected.type != "link") {
+              if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {
                 if (this.currentSelected.type == "unionNode") {
                   this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, true)
                 } else {
@@ -1566,11 +1785,12 @@ export default class Query extends Component {
     let graphFilters
     let tooltips = (
         <div>
-        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
-        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
-        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
-        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        <Tooltip anchorSelect=".formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</Tooltip>
+        <Tooltip anchorSelect=".linkTooltip">Link this attribute to another</Tooltip>
+        <Tooltip anchorSelect=".optionalTooltip">Show all values, including empty values.</Tooltip>
+        <Tooltip anchorSelect=".excludeTooltip">Exclude categories, instead of including</Tooltip>
+        <Tooltip anchorSelect=".visibleTooltip">Display attribute value in the results</Tooltip>
+        <Tooltip anchorSelect=".linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</Tooltip>
         </div>
     )
 
@@ -1600,6 +1820,13 @@ export default class Query extends Component {
                 toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
+                handleLinkedNumericModifierSign={p => this.handleLinkedNumericModifierSign(p)}
+                handleLinkedNumericSign={p => this.handleLinkedNumericSign(p)}
+                handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
+                toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
+                toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
+                handleLinkedNegative={p => this.handleLinkedNegative(p)}
+                handleLinkedFilterValue={p => this.handleLinkedFilterValue(p)}
                 config={this.state.config}
                 isOnto={isOnto}
                 entityUri={this.currentSelected.uri}
@@ -1629,6 +1856,13 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+            toggleAddFaldoFilter={p => this.toggleAddFaldoFilter(p)}
+            toggleRemoveFaldoFilter={p => this.toggleRemoveFaldoFilter(p)}
+            handleFaldoModifierSign={p => this.handleFaldoModifierSign(p)}
+            handleFaldoFilterSign={p => this.handleFaldoFilterSign(p)}
+            handleFaldoFilterStart={p => this.handleFaldoFilterStart(p)}
+            handleFaldoFilterEnd={p => this.handleFaldoFilterEnd(p)}
+            handleFaldoValue={p => this.handleFaldoValue(p)}
           />
         }
 
