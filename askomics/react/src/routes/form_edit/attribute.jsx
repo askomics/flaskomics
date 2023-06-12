@@ -83,14 +83,22 @@ export default class AttributeBox extends Component {
       content = this.renderNumericLinker(optionDict, "date")
     }
 
+    let selector
+
+    if (typeof this.props.attribute.linkedWith === "object" && typeof this.props.attribute.linkedWith !== "object"){
+      selector = (
+        <CustomInput disabled={this.props.attribute.optional || typeof this.props.attribute.linkedWith !== "object"} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
+          <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
+          {options.map(opt => {
+            return opt
+          })}
+        </CustomInput>
+      )
+    }
+
     return (
       <>
-      <CustomInput disabled={this.props.attribute.optional || typeof this.props.attribute.linkedWith !== "object"} type="select" id={this.props.attribute.id} name="link" onChange={this.handleChangeLink}>
-        <option style={{"background-color": "#cccccc"}} disabled selected>{"Link with a " + this.props.attribute.type + " attribute"}</option>
-        {options.map(opt => {
-          return opt
-        })}
-      </CustomInput>
+      {selector}
       {content}
       </>
     )

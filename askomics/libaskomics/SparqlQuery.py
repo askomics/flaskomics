@@ -1366,13 +1366,11 @@ class SparqlQuery(Params):
                         attributes[attribute["linkedWith"]]["entity_id"],
                         attributes[attribute["linkedWith"]]["label"]
                     ))
-                    any([filter['filterSign'] == "=" and not filter['filterValue'] for filter in attribute.get('linkedFilters', [])])
-
                     if not (attribute.get('linkedNegative', False) or attribute.get('linkedFilterValue')):
                         var_to_replace.append((obj, var_2))
                     else:
                         filter = "!" if attribute.get('linkedNegative', False) else ""
-                        regex_clause = var_2
+                        regex_clause = "{} = {}".format(obj, var_2)
                         if attribute.get('linkedFilterValue'):
                             regex_clause = r"REGEX({}, REPLACE('{}', '\\$1', {}), 'i')".format(obj, attribute.get('linkedFilterValue', "$1"), var_2)
                         filter_string = "FILTER ( {} {} ) .".format(filter, regex_clause)
