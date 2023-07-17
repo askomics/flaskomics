@@ -308,8 +308,8 @@ class BedFile(File):
 
             # blocks
             block_base = self.settings.getint("triplestore", "block_size")
-            block_start = int(self.convert_type(feature.location.start)) // block_base
-            block_end = int(self.convert_type(feature.location.end)) // block_base
+            block_start = int(self.convert_type(feature.start + 1)) // block_base
+            block_end = int(self.convert_type(feature.end)) // block_base
 
             for slice_block in range(block_start, block_end + 1):
                 self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
