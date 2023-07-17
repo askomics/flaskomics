@@ -306,4 +306,14 @@ class BedFile(File):
                 self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
                 self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
+            # blocks
+            block_base = self.settings.getint("triplestore", "block_size")
+            block_start = int(self.convert_type(feature.location.start)) // block_base
+            block_end = int(self.convert_type(feature.location.end)) // block_base
+
+            for slice_block in range(block_start, block_end + 1):
+                self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
+                block_reference = self.rdfize(self.format_uri("{}_{}".format(feature.chrom, slice_block)))
+                self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+
             yield
