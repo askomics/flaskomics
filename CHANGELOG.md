@@ -27,6 +27,7 @@ This changelog was started for release 4.2.0.
 - Fixed an issue when using filters and an 'UNION' node
 - Fixed an issue when launching a query with a 'linked' attribute toggled but unselected
 - Fixed missing includeIn and includeInReference in bed files
+- Fixed 'overlap_with' faldo query
 
 ### Changed
 
