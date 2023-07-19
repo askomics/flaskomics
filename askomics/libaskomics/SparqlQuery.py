@@ -1185,7 +1185,7 @@ class SparqlQuery(Params):
                         ), block_id, sblock_id, pblock_ids)
 
                     elif link["uri"] == "overlap_with":
-                        self.store_filter("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}))".format(
+                        self.store_filter("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}) || ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}))".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
