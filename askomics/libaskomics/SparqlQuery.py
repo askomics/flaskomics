@@ -1036,8 +1036,9 @@ class SparqlQuery(Params):
         """
         for link in self.json["links"]:
             if link["type"] == "specialLink":
-                if link["source"]["id"] == special_node_id:
-                    return link["target"]["id"]
+                # Source is also a special node. Get source of source
+                if link["source"]['type'] in ['unionNode', 'minusNode']:
+                    return self.get_source_of_special_node(link["source"]['id'])
                 if link["target"]["id"] == special_node_id:
                     return link["source"]["id"]
         return None
@@ -1093,12 +1094,17 @@ class SparqlQuery(Params):
 
                 # if link is special, replace the special node variable with its real node
                 if link["type"] == "specialLink":
-                    special_node = link["source"] if link["source"]["type"] in ("unionNode", "minusNode") else link["target"]
-                    real_node = link["target"] if link["source"]["type"] in ("unionNode", "minusNode") else link["source"]
+                    special_node = link["target"]
+                    real_node = link["source"]
+                    real_node_id = real_node['id']
+
+                    # Both end are special nodes.
+                    if real_node['type'] in ['minusNode', 'unionNode']:
+                        real_node_id = self.get_source_of_special_node(real_node_id)
 
                     var_to_replace.append((
                         self.format_sparql_variable("{}{}_uri".format(special_node["label"], special_node["id"])),
-                        self.format_sparql_variable("{}{}_uri".format(real_node["label"], real_node["id"]))
+                        self.format_sparql_variable("{}{}_uri".format(real_node["label"], real_node_id))
                     ))
 
                     continue
@@ -1563,7 +1569,6 @@ class SparqlQuery(Params):
         self.replace_variables_in_triples(var_to_replace)
 
         # Write the query
-
         # query is for editor (no froms, no federated)
         if for_editor:
             query = """
