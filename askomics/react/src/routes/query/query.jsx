@@ -119,6 +119,28 @@ export default class Query extends Component {
     return this.specialNodeIdNumber
   }
 
+  getMaxDepth (node, preRender=false) {
+    let listDepth = new Set()
+    let remote
+
+    this.graphState.links.map(link => {
+      if (preRender) {
+      // Ugly, but before rendering source and target are IDs and not objects
+        if (link.source == node.id) {
+          remote = this.state.nodes.some(rem => {
+            return (link.source == rem.id )
+          })
+          listDepth.add(remote.depth[-1])
+        }
+      } else {
+        if (link.source.id == node.id) {
+          listDepth.add(link.target.depth[-1])
+        }
+      }
+    })
+    return Math.max(...listDepth)
+  }
+
   getLargestSpecialNodeGroupId (node, preRender=false) {
     let listIds = new Set()
     let remote
@@ -432,7 +454,7 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null]) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null], depth=[]) {
     /*
     Insert a new node in the graphState
     */
@@ -459,6 +481,7 @@ export default class Query extends Component {
       specialNodeId: specialNodeId,
       specialNodeGroupId: specialNodeGroupId,
       specialPreviousIds: specialPreviousIds,
+      depth: depth,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -525,7 +548,7 @@ export default class Query extends Component {
     return nodesAndLinks
   }
 
-  insertSuggestion (node, incrementSpecialNodeGroupId=null) {
+  insertSuggestion (node, incrementSpecialNodeGroupId=null, increaseDepth=null) {
     /*
     Insert suggestion for this node
 
@@ -544,9 +567,16 @@ export default class Query extends Component {
     let reLink = new RegExp(node.filterLink.toLowerCase(), 'g')
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
+    let depth = increaseDepth ? increaseDepth : node.depth
 
     if (this.isOntoEndNode(node.id)){
         return
+    }
+
+    let depth = node.depth
+
+    if (increaseDepth){
+
     }
 
     this.state.abstraction.relations.map(relation => {
@@ -575,7 +605,8 @@ export default class Query extends Component {
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
               suggested: true,
-              ontology: isOnto
+              ontology: isOnto,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -621,7 +652,8 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
-              suggested: true
+              suggested: true,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -665,6 +697,7 @@ export default class Query extends Component {
             faldo: entity.faldo,
             selected: false,
             suggested: true,
+            depth: depth
           })
           // push suggested link
           this.graphState.links.push({
@@ -867,7 +900,7 @@ export default class Query extends Component {
 
       // if node is a special node, get the greatest specialNodeGroupId
       if (clickedNode.type == "unionNode") {
-        this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(clickedNode) + 1)
+        this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(clickedNode) + 1, this.getMaxDepth(clickedNode) + 1)
       } else {
         this.insertSuggestion(this.currentSelected)
       }
@@ -970,12 +1003,15 @@ export default class Query extends Component {
 
     // Get previous special node ids
     let specialPreviousIds = [sourceNode.specialNodeId, sourceNode.specialNodeGroupId]
+    let depth = sourceNode.depth
+    depth.push(1)
 
     // insert a special node and select it
-    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds)
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds, depth)
+    depth.push(1)
 
     // insert target node with specialNodeGroupId = 1
-    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds)
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds, depth)
 
     // insert link between source and special node
     this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
@@ -1050,7 +1086,7 @@ export default class Query extends Component {
     // Reset suggestion
     this.removeAllSuggestion()
     if (this.currentSelected.type == "unionNode") {
-      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, this.getMaxDepth(this.currentSelected) + 1)
     } else {
       this.insertSuggestion(this.currentSelected)
     }
@@ -1069,7 +1105,7 @@ export default class Query extends Component {
     // Reset suggestion
     this.removeAllSuggestion()
     if (this.currentSelected.type == "unionNode") {
-      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, this.getMaxDepth(this.currentSelected) + 1)
     } else {
       this.insertSuggestion(this.currentSelected)
     }
@@ -1084,7 +1120,7 @@ export default class Query extends Component {
     // Reset suggestion
     this.removeAllSuggestion()
     if (this.currentSelected.type == "unionNode") {
-      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, this.getMaxDepth(this.currentSelected) + 1)
     } else {
       this.insertSuggestion(this.currentSelected)
     }
@@ -1718,7 +1754,7 @@ export default class Query extends Component {
             if (this.currentSelected) {
               if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {
                 if (this.currentSelected.type == "unionNode") {
-                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, true)
+                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, this.getMaxDepth(this.currentSelected) + 1)
                 } else {
                   this.insertSuggestion(this.currentSelected)
                 }
