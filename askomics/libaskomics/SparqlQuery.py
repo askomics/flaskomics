@@ -799,6 +799,10 @@ class SparqlQuery(Params):
             "minusNode": "MINUS"
         }
 
+        # Union sub-block
+        if '_' in blockid:
+            return "DEFAULT"
+
         for node in self.json["nodes"]:
             if node["type"] in ("unionNode", "minusNode"):
                 if node["specialNodeId"] == blockid:
@@ -970,6 +974,25 @@ class SparqlQuery(Params):
             }, ]
         })
 
+    def update_sub_block(self, block_dict, depths, type, value, current_depth):
+        depth = depths[current_depth]
+        if depth not in block_dict:
+            block_dict[depth] = {
+                "type": self.get_block_type(depth),
+                "triples": [],
+                "filters": [],
+                "values": [],
+                "sub_blocks": {}
+            }
+        # End of branch
+        if current_depth == len(depths) - 1:
+            block_dict[depth][type].append(value)
+        else:
+            self.update_sub_block(block_dict[depth]["sub_blocks"], depths, type, value, current_depth + 1)
+
+    def update_block_dict(self, depths, type, value):
+        self.update_sub_block(self.triples_blocks_dict, depths, type, value, 0)
+
     def replace_variables_in_triples(self, var_to_replace):
         """Replace variables in triples
 
@@ -1063,6 +1086,7 @@ class SparqlQuery(Params):
 
         self.triples = []
         self.triples_blocks = []
+        self.triples_blocks_dict = {}
 
         self.values = []
         self.filters = []
