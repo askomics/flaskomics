@@ -998,7 +998,7 @@ export default class Query extends Component {
 
     let depth
     if (this.currentSelected.type == "unionNode"){
-      depth = [...sourceNode.depth, sourceNode.specialNodeId + "_" + this.getLargestSpecialNodeGroupId(sourceNode) + 1]
+      depth = [...sourceNode.depth, sourceNode.specialNodeId, sourceNode.specialNodeId + "_" + this.getLargestSpecialNodeGroupId(sourceNode) + 1]
     } else {
       depth = [...sourceNode.depth]
     }

@@ -1055,23 +1055,27 @@ class SparqlQuery(Params):
             self.replace_variables_in_sub_block(var_to_replace, block)
 
     def triple_sub_block_to_string(self, block, indent="    "):
+        new_indent = indent + "    "
         sub_content = ""
+        first_level = indent == "    "
         if block['sub_blocks']:
-            sub_content = "{{{}\n".format(indent)
             if block["type"] == "UNION":
-                sub_content = "\n{}UNION".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
+                sub_content = "\n{}UNION ".format(new_indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
+                if not first_level:
+                    return sub_content
             elif block["type"] == "MINUS":
-                sub_content = "MINUS" + "\n{}MINUS".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
+                sub_content = "MINUS " + "\n{}MINUS".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
+                if not first_level:
+                    return sub_content
             else:
-                sub_content = "\n{}".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
-            sub_content += "\n{}}}".format(indent)
+                sub_content = "\n{}".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
 
-        content = "{{{}\n".format(indent)
-        triples_string = '\n{}'.format(indent * 2).join([self.triple_dict_to_string(triple_dict) for triple_dict in block["triples"]])
-        triples_string += '\n{}'.format(indent * 2)
-        triples_string += '\n{}'.format(indent * 2).join([filtr for filtr in block["filters"]])
-        triples_string += '\n{}'.format(indent * 2)
-        triples_string += '\n{}'.format(indent * 2).join([value for value in block["values"]])
+        content = "{{\n{}".format(new_indent)
+        triples_string = '\n{}'.format(new_indent).join([self.triple_dict_to_string(triple_dict) for triple_dict in block["triples"]])
+        triples_string += '\n{}'.format(new_indent) if block["filters"] else ""
+        triples_string += '\n{}'.format(new_indent).join([filtr for filtr in block["filters"]])
+        triples_string += '\n{}'.format(new_indent) if block["values"] else ""
+        triples_string += '\n{}'.format(new_indent).join([value for value in block["values"]])
         content += triples_string
         content += sub_content
 
@@ -1080,7 +1084,7 @@ class SparqlQuery(Params):
         return content
 
     def triple_blocks_dict_to_string(self):
-        return '\n    '.join([self.triple_sub_block_to_string(triple_block) for triple_block in self.triples_blocks_dict.values()]),
+        return '\n    '.join([self.triple_sub_block_to_string(triple_block) for triple_block in self.triples_blocks_dict.values()])
 
     def replace_variables_in_blocks(self, var_to_replace):
         """Replace variables in blocks
@@ -1672,7 +1676,7 @@ WHERE {{
             """.format(
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                blocks=self.triple_blocks_dict_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 
@@ -1716,7 +1720,7 @@ WHERE {{
                 selects=' '.join(self.selects),
                 froms=from_string,
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                blocks=self.triple_blocks_dict_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 
