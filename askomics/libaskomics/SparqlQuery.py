@@ -1026,6 +1026,62 @@ class SparqlQuery(Params):
         self.triples = Utils.unique(self.triples)
         self.selects = Utils.unique(self.selects)
 
+    def replace_variables_in_sub_block(self, var_to_replace, content):
+        for var_source, var_target in var_to_replace:
+            for ntriple, triple_dict in enumerate(content["triples"]):
+                for key, value in triple_dict.items():
+                    if key not in ["optional", "nested", "nested_start", "nested_end", "form"]:
+                        content["triples"][ntriple][key] = value.replace(var_source, var_target)
+
+            for i, filtr in enumerate(content["filters"]):
+                content["filters"][i] = filtr.replace(var_source, var_target)
+
+            for i, value in enumerate(content["values"]):
+                content["values"][i] = value.replace(var_source, var_target)
+        content["triples"] = Utils.unique(content["triples"])
+
+        if content['sub_blocks']:
+            self.replace_variables_in_sub_block(var_to_replace, content['sub_blocks'])
+
+    def replace_variables_in_blocks_dict(self, var_to_replace):
+        """Replace variables in blocks
+
+        Parameters
+        ----------
+        var_to_replace : list of tuples
+            var to replace in block
+        """
+        for block in self.triples_blocks_dict.values():
+            self.replace_variables_in_sub_block(var_to_replace, block)
+
+    def triple_sub_block_to_string(self, block, indent="    "):
+        sub_content = ""
+        if block['sub_blocks']:
+            sub_content = "{{{}\n".format(indent)
+            if block["type"] == "UNION":
+                sub_content = "\n{}UNION".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
+            elif block["type"] == "MINUS":
+                sub_content = "MINUS" + "\n{}MINUS".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
+            else:
+                sub_content = "\n{}".format(indent).join([self.triple_sub_block_to_string(sub_block, indent * 2) for sub_block in block['sub_blocks'].values()])
+            sub_content += "\n{}}}".format(indent)
+
+        content = "{{{}\n".format(indent)
+        triples_string = '\n{}'.format(indent * 2).join([self.triple_dict_to_string(triple_dict) for triple_dict in block["triples"]])
+        triples_string += '\n{}'.format(indent * 2)
+        triples_string += '\n{}'.format(indent * 2).join([filtr for filtr in block["filters"]])
+        triples_string += '\n{}'.format(indent * 2)
+        triples_string += '\n{}'.format(indent * 2).join([value for value in block["values"]])
+        content += triples_string
+        content += sub_content
+
+        content += "\n{}}}".format(indent)
+
+        return content
+
+    def triple_blocks_dict_to_string(self):
+        return '\n    '.join([self.triple_sub_block_to_string(triple_block) for triple_block in self.triples_blocks_dict.values()]),
+
     def replace_variables_in_blocks(self, var_to_replace):
         """Replace variables in blocks
 
