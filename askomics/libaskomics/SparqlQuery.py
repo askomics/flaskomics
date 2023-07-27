@@ -1087,6 +1087,11 @@ class SparqlQuery(Params):
     def triple_blocks_dict_to_string(self):
         return '\n    '.join([self.triple_sub_block_to_string(triple_block) for triple_block in self.triples_blocks_dict.values()])
 
+    def blocks_to_string(self):
+        if self.legacy_block:
+            return '\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks])
+        return self.triple_blocks_dict_to_string()
+
     def replace_variables_in_blocks(self, var_to_replace):
         """Replace variables in blocks
 
@@ -1174,6 +1179,9 @@ class SparqlQuery(Params):
             entities = entities + attr["entityUris"]
             if attr["type"] == "uri" and attr.get("ontology", False) is True and not attr["entityUris"][0] in ontologies:
                 ontologies[attr["entityUris"][0]] = om.get_ontology(uri=attr["entityUris"][0])
+
+        # Check if legacy block mode (ie, stored queries)
+        self.legacy_block = any([entity.get('legacyBlock') for entity in self.json['nodes']])
 
         entities = list(set(entities))  # uniq list
 
@@ -1679,7 +1687,7 @@ WHERE {{
             """.format(
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks=self.triple_blocks_dict_to_string(),
+                blocks=self.blocks_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 
@@ -1703,7 +1711,7 @@ WHERE {{
                 remote_graphs=federated_graphs_string,
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                blocks=self.blocks_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values)
             )
@@ -1723,7 +1731,7 @@ WHERE {{
                 selects=' '.join(self.selects),
                 froms=from_string,
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks=self.triple_blocks_dict_to_string(),
+                blocks=self.blocks_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 
@@ -1740,7 +1748,7 @@ WHERE {{
             """.format(
                 selects=' '.join(self.selects),
                 triples='\n    '.join([self.triple_dict_to_string(triple_dict) for triple_dict in self.triples]),
-                blocks='\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks]),
+                blocks=self.blocks_to_string(),
                 filters='\n    '.join(self.filters),
                 values='\n    '.join(self.values))
 

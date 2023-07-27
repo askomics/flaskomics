@@ -1638,6 +1638,24 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // Fix update graphState
+  fixGraphState() {
+    // Fix faldoFilters
+    this.graphState.links.map(link => {
+      if (!link.faldoFilters) {
+        link.faldoFilters = this.defaultFaldoFilters
+      }
+    })
+    this.graphState.nodes.map(node => {
+      if (!node.depth) {
+        if(node.specialNodeId){
+          node.legacyBlock = true
+        }
+        node.depth = []
+      }
+    })
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -1750,6 +1768,7 @@ export default class Query extends Component {
             // redo a query
             this.graphState = this.props.location.state.graphState
             this.initId()
+            this.fixGraphState()
             this.setCurrentSelected()
             if (this.currentSelected) {
               if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {

@@ -355,6 +355,17 @@ class Database(Params):
         except Exception:
             pass
 
+        query = '''
+        ALTER TABLE results
+        ADD version text NULL
+        DEFAULT(NULL)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_endpoints_table(self):
         """Create the endpoints table"""
         query = '''
