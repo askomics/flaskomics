@@ -1041,7 +1041,8 @@ class SparqlQuery(Params):
         content["triples"] = Utils.unique(content["triples"])
 
         if content['sub_blocks']:
-            self.replace_variables_in_sub_block(var_to_replace, content['sub_blocks'])
+            for sub_block in content['sub_blocks'].values():
+                self.replace_variables_in_sub_block(var_to_replace, sub_block)
 
     def replace_variables_in_blocks_dict(self, var_to_replace):
         """Replace variables in blocks
@@ -1214,6 +1215,7 @@ class SparqlQuery(Params):
                     block_id = link["source"]["specialNodeId"]
                     sblock_id = link["source"]["specialNodeGroupId"] if link["source"]["specialNodeGroupId"] else link["target"]["specialNodeGroupId"]
                     pblock_ids = link["source"]["specialPreviousIds"]
+                    depth = link["source"].get("depth")
 
                 # Position
                 if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):
