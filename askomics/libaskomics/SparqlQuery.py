@@ -1661,6 +1661,7 @@ class SparqlQuery(Params):
         # Linked attributes: replace SPARQL variable target by source
         self.replace_variables_in_blocks(var_to_replace)
         self.replace_variables_in_triples(var_to_replace)
+        self.replace_variables_in_blocks_dict(var_to_replace)
 
         # Write the query
         # query is for editor (no froms, no federated)
