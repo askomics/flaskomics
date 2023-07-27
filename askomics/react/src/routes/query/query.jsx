@@ -1050,7 +1050,8 @@ export default class Query extends Component {
           target: link.target.id == targetId ? "target" : "source",
           selected: link.selected,
           suggested: link.suggested,
-          directed: link.directed
+          directed: link.directed,
+          faldoFilters: link.faldoFilters
         }
       }
     })
