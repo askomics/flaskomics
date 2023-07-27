@@ -270,6 +270,7 @@ class Database(Params):
             template boolean,
             has_form_attr boolean,
             form boolean,
+            version text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
