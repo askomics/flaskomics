@@ -1599,22 +1599,17 @@ class SparqlQuery(Params):
                             "subject": node_uri,
                             "predicate": category_name,
                             "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
-                        }, block_id, sblock_id, pblock_ids, depth)
-                        self.store_triple({
-                            "subject": faldo_strand,
-                            "predicate": "a",
-                            "object": category_value_uri,
-                            "optional": True if attribute["optional"] else False
+                            "optional": True if attribute["optional"] else False,
+                            "nested_start": True if (attribute["optional"] and attribute["visible"]) else False
                         }, block_id, sblock_id, pblock_ids, depth)
                         if attribute["visible"]:
                             self.store_triple({
-                                "subject": faldo_strand,
+                                "subject": category_value_uri,
                                 "predicate": "rdfs:label",
                                 "object": category_label,
-                                "optional": False
+                                "optional": True if attribute["optional"] else False,
+                                "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids, depth)
-                        self.store_value("VALUES {} {{ faldo:ReverseStrandPosition faldo:ForwardStrandPosition faldo:BothStrandPosition}} .".format(category_value_uri), block_id, sblock_id, pblock_ids, depth)
                     else:
                         category_name = "<{}>".format(attribute["uri"])
                         self.store_triple({

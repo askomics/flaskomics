@@ -110,12 +110,12 @@ class BedFile(File):
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
-
+                    o = self.namespace_data[self.format_uri(value)]
                     if attribute["label"] == rdflib.Literal("strand"):
-                        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
+                        o = self.get_faldo_strand(value)
+                    self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], o))
 
         # Faldo:
         if self.faldo_entity:

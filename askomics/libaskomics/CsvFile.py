@@ -367,11 +367,11 @@ class CsvFile(File):
                 p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
                     o = self.rdfize(value)
+                    if self.columns_type[index] == "strand":
+                        o = self.get_faldo_strand(value)
                     self.graph_abstraction_dk.add((s, p, o))
                     self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
-                    if self.columns_type[index] == "strand":
-                        self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
 
     def set_rdf_abstraction(self):
         """Set the abstraction"""
