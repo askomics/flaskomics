@@ -436,7 +436,7 @@ class File(Params):
 
         return self.faldo.BothStrandPosition
 
-    def get_reference_strand_uri(self, reference, block, strand):
+    def get_reference_strand_uri(self, reference, strand, block):
         faldo_dict = {
             self.faldo.ForwardStrandPosition: "ForwardStrand",
             self.faldo.ReverseStrandPosition: "ReverseStrand",
