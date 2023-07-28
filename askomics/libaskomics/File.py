@@ -436,6 +436,14 @@ class File(Params):
 
         return self.faldo.BothStrandPosition
 
+    def get_reference_strand_uri(self, reference, block, strand):
+        faldo_dict = {
+            self.faldo.ForwardStrandPosition: "ForwardStrand",
+            self.faldo.ReverseStrandPosition: "ReverseStrand",
+            self.faldo.BothStrandPosition: "BothStrand"
+        }
+        return self.rdfize(self.format_uri("{}_s{}_{}".format(reference, faldo_dict[strand], block)))
+
     def get_rdf_type(self, value):
         """get xsd type of a value
 

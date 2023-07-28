@@ -315,5 +315,9 @@ class BedFile(File):
                 self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
                 block_reference = self.rdfize(self.format_uri("{}_{}".format(feature.chrom, slice_block)))
                 self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+                if faldo_strand:
+                    self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
+                    strand_ref = self.get_reference_strand_uri(feature.chrom, faldo_strand, slice_block)
+                    self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], strand_ref))
 
             yield

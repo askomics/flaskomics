@@ -1248,9 +1248,6 @@ class SparqlQuery(Params):
                             if attr["faldo"].endswith("faldoEnd"):
                                 start_end.append(attr["id"])
                                 end_1 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
-                            if attr["faldo"].endswith("faldoStrand"):
-                                strand_1 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
-                                strands.append(attr["id"])
                         if attr["nodeId"] == target_id:
                             if attr["faldo"].endswith("faldoStart"):
                                 start_end.append(attr["id"])
@@ -1258,13 +1255,18 @@ class SparqlQuery(Params):
                             if attr["faldo"].endswith("faldoEnd"):
                                 start_end.append(attr["id"])
                                 end_2 = self.format_sparql_variable("{}{}_{}".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
-                            if attr["faldo"].endswith("faldoStrand"):
-                                strand_2 = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attr["entityLabel"], attr["nodeId"], attr["label"]))
-                                strands.append(attr["id"])
+
+                    block_uri = "includeIn"
+                    if link["sameRef"]:
+                        block_uri = "includeInReference"
+                        if link["sameStrand"]:
+                            block_uri = "includeInReferenceStrand"
+                    elif link["sameStrand"]:
+                        block_uri = "includeInStrand"
 
                     self.store_triple({
                         "subject": source,
-                        "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
+                        "predicate": "askomics:{}".format(block_uri),
                         "object": common_block,
                         "optional": False
 
@@ -1272,16 +1274,11 @@ class SparqlQuery(Params):
 
                     self.store_triple({
                         "subject": target,
-                        "predicate": "askomics:{}".format("includeInReference" if link["sameRef"] else "includeIn"),
+                        "predicate": "askomics:{}".format(block_uri),
                         "object": common_block,
                         "optional": False
 
                     }, block_id, sblock_id, pblock_ids, depth)
-
-                    if link["sameStrand"]:
-                        var_to_replace.append((strand_1, strand_2))
-                    else:
-                        strands = []
 
                     equal_sign = "" if link["strict"] else "="
 

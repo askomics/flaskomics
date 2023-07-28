@@ -708,5 +708,10 @@ class CsvFile(File):
                         if reference:
                             block_reference = self.rdfize(self.format_uri("{}_{}".format(reference, slice_block)))
                             self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+                            if faldo_strand:
+                                strand_ref = self.get_reference_strand_uri(reference, faldo_strand, slice_block)
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], strand_ref))
+                        if faldo_strand:
+                            self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
 
                 yield
