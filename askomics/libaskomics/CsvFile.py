@@ -617,7 +617,8 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
-                        if not cell:
+                        if current_type == "strand":
+                            # Override csv value, use "proper" values
                             cell = self.get_faldo_strand_label(cell)
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
