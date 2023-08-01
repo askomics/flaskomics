@@ -533,9 +533,7 @@ class SparqlQuery(Params):
             }}
 
             OPTIONAL {{
-            ?object faldo:begin/rdf:type ?Gene1_strandCategory .
-            ?Gene1_strand_faldoStrand a ?Gene1_strandCategory .
-            ?Gene1_strand_faldoStrand rdfs:label ?faldo_value .
+            ?object faldo:begin/rdf:type/rdfs:label ?faldo_value .
             ?faldo_uri rdf:type askomics:faldoStrand .
             }}
 
