@@ -617,6 +617,8 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
+                        if not cell:
+                            cell = self.get_faldo_strand_label(cell)
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
@@ -628,7 +630,6 @@ class CsvFile(File):
                             reference = cell
                             self.faldo_abstraction["reference"] = potential_relation
                         elif current_type == 'strand':
-                            cell = self.get_faldo_strand_label(cell)
                             faldo_strand = self.get_faldo_strand(cell)
                             self.faldo_abstraction["strand"] = potential_relation
                         else:
@@ -709,8 +710,12 @@ class CsvFile(File):
                             self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
                             if faldo_strand:
                                 strand_ref = self.get_reference_strand_uri(reference, faldo_strand, slice_block)
-                                self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], strand_ref))
+                                for sref in strand_ref:
+                                    self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
                         if faldo_strand:
                             self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
+                            if faldo_strand == self.faldo.BothStrandPosition:
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ForwardStrandPosition))
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ReverseStrandPosition))
 
                 yield

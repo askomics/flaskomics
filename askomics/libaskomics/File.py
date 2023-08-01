@@ -464,7 +464,10 @@ class File(Params):
             self.faldo.ReverseStrandPosition: "ReverseStrand",
             self.faldo.BothStrandPosition: "BothStrand"
         }
-        return self.rdfize(self.format_uri("{}_s{}_{}".format(reference, faldo_dict[strand], block)))
+        if strand == self.faldo.BothStrandPosition:
+            return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, dstrand, block))) for dstrand in faldo_dict.values()]
+
+        return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, faldo_dict[strand], block)))]
 
     def get_rdf_type(self, value):
         """get xsd type of a value

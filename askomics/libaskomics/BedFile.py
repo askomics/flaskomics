@@ -318,6 +318,7 @@ class BedFile(File):
                 if faldo_strand:
                     self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
                     strand_ref = self.get_reference_strand_uri(feature.chrom, faldo_strand, slice_block)
-                    self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], strand_ref))
+                    for sref in strand_ref:
+                        self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
 
             yield

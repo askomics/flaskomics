@@ -53,18 +53,6 @@
       {
         "categories": [
           {
-            "label": "minus",
-            "uri": "http://biohackathon.org/resource/faldo/ReverseStrandPosition"
-          },
-          {
-            "label": "plus",
-            "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
-          },
-	        {
-            "label": "unknown/both",
-            "uri": "http://biohackathon.org/resource/faldo/BothStrandPosition"
-          },
-          {
             "label": "+",
             "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
           },
