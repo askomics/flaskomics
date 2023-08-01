@@ -617,8 +617,6 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
-                        if not cell:
-                            cell = "unknown/both"
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
@@ -630,6 +628,7 @@ class CsvFile(File):
                             reference = cell
                             self.faldo_abstraction["reference"] = potential_relation
                         elif current_type == 'strand':
+                            cell = self.get_faldo_strand_label(cell)
                             faldo_strand = self.get_faldo_strand(cell)
                             self.faldo_abstraction["strand"] = potential_relation
                         else:

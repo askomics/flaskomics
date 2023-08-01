@@ -436,6 +436,28 @@ class File(Params):
 
         return self.faldo.BothStrandPosition
 
+    def get_faldo_strand_label(self, raw_strand):
+        """Get faldo strand label
+
+        Parameters
+        ----------
+        raw_strand : string
+            raw value of strand
+
+        Returns
+        -------
+        label
+            "+", "-", or "."
+        """
+
+        if raw_strand in ("+", "plus", "1", "positive", "forward"):
+            return "+"
+
+        if raw_strand in ("-", "minus", "moins", "-1", "reverse", "negative"):
+            return "-"
+
+        return "."
+
     def get_reference_strand_uri(self, reference, strand, block):
         faldo_dict = {
             self.faldo.ForwardStrandPosition: "ForwardStrand",

@@ -1570,7 +1570,6 @@ class SparqlQuery(Params):
                     node_uri = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
-                    faldo_strand = self.format_sparql_variable("{}{}_{}_faldoStrand".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
                         category_name = 'faldo:location/faldo:begin/faldo:reference'
                         self.store_triple({
@@ -1628,10 +1627,7 @@ class SparqlQuery(Params):
                 # values
                 if attribute["filterSelectedValues"] != [] and not attribute["optional"] and not attribute["linked"]:
                     uri_val_list = []
-                    if attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
-                        value_var = faldo_strand
-                    else:
-                        value_var = category_value_uri
+                    value_var = category_value_uri
                     uri_val_list = ["<{}>".format(value) for value in attribute["filterSelectedValues"]]
                     if uri_val_list:
                         if attribute["exclude"]:

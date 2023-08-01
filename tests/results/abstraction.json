@@ -54,27 +54,27 @@
         "categories": [
           {
             "label": "minus",
-            "uri": "http://askomics.org/test/data/minus"
+            "uri": "http://biohackathon.org/resource/faldo/ReverseStrandPosition"
           },
           {
             "label": "plus",
-            "uri": "http://askomics.org/test/data/plus"
+            "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
           },
 	        {
             "label": "unknown/both",
-            "uri": "http://askomics.org/test/data/unknown/both"
+            "uri": "http://biohackathon.org/resource/faldo/BothStrandPosition"
           },
           {
             "label": "+",
-            "uri": "http://askomics.org/test/data/%2B"
+            "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
           },
           {
             "label": "-",
-            "uri": "http://askomics.org/test/data/-"
+            "uri": "http://biohackathon.org/resource/faldo/ReverseStrandPosition"
           },
           {
             "label": ".",
-            "uri": "http://askomics.org/test/data/."
+            "uri": "http://biohackathon.org/resource/faldo/BothStrandPosition"
           }
         ],
         "entityUri": "http://askomics.org/test/data/transcript",
