@@ -13,7 +13,7 @@
             "predicate":"http://askomics.org/test/data/chromosomeName"
         },
         {
-            "object":"plus",
+            "object":"+",
             "predicate":"http://askomics.org/test/data/strand"
         },
         {
