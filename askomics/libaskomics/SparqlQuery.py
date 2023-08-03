@@ -1056,16 +1056,11 @@ class SparqlQuery(Params):
     def triple_sub_block_to_string(self, block, indent="    "):
         new_indent = indent + "    "
         sub_content = ""
-        first_level = indent == "    "
         if block['sub_blocks']:
             if block["type"] == "UNION":
                 sub_content = "\n{}UNION ".format(new_indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
-                if not first_level:
-                    return sub_content
             elif block["type"] == "MINUS":
-                sub_content = "MINUS " + "\n{}MINUS".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
-                if not first_level:
-                    return sub_content
+                sub_content = "MINUS ".format(indent) + "\n{}MINUS ".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
             else:
                 sub_content = "\n{}".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
 
@@ -1076,6 +1071,7 @@ class SparqlQuery(Params):
         triples_string += '\n{}'.format(new_indent) if block["values"] else ""
         triples_string += '\n{}'.format(new_indent).join([value for value in block["values"]])
         content += triples_string
+        content += '\n{}'.format(new_indent) if sub_content and triples_string else ""
         content += sub_content
 
         content += "\n{}}}".format(indent)
