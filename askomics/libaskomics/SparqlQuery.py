@@ -1060,7 +1060,7 @@ class SparqlQuery(Params):
             if block["type"] == "UNION":
                 sub_content = "\n{}UNION ".format(new_indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
             elif block["type"] == "MINUS":
-                sub_content = "MINUS ".format(indent) + "\n{}MINUS ".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
+                sub_content = "MINUS " + "\n{}MINUS ".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
             else:
                 sub_content = "\n{}".format(indent).join([self.triple_sub_block_to_string(sub_block, new_indent) for sub_block in block['sub_blocks'].values()])
 
