@@ -1217,7 +1217,10 @@ class SparqlQuery(Params):
                     block_id = link["source"]["specialNodeId"]
                     sblock_id = link["source"]["specialNodeGroupId"] if link["source"]["specialNodeGroupId"] else link["target"]["specialNodeGroupId"]
                     pblock_ids = link["source"]["specialPreviousIds"]
-                    depth = link["target"].get("depth")
+                    # Correct depth is the longest one
+                    depth = link["target"].get("depth", [])
+                    if len(link["source"].get("depth", [])) > len(depth):
+                        depth = link["source"].get("depth", [])
 
                 # Position
                 if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):
