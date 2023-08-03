@@ -1221,7 +1221,7 @@ class SparqlQuery(Params):
                     block_id = link["source"]["specialNodeId"]
                     sblock_id = link["source"]["specialNodeGroupId"] if link["source"]["specialNodeGroupId"] else link["target"]["specialNodeGroupId"]
                     pblock_ids = link["source"]["specialPreviousIds"]
-                    depth = link["source"].get("depth")
+                    depth = link["target"].get("depth")
 
                 # Position
                 if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):

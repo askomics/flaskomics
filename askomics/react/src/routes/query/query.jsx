@@ -132,18 +132,9 @@ export default class Query extends Component {
           })
           listIds.add(remote.specialNodeGroupId)
         }
-        if (link.target == node.id) {
-          remote = this.state.nodes.some(rem => {
-            return (link.target == rem.id )
-          })
-          listIds.add(remote.specialNodeGroupId)
-        }
       } else {
         if (link.source.id == node.id) {
           listIds.add(link.target.specialNodeGroupId)
-        }
-        if (link.target.id == node.id) {
-          listIds.add(link.source.specialNodeGroupId)
         }
       }
     })
@@ -555,7 +546,7 @@ export default class Query extends Component {
     let depth = [...node.depth]
 
     if(incrementSpecialNodeGroupId){
-      depth = [...node.depth, node.specialNodeGroupId, node.specialNodeGroupId + "_" + incrementSpecialNodeGroupId]
+      depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
     }
 
     if (this.isOntoEndNode(node.id)){
