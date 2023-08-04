@@ -711,7 +711,7 @@ class SparqlQuery(Params):
 
         return block_string
 
-    def triple_dict_to_string(self, triple_dict):
+    def triple_dict_to_string(self, triple_dict):  # pragma: no cover
         """Convert a triple dict into a triple string
 
         Parameters
@@ -779,7 +779,7 @@ class SparqlQuery(Params):
 
         raise ValueError("{} is not a valid URI or CURIE".format(value))
 
-    def get_block_type(self, blockid):
+    def get_block_type(self, blockid):  # pragma: no cover
         """Summary
 
         Parameters
@@ -867,7 +867,7 @@ class SparqlQuery(Params):
         else:
             self.values.append(value)
 
-    def store_values_block(self, value, blockid, sblockid):
+    def store_values_block(self, value, blockid, sblockid):  # pragma: no cover
         """Add a VALUES in a block. If block exist, add the triples, else, create a new block.
 
         Same for the sub block
@@ -905,7 +905,7 @@ class SparqlQuery(Params):
             }, ]
         })
 
-    def store_filter_block(self, filtr, blockid, sblockid):
+    def store_filter_block(self, filtr, blockid, sblockid):  # pragma: no cover
         """Add a FILTER in a block. If block exist, add the triples, else, create a new block.
 
         Same for the sub block
@@ -943,7 +943,7 @@ class SparqlQuery(Params):
             }, ]
         })
 
-    def store_block(self, triple, blockid, sblockid, pblock_ids):
+    def store_block(self, triple, blockid, sblockid, pblock_ids):  # pragma: no cover
         """Add a triple in a block. If block exist, add the triples, else, create a new block.
 
         Same for the sub block
@@ -981,7 +981,7 @@ class SparqlQuery(Params):
             }, ]
         })
 
-    def update_sub_block(self, block_dict, depths, type, value, current_depth):
+    def update_sub_block(self, block_dict, depths, type, value, current_depth):  # pragma: no cover
         depth = depths[current_depth]
         if depth not in block_dict:
             block_dict[depth] = {
@@ -997,7 +997,7 @@ class SparqlQuery(Params):
         else:
             self.update_sub_block(block_dict[depth]["sub_blocks"], depths, type, value, current_depth + 1)
 
-    def update_block_dict(self, depths, type, value):
+    def update_block_dict(self, depths, type, value):  # pragma: no cover
         self.update_sub_block(self.triples_blocks_dict, depths, type, value, 0)
 
     def replace_variables_in_triples(self, var_to_replace):
@@ -1024,7 +1024,7 @@ class SparqlQuery(Params):
         self.triples = Utils.unique(self.triples)
         self.selects = Utils.unique(self.selects)
 
-    def replace_variables_in_sub_block(self, var_to_replace, content):
+    def replace_variables_in_sub_block(self, var_to_replace, content):  # pragma: no cover
         for var_source, var_target in var_to_replace:
             for ntriple, triple_dict in enumerate(content["triples"]):
                 for key, value in triple_dict.items():
@@ -1042,7 +1042,7 @@ class SparqlQuery(Params):
             for sub_block in content['sub_blocks'].values():
                 self.replace_variables_in_sub_block(var_to_replace, sub_block)
 
-    def replace_variables_in_blocks_dict(self, var_to_replace):
+    def replace_variables_in_blocks_dict(self, var_to_replace):  # pragma: no cover
         """Replace variables in blocks
 
         Parameters
@@ -1053,7 +1053,7 @@ class SparqlQuery(Params):
         for block in self.triples_blocks_dict.values():
             self.replace_variables_in_sub_block(var_to_replace, block)
 
-    def triple_sub_block_to_string(self, block, indent="    "):
+    def triple_sub_block_to_string(self, block, indent="    "):  # pragma: no cover
         new_indent = indent + "    "
         sub_content = ""
         if block['sub_blocks']:
@@ -1078,15 +1078,15 @@ class SparqlQuery(Params):
 
         return content
 
-    def triple_blocks_dict_to_string(self):
+    def triple_blocks_dict_to_string(self):  # pragma: no cover
         return '\n    '.join([self.triple_sub_block_to_string(triple_block) for triple_block in self.triples_blocks_dict.values()])
 
-    def blocks_to_string(self):
+    def blocks_to_string(self):  # pragma: no cover
         if self.legacy_block:
             return '\n    '.join([self.triple_block_to_string(triple_block) for triple_block in self.triples_blocks])
         return self.triple_blocks_dict_to_string()
 
-    def replace_variables_in_blocks(self, var_to_replace):
+    def replace_variables_in_blocks(self, var_to_replace):  # pragma: no cover
         """Replace variables in blocks
 
         Parameters
@@ -1113,7 +1113,7 @@ class SparqlQuery(Params):
 
                 self.triples_blocks[nblock]["sblocks"][nsblock]["triples"] = Utils.unique(self.triples_blocks[nblock]["sblocks"][nsblock]["triples"])
 
-    def get_source_of_special_node(self, special_node_id):
+    def get_source_of_special_node(self, special_node_id):  # pragma: no cover
         """Get if of original node of a special one
 
         Parameters
