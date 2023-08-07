@@ -519,7 +519,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label ?indirect_relation
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
@@ -530,6 +530,7 @@ class TriplestoreExplorer(Params):
                 ?node a askomics:AskomicsRelation .
                 ?node rdfs:label ?property_label .
                 ?node rdfs:range ?range_uri .
+                OPTIONAL {{ ?node askomics:isIndirectRelation ?indirect_relation . }}
                 # Retrocompatibility
                 OPTIONAL {{?node askomics:uri ?new_property_uri}}
                 BIND( IF(isBlank(?node), ?new_property_uri, ?node) as ?property_uri)
@@ -563,7 +564,8 @@ class TriplestoreExplorer(Params):
                         "label": result["property_label"],
                         "graphs": [result["graph"], ],
                         "source": result["entity_uri"],
-                        "target": result["range_uri"]
+                        "target": result["range_uri"],
+                        "indirect": result.get("indirect_relation", False)
                     }
                     relations.append(relation)
                 else:

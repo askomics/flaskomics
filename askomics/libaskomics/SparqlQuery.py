@@ -1330,7 +1330,8 @@ class SparqlQuery(Params):
                         "optional": False
                     }
 
-                    self.store_triple(triple, block_id, sblock_id, pblock_ids, depth)
+                    if not link.get('indirect', False):
+                        self.store_triple(triple, block_id, sblock_id, pblock_ids, depth)
 
         # Store linked attributes
         for attribute in self.json["attr"]:

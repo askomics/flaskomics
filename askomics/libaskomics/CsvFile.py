@@ -416,8 +416,9 @@ class CsvFile(File):
 
             blank = BNode()
             # Relation
-            if self.columns_type[index] in ('general_relation', 'symetric_relation'):
+            if self.columns_type[index] in ('general_relation', 'symetric_relation', 'indirect_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
+                indirect_relation = True if self.columns_type[index] == 'indirect_relation' else False
                 splitted = attribute_name.split('@')
 
                 attribute = self.rdfize(splitted[0])
@@ -439,6 +440,8 @@ class CsvFile(File):
                 if symetric_relation:
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+                if indirect_relation:
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], True))
 
                 continue
 
