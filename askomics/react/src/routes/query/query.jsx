@@ -1653,6 +1653,9 @@ export default class Query extends Component {
       if (!link.faldoFilters) {
         link.faldoFilters = this.defaultFaldoFilters
       }
+      if (!link.indirect){
+        link.indirect = false
+      }
     })
     this.graphState.nodes.map(node => {
       if (!node.depth) {

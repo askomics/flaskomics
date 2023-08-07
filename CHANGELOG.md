@@ -25,6 +25,7 @@ This changelog was started for release 4.2.0.
 - Added 'custom distance' option for faldo relation (instead of just 'included_in' and 'overlap_with')
 - Store 'version' value when storing results. Not used for now, but might be used in deprecation warnings later
 - Removed some lines from coverage computation
+- Added 'indirect relations': Two entities will be linked on the graph, without a direct relation between them (same as faldo relations). This is intended to be used with 'linked attributes' (ex: get all entities B where B.color is the same as A.color, without a direct relation between A and B)
 
 ### Fixed
 

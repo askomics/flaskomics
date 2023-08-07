@@ -100,7 +100,7 @@ _:blank askomics:uri :category_attribute_uri
 
 [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) is a simple ontology to describe sequence feature positions and regions. AskOmics can use FALDO to describe this kind of entities. GFF, BED and some CSV/TSV are converted with FALDO.
 
-A FALDO entity have to be declared as FALDO on the abstraction. If attribute are decribed as FALDO in the abstractio, The data triples have to use FALDO to describe the data.
+A FALDO entity have to be declared as FALDO on the abstraction. If attribute are described as FALDO in the abstraction, The data triples have to use FALDO to describe the data.
 
 ```turtle
 :FaldoEntity rdf:type askomics:entity .
@@ -177,6 +177,10 @@ _:blank rdfs:range :EntityTarget .
 _:blank dcat:endpointURL <url...> .
 _:blank dcat:dataset <file_turtle_XXXXX_gene_tsv> .
 ```
+
+!!! note "Info"
+    If defining an 'indirect relation', you can add a `_:blank askomics:isIndirectRelation true` triple.
+
 
 # Federation
 
