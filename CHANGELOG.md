@@ -9,6 +9,12 @@ This changelog was started for release 4.2.0.
 
 ## [4.5.0] - Unreleased
 
+### **Deprecation warning**
+
+- Due to a change in the way *strands* are integrated for FALDO entities, you will need to re-integrate them.
+- 'Results' from older version of Askomics using 'Minus' or 'Union' blocks will use 'legacy' mode. (Meaning, they will not have recursive block support). To enable recursive block support, please recreate the query from scratch, or manually delete the blocks and re-create them.
+
+
 ### Added
 
 - Added 'anonymous_query' and 'anonymous_query_cleanup' variables
@@ -17,6 +23,8 @@ This changelog was started for release 4.2.0.
 - Added 'Abstraction' tab on the navbar. This will print the whole abstraction as a 2d/3d graph.
 - Added 'distance' notion, using attribute link. This allows user to filter a value based on another value, with an optional modifier.
 - Added 'custom distance' option for faldo relation (instead of just 'included_in' and 'overlap_with')
+- Store 'version' value when storing results. Not used for now, but might be used in deprecation warnings later
+- Removed some lines from coverage computation
 
 ### Fixed
 
@@ -26,6 +34,8 @@ This changelog was started for release 4.2.0.
 - Fixed Gff Faldo integration (was only integrating the last selected entity)
 - Fixed an issue when using filters and an 'UNION' node
 - Fixed an issue when launching a query with a 'linked' attribute toggled but unselected
+- Fixed missing includeIn and includeInReference in bed files
+- Fixed 'overlap_with' faldo query
 
 ### Changed
 
@@ -37,6 +47,10 @@ This changelog was started for release 4.2.0.
 - Fix documentation build
 - Force all 'user queries'(ask/sparql interfaces) to go to the unauthenticated endpoint, to increase security (no write permissions)
 - Force all queries to use 'POST' instead of 'GET' to avoid max length issues
+- Changed the way 'strands' are integrated, to quicken FALDO queries. (Require re-integrating the data)
+- 'Same strand' queries will now match 'BothStrand' with a forward or reverse strand
+- Use '+', '-' and '.' for strand values in CSV instead of raw value (for homogenization)
+- Now allows 'infinite' recursive blocks (ie, a Minus block inside a Union block, or the opposite)
 
 ### Security
 

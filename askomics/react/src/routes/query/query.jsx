@@ -128,13 +128,13 @@ export default class Query extends Component {
       // Ugly, but before rendering source and target are IDs and not objects
         if (link.source == node.id) {
           remote = this.state.nodes.some(rem => {
-            return (link.source == rem.id )
+            return (link.target == rem.id )
           })
           listIds.add(remote.specialNodeGroupId)
         }
         if (link.target == node.id) {
           remote = this.state.nodes.some(rem => {
-            return (link.target == rem.id )
+            return (link.source == rem.id )
           })
           listIds.add(remote.specialNodeGroupId)
         }
@@ -432,7 +432,7 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null]) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null], newDepth=[]) {
     /*
     Insert a new node in the graphState
     */
@@ -440,12 +440,19 @@ export default class Query extends Component {
     let humanId = this.getHumanNodeId(uri)
     let specialNodeId = null
 
+    let depth = [...newDepth]
+
     if (special) {
       specialNodeId = this.getSpecialNodeId()
     }
 
+    if (special == "minusNode"){
+      depth = [...newDepth, specialNodeId, specialNodeId + "_1"]
+    }
+
     if (forceSpecialId) {
       specialNodeId = forceSpecialId
+      depth = [...depth, forceSpecialId, forceSpecialId + "_" + specialNodeGroupId]
     }
 
     let node = {
@@ -459,6 +466,7 @@ export default class Query extends Component {
       specialNodeId: specialNodeId,
       specialNodeGroupId: specialNodeGroupId,
       specialPreviousIds: specialPreviousIds,
+      depth: depth,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -544,6 +552,11 @@ export default class Query extends Component {
     let reLink = new RegExp(node.filterLink.toLowerCase(), 'g')
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
+    let depth = [...node.depth]
+
+    if(incrementSpecialNodeGroupId){
+      depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+    }
 
     if (this.isOntoEndNode(node.id)){
         return
@@ -575,7 +588,8 @@ export default class Query extends Component {
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
               suggested: true,
-              ontology: isOnto
+              ontology: isOnto,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -594,6 +608,9 @@ export default class Query extends Component {
               faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+            if (incrementSpecialNodeGroupId){
+              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            }
           }
         }
       }
@@ -621,7 +638,8 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
-              suggested: true
+              suggested: true,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -639,6 +657,9 @@ export default class Query extends Component {
               faldoFilters: this.defaultFaldoFilters
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+            if (incrementSpecialNodeGroupId){
+              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            }
           }
         }
       }
@@ -665,6 +686,7 @@ export default class Query extends Component {
             faldo: entity.faldo,
             selected: false,
             suggested: true,
+            depth: depth
           })
           // push suggested link
           this.graphState.links.push({
@@ -683,6 +705,9 @@ export default class Query extends Component {
             faldoFilters: this.defaultFaldoFilters
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+          if (incrementSpecialNodeGroupId){
+            depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+          }
         }
       })
     }
@@ -971,11 +996,18 @@ export default class Query extends Component {
     // Get previous special node ids
     let specialPreviousIds = [sourceNode.specialNodeId, sourceNode.specialNodeGroupId]
 
+    let depth
+    if (this.currentSelected.type == "unionNode"){
+      depth = [...sourceNode.depth, sourceNode.specialNodeId, sourceNode.specialNodeId + "_" + this.getLargestSpecialNodeGroupId(sourceNode) + 1]
+    } else {
+      depth = [...sourceNode.depth]
+    }
+
     // insert a special node and select it
-    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds)
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds, depth)
 
     // insert target node with specialNodeGroupId = 1
-    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds)
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds, depth)
 
     // insert link between source and special node
     this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
@@ -989,7 +1021,11 @@ export default class Query extends Component {
     this.graphState.links.push(relation)
 
     //insert suggestion with first specialNodeGroupId = 2 (will be incremented for each suggestion)
-    this.insertSuggestion(specialNode, 2)
+    if (this.currentSelected.type == "unionNode"){
+      this.insertSuggestion(specialNode, 2)
+    } else {
+      this.insertSuggestion(specialNode)
+    }
 
     // Manage selection
     this.manageCurrentPreviousSelected(specialNode)
@@ -1014,7 +1050,8 @@ export default class Query extends Component {
           target: link.target.id == targetId ? "target" : "source",
           selected: link.selected,
           suggested: link.suggested,
-          directed: link.directed
+          directed: link.directed,
+          faldoFilters: link.faldoFilters
         }
       }
     })
@@ -1602,6 +1639,24 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  // Fix update graphState
+  fixGraphState() {
+    // Fix faldoFilters
+    this.graphState.links.map(link => {
+      if (!link.faldoFilters) {
+        link.faldoFilters = this.defaultFaldoFilters
+      }
+    })
+    this.graphState.nodes.map(node => {
+      if (!node.depth) {
+        if(node.specialNodeId){
+          node.legacyBlock = true
+        }
+        node.depth = []
+      }
+    })
+  }
+
   // ------------------------------------------------
 
   // Preview results and Launch query buttons -------
@@ -1714,11 +1769,12 @@ export default class Query extends Component {
             // redo a query
             this.graphState = this.props.location.state.graphState
             this.initId()
+            this.fixGraphState()
             this.setCurrentSelected()
             if (this.currentSelected) {
               if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {
                 if (this.currentSelected.type == "unionNode") {
-                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1, true)
+                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
                 } else {
                   this.insertSuggestion(this.currentSelected)
                 }

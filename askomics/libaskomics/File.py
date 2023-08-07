@@ -436,6 +436,39 @@ class File(Params):
 
         return self.faldo.BothStrandPosition
 
+    def get_faldo_strand_label(self, raw_strand):
+        """Get faldo strand label
+
+        Parameters
+        ----------
+        raw_strand : string
+            raw value of strand
+
+        Returns
+        -------
+        label
+            "+", "-", or "."
+        """
+
+        if raw_strand in ("+", "plus", "1", "positive", "forward"):
+            return "+"
+
+        if raw_strand in ("-", "minus", "moins", "-1", "reverse", "negative"):
+            return "-"
+
+        return "."
+
+    def get_reference_strand_uri(self, reference, strand, block):
+        faldo_dict = {
+            self.faldo.ForwardStrandPosition: "ForwardStrand",
+            self.faldo.ReverseStrandPosition: "ReverseStrand",
+            self.faldo.BothStrandPosition: "BothStrand"
+        }
+        if strand == self.faldo.BothStrandPosition:
+            return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, dstrand, block))) for dstrand in faldo_dict.values()]
+
+        return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, faldo_dict[strand], block)))]
+
     def get_rdf_type(self, value):
         """get xsd type of a value
 

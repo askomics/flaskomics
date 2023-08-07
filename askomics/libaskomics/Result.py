@@ -9,6 +9,8 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 
+from pkg_resources import get_distribution
+
 
 class Result(Params):
     """Result represent a query result file
@@ -381,6 +383,7 @@ class Result(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
@@ -396,7 +399,8 @@ class Result(Params):
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
             False,
             self.session["user"]["admin"] and any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
-            False
+            False,
+            get_distribution('askomics').version
         ), get_id=True)
 
         return self.id

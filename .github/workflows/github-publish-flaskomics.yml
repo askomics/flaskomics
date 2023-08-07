@@ -1,4 +1,4 @@
-name: Publish Flaskomics Docker image to github 
+name: Publish Flaskomics Docker image to github
 
 on:
   push:
@@ -14,13 +14,14 @@ env:
 
 jobs:
   build-and-push-image:
+    if: github.repository == 'askomics/flaskomics'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - 
+      -
         name: Checkout repository
         uses: actions/checkout@v3
 

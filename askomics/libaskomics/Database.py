@@ -270,6 +270,7 @@ class Database(Params):
             template boolean,
             has_form_attr boolean,
             form boolean,
+            version text,
             FOREIGN KEY(user_id) REFERENCES users(user_id)
         )
         '''
@@ -348,6 +349,17 @@ class Database(Params):
         ALTER TABLE results
         ADD form boolean NULL
         DEFAULT(0)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE results
+        ADD version text NULL
+        DEFAULT(NULL)
         '''
 
         try:
