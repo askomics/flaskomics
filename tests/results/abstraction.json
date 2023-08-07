@@ -575,6 +575,7 @@
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
+        "indirect": false,
         "label": "Parent",
         "source": "http://askomics.org/test/data/transcript",
         "target": "http://askomics.org/test/data/gene",
