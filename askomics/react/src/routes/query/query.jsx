@@ -705,7 +705,7 @@ export default class Query extends Component {
             suggested: true,
             directed: true,
             faldoFilters: this.defaultFaldoFilters,
-            indirect: relation.indirect
+            indirect: false
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           if (incrementSpecialNodeGroupId){

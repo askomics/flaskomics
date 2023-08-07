@@ -441,7 +441,7 @@ class CsvFile(File):
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
                 if indirect_relation:
-                    self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], True))
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], rdflib.Literal("true", datatype=rdflib.XSD.boolean)))
 
                 continue
 
@@ -598,6 +598,10 @@ class CsvFile(File):
                     # Skip label type for second column
                     # if type is label but not second column, default to string
                     if current_type == "label" and column_number == 1:
+                        continue
+
+                    # We ignore all data for indirect relations
+                    if current_type == "indirect_relation":
                         continue
 
                     # Skip entity and blank cells

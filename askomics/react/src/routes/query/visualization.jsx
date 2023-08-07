@@ -30,6 +30,7 @@ export default class Visualization extends Component {
     this.colorDarkGrey = '#404040'
     this.colorFirebrick = '#cc0000'
     this.colorGreen = '#005500FF'
+    this.colorBlue = "#343aeb"
     this.lineWidth = 0.5
     this.nodeSize = 3
     this.blankNodeSize = 1
@@ -168,9 +169,14 @@ export default class Visualization extends Component {
     // link style
     link.suggested ? ctx.setLineDash([this.lineWidth, this.lineWidth]) : ctx.setLineDash([])
 
-    let greenArray = ["included_in", "overlap_with"]
+    let greenArray = ["included_in", "overlap_with", "distance_from"]
     let unselectedColor = greenArray.indexOf(link.uri) >= 0 || link.type == "ontoLink" ? this.colorGreen : this.colorGrey
     let unselectedColorText = greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorDarkGrey
+    if (link.indirect){
+      unselectedColor = this.colorBlue
+      unselectedColorText = this.colorBlue
+    }
+
     ctx.strokeStyle = link.selected ? this.colorFirebrick : unselectedColor
 
     ctx.fillStyle = link.selected ? this.colorFirebrick : greenArray.indexOf(link.uri) >= 0 ? this.colorGreen : this.colorGrey
