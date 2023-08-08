@@ -195,7 +195,7 @@ class BedFile(File):
             attribute = rdflib.Literal(self.convert_type(feature.start + 1))  # +1 because bed is 0 based
             faldo_start = attribute
             self.faldo_abstraction["start"] = relation
-            self.graph_chunk.add((entity, relation, attribute))
+            # self.graph_chunk.add((entity, relation, attribute))
 
             if "start" not in attribute_list:
                 attribute_list.append("start")
@@ -212,7 +212,7 @@ class BedFile(File):
             attribute = rdflib.Literal(self.convert_type(feature.end))
             faldo_end = attribute
             self.faldo_abstraction["end"] = relation
-            self.graph_chunk.add((entity, relation, attribute))
+            # self.graph_chunk.add((entity, relation, attribute))
 
             if "end" not in attribute_list:
                 attribute_list.append("end")
@@ -233,7 +233,7 @@ class BedFile(File):
                 attribute = self.namespace_data[self.format_uri("+")]
                 faldo_strand = self.get_faldo_strand("+")
                 self.faldo_abstraction["strand"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
                 strand = True
                 strand_type = "+"
             elif feature.strand == "-":
@@ -242,7 +242,7 @@ class BedFile(File):
                 attribute = self.namespace_data[self.format_uri("-")]
                 faldo_strand = self.get_faldo_strand("-")
                 self.faldo_abstraction["strand"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
                 strand = True
                 strand_type = "-"
             else:
@@ -251,7 +251,7 @@ class BedFile(File):
                 attribute = self.namespace_data[self.format_uri(".")]
                 faldo_strand = self.get_faldo_strand(".")
                 self.faldo_abstraction["strand"] = relation
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
                 strand = True
                 strand_type = "."
 
@@ -271,7 +271,7 @@ class BedFile(File):
             if feature.score != '.':
                 relation = self.namespace_data[self.format_uri("score")]
                 attribute = rdflib.Literal(self.convert_type(feature.score))
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
 
                 if "score" not in attribute_list:
                     attribute_list.append("score")
@@ -283,28 +283,16 @@ class BedFile(File):
                         "range": rdflib.XSD.decimal
                     })
 
-            location = BNode()
-            begin = BNode()
-            end = BNode()
+            self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+            self.graph_chunk.add((entity, self.faldo.begin, faldo_start))
 
-            self.graph_chunk.add((entity, self.faldo.location, location))
+            self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+            self.graph_chunk.add((entity, self.faldo.end, faldo_end))
 
-            self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
-            self.graph_chunk.add((location, self.faldo.begin, begin))
-            self.graph_chunk.add((location, self.faldo.end, end))
-
-            self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
-            self.graph_chunk.add((begin, self.faldo.position, faldo_start))
-
-            self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-            self.graph_chunk.add((end, self.faldo.position, faldo_end))
-
-            self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
-            self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
+            self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
 
             if faldo_strand:
-                self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
-                self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
+                self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
 
             # blocks
             block_base = self.settings.getint("triplestore", "block_size")

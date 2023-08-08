@@ -1,9 +1,9 @@
-During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples that describe the data. This set of triple are called *Abstraction*. *Abstraction* is a set of RDF triples who describes the data. This triples define *Entities*, *Attributes* and *Relations*. Abstraction is used to build the *Query builder*.
+During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples that describe the data. This set of triple are called *Abstraction*. These triples define *Entities*, *Attributes* and *Relations*. The abstraction is used to build the *Query builder*.
 
-Raw RDF can be integrated into AskOmics. In this case, abstraction have to be built manually. The following documentation explain how to write manually write an AskOmics abstraction in turtle format.
+Raw RDF can be integrated into AskOmics. In this case, the abstraction have to be built manually. The following documentation explain how to write manually write an AskOmics abstraction in turtle format.
 
 !!! warning
-    Starting from 4.4, attributes & relations are defined using blank nodes, to avoid overriding information
+    Starting from 4.4, attributes & relations are defined using blank nodes, to avoid overriding information.
     They are linked to the correct node using askomics:uri
 
 # Namespaces
@@ -85,7 +85,6 @@ _:blank rdfs:domain :EntityName .
 _:blank rdfs:range :category_attributeCategory .
 _:blank askomics:uri :category_attribute_uri
 
-
 :category_attributeCategory askomics:category :value_1 .
 :category_attributeCategory askomics:category :value_2 .
 
@@ -100,7 +99,7 @@ _:blank askomics:uri :category_attribute_uri
 
 [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) is a simple ontology to describe sequence feature positions and regions. AskOmics can use FALDO to describe this kind of entities. GFF, BED and some CSV/TSV are converted with FALDO.
 
-A FALDO entity have to be declared as FALDO on the abstraction. If attribute are described as FALDO in the abstraction, The data triples have to use FALDO to describe the data.
+A FALDO entity have to be declared as FALDO on the abstraction. If attribute are described as FALDO in the abstraction, the data triples have to use FALDO to describe the data.
 
 ```turtle
 :FaldoEntity rdf:type askomics:entity .
@@ -109,6 +108,10 @@ A FALDO entity have to be declared as FALDO on the abstraction. If attribute are
 :FaldoEntity rdf:type askomics:startPoint .
 :FaldoEntity rdfs:label "FaldoEntity" .
 ```
+
+!!! warning
+    Faldo triples should use "faldo:begin", "faldo:end", "faldo:reference" or "faldo:strand" as their relation.
+
 
 Four FALDO attributes are supported by AskOmics: reference, strand, start and end.
 
@@ -124,6 +127,17 @@ _:blank rdfs:label "reference_attribute" .
 _:blank rdfs:domain :EntityName .
 _:blank rdfs:range :reference_attributeCategory.
 _:blank askomics:uri :reference_attribute
+
+
+:reference_attributeCategory askomics:category :value_1 .
+:reference_attributeCategory askomics:category :value_2 .
+
+:value_1 rdf:type :reference_attributeCategoryValue .
+:value_1 rdfs:label "value_1" .
+
+:value_2 rdf:type :reference_attributeCategoryValue .
+:value_2 rdfs:label "value_2" .
+
 ```
 
 ### faldo:strand
@@ -136,9 +150,21 @@ _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdf:type owl:ObjectProperty .
 _:blank rdfs:label "strand_attribute" .
 _:blank rdfs:domain :EntityName .
-_:blank rdfs:range :strand_attributeCategory.
+_:blank rdfs:range :strand_attributeCategory .
 _:blank askomics:uri :strand_attribute
+
+:strand_attributeCategory askomics:category faldo:ForwardStrandPosition .
+:strand_attributeCategory askomics:category faldo:ReverseStrandPosition .
+
+faldo:ForwardStrandPosition rdf:type :strand_attributeCategoryValue .
+faldo:ForwardStrandPosition rdfs:label "+" .
+
+faldo:ReverseStrandPosition rdf:type :strand_attributeCategoryValue .
+faldo:ReverseStrandPosition rdfs:label "-" .
 ```
+
+!!! note "Info"
+    For homogeneity with GFF and BED integration, it's better to use '+', '-' or '.' as the strand label.
 
 ### faldo:start and faldo:end
 

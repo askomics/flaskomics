@@ -1486,7 +1486,7 @@ class SparqlQuery(Params):
                 if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in start_end or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
-                        predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
+                        predicate = "faldo:{}".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
@@ -1571,7 +1571,7 @@ class SparqlQuery(Params):
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
-                        category_name = 'faldo:location/faldo:begin/faldo:reference'
+                        category_name = 'faldo:reference'
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
@@ -1588,7 +1588,7 @@ class SparqlQuery(Params):
                                 "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids, depth)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
-                        category_name = 'faldo:location/faldo:begin/rdf:type'
+                        category_name = 'faldo:strand'
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,

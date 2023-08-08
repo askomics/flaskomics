@@ -682,29 +682,18 @@ class CsvFile(File):
                             self.graph_chunk.add((attribute, relation, entity))
 
                 if self.faldo_entity and faldo_start and faldo_end:
-                    location = BNode()
-                    begin_node = BNode()
-                    end_node = BNode()
 
-                    self.graph_chunk.add((entity, self.faldo.location, location))
+                    self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((entity, self.faldo.begin, faldo_start))
 
-                    self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
-                    self.graph_chunk.add((location, self.faldo.begin, begin_node))
-                    self.graph_chunk.add((location, self.faldo.end, end_node))
-
-                    self.graph_chunk.add((begin_node, rdflib.RDF.type, self.faldo.ExactPosition))
-                    self.graph_chunk.add((begin_node, self.faldo.position, faldo_start))
-
-                    self.graph_chunk.add((end_node, rdflib.RDF.type, self.faldo.ExactPosition))
-                    self.graph_chunk.add((end_node, self.faldo.position, faldo_end))
+                    self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+                    self.graph_chunk.add((entity, self.faldo.end, faldo_end))
 
                     if faldo_reference:
-                        self.graph_chunk.add((begin_node, self.faldo.reference, faldo_reference))
-                        self.graph_chunk.add((end_node, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
 
                     if faldo_strand:
-                        self.graph_chunk.add((begin_node, rdflib.RDF.type, faldo_strand))
-                        self.graph_chunk.add((end_node, rdflib.RDF.type, faldo_strand))
+                        self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
 
                     # blocks
                     block_base = self.settings.getint("triplestore", "block_size")
