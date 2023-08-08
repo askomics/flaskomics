@@ -1486,7 +1486,7 @@ class SparqlQuery(Params):
                 if attribute["visible"] or Utils.check_key_in_list_of_dict(attribute["filters"], "filterValue") or attribute["id"] in start_end or attribute["id"] in linked_attributes:
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
-                        predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
+                        predicate = "faldo:{}".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))

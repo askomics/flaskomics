@@ -271,7 +271,7 @@ class BedFile(File):
             if feature.score != '.':
                 relation = self.namespace_data[self.format_uri("score")]
                 attribute = rdflib.Literal(self.convert_type(feature.score))
-                self.graph_chunk.add((entity, relation, attribute))
+                # self.graph_chunk.add((entity, relation, attribute))
 
                 if "score" not in attribute_list:
                     attribute_list.append("score")
@@ -298,15 +298,13 @@ class BedFile(File):
             self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
             self.graph_chunk.add((begin, self.faldo.position, faldo_start))
 
-            self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-            self.graph_chunk.add((end, self.faldo.position, faldo_end))
+            self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+            self.graph_chunk.add((entity, self.faldo.end, faldo_end))
 
-            self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
-            self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
+            self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
 
             if faldo_strand:
-                self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
-                self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
+                self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
 
             # Shortcut triple for faldo queries
             self.graph_chunk.add((entity, self.faldo.begin, faldo_start))

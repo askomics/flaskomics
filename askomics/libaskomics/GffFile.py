@@ -394,24 +394,13 @@ class GffFile(File):
                 begin = BNode()
                 end = BNode()
 
-                self.graph_chunk.add((entity, self.faldo.location, location))
+                self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
+                self.graph_chunk.add((entity, self.faldo.end, faldo_end))
 
-                self.graph_chunk.add((location, rdflib.RDF.type, self.faldo.region))
-                self.graph_chunk.add((location, self.faldo.begin, begin))
-                self.graph_chunk.add((location, self.faldo.end, end))
-
-                self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
-                self.graph_chunk.add((begin, self.faldo.position, faldo_start))
-
-                self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
-                self.graph_chunk.add((end, self.faldo.position, faldo_end))
-
-                self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
-                self.graph_chunk.add((end, self.faldo.reference, faldo_reference))
+                self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
 
                 if faldo_strand:
-                    self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
-                    self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
+                    self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
 
                 # Shortcut triple for faldo queries
                 self.graph_chunk.add((entity, self.faldo.begin, faldo_start))
