@@ -1571,7 +1571,7 @@ class SparqlQuery(Params):
                     category_value_uri = self.format_sparql_variable("{}{}_{}Category".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
                     category_label = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["humanNodeId"], attribute["label"]))
                     if attribute["faldo"] and attribute["faldo"].endswith("faldoReference"):
-                        category_name = 'faldo:location/faldo:begin/faldo:reference'
+                        category_name = 'faldo:reference'
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,
@@ -1588,7 +1588,7 @@ class SparqlQuery(Params):
                                 "nested_end": True if attribute["optional"] else False
                             }, block_id, sblock_id, pblock_ids, depth)
                     elif attribute["faldo"] and attribute["faldo"].endswith("faldoStrand"):
-                        category_name = 'faldo:location/faldo:begin/rdf:type'
+                        category_name = 'faldo:strand'
                         self.store_triple({
                             "subject": node_uri,
                             "predicate": category_name,

@@ -464,6 +464,11 @@ class File(Params):
             self.faldo.ReverseStrandPosition: "ReverseStrand",
             self.faldo.BothStrandPosition: "BothStrand"
         }
+        if not block:
+            if strand == self.faldo.BothStrandPosition:
+                return [self.rdfize(self.format_uri("{}_s{}s".format(reference, dstrand))) for dstrand in faldo_dict.values()]
+            return [self.rdfize(self.format_uri("{}_s{}".format(reference, faldo_dict[strand])))]
+
         if strand == self.faldo.BothStrandPosition:
             return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, dstrand, block))) for dstrand in faldo_dict.values()]
 
