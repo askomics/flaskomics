@@ -1315,6 +1315,39 @@ class SparqlQuery(Params):
                                     "optional": False
 
                                 }, block_id, sblock_id, pblock_ids, depth)
+                            else:
+                                self.store_triple({
+                                    "subject": source,
+                                    "predicate": "faldo:reference",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+
+                                self.store_triple({
+                                    "subject": target,
+                                    "predicate": "faldo:reference",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+
+                        elif link["sameStrand"]:
+                            self.store_triple({
+                                "subject": source,
+                                "predicate": "faldo:strand",
+                                "object": common_block,
+                                "optional": False
+
+                            }, block_id, sblock_id, pblock_ids, depth)
+
+                            self.store_triple({
+                                "subject": target,
+                                "predicate": "faldo:strand",
+                                "object": common_block,
+                                "optional": False
+
+                            }, block_id, sblock_id, pblock_ids, depth)
 
                         for filter in link.get('faldoFilters', []):
                             modifier_string = ""

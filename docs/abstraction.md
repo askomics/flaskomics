@@ -109,10 +109,6 @@ A FALDO entity have to be declared as FALDO on the abstraction. If attribute are
 :FaldoEntity rdfs:label "FaldoEntity" .
 ```
 
-!!! warning
-    Faldo triples should use "faldo:begin", "faldo:end", "faldo:reference" or "faldo:strand" as their relation.
-
-
 Four FALDO attributes are supported by AskOmics: reference, strand, start and end.
 
 ### faldo:reference
@@ -187,6 +183,35 @@ _:blank rdfs:domain :EntityName .
 _:blank rdfs:range xsd:decimal .
 _:blank askomics:uri :end_attribute
 ```
+
+### *Shortcut* faldo triples
+
+The default faldo ontology uses a chain of triple to describe the position (ex, faldo:location/faldo:begin/faldo:position).
+This make *faldo queries* (included_in/overlap_with/distant_from) extremely slow. To improve query time, AskOmics can use 'shortcut triples', direct relations between the Entity and the reference/strand, to quickly filter entities on the same reference/strand/both. For example:
+
+```turtle
+:EntityName faldo:reference reference_uri .
+:EntityName faldo:strand strand_uri .
+:EntityName askomics:referenceStrand reference_strand_uri .
+```
+
+To improve query times further, AskOmics will break down the entity genomic position in blocks (block size if defined in the configuration file).
+This improve query time by filtering all entities having 'common blocks'. Each entity will span at least two blocks. Additional blocks will be created to include the reference and the strand.
+For instance:
+
+```turtle
+:EntityName askomics:includeIn block1_uri .
+:EntityName askomics:includeIn block2_uri .
+:EntityName askomics:includeInReference block1_reference_uri .
+:EntityName askomics:includeInReference block2_reference_uri .
+:EntityName askomics:includeInReferenceStrand block1_reference_strand_uri .
+:EntityName askomics:includeInReferenceStrand block2_reference_strand_uri .
+:EntityName askomics:includeInStrand block1_strand_uri .
+:EntityName askomics:includeInStrand block1_strand_uri .
+```
+
+!!! note "Info"
+    When using 'BothStrand', make sur to add 'ForwardStrandPosition' and 'ReverseStrandPosition' to these additional triples, or they won't be matched on the 'same strand' query.
 
 # Relations
 
