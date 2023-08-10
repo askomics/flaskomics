@@ -52,6 +52,7 @@ This changelog was started for release 4.2.0.
 - 'Same strand' queries will now match 'BothStrand' with a forward or reverse strand
 - Use '+', '-' and '.' for strand values in CSV instead of raw value (for homogenization)
 - Now allows 'infinite' recursive blocks (ie, a Minus block inside a Union block, or the opposite)
+- Overhaul faldo relation: add 'direct shortcut' triples between entities and values, to avoid using slow property paths when using faldo queries
 
 ### Security
 
