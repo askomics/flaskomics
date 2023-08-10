@@ -710,17 +710,17 @@ class CsvFile(File):
                         self.graph_chunk.add((end_node, rdflib.RDF.type, faldo_strand))
 
                     # Shortcut triple for faldo queries
-                    self.graph_chunk.add((entity, self.faldo.begin, faldo_start))
-                    self.graph_chunk.add((entity, self.faldo.end, faldo_end))
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
                     if faldo_reference:
-                        self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
                         if faldo_strand:
                             strand_ref = self.get_reference_strand_uri(reference, faldo_strand, None)
                             for sref in strand_ref:
                                 self.graph_chunk.add((entity, self.namespace_internal["referenceStrand"], sref))
 
                     if faldo_strand:
-                        self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoStrand"], faldo_strand))
 
                     # blocks
                     block_base = self.settings.getint("triplestore", "block_size")
