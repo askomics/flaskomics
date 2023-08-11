@@ -298,13 +298,13 @@ class BedFile(File):
             self.graph_chunk.add((begin, rdflib.RDF.type, self.faldo.ExactPosition))
             self.graph_chunk.add((begin, self.faldo.position, faldo_start))
 
-            self.graph_chunk.add((entity, rdflib.RDF.type, self.faldo.ExactPosition))
-            self.graph_chunk.add((entity, self.faldo.end, faldo_end))
+            self.graph_chunk.add((end, rdflib.RDF.type, self.faldo.ExactPosition))
+            self.graph_chunk.add((end, self.faldo.end, faldo_end))
 
-            self.graph_chunk.add((entity, self.faldo.reference, faldo_reference))
+            self.graph_chunk.add((begin, self.faldo.reference, faldo_reference))
 
             if faldo_strand:
-                self.graph_chunk.add((entity, self.faldo.strand, faldo_strand))
+                self.graph_chunk.add((begin, self.faldo.strand, faldo_strand))
 
             # Shortcut triple for faldo queries
             self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
