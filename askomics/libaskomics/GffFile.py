@@ -414,7 +414,7 @@ class GffFile(File):
                     self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
                 # Shortcut triple for faldo queries
-                self.graph_chunk.add((entity, self.namespace_internal["faldobegin"], faldo_start))
+                self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
                 self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
                 self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
 
