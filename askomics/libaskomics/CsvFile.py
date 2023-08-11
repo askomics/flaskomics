@@ -737,9 +737,8 @@ class CsvFile(File):
                                 for sref in strand_ref:
                                     self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
                         if faldo_strand:
-                            self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
-                            if faldo_strand == self.faldo.BothStrandPosition:
-                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ForwardStrandPosition))
-                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ReverseStrandPosition))
+                            strand_ref = self.get_reference_strand_uri(None, faldo_strand, slice_block)
+                            for sref in strand_ref:
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], sref))
 
                 yield
