@@ -28,6 +28,17 @@ export default class LinkView extends Component {
   }
 
 
+  subNums (id) {
+    let newStr = ""
+    let oldStr = id.toString()
+    let arrayString = [...oldStr]
+    arrayString.forEach(char => {
+      let code = char.charCodeAt()
+      newStr += String.fromCharCode(code + 8272)
+    })
+    return newStr
+  }
+
   render () {
     const sign_display = {
       '=': '=',
@@ -60,7 +71,7 @@ export default class LinkView extends Component {
               <td>
                 <CustomInput key={index} data-index={index} type="select" id={this.props.link.id} onChange={this.handleFaldoFilterStart}>
                   {Object.keys(position_display).map(sign => {
-                    return <option key={sign} selected={filter.filterStart == sign ? true : false} value={sign}>{position_display[sign]}</option>
+                    return <option key={sign} selected={filter.filterStart == sign ? true : false} value={sign}>{position_display[sign] + " " + this.props.link.source.label + this.subNums(this.props.link.source.humanId)}</option>
                   })}
                 </CustomInput>
               </td>
@@ -71,11 +82,10 @@ export default class LinkView extends Component {
                   })}
                 </CustomInput>
               </td>
-              <td>{this.props.link.target.label}</td>
               <td>
                 <CustomInput key={index} data-index={index} type="select" id={this.props.link.id} onChange={this.handleFaldoFilterEnd}>
                   {Object.keys(position_display).map(sign => {
-                    return <option key={sign} selected={filter.filterEnd == sign ? true : false} value={sign}>{position_display[sign]}</option>
+                    return <option key={sign} selected={filter.filterEnd == sign ? true : false} value={sign}>{position_display[sign] + " " + this.props.link.target.label + this.subNums(this.props.link.target.humanId)}</option>
                   })}
                 </CustomInput>
               </td>
