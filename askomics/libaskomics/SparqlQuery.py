@@ -1539,6 +1539,9 @@ class SparqlQuery(Params):
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
+                        # Use faldo shortcut for faldo queries
+                        if attribute["id"] in start_end or attribute["id"] in linked_attributes:
+                            predicate = "askomics:{}".format("faldoBegin" if attribute["faldo"].endswith("faldoStart") else "faldoEnd")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))
