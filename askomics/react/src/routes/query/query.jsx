@@ -1548,10 +1548,15 @@ export default class Query extends Component {
 
   getOntoLabel (uri) {
       let labels = {}
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is child of"
       labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parent of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
+
+      labels["http://www.w3.org/2004/02/skos/core#broader"] = "is child of"
+      labels["http://www.w3.org/2004/02/skos/core#broader*"] = "is descendant of"
+      labels["http://www.w3.org/2004/02/skos/core#narrower"] = "is parent of"
+      labels["http://www.w3.org/2004/02/skos/core#narrower*"] = "is ancestor of"
       return labels[uri]
   }
 
