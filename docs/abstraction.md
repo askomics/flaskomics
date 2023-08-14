@@ -1,9 +1,9 @@
-During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples that describe the data. This set of triple are called *Abstraction*. *Abstraction* is a set of RDF triples who describes the data. This triples define *Entities*, *Attributes* and *Relations*. Abstraction is used to build the *Query builder*.
+During integration of TSV/CSV, GFF and BED files, AskOmics create RDF triples that describe the data. This set of triple are called *Abstraction*. These triples define *Entities*, *Attributes* and *Relations*. The abstraction is used to build the *Query builder*.
 
-Raw RDF can be integrated into AskOmics. In this case, abstraction have to be built manually. The following documentation explain how to write manually write an AskOmics abstraction in turtle format.
+Raw RDF can be integrated into AskOmics. In this case, the abstraction have to be built manually. The following documentation explain how to write manually write an AskOmics abstraction in turtle format.
 
 !!! warning
-    Starting from 4.4, attributes & relations are defined using blank nodes, to avoid overriding information
+    Starting from 4.4, attributes & relations are defined using blank nodes, to avoid overriding information.
     They are linked to the correct node using askomics:uri
 
 # Namespaces
@@ -85,7 +85,6 @@ _:blank rdfs:domain :EntityName .
 _:blank rdfs:range :category_attributeCategory .
 _:blank askomics:uri :category_attribute_uri
 
-
 :category_attributeCategory askomics:category :value_1 .
 :category_attributeCategory askomics:category :value_2 .
 
@@ -100,7 +99,7 @@ _:blank askomics:uri :category_attribute_uri
 
 [FALDO](https://bioportal.bioontology.org/ontologies/FALDO) is a simple ontology to describe sequence feature positions and regions. AskOmics can use FALDO to describe this kind of entities. GFF, BED and some CSV/TSV are converted with FALDO.
 
-A FALDO entity have to be declared as FALDO on the abstraction. If attribute are decribed as FALDO in the abstractio, The data triples have to use FALDO to describe the data.
+A FALDO entity have to be declared as FALDO on the abstraction. If attribute are described as FALDO in the abstraction, the data triples have to use FALDO to describe the data.
 
 ```turtle
 :FaldoEntity rdf:type askomics:entity .
@@ -111,6 +110,19 @@ A FALDO entity have to be declared as FALDO on the abstraction. If attribute are
 ```
 
 Four FALDO attributes are supported by AskOmics: reference, strand, start and end.
+
+!!! warning
+    AskOmics expect faldo entities to follow the faldo ontology for triple definition. Ex:
+    ```turtle
+    # Reference
+    :Entity faldo:location/faldo:begin/faldo:reference "value"
+    # strand
+    :Entity faldo:location/faldo:begin/rdf:type "value"
+    # Start
+    :Entity faldo:location/faldo:begin/faldo:position "value"
+    # Stop.
+    :Entity faldo:location/faldo:end/faldo:position "value"
+    ```
 
 ### faldo:reference
 
@@ -124,6 +136,17 @@ _:blank rdfs:label "reference_attribute" .
 _:blank rdfs:domain :EntityName .
 _:blank rdfs:range :reference_attributeCategory.
 _:blank askomics:uri :reference_attribute
+
+
+:reference_attributeCategory askomics:category :value_1 .
+:reference_attributeCategory askomics:category :value_2 .
+
+:value_1 rdf:type :reference_attributeCategoryValue .
+:value_1 rdfs:label "value_1" .
+
+:value_2 rdf:type :reference_attributeCategoryValue .
+:value_2 rdfs:label "value_2" .
+
 ```
 
 ### faldo:strand
@@ -136,9 +159,21 @@ _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdf:type owl:ObjectProperty .
 _:blank rdfs:label "strand_attribute" .
 _:blank rdfs:domain :EntityName .
-_:blank rdfs:range :strand_attributeCategory.
+_:blank rdfs:range :strand_attributeCategory .
 _:blank askomics:uri :strand_attribute
+
+:strand_attributeCategory askomics:category faldo:ForwardStrandPosition .
+:strand_attributeCategory askomics:category faldo:ReverseStrandPosition .
+
+faldo:ForwardStrandPosition rdf:type :strand_attributeCategoryValue .
+faldo:ForwardStrandPosition rdfs:label "+" .
+
+faldo:ReverseStrandPosition rdf:type :strand_attributeCategoryValue .
+faldo:ReverseStrandPosition rdfs:label "-" .
 ```
+
+!!! note "Info"
+    For homogeneity with GFF and BED integration, it's better to use '+', '-' or '.' as the strand label.
 
 ### faldo:start and faldo:end
 
@@ -162,6 +197,37 @@ _:blank rdfs:range xsd:decimal .
 _:blank askomics:uri :end_attribute
 ```
 
+### *Shortcut* faldo triples
+
+The default faldo ontology uses a chain of triple to describe the position (ex, faldo:location/faldo:begin/faldo:position).
+This make *faldo queries* (included_in/overlap_with/distant_from) extremely slow. To improve query time, AskOmics can use 'shortcut triples', direct relations between the Entity and the reference/strand, to quickly filter entities on the same reference/strand/both. For example:
+
+```turtle
+:EntityName askomics:faldoReference reference_uri .
+:EntityName askomics:faldoBegin begin_value .
+:EntityName askomics:faldoEnd end_value .
+:EntityName askomics:faldoStrand strand_uri .
+:EntityName askomics:referenceStrand reference_strand_uri .
+```
+
+To improve query times further, AskOmics will break down the entity genomic position in blocks (block size if defined in the configuration file).
+This improve query time by filtering all entities having 'common blocks'. Each entity will span at least two blocks. Additional blocks will be created to include the reference and the strand.
+For instance:
+
+```turtle
+:EntityName askomics:includeIn block1_uri .
+:EntityName askomics:includeIn block2_uri .
+:EntityName askomics:includeInReference block1_reference_uri .
+:EntityName askomics:includeInReference block2_reference_uri .
+:EntityName askomics:includeInReferenceStrand block1_reference_strand_uri .
+:EntityName askomics:includeInReferenceStrand block2_reference_strand_uri .
+:EntityName askomics:includeInStrand block1_strand_uri .
+:EntityName askomics:includeInStrand block1_strand_uri .
+```
+
+!!! note "Info"
+    When using 'BothStrand', make sur to add 'ForwardStrandPosition' and 'ReverseStrandPosition' to these additional triples, or they won't be matched on the 'same strand' query.
+
 # Relations
 
 Entities are linked between them with relations. Relations are displayed with arrows between nodes on the query builder. The following turtle explain how relations are described. To avoid overwriting information, relations are described using a blank node. The relation `:RelationExample`, linking `EntitySource` to `EntityTarget`, with the label *relation_example*, will be defined as follows:  
@@ -177,6 +243,10 @@ _:blank rdfs:range :EntityTarget .
 _:blank dcat:endpointURL <url...> .
 _:blank dcat:dataset <file_turtle_XXXXX_gene_tsv> .
 ```
+
+!!! note "Info"
+    If defining an 'indirect relation', you can add a `_:blank askomics:isIndirectRelation true` triple.
+
 
 # Federation
 

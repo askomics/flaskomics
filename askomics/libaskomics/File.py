@@ -458,12 +458,23 @@ class File(Params):
 
         return "."
 
-    def get_reference_strand_uri(self, reference, strand, block):
+    def get_reference_strand_uri(self, reference, strand, block=None):
         faldo_dict = {
             self.faldo.ForwardStrandPosition: "ForwardStrand",
             self.faldo.ReverseStrandPosition: "ReverseStrand",
             self.faldo.BothStrandPosition: "BothStrand"
         }
+        if reference is None:
+            if strand == self.faldo.BothStrandPosition:
+                return [self.rdfize(self.format_uri("s{}_{}".format(dstrand, block))) for dstrand in faldo_dict.values()]
+
+            return [self.rdfize(self.format_uri("s{}_{}".format(faldo_dict[strand], block)))]
+
+        if block is None:
+            if strand == self.faldo.BothStrandPosition:
+                return [self.rdfize(self.format_uri("{}_s{}s".format(reference, dstrand))) for dstrand in faldo_dict.values()]
+            return [self.rdfize(self.format_uri("{}_s{}".format(reference, faldo_dict[strand])))]
+
         if strand == self.faldo.BothStrandPosition:
             return [self.rdfize(self.format_uri("{}_s{}_{}".format(reference, dstrand, block))) for dstrand in faldo_dict.values()]
 

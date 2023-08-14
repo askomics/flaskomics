@@ -1261,21 +1261,22 @@ class SparqlQuery(Params):
                     elif link["sameStrand"]:
                         block_uri = "includeInStrand"
 
-                    self.store_triple({
-                        "subject": source,
-                        "predicate": "askomics:{}".format(block_uri),
-                        "object": common_block,
-                        "optional": False
+                    if link["uri"] in ('included_in', 'overlap_with'):
+                        self.store_triple({
+                            "subject": source,
+                            "predicate": "askomics:{}".format(block_uri),
+                            "object": common_block,
+                            "optional": False
 
-                    }, block_id, sblock_id, pblock_ids, depth)
+                        }, block_id, sblock_id, pblock_ids, depth)
 
-                    self.store_triple({
-                        "subject": target,
-                        "predicate": "askomics:{}".format(block_uri),
-                        "object": common_block,
-                        "optional": False
+                        self.store_triple({
+                            "subject": target,
+                            "predicate": "askomics:{}".format(block_uri),
+                            "object": common_block,
+                            "optional": False
 
-                    }, block_id, sblock_id, pblock_ids, depth)
+                        }, block_id, sblock_id, pblock_ids, depth)
 
                     equal_sign = "" if link["strict"] else "="
 
@@ -1297,6 +1298,57 @@ class SparqlQuery(Params):
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids, depth)
                     else:
+                        if link["sameRef"]:
+                            if link['sameStrand']:
+                                self.store_triple({
+                                    "subject": source,
+                                    "predicate": "askomics:referenceStrand",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+
+                                self.store_triple({
+                                    "subject": target,
+                                    "predicate": "askomics:referenceStrand",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+                            else:
+                                self.store_triple({
+                                    "subject": source,
+                                    "predicate": "askomics:faldoReference",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+
+                                self.store_triple({
+                                    "subject": target,
+                                    "predicate": "askomics:faldoReference",
+                                    "object": common_block,
+                                    "optional": False
+
+                                }, block_id, sblock_id, pblock_ids, depth)
+
+                        elif link["sameStrand"]:
+                            self.store_triple({
+                                "subject": source,
+                                "predicate": "askomics:faldoStrand",
+                                "object": common_block,
+                                "optional": False
+
+                            }, block_id, sblock_id, pblock_ids, depth)
+
+                            self.store_triple({
+                                "subject": target,
+                                "predicate": "askomics:faldoStrand",
+                                "object": common_block,
+                                "optional": False
+
+                            }, block_id, sblock_id, pblock_ids, depth)
+
                         for filter in link.get('faldoFilters', []):
                             modifier_string = ""
                             if filter['filterValue']:
@@ -1330,7 +1382,8 @@ class SparqlQuery(Params):
                         "optional": False
                     }
 
-                    self.store_triple(triple, block_id, sblock_id, pblock_ids, depth)
+                    if not link.get('indirect', False):
+                        self.store_triple(triple, block_id, sblock_id, pblock_ids, depth)
 
         # Store linked attributes
         for attribute in self.json["attr"]:
@@ -1486,6 +1539,9 @@ class SparqlQuery(Params):
                     subject = self.format_sparql_variable("{}{}_uri".format(attribute["entityLabel"], attribute["nodeId"]))
                     if attribute["faldo"]:
                         predicate = "faldo:location/faldo:{}/faldo:position".format("begin" if attribute["faldo"].endswith("faldoStart") else "end")
+                        # Use faldo shortcut for faldo queries
+                        if attribute["id"] in start_end or attribute["id"] in linked_attributes:
+                            predicate = "askomics:{}".format("faldoBegin" if attribute["faldo"].endswith("faldoStart") else "faldoEnd")
                     else:
                         predicate = "<{}>".format(attribute["uri"])
                     obj = self.format_sparql_variable("{}{}_{}".format(attribute["entityLabel"], attribute["nodeId"], attribute["label"]))

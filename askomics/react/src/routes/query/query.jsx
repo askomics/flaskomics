@@ -605,7 +605,8 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              faldoFilters: this.defaultFaldoFilters
+              faldoFilters: this.defaultFaldoFilters,
+              indirect: relation.indirect
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -654,7 +655,8 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
-              faldoFilters: this.defaultFaldoFilters
+              faldoFilters: this.defaultFaldoFilters,
+              indirect: relation.indirect
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -702,7 +704,8 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
-            faldoFilters: this.defaultFaldoFilters
+            faldoFilters: this.defaultFaldoFilters,
+            indirect: false
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           if (incrementSpecialNodeGroupId){
@@ -744,7 +747,8 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
-          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
+          indirect: link.indirect ? link.indirect : false
         }
       }
 
@@ -764,7 +768,8 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
-          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
+          indirect: link.indirect ? link.indirect : false
         }
       }
     })
@@ -1051,7 +1056,8 @@ export default class Query extends Component {
           selected: link.selected,
           suggested: link.suggested,
           directed: link.directed,
-          faldoFilters: link.faldoFilters
+          faldoFilters: link.faldoFilters,
+          indirect: link.indirect
         }
       }
     })
@@ -1071,7 +1077,8 @@ export default class Query extends Component {
       target: node2.id,
       selected: false,
       suggested: false,
-      directed: false
+      directed: false,
+      indirect: false
     }
     this.graphState.links.push(link)
   }
@@ -1645,6 +1652,9 @@ export default class Query extends Component {
     this.graphState.links.map(link => {
       if (!link.faldoFilters) {
         link.faldoFilters = this.defaultFaldoFilters
+      }
+      if (!link.indirect){
+        link.indirect = false
       }
     })
     this.graphState.nodes.map(node => {

@@ -129,6 +129,7 @@ export default class CsvTable extends Component {
               <optgroup label="Relation">
                 <option value="general_relation" >Directed</option>
                 <option value="symetric_relation" >Symetric</option>
+                <option value="indirect_relation" >Indirect</option>
               </optgroup>
               {ontoInput}
             </CustomInput>
@@ -158,6 +159,7 @@ export default class CsvTable extends Component {
             <optgroup label="Relation">
               <option value="general_relation" >Directed</option>
               <option value="symetric_relation" >Symetric</option>
+              <option value="indirect_relation" >Indirect</option>
             </optgroup>
             {ontoInput}
           </CustomInput>

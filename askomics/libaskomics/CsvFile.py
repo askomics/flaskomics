@@ -416,8 +416,9 @@ class CsvFile(File):
 
             blank = BNode()
             # Relation
-            if self.columns_type[index] in ('general_relation', 'symetric_relation'):
+            if self.columns_type[index] in ('general_relation', 'symetric_relation', 'indirect_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
+                indirect_relation = True if self.columns_type[index] == 'indirect_relation' else False
                 splitted = attribute_name.split('@')
 
                 attribute = self.rdfize(splitted[0])
@@ -439,6 +440,8 @@ class CsvFile(File):
                 if symetric_relation:
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+                if indirect_relation:
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], rdflib.Literal("true", datatype=rdflib.XSD.boolean)))
 
                 continue
 
@@ -597,6 +600,10 @@ class CsvFile(File):
                     if current_type == "label" and column_number == 1:
                         continue
 
+                    # We ignore all data for indirect relations
+                    if current_type == "indirect_relation":
+                        continue
+
                     # Skip entity and blank cells
                     if column_number == 0 or (not cell and not current_type == "strand"):
                         continue
@@ -675,6 +682,9 @@ class CsvFile(File):
                             self.graph_chunk.add((attribute, relation, entity))
 
                 if self.faldo_entity and faldo_start and faldo_end:
+
+                    # Triples respecting faldo ontology
+
                     location = BNode()
                     begin_node = BNode()
                     end_node = BNode()
@@ -699,6 +709,19 @@ class CsvFile(File):
                         self.graph_chunk.add((begin_node, rdflib.RDF.type, faldo_strand))
                         self.graph_chunk.add((end_node, rdflib.RDF.type, faldo_strand))
 
+                    # Shortcut triple for faldo queries
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
+                    if faldo_reference:
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
+                        if faldo_strand:
+                            strand_ref = self.get_reference_strand_uri(reference, faldo_strand, None)
+                            for sref in strand_ref:
+                                self.graph_chunk.add((entity, self.namespace_internal["referenceStrand"], sref))
+
+                    if faldo_strand:
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoStrand"], faldo_strand))
+
                     # blocks
                     block_base = self.settings.getint("triplestore", "block_size")
                     block_start = int(start) // block_base
@@ -714,9 +737,8 @@ class CsvFile(File):
                                 for sref in strand_ref:
                                     self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
                         if faldo_strand:
-                            self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
-                            if faldo_strand == self.faldo.BothStrandPosition:
-                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ForwardStrandPosition))
-                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], self.faldo.ReverseStrandPosition))
+                            strand_ref = self.get_reference_strand_uri(None, faldo_strand, slice_block)
+                            for sref in strand_ref:
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], sref))
 
                 yield

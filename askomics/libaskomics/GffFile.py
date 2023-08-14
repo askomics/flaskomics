@@ -388,6 +388,8 @@ class GffFile(File):
 
                         self.graph_chunk.add((entity, relation, attribute))
 
+                # Triples respecting faldo ontology
+
                 location = BNode()
                 begin = BNode()
                 end = BNode()
@@ -411,6 +413,17 @@ class GffFile(File):
                     self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
                     self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
+                # Shortcut triple for faldo queries
+                self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
+                self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
+                self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
+
+                if faldo_strand:
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoStrand"], faldo_strand))
+                    strand_ref = self.get_reference_strand_uri(rec.id, faldo_strand, None)
+                    for sref in strand_ref:
+                        self.graph_chunk.add((entity, self.namespace_internal["referenceStrand"], sref))
+
                 # blocks
                 block_base = self.settings.getint("triplestore", "block_size")
                 block_start = int(self.convert_type(feature.location.start)) // block_base
@@ -421,10 +434,12 @@ class GffFile(File):
                     block_reference = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
                     self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
                     if faldo_strand:
-                        self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], faldo_strand))
                         strand_ref = self.get_reference_strand_uri(rec.id, faldo_strand, slice_block)
                         for sref in strand_ref:
                             self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
+                        strand_ref = self.get_reference_strand_uri(None, faldo_strand, slice_block)
+                        for sref in strand_ref:
+                            self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], sref))
 
                 yield
 
