@@ -111,18 +111,20 @@ A FALDO entity have to be declared as FALDO on the abstraction. If attribute are
 
 Four FALDO attributes are supported by AskOmics: reference, strand, start and end.
 
-!!! warning
-    AskOmics expect faldo entities to follow the faldo ontology for triple definition. Ex:
-    ```turtle
-    # Reference
-    :Entity faldo:location/faldo:begin/faldo:reference "value"
-    # strand
-    :Entity faldo:location/faldo:begin/rdf:type "value"
-    # Start
-    :Entity faldo:location/faldo:begin/faldo:position "value"
-    # Stop.
-    :Entity faldo:location/faldo:end/faldo:position "value"
-    ```
+### Faldo ontology
+
+AskOmics expect faldo entities to follow the faldo ontology for triple definition. Ex:
+
+```turtle
+# Reference
+:Entity faldo:location/faldo:begin/faldo:reference "value"
+# strand
+:Entity faldo:location/faldo:begin/rdf:type "value"
+# Start
+:Entity faldo:location/faldo:begin/faldo:position "value"
+# Stop.
+:Entity faldo:location/faldo:end/faldo:position "value"
+```
 
 ### faldo:reference
 
