@@ -274,6 +274,10 @@ Ontologies needs to be are defined as follows:
 
 You will then need to add any relations and attributes using blank nodes:
 
+!!! warning
+    If using "skos:narrower" or "skos:broader", you only need to define one of them.
+    AskOmics will show both options in the UI
+
 ```turtle
 # SubCLassOf relation
 _:blank1 a askomics:AskomicsRelation .
@@ -303,6 +307,9 @@ Here is an example of an ontological class:
 <class_uri> <rank_uri> "order" .
 <class_uri> skos:prefLabel "OntologyLabel" .
 ```
+
+!!! warning
+    For now, AskOmics expect the classes to be defined by 'owl:Class'
 
 !!! note "Info"
     The label does not need to be `rdfs:label`, but you will need to specify the correct label in the UI.
