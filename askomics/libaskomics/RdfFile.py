@@ -79,10 +79,13 @@ class RdfFile(File):
                 head += ttl_file.readline()
 
         location = None
+        remote_graph = None
         try:
             location, remote_graph = self.get_location_and_remote_graph()
         except Exception as e:
             self.error_message = str(e)
+            # Todo: Better error management
+            raise e
 
         return {
             'type': self.type,
