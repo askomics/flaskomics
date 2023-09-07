@@ -255,7 +255,7 @@ _:blank dcat:dataset <file_turtle_XXXXX_gene_tsv> .
 To describe a remote dataset, you can either fill out the "Distant endpoint" and optionally the "Distant graph" fields when integrating an RDF dataset, or you could add description triples in your dataset, as follows:
 
 ```turtle
-_:blank ns1:atLocation "https://my_remote_endpoint/sparql" .
+_:blank prov:atLocation "https://my_remote_endpoint/sparql" .
 _:blank dcat:Dataset <my_remote_graph> .
 ```
 
@@ -319,7 +319,7 @@ Here is an example of an ontological class:
 If instead you have access to a remote SPARQL endpoint, you can indicate it here:
 
 ```turtle
-_:blank ns1:atLocation "https://my_remote_endpoint/sparql" .
+_:blank prov:atLocation "https://my_remote_endpoint/sparql" .
 # Optional: Set a specific graph for remote queries
 _:blank dcat:Dataset <my_remote_graph> .
 ```
