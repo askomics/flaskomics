@@ -489,7 +489,7 @@ class Client(object):
         # integrate
         int_ontology = self.integrate_file({
             "id": 1,
-        }, set_graph=True, endpoint="http://localhost:8891/sparql")
+        }, set_graph=True, endpoint="http://localhost:8891/sparql-auth")
 
         return {
             "upload": up_ontology,
