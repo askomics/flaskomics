@@ -95,7 +95,7 @@ anonymous_query_cleanup = 60
 # name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
 # Sparql endpoint
-endpoint = http://localhost:8890/sparql-auth
+endpoint = http://localhost:8890/sparql
 # Sparql updatepoint
 updatepoint = http://localhost:8890/sparql-auth
 # Isql API
