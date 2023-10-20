@@ -8,10 +8,10 @@
     [{
         "endpoints": [{
             "name": "local",
-            "url": "http://localhost:8891/sparql-auth"
+            "url": "http://localhost:8891/sparql"
         }, {
             "name": "local",
-            "url": "http://localhost:8891/sparql-auth"
+            "url": "http://localhost:8891/sparql"
         }],
         "entity":
         "http://askomics.org/test/data/transcript",
@@ -37,10 +37,10 @@
      {
          "endpoints": [{
              "name": "local",
-             "url": "http://localhost:8891/sparql-auth"
+             "url": "http://localhost:8891/sparql"
          }, {
              "name": "local",
-             "url": "http://localhost:8891/sparql-auth"
+             "url": "http://localhost:8891/sparql"
          }],
          "entity":
          "http://askomics.org/test/data/gene",
@@ -70,7 +70,7 @@
      {
          "endpoints": [{
              "name": "local",
-             "url": "http://localhost:8891/sparql-auth"
+             "url": "http://localhost:8891/sparql"
          }],
          "entity":
          "http://askomics.org/test/data/DifferentialExpression",
@@ -89,7 +89,7 @@
      {
          "endpoints": [{
              "name": "local",
-             "url": "http://localhost:8891/sparql-auth"
+             "url": "http://localhost:8891/sparql"
          }],
          "entity":
          "http://askomics.org/test/data/QTL",
