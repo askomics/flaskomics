@@ -60,7 +60,7 @@ _:blank rdf:type owl:DatatypeProperty .
 _:blank rdfs:label "numeric_attribute" .
 _:blank rdfs:domain :EntityName .
 _:blank rdfs:range xsd:decimal .
-_:blank askomics:uri :numeric_attribute_uri
+_:blank askomics:uri :numeric_attribute_uri .
 ```
 
 ## Text
@@ -70,7 +70,7 @@ _:blank rdf:type owl:DatatypeProperty .
 _:blank rdfs:label "text_attribute" .
 _:blank rdfs:domain :EntityName .
 _:blank rdfs:range xsd:string .
-_:blank askomics:uri :text_attribute_uri
+_:blank askomics:uri :text_attribute_uri .
 ```
 
 ## Category
@@ -83,7 +83,7 @@ _:blank rdf:type askomics:AskomicsCategory .
 _:blank rdfs:label "category_attribute" .
 _:blank rdfs:domain :EntityName .
 _:blank rdfs:range :category_attributeCategory .
-_:blank askomics:uri :category_attribute_uri
+_:blank askomics:uri :category_attribute_uri .
 
 :category_attributeCategory askomics:category :value_1 .
 :category_attributeCategory askomics:category :value_2 .
