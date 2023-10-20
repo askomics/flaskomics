@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This changelog was started for release 4.2.0.
 
+## [4.5.0] - 2023-10-20
+
+### **Deprecation warning**
+
+- Due to a change in the way *strands* are integrated for FALDO entities, you will need to re-integrate them.
+- 'Results' from older version of Askomics using 'Minus' or 'Union' blocks will use 'legacy' mode. (Meaning, they will not have recursive block support). To enable recursive block support, please recreate the query from scratch, or manually delete the blocks and re-create them.
+
+
+### Added
+
+- Added 'anonymous_query' and 'anonymous_query_cleanup' variables
+    - These enable 'anonymous query' mode, allowing anonymous users to send 'full queries'. See documentation
+- Added 'overview' button in the query page. This button will show all 'selected' attributes, and allow users to quickly select the related entity.
+- Added 'Abstraction' tab on the navbar. This will print the whole abstraction as a 2d/3d graph.
+- Added 'distance' notion, using attribute link. This allows user to filter a value based on another value, with an optional modifier.
+- Added 'custom distance' option for faldo relation (instead of just 'included_in' and 'overlap_with')
+- Store 'version' value when storing results. Not used for now, but might be used in deprecation warnings later
+- Removed some lines from coverage computation
+- Added 'indirect relations': Two entities will be linked on the graph, without a direct relation between them (same as faldo relations). This is intended to be used with 'linked attributes' (ex: get all entities B where B.color is the same as A.color, without a direct relation between A and B)
+- Basic support for 'skos:broader' and 'skos:narrower' for ontologies.
+
+### Fixed
+
+- Fixed new linting
+- Fixed logs for production setup
+- Fixed profile update & password reset tab in user profile page
+- Fixed Gff Faldo integration (was only integrating the last selected entity)
+- Fixed an issue when using filters and an 'UNION' node
+- Fixed an issue when launching a query with a 'linked' attribute toggled but unselected
+- Fixed missing includeIn and includeInReference in bed files
+- Fixed 'overlap_with' faldo query
+
+### Changed
+
+- Added contact_message config option, displayed in a new 'Contact' page
+- Added front_message config option, displayed on the front page
+- Now print reset link into logs if there are no mailer configured
+- Fixed markupsafe to 2.0.1
+- Increased Galaxy timeout for tests
+- Fix documentation build
+- Force all 'user queries'(ask/sparql interfaces) to go to the unauthenticated endpoint, to increase security (no write permissions)
+- Force all queries to use 'POST' instead of 'GET' to avoid max length issues
+- Changed the way 'strands' are integrated, to quicken FALDO queries. (Require re-integrating the data)
+- 'Same strand' queries will now match 'BothStrand' with a forward or reverse strand
+- Use '+', '-' and '.' for strand values in CSV instead of raw value (for homogenization)
+- Now allows 'infinite' recursive blocks (ie, a Minus block inside a Union block, or the opposite)
+- Overhaul faldo relation: add 'direct shortcut' triples between entities and values, to avoid using slow property paths when using faldo queries
+
+### Security
+
+- Bump markdown-captions from 2 to 2.1.2
+- Bump http-cache-semantics from 4.1.0 to 4.1.1
+- Bump minimatch from 3.0.4 to 3.1.2
+- Bump json5 from 1.0.1 to 1.0.2
+- Bump qs from 6.10.1 to 6.10.3
+- Bump decode-uri-component from 0.2.0 to 0.2.2
+- Bump loader-utils from 1.4.0 to 1.4.2
+
+
 ## [4.4.0] - 2022-07-01
 
 ### Fixed

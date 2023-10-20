@@ -17,10 +17,6 @@
             "predicate":"http://askomics.org/test/data/reference"
         },
         {
-            "object":"plus",
-            "predicate":"http://askomics.org/test/data/strand"
-        },
-        {
             "object":"+",
             "predicate":"http://askomics.org/test/data/strand"
         },

@@ -141,6 +141,14 @@ div.attribute-box {
   color: #454545;
 }
 
+div.entity-box {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #c5c5c5;
+  font-weight: normal;
+}
+
 label.attr-label {
   font-weight: 700;
 }
@@ -185,6 +193,20 @@ button.input-with-icon {
   background: none;
   position: absolute;
   right: 0.3rem;
+  top: 0.15rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+button.input-with-icon-two {
+  border: none;
+  background: none;
+  position: absolute;
+  right: 2.15rem;
   top: 0.15rem;
   width: 2rem;
   height: 2rem;
@@ -309,4 +331,8 @@ button.input-with-icon {
 .react-autosuggest__suggestion--highlighted {
   background-color: #0356fc;
   color: #fff;
+}
+
+.asko-switch-3d {
+  background-color: #87d068 !important;
 }

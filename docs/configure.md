@@ -18,6 +18,8 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `reverse_proxy_path` (string): Proxy path if AskOmics is accessible under a subpath
     - `subtitle` (string): Subtitle, displayed on the browser tab
     - `footer_message` (string): Custom message displayed on the AskOmics footer
+    - `front_message` (string): Custom message displayed on the AskOmics main page
+    - `contact_message` (string): Custom message displayed on the Contact page
     - `display_commit_hash` (`true` or `false`): diplay the commit hash of the current version in the AskOmics footer
     - `data_directory` (path): Where AskOmics store the data
     - `database_path` (path): Path to the sqlite database
@@ -52,6 +54,9 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `ldap_password_reset_link` (url): Link to manage the LDAP password
     - `ldap_account_link` (url): Link to the LDAP account manager
     - `autocomplete_max_results` (int): Max results queries by autocompletion
+    - `single_tenant` (bool): Enable [single tenant mode](/manage/#single-tenant-mode)
+    - `anonymous_query` (bool): Enable [anonymous query mode](/manage/#anonymous-query)
+    - `anonymous_query_cleanup` (int): Number of days before a successful anonymous job is deleted
 
 - `virtuoso`
 
@@ -73,7 +78,6 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
     - `namespace_internal` (url): AskOmics namespace for internal triples. Correspond to the `askomics:` prefix. You should change this to your instance url if you want your URIs to be resolved.
     - `preview_limit` (int): Number of line to be previewed in the results page
     - `result_set_max_rows` (int): Triplestore max row. Must be the same as SPARQL[ResultSetMaxRows] in virtuoso.ini config
-    - `single_tenant` (bool): Enable [single tenant mode](/manage/#single-tenant-mode)
 
 - `federation`
 

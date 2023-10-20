@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import AttributeBox from './attribute'
 import Entity from './entity'
 import ResultsTable from '../sparql/resultstable'
@@ -124,6 +124,15 @@ export default class FormQuery extends Component {
     this.updateGraphState()
   }
 
+  handleLinkedNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedNegative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -137,6 +146,15 @@ export default class FormQuery extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilterValue = event.target.value
       }
     })
     this.updateGraphState()
@@ -181,6 +199,71 @@ export default class FormQuery extends Component {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.push({
+          filterValue: "",
+          filterSign: "=",
+          filterModifier: "+"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedNumericModifierSign (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterModifier = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
             if (index == event.target.dataset.index) {
               filter.filterValue = event.target.value
             }
@@ -276,7 +359,6 @@ export default class FormQuery extends Component {
       saveIcon: "play",
       waiting: waiting
     })
-    ReactTooltip.rebuild();
   }
 
   // Preview results and Launch query buttons -------
@@ -438,11 +520,12 @@ export default class FormQuery extends Component {
     let entityMap = new Map()
     let tooltips = (
         <div>
-        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
-        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
-        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
-        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        <Tooltip anchorSelect=".formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</Tooltip>
+        <Tooltip anchorSelect=".linkTooltip">Link this attribute to another</Tooltip>
+        <Tooltip anchorSelect=".optionalTooltip">Show all values, including empty values.</Tooltip>
+        <Tooltip anchorSelect=".excludeTooltip">Exclude categories, instead of including</Tooltip>
+        <Tooltip anchorSelect=".visibleTooltip">Display attribute value in the results</Tooltip>
+        <Tooltip anchorSelect=".linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</Tooltip>
         </div>
     )
 
@@ -471,6 +554,13 @@ export default class FormQuery extends Component {
               toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
               handleFilterDateValue={p => this.handleFilterDateValue(p)}
               handleDateFilter={p => this.handleDateFilter(p)}
+              handleLinkedNumericModifierSign={p => this.handleLinkedNumericModifierSign(p)}
+              handleLinkedNumericSign={p => this.handleLinkedNumericSign(p)}
+              handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
+              toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
+              toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
+              handleLinkedNegative={p => this.handleLinkedNegative(p)}
+              handleLinkedFilterValue={p => this.handleLinkedFilterValue(p)}
             />
           )
         }

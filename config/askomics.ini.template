@@ -18,6 +18,8 @@ debug_ttl = false
 footer_message = Welcome to AskOmics!
 #front_message=
 
+#contact_message=
+
 display_commit_hash = false
 
 # data directory
@@ -86,12 +88,14 @@ ldap_mail_attribute = mail
 # Max results returned for autocompletion
 autocomplete_max_results = 10
 
+anonymous_query = false
+anonymous_query_cleanup = 60
 
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
 # Sparql endpoint
-endpoint = http://localhost:8890/sparql-auth
+endpoint = http://localhost:8890/sparql
 # Sparql updatepoint
 updatepoint = http://localhost:8890/sparql-auth
 # Isql API

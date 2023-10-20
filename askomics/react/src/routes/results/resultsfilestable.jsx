@@ -408,7 +408,7 @@ export default class ResultsFilesTable extends Component {
     }, {
       dataField: 'description',
       text: 'Description',
-      sort: true
+      sort: true,
     }, {
       dataField: 'start',
       text: 'Creation date',
@@ -425,11 +425,12 @@ export default class ResultsFilesTable extends Component {
       dataField: 'template',
       text: 'Template',
       sort: true,
+      hidden: !this.props.config.user.logged,
       formatter: (cell, row) => {
         return (
           <FormGroup>
             <div>
-              <CustomInput disabled={row.status == "success" ? false : true} type="switch" template-id={row.id} id={"template-" + row.id} onChange={this.toggleTemplateQuery} checked={cell} value={cell} />
+              <CustomInput disabled={!this.props.config.user.logged || row.status == "success" ? false : true} type="switch" template-id={row.id} id={"template-" + row.id} onChange={this.toggleTemplateQuery} checked={cell} value={cell} />
             </div>
           </FormGroup>
         )

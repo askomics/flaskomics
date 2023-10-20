@@ -306,6 +306,12 @@ The <btn class="white">Edit</btn> button can be used to simply replay the query 
 Advanced queries, including *UNION* and *MINUS* SPARQL queries are also available to further your queries.  
 Please head [here](query.md#minus-and-union-nodes) for more information.
 
+## Abstraction
+
+By using the 'Abstraction' button on the navigation bar, you can see the whole abstraction (all nodes and relations) as a 2D/3D graph. You can click on a node to focus on it.
+
+In '2D' mode, hovering over a node or a link will show all related nodes.
+
 # Conclusion
 
 In this tutorial we have seen how to use the AskOmics Interactive Tool, building a complex SPARQL query to interrogate 4 different datasets and answer a biological question.

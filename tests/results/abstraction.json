@@ -29,15 +29,15 @@
         "categories": [
           {
             "label": "+",
-            "uri": "http://askomics.org/test/data/%2B"
+            "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
           },
           {
             "label": "-",
-            "uri": "http://askomics.org/test/data/-"
+            "uri": "http://biohackathon.org/resource/faldo/ReverseStrandPosition"
           },
           {
             "label": ".",
-            "uri": "http://askomics.org/test/data/."
+            "uri": "http://biohackathon.org/resource/faldo/BothStrandPosition"
           }
         ],
         "entityUri": "http://askomics.org/test/data/gene",
@@ -53,28 +53,16 @@
       {
         "categories": [
           {
-            "label": "minus",
-            "uri": "http://askomics.org/test/data/minus"
-          },
-          {
-            "label": "plus",
-            "uri": "http://askomics.org/test/data/plus"
-          },
-	        {
-            "label": "unknown/both",
-            "uri": "http://askomics.org/test/data/unknown/both"
-          },
-          {
             "label": "+",
-            "uri": "http://askomics.org/test/data/%2B"
+            "uri": "http://biohackathon.org/resource/faldo/ForwardStrandPosition"
           },
           {
             "label": "-",
-            "uri": "http://askomics.org/test/data/-"
+            "uri": "http://biohackathon.org/resource/faldo/ReverseStrandPosition"
           },
           {
             "label": ".",
-            "uri": "http://askomics.org/test/data/."
+            "uri": "http://biohackathon.org/resource/faldo/BothStrandPosition"
           }
         ],
         "entityUri": "http://askomics.org/test/data/transcript",
@@ -525,7 +513,7 @@
     "entities": [
       {
         "endpoints": [
-          "http://localhost:8891/sparql-auth"
+          "http://localhost:8891/sparql"
         ],
         "faldo": true,
         "graphs": [
@@ -540,7 +528,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql-auth"
+          "http://localhost:8891/sparql"
         ],
         "faldo": true,
         "graphs": [
@@ -555,7 +543,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql-auth"
+          "http://localhost:8891/sparql"
         ],
         "faldo": true,
         "graphs": [
@@ -569,7 +557,7 @@
       },
       {
         "endpoints": [
-          "http://localhost:8891/sparql-auth"
+          "http://localhost:8891/sparql"
         ],
         "faldo": false,
         "graphs": [
@@ -587,6 +575,7 @@
         "graphs": [
           "urn:sparql:askomics_test:1_jdoe:gene.gff3_###GFF_TIMESTAMP###"
         ],
+        "indirect": false,
         "label": "Parent",
         "source": "http://askomics.org/test/data/transcript",
         "target": "http://askomics.org/test/data/gene",

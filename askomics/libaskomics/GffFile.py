@@ -45,6 +45,13 @@ class GffFile(File):
 
         self.faldo_entity = True
 
+        self.faldo_abstraction = {
+            "start": [],
+            "end": [],
+            "strand": [],
+            "reference": []
+        }
+
     def set_preview(self):
         """Summary"""
         try:
@@ -133,24 +140,24 @@ class GffFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, attribute["domain"]))
                 self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, attribute["range"]))
 
-            attribute_blanks[attribute["uri"]] = blank
+            attribute_blanks[(attribute['domain'], attribute["uri"])] = blank
             # Domain Knowledge
             if "values" in attribute.keys():
                 for value in attribute["values"]:
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDFS.label, rdflib.Literal(value)))
-                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], self.namespace_data[self.format_uri(value)]))
-
+                    o = self.namespace_data[self.format_uri(value)]
                     if attribute["label"] == rdflib.Literal("strand"):
-                        self.graph_abstraction_dk.add((self.namespace_data[self.format_uri(value)], rdflib.RDF.type, self.get_faldo_strand(value)))
-
+                        o = self.get_faldo_strand(value)
+                    self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data[self.format_uri("{}CategoryValue".format(attribute["label"]))]))
+                    self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
+                    self.graph_abstraction_dk.add((self.namespace_data[self.format_uri("{}Category".format(attribute["label"]))], self.namespace_internal[self.format_uri("category")], o))
         # Faldo:
         if self.faldo_entity:
-            for key, value in self.faldo_abstraction.items():
-                if value:
-                    blank = attribute_blanks[value]
-                    self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
-                    self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], value))
+            for key, values in self.faldo_abstraction.items():
+                if values:
+                    for val in values:
+                        blank = attribute_blanks[val]
+                        self.graph_abstraction_dk.add((blank, rdflib.RDF.type, self.faldo_abstraction_eq[key]))
+                        self.graph_abstraction_dk.add((blank, self.namespace_internal["uri"], val[1]))
 
     def format_gff_entity(self, entity):
         """Format a gff entity name by removing type (type:entity --> entity)
@@ -233,7 +240,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("reference")]
                 attribute = self.namespace_data[self.format_uri(rec.id)]
                 faldo_reference = attribute
-                self.faldo_abstraction["reference"] = relation
+                self.faldo_abstraction["reference"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "reference") not in attribute_list:
@@ -256,7 +263,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("start")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.start))
                 faldo_start = attribute
-                self.faldo_abstraction["start"] = relation
+                self.faldo_abstraction["start"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "start") not in attribute_list:
@@ -273,7 +280,7 @@ class GffFile(File):
                 relation = self.namespace_data[self.format_uri("end")]
                 attribute = rdflib.Literal(self.convert_type(feature.location.end))
                 faldo_end = attribute
-                self.faldo_abstraction["end"] = relation
+                self.faldo_abstraction["end"].append((entity_type, relation))
                 # self.graph_chunk.add((entity, relation, attribute))
 
                 if (feature.type, "end") not in attribute_list:
@@ -292,7 +299,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri("+")]
                     faldo_strand = self.get_faldo_strand("+")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "+"
                     # self.graph_chunk.add((entity, relation, attribute))
                 elif feature.location.strand == -1:
@@ -300,7 +307,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri("-")]
                     faldo_strand = self.get_faldo_strand("-")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "-"
                     # self.graph_chunk.add((entity, relation, attribute))
                 else:
@@ -308,7 +315,7 @@ class GffFile(File):
                     relation = self.namespace_data[self.format_uri("strand")]
                     attribute = self.namespace_data[self.format_uri(".")]
                     faldo_strand = self.get_faldo_strand(".")
-                    self.faldo_abstraction["strand"] = relation
+                    self.faldo_abstraction["strand"].append((entity_type, relation))
                     strand_type = "."
 
                 if (feature.type, "strand", strand_type) not in attribute_list:
@@ -381,6 +388,8 @@ class GffFile(File):
 
                         self.graph_chunk.add((entity, relation, attribute))
 
+                # Triples respecting faldo ontology
+
                 location = BNode()
                 begin = BNode()
                 end = BNode()
@@ -404,15 +413,33 @@ class GffFile(File):
                     self.graph_chunk.add((begin, rdflib.RDF.type, faldo_strand))
                     self.graph_chunk.add((end, rdflib.RDF.type, faldo_strand))
 
-                    # blocks
-                    block_base = self.settings.getint("triplestore", "block_size")
-                    block_start = int(self.convert_type(feature.location.start)) // block_base
-                    block_end = int(self.convert_type(feature.location.end)) // block_base
+                # Shortcut triple for faldo queries
+                self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
+                self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
+                self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
 
-                    for slice_block in range(block_start, block_end + 1):
-                        self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
-                        block_reference = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
-                        self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+                if faldo_strand:
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoStrand"], faldo_strand))
+                    strand_ref = self.get_reference_strand_uri(rec.id, faldo_strand, None)
+                    for sref in strand_ref:
+                        self.graph_chunk.add((entity, self.namespace_internal["referenceStrand"], sref))
+
+                # blocks
+                block_base = self.settings.getint("triplestore", "block_size")
+                block_start = int(self.convert_type(feature.location.start)) // block_base
+                block_end = int(self.convert_type(feature.location.end)) // block_base
+
+                for slice_block in range(block_start, block_end + 1):
+                    self.graph_chunk.add((entity, self.namespace_internal['includeIn'], rdflib.Literal(int(slice_block))))
+                    block_reference = self.rdfize(self.format_uri("{}_{}".format(rec.id, slice_block)))
+                    self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+                    if faldo_strand:
+                        strand_ref = self.get_reference_strand_uri(rec.id, faldo_strand, slice_block)
+                        for sref in strand_ref:
+                            self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
+                        strand_ref = self.get_reference_strand_uri(None, faldo_strand, slice_block)
+                        for sref in strand_ref:
+                            self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], sref))
 
                 yield
 

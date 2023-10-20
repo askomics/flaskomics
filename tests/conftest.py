@@ -126,6 +126,29 @@ class Client(object):
         """
         return self.client
 
+    def log_anon(self):
+        """Summary
+        Log anon user
+        """
+        with self.client.session_transaction() as sess:
+            sess["user"] = {
+                'id': 0,
+                'ldap': False,
+                'fname': "",
+                'lname': "",
+                'username': "anonymous",
+                'email': "",
+                'admin': False,
+                'blocked': False,
+                'quota': 0,
+                'apikey': "0000000000",
+                "galaxy": False
+            }
+
+        self.session = sess
+        auth = LocalAuth(self.app, self.session)
+        auth.create_user_directories(0, "anonymous")
+
     def log_user(self, username, quota=0, blocked=False, ldap=False):
         """Summary
 
@@ -378,7 +401,7 @@ class Client(object):
             }
         }
 
-    def upload_and_integrate(self, set_graph=False):
+    def upload_and_integrate(self, set_graph=False, public=False):
         """Summary
 
         Returns
@@ -397,27 +420,27 @@ class Client(object):
         int_transcripts = self.integrate_file({
             "id": 1,
             "columns_type": ["start_entity", "label", "category", "text", "reference", "start", "end", "category", "strand", "text", "text", "date"]
-        }, set_graph=set_graph)
+        }, set_graph=set_graph, public=public)
 
         int_de = self.integrate_file({
             "id": 2,
             "columns_type": ["start_entity", "directed", "numeric", "numeric", "numeric", "text", "numeric", "numeric", "numeric", "numeric"]
-        }, set_graph=set_graph)
+        }, set_graph=set_graph, public=public)
 
         int_qtl = self.integrate_file({
             "id": 3,
             "columns_type": ["start_entity", "ref", "start", "end"]
-        }, set_graph=set_graph)
+        }, set_graph=set_graph, public=public)
 
         int_gff = self.integrate_file({
             "id": 4,
             "entities": ["gene", "transcript"]
-        }, set_graph=set_graph)
+        }, set_graph=set_graph, public=public)
 
         int_bed = self.integrate_file({
             "id": 5,
             "entity_name": "gene"
-        }, set_graph=set_graph)
+        }, set_graph=set_graph, public=public)
 
         return {
             "transcripts": {
@@ -466,7 +489,7 @@ class Client(object):
         # integrate
         int_ontology = self.integrate_file({
             "id": 1,
-        }, set_graph=True, endpoint="http://localhost:8891/sparql-auth")
+        }, set_graph=True, endpoint="http://localhost:8891/sparql")
 
         return {
             "upload": up_ontology,
@@ -477,7 +500,7 @@ class Client(object):
             "endpoint": int_ontology["endpoint"]
         }
 
-    def create_result(self, has_form=False):
+    def create_result(self, has_form=False, start=None, status="success"):
         """Create a result entry in db
 
         Returns
@@ -513,14 +536,14 @@ class Client(object):
         # Save job in database database
         result = Result(self.app, self.session, info)
 
-        result.save_in_db()
+        result.save_in_db(start=start)
 
         # Execute query and write result to file
         headers, results = query_launcher.process_query(query.sparql)
         file_size = result.save_result_in_file(headers, results)
 
         # Update database status
-        result.update_db_status("success", size=file_size)
+        result.update_db_status(status, size=file_size)
 
         return {
             "id": result.id,

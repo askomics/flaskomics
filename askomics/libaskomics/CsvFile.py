@@ -367,11 +367,11 @@ class CsvFile(File):
                 p = self.namespace_internal["category"]
                 for value in self.category_values[self.header[index]]:
                     o = self.rdfize(value)
+                    if self.columns_type[index] == "strand":
+                        o = self.get_faldo_strand(value)
                     self.graph_abstraction_dk.add((s, p, o))
                     self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.namespace_data["{}CategoryValue".format(self.format_uri(self.header[index]))]))
                     self.graph_abstraction_dk.add((o, rdflib.RDFS.label, rdflib.Literal(value)))
-                    if self.columns_type[index] == "strand":
-                        self.graph_abstraction_dk.add((o, rdflib.RDF.type, self.get_faldo_strand(value)))
 
     def set_rdf_abstraction(self):
         """Set the abstraction"""
@@ -416,8 +416,9 @@ class CsvFile(File):
 
             blank = BNode()
             # Relation
-            if self.columns_type[index] in ('general_relation', 'symetric_relation'):
+            if self.columns_type[index] in ('general_relation', 'symetric_relation', 'indirect_relation'):
                 symetric_relation = True if self.columns_type[index] == 'symetric_relation' else False
+                indirect_relation = True if self.columns_type[index] == 'indirect_relation' else False
                 splitted = attribute_name.split('@')
 
                 attribute = self.rdfize(splitted[0])
@@ -439,6 +440,8 @@ class CsvFile(File):
                 if symetric_relation:
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
                     self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+                if indirect_relation:
+                    self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], rdflib.Literal("true", datatype=rdflib.XSD.boolean)))
 
                 continue
 
@@ -597,6 +600,10 @@ class CsvFile(File):
                     if current_type == "label" and column_number == 1:
                         continue
 
+                    # We ignore all data for indirect relations
+                    if current_type == "indirect_relation":
+                        continue
+
                     # Skip entity and blank cells
                     if column_number == 0 or (not cell and not current_type == "strand"):
                         continue
@@ -617,8 +624,9 @@ class CsvFile(File):
                     # Category
                     elif current_type in ('category', 'reference', 'strand'):
                         potential_relation = self.rdfize(current_header)
-                        if not cell:
-                            cell = "unknown/both"
+                        if current_type == "strand":
+                            # Override csv value, use "proper" values
+                            cell = self.get_faldo_strand_label(cell)
                         if current_header not in self.category_values.keys():
                             # Add the category in dict, and the first value in a set
                             self.category_values[current_header] = {cell, }
@@ -674,6 +682,9 @@ class CsvFile(File):
                             self.graph_chunk.add((attribute, relation, entity))
 
                 if self.faldo_entity and faldo_start and faldo_end:
+
+                    # Triples respecting faldo ontology
+
                     location = BNode()
                     begin_node = BNode()
                     end_node = BNode()
@@ -698,6 +709,19 @@ class CsvFile(File):
                         self.graph_chunk.add((begin_node, rdflib.RDF.type, faldo_strand))
                         self.graph_chunk.add((end_node, rdflib.RDF.type, faldo_strand))
 
+                    # Shortcut triple for faldo queries
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoBegin"], faldo_start))
+                    self.graph_chunk.add((entity, self.namespace_internal["faldoEnd"], faldo_end))
+                    if faldo_reference:
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoReference"], faldo_reference))
+                        if faldo_strand:
+                            strand_ref = self.get_reference_strand_uri(reference, faldo_strand, None)
+                            for sref in strand_ref:
+                                self.graph_chunk.add((entity, self.namespace_internal["referenceStrand"], sref))
+
+                    if faldo_strand:
+                        self.graph_chunk.add((entity, self.namespace_internal["faldoStrand"], faldo_strand))
+
                     # blocks
                     block_base = self.settings.getint("triplestore", "block_size")
                     block_start = int(start) // block_base
@@ -708,5 +732,13 @@ class CsvFile(File):
                         if reference:
                             block_reference = self.rdfize(self.format_uri("{}_{}".format(reference, slice_block)))
                             self.graph_chunk.add((entity, self.namespace_internal["includeInReference"], block_reference))
+                            if faldo_strand:
+                                strand_ref = self.get_reference_strand_uri(reference, faldo_strand, slice_block)
+                                for sref in strand_ref:
+                                    self.graph_chunk.add((entity, self.namespace_internal["includeInReferenceStrand"], sref))
+                        if faldo_strand:
+                            strand_ref = self.get_reference_strand_uri(None, faldo_strand, slice_block)
+                            for sref in strand_ref:
+                                self.graph_chunk.add((entity, self.namespace_internal["includeInStrand"], sref))
 
                 yield

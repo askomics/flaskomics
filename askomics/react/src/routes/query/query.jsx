@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner } from 'reactstrap'
+import { Alert, Button, CustomInput, Row, Col, ButtonGroup, Input, Spinner, ButtonToolbar } from 'reactstrap'
 import { Redirect } from 'react-router-dom'
 import ErrorDiv from '../error/error'
 import WaitingDiv from '../../components/waiting'
 import update from 'react-addons-update'
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip'
 import Visualization from './visualization'
 import AttributeBox from './attribute'
 import LinkView from './linkview'
 import OntoLinkView from './ontolinkview'
+import OverviewModal from './overviewModal'
 import GraphFilters from './graphfilters'
 import ResultsTable from '../sparql/resultstable'
 import PropTypes from 'prop-types'
@@ -55,6 +56,13 @@ export default class Query extends Component {
     this.divHeight = 650
     this.showFaldo = true;
 
+    this.defaultFaldoFilters = [{
+      filterValue: null,
+      filterSign: "=",
+      filterModifier: "+",
+      filterStart: "start",
+      filterEnd: "start"
+    }]
 
     this.idNumber = 0
     this.specialNodeIdNumber = 0
@@ -111,14 +119,32 @@ export default class Query extends Component {
     return this.specialNodeIdNumber
   }
 
-  getLargestSpecialNodeGroupId (node) {
+  getLargestSpecialNodeGroupId (node, preRender=false) {
     let listIds = new Set()
+    let remote
+
     this.graphState.links.map(link => {
-      if (link.source.id == node.id) {
-        listIds.add(link.target.specialNodeGroupId)
-      }
-      if (link.target.id == node.id) {
-        listIds.add(link.source.specialNodeGroupId)
+      if (preRender) {
+      // Ugly, but before rendering source and target are IDs and not objects
+        if (link.source == node.id) {
+          remote = this.state.nodes.some(rem => {
+            return (link.target == rem.id )
+          })
+          listIds.add(remote.specialNodeGroupId)
+        }
+        if (link.target == node.id) {
+          remote = this.state.nodes.some(rem => {
+            return (link.source == rem.id )
+          })
+          listIds.add(remote.specialNodeGroupId)
+        }
+      } else {
+        if (link.source.id == node.id) {
+          listIds.add(link.target.specialNodeGroupId)
+        }
+        if (link.target.id == node.id) {
+          listIds.add(link.source.specialNodeGroupId)
+        }
       }
     })
     return Math.max(...listIds)
@@ -360,35 +386,40 @@ export default class Query extends Component {
         firstAttrVisibleForBnode = false
 
         if (attributeType == 'decimal') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: "",
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
 
         if (attributeType == 'text') {
           nodeAttribute.filterType = 'exact'
-          nodeAttribute.filterValue = ''
+          nodeAttribute.linkedNegative = false
+          nodeAttribute.filterValue = nodeAttribute.linkedFilterValue = ''
         }
 
         if (attributeType == 'category') {
           nodeAttribute.exclude = false
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterValues = attr.categories
           nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'boolean') {
           nodeAttribute.filterValues = ["true", "false"]
+          nodeAttribute.linkedNegative = false
           nodeAttribute.filterSelectedValues = []
         }
 
         if (attributeType == 'date') {
-          nodeAttribute.filters = [
+          nodeAttribute.filters = nodeAttribute.linkedFilters = [
             {
               filterValue: null,
-              filterSign: "="
+              filterSign: "=",
+              filterModifier: "+"
             }
           ]
         }
@@ -401,7 +432,7 @@ export default class Query extends Component {
     this.graphState.attr = this.graphState.attr.concat(nodeAttributes)
   }
 
-  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null]) {
+  insertNode (uri, selected, suggested, special=null, forceSpecialId=null, specialNodeGroupId=null, specialPreviousIds=[null, null], newDepth=[]) {
     /*
     Insert a new node in the graphState
     */
@@ -409,12 +440,19 @@ export default class Query extends Component {
     let humanId = this.getHumanNodeId(uri)
     let specialNodeId = null
 
+    let depth = [...newDepth]
+
     if (special) {
       specialNodeId = this.getSpecialNodeId()
     }
 
+    if (special == "minusNode"){
+      depth = [...newDepth, specialNodeId, specialNodeId + "_1"]
+    }
+
     if (forceSpecialId) {
       specialNodeId = forceSpecialId
+      depth = [...depth, forceSpecialId, forceSpecialId + "_" + specialNodeGroupId]
     }
 
     let node = {
@@ -428,6 +466,7 @@ export default class Query extends Component {
       specialNodeId: specialNodeId,
       specialNodeGroupId: specialNodeGroupId,
       specialPreviousIds: specialPreviousIds,
+      depth: depth,
       label: this.getLabel(uri),
       faldo: this.isFaldoEntity(uri),
       selected: selected,
@@ -513,6 +552,11 @@ export default class Query extends Component {
     let reLink = new RegExp(node.filterLink.toLowerCase(), 'g')
 
     let specialNodeGroupId = incrementSpecialNodeGroupId ? incrementSpecialNodeGroupId : node.specialNodeGroupId
+    let depth = [...node.depth]
+
+    if(incrementSpecialNodeGroupId){
+      depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+    }
 
     if (this.isOntoEndNode(node.id)){
         return
@@ -544,7 +588,8 @@ export default class Query extends Component {
               faldo: this.isFaldoEntity(relation.target),
               selected: false,
               suggested: true,
-              ontology: isOnto
+              ontology: isOnto,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -560,8 +605,13 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: this.defaultFaldoFilters,
+              indirect: relation.indirect
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+            if (incrementSpecialNodeGroupId){
+              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            }
           }
         }
       }
@@ -589,7 +639,8 @@ export default class Query extends Component {
               label: label,
               faldo: this.isFaldoEntity(relation.source),
               selected: false,
-              suggested: true
+              suggested: true,
+              depth: depth
             })
             // push suggested link
             this.graphState.links.push({
@@ -604,8 +655,13 @@ export default class Query extends Component {
               selected: false,
               suggested: true,
               directed: true,
+              faldoFilters: this.defaultFaldoFilters,
+              indirect: relation.indirect
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+            if (incrementSpecialNodeGroupId){
+              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            }
           }
         }
       }
@@ -632,6 +688,7 @@ export default class Query extends Component {
             faldo: entity.faldo,
             selected: false,
             suggested: true,
+            depth: depth
           })
           // push suggested link
           this.graphState.links.push({
@@ -647,8 +704,13 @@ export default class Query extends Component {
             selected: false,
             suggested: true,
             directed: true,
+            faldoFilters: this.defaultFaldoFilters,
+            indirect: false
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+          if (incrementSpecialNodeGroupId){
+            depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+          }
         }
       })
     }
@@ -685,6 +747,8 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
+          indirect: link.indirect ? link.indirect : false
         }
       }
 
@@ -704,6 +768,8 @@ export default class Query extends Component {
           selected: false,
           suggested: false,
           directed: link.directed,
+          faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
+          indirect: link.indirect ? link.indirect : false
         }
       }
     })
@@ -908,8 +974,6 @@ export default class Query extends Component {
       saveIcon: "play",
       waiting: waiting
     })
-    console.log(this.graphState)
-    ReactTooltip.rebuild();
   }
 
   initGraph () {
@@ -937,11 +1001,18 @@ export default class Query extends Component {
     // Get previous special node ids
     let specialPreviousIds = [sourceNode.specialNodeId, sourceNode.specialNodeGroupId]
 
+    let depth
+    if (this.currentSelected.type == "unionNode"){
+      depth = [...sourceNode.depth, sourceNode.specialNodeId, sourceNode.specialNodeId + "_" + this.getLargestSpecialNodeGroupId(sourceNode) + 1]
+    } else {
+      depth = [...sourceNode.depth]
+    }
+
     // insert a special node and select it
-    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds)
+    let specialNode = this.insertNode(sourceNode.uri, true, false, data.convertTo, null, null, specialPreviousIds, depth)
 
     // insert target node with specialNodeGroupId = 1
-    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds)
+    let targetNode = this.insertNode(data.node.uri, false, false, null, specialNode.specialNodeId, 1, specialPreviousIds, depth)
 
     // insert link between source and special node
     this.insertSpecialLink(sourceNode, specialNode, data.convertTo)
@@ -955,7 +1026,11 @@ export default class Query extends Component {
     this.graphState.links.push(relation)
 
     //insert suggestion with first specialNodeGroupId = 2 (will be incremented for each suggestion)
-    this.insertSuggestion(specialNode, 2)
+    if (this.currentSelected.type == "unionNode"){
+      this.insertSuggestion(specialNode, 2)
+    } else {
+      this.insertSuggestion(specialNode)
+    }
 
     // Manage selection
     this.manageCurrentPreviousSelected(specialNode)
@@ -980,7 +1055,9 @@ export default class Query extends Component {
           target: link.target.id == targetId ? "target" : "source",
           selected: link.selected,
           suggested: link.suggested,
-          directed: link.directed
+          directed: link.directed,
+          faldoFilters: link.faldoFilters,
+          indirect: link.indirect
         }
       }
     })
@@ -1000,7 +1077,8 @@ export default class Query extends Component {
       target: node2.id,
       selected: false,
       suggested: false,
-      directed: false
+      directed: false,
+      indirect: false
     }
     this.graphState.links.push(link)
   }
@@ -1015,7 +1093,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1030,7 +1112,11 @@ export default class Query extends Component {
     })
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1041,7 +1127,11 @@ export default class Query extends Component {
     this.showFaldo = !this.showFaldo
     // Reset suggestion
     this.removeAllSuggestion()
-    this.insertSuggestion(this.currentSelected)
+    if (this.currentSelected.type == "unionNode") {
+      this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+    } else {
+      this.insertSuggestion(this.currentSelected)
+    }
     this.updateGraphState()
   }
 
@@ -1100,6 +1190,15 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
+  handleLinkedNegative (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedNegative = event.target.value == '=' ? false : true
+      }
+    })
+    this.updateGraphState()
+  }
+
   handleFilterType (event) {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
@@ -1113,6 +1212,15 @@ export default class Query extends Component {
     this.graphState.attr.map(attr => {
       if (attr.id == event.target.id) {
         attr.filterValue = event.target.value
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedFilterValue (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilterValue = event.target.value
       }
     })
     this.updateGraphState()
@@ -1157,6 +1265,71 @@ export default class Query extends Component {
       this.graphState.attr.map(attr => {
         if (attr.id == event.target.id) {
           attr.filters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericSign (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleAddNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.push({
+          filterValue: "",
+          filterSign: "=",
+          filterModifier: "+"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveNumLinkedFilter (event) {
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleLinkedNumericModifierSign (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterModifier = event.target.value
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
+  }
+
+  handleLinkedNumericValue (event) {
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
             if (index == event.target.dataset.index) {
               filter.filterValue = event.target.value
             }
@@ -1221,10 +1394,30 @@ export default class Query extends Component {
         attr.linked = !attr.linked
         if (!attr.linked) {
           attr.linkedWith = null
+          attr.linkedFilters = [{
+            filterValue: "",
+            filterSign: "=",
+            filterModifier: "+"
+          }]
         }
       }
     })
     this.updateGraphState()
+  }
+
+  handleFilterLinked (event){
+    if (!isNaN(event.target.value)) {
+      this.graphState.attr.map(attr => {
+        if (attr.id == event.target.id) {
+          attr.linkedFilters.map((filter, index) => {
+            if (index == event.target.dataset.index) {
+              filter.filterValue = this.fixTimezoneOffset(event.target.value)
+            }
+          })
+        }
+      })
+      this.updateGraphState()
+    }
   }
 
   handleChangeLink (event) {
@@ -1242,7 +1435,17 @@ export default class Query extends Component {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
         link.uri = event.target.value
-        link.label = event.target.value == 'included_in' ? "Included in" : "Overlap with"
+
+        if (event.target.value != "distance_from"){
+          link.faldoFilters = this.defaultFaldoFilters
+        }
+        if (event.target.value == 'included_in'){
+          link.label = "Included in"
+        } else if (event.target.value == 'overlap_with'){
+          link.label = "Overlap with"
+        } else {
+          link.label = "Distant from"
+        }
       }
     })
     this.updateGraphState()
@@ -1345,11 +1548,128 @@ export default class Query extends Component {
 
   getOntoLabel (uri) {
       let labels = {}
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is children of"
+      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is child of"
       labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parents of"
+      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parent of"
       labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
+
+      labels["http://www.w3.org/2004/02/skos/core#broader"] = "is child of"
+      labels["http://www.w3.org/2004/02/skos/core#broader*"] = "is descendant of"
+      labels["http://www.w3.org/2004/02/skos/core#narrower"] = "is parent of"
+      labels["http://www.w3.org/2004/02/skos/core#narrower*"] = "is ancestor of"
       return labels[uri]
+  }
+
+  // Faldo filters -----------------------------
+
+  toggleAddFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.push({
+          filterValue: null,
+          filterSign: "=",
+          filterModifier: "+",
+          filterStart: "start",
+          filterEnd: "start"
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  toggleRemoveFaldoFilter (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.pop()
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoModifierSign (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterModifier = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterSign (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterSign = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterStart (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterStart = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoFilterEnd (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterEnd = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleFaldoValue (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.faldoFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterValue = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
+  }
+
+  // Fix update graphState
+  fixGraphState() {
+    // Fix faldoFilters
+    this.graphState.links.map(link => {
+      if (!link.faldoFilters) {
+        link.faldoFilters = this.defaultFaldoFilters
+      }
+      if (!link.indirect){
+        link.indirect = false
+      }
+    })
+    this.graphState.nodes.map(node => {
+      if (!node.depth) {
+        if(node.specialNodeId){
+          node.legacyBlock = true
+        }
+        node.depth = []
+      }
+    })
   }
 
   // ------------------------------------------------
@@ -1464,10 +1784,15 @@ export default class Query extends Component {
             // redo a query
             this.graphState = this.props.location.state.graphState
             this.initId()
+            this.fixGraphState()
             this.setCurrentSelected()
             if (this.currentSelected) {
-              if (this.currentSelected.type != "link") {
-                this.insertSuggestion(this.currentSelected)
+              if (this.currentSelected.type != "link" && this.currentSelected.type != "posLink" && this.currentSelected.type != "ontoLink") {
+                if (this.currentSelected.type == "unionNode") {
+                  this.insertSuggestion(this.currentSelected, this.getLargestSpecialNodeGroupId(this.currentSelected) + 1)
+                } else {
+                  this.insertSuggestion(this.currentSelected)
+                }
               }
             }
             this.updateGraphState()
@@ -1524,17 +1849,19 @@ export default class Query extends Component {
     let isOnto
     let linkView
     let previewButton
+    let overviewButton
     let faldoButton
     let launchQueryButton
     let removeButton
     let graphFilters
     let tooltips = (
         <div>
-        <ReactTooltip id="formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</ReactTooltip>
-        <ReactTooltip id="linkTooltip">Link this attribute to another</ReactTooltip>
-        <ReactTooltip id="optionalTooltip">Show all values, including empty values.</ReactTooltip>
-        <ReactTooltip id="excludeTooltip">Exclude categories, instead of including</ReactTooltip>
-        <ReactTooltip id="visibleTooltip">Display attribute value in the results</ReactTooltip>
+        <Tooltip anchorSelect=".formTooltip" place="top" effect="solid">Mark attribute as a <i>form</i> attribute</Tooltip>
+        <Tooltip anchorSelect=".linkTooltip">Link this attribute to another</Tooltip>
+        <Tooltip anchorSelect=".optionalTooltip">Show all values, including empty values.</Tooltip>
+        <Tooltip anchorSelect=".excludeTooltip">Exclude categories, instead of including</Tooltip>
+        <Tooltip anchorSelect=".visibleTooltip">Display attribute value in the results</Tooltip>
+        <Tooltip anchorSelect=".linkedTooltip">Regex value, with $1 as a placeholder for the linked value. Ex: $1-suffix</Tooltip>
         </div>
     )
 
@@ -1564,6 +1891,13 @@ export default class Query extends Component {
                 toggleAddDateFilter={p => this.toggleAddDateFilter(p)}
                 handleFilterDateValue={p => this.handleFilterDateValue(p)}
                 handleDateFilter={p => this.handleDateFilter(p)}
+                handleLinkedNumericModifierSign={p => this.handleLinkedNumericModifierSign(p)}
+                handleLinkedNumericSign={p => this.handleLinkedNumericSign(p)}
+                handleLinkedNumericValue={p => this.handleLinkedNumericValue(p)}
+                toggleAddNumLinkedFilter={p => this.toggleAddNumLinkedFilter(p)}
+                toggleRemoveNumLinkedFilter={p => this.toggleRemoveNumLinkedFilter(p)}
+                handleLinkedNegative={p => this.handleLinkedNegative(p)}
+                handleLinkedFilterValue={p => this.handleLinkedFilterValue(p)}
                 config={this.state.config}
                 isOnto={isOnto}
                 entityUri={this.currentSelected.uri}
@@ -1593,6 +1927,13 @@ export default class Query extends Component {
             handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
+            toggleAddFaldoFilter={p => this.toggleAddFaldoFilter(p)}
+            toggleRemoveFaldoFilter={p => this.toggleRemoveFaldoFilter(p)}
+            handleFaldoModifierSign={p => this.handleFaldoModifierSign(p)}
+            handleFaldoFilterSign={p => this.handleFaldoFilterSign(p)}
+            handleFaldoFilterStart={p => this.handleFaldoFilterStart(p)}
+            handleFaldoFilterEnd={p => this.handleFaldoFilterEnd(p)}
+            handleFaldoValue={p => this.handleFaldoValue(p)}
           />
         }
 
@@ -1630,12 +1971,14 @@ export default class Query extends Component {
       )
 
       // buttons
+      overviewButton = (<OverviewModal divHeight={this.divHeight} graphState={this.state.graphState} handleNodeSelection={p => this.handleNodeSelection(p)} handleLinkSelection={p => this.handleLinkSelection(p)}/>)
+
       let previewIcon = <i className={"fas fa-" + this.state.previewIcon}></i>
       if (this.state.previewIcon == "spinner") {
         previewIcon = <Spinner size="sm" color="light" />
       }
       previewButton = <Button onClick={this.handlePreview} color="secondary" disabled={this.state.disablePreview}>{previewIcon} Run & preview</Button>
-      if (this.state.config.logged) {
+      if (this.state.config.logged || this.state.config.anonymousQuery) {
         launchQueryButton = <Button onClick={this.handleQuery} color="secondary" disabled={this.state.disableSave || this.state.exceededQuota}><i className={"fas fa-" + this.state.saveIcon}></i> Run & save</Button>
       }
       if (this.currentSelected != null) {
@@ -1707,10 +2050,19 @@ export default class Query extends Component {
           </Col>
         </Row>
         {warningDiskSpace}
-        <ButtonGroup>
-          {previewButton}
-          {launchQueryButton}
-        </ButtonGroup>
+        <Row>
+          <Col xs="7" style={{ paddingRight: 0 }}>
+            <ButtonToolbar className="justify-content-between">
+              <ButtonGroup>
+                {previewButton}
+                {launchQueryButton}
+              </ButtonGroup>
+              <ButtonGroup>
+                {overviewButton}
+              </ButtonGroup>
+            </ButtonToolbar>
+          </Col>
+        </Row>
         <br /> <br />
         <div>
           {resultsTable}

@@ -356,7 +356,7 @@ class FilesHandler(FilesUtils):
                     self.delete_file_from_fs(file_path)
             except Exception:
                 pass
-            raise(e)
+            raise e
 
     def download_url(self, url, task_id):
         """Download a file from an URL and insert info in database

@@ -45,6 +45,12 @@ def start():
         except Exception:
             pass
 
+        contact_message = None
+        try:
+            contact_message = current_app.iniconfig.get('askomics', 'contact_message')
+        except Exception:
+            pass
+
         # get proxy path
         proxy_path = "/"
         try:
@@ -71,6 +77,7 @@ def start():
         config = {
             "footerMessage": current_app.iniconfig.get('askomics', 'footer_message'),
             "frontMessage": front_message,
+            "contactMessage": contact_message,
             "version": get_distribution('askomics').version,
             "commit": sha,
             "gitUrl": current_app.iniconfig.get('askomics', 'github'),
@@ -86,7 +93,8 @@ def start():
             "logged": False,
             "ontologies": ontologies,
             "singleTenant": current_app.iniconfig.getboolean('askomics', 'single_tenant', fallback=False),
-            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10)
+            "autocompleteMaxResults": current_app.iniconfig.getint("askomics", "autocomplete_max_results", fallback=10),
+            "anonymousQuery": current_app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False)
         }
 
         json = {
@@ -95,7 +103,7 @@ def start():
             "config": config
         }
 
-        if 'user' in session:
+        if 'user' in session and not session['user'].get('fake', False):
             local_auth = LocalAuth(current_app, session)
             user = local_auth.get_user(session['user']['username'])
             local_auth.update_last_action(session["user"]["username"])

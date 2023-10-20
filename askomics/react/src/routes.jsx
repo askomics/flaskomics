@@ -23,6 +23,8 @@ import Query from './routes/query/query'
 import Results from './routes/results/results'
 import AskoNavbar from './navbar'
 import AskoFooter from './footer'
+import Contact from './contact'
+import Overview from './routes/overview/overview'
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -41,6 +43,8 @@ export default class Routes extends Component {
         user: {},
         logged: false,
         footerMessage: null,
+        frontMessage: null,
+        contactMessage: null,
         version: null,
         commit: null,
         gitUrl: null,
@@ -49,7 +53,8 @@ export default class Routes extends Component {
         namespaceInternal: null,
         ontologies: [],
         singleTenant: false,
-        autocompleteMaxResults: 10
+        autocompleteMaxResults: 10,
+        anonymousQuery: false
       }
     }
     this.cancelRequest
@@ -103,6 +108,11 @@ export default class Routes extends Component {
       )
     }
 
+    let contactRoute
+
+    if (this.state.config.contactMessage) {
+      contactRoute = <Route path="/contact" exact component={() => (<Contact config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
+    }
 
     return (
       <Router basename={this.state.config.proxyPath}>
@@ -121,11 +131,13 @@ export default class Routes extends Component {
             <Route path="/prefixes" exact component={() => (<Prefixes config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/ontologies" exact component={() => (<Ontologies config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/query" exact component={Query} />
+            <Route path="/overview" exact component={ () => (<Overview config={this.state.config} waitForStart={this.state.waiting} setStateNavbar={p => this.setState(p)} />)} />
             <Route path="/form" exact component={FormQuery} />
             <Route path="/form_edit" exact component={FormEditQuery} />
             <Route path="/results" exact component={() => (<Results config={this.state.config} waitForStart={this.state.waiting} />)} />
             <Route path="/sparql" render={(props) => <Sparql config={this.state.config} waitForStart={this.state.waiting} {...props}/>}/>
             <Route path="/data/:uri" exact component={() => (<Data config={this.state.config} waitForStart={this.state.waiting} />)} />
+            {contactRoute}
             {integrationRoutes}
           </Switch>
           <br />

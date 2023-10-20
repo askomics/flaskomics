@@ -18,7 +18,7 @@ class ResultsHandler(Params):
         """
         Params.__init__(self, app, session)
 
-    def delete_results(self, files_id):
+    def delete_results(self, files_id, admin=False):
         """Delete files
 
         Parameters
@@ -32,9 +32,13 @@ class ResultsHandler(Params):
             list of remaining files
         """
         for file_id in files_id:
-            result = Result(self.app, self.session, {"id": file_id})
-            self.app.celery.control.revoke(result.celery_id, terminate=True)
-            result.delete_result()
+            result = Result(self.app, self.session, {"id": file_id}, owner=True, admin=admin)
+            if result.celery_id:
+                self.app.celery.control.revoke(result.celery_id, terminate=True)
+            if result.id:
+                result.delete_result(admin=admin)
+        if admin:
+            return self.get_admin_queries()
 
         return self.get_files_info()
 
@@ -156,26 +160,24 @@ class ResultsHandler(Params):
 
         return queries
 
-    def get_admin_public_queries(self):
-        """Get id description, and owner of published queries
+    def get_admin_queries(self):
+        """Get id description, and owner of all queries
 
         Returns
         -------
         List
-            List of published queries (id and description)
+            List of all queries (id and description)
         """
 
-        sql_var = (True, )
         database = Database(self.app, self.session)
 
         query = '''
         SELECT results.id, results.status, results.start, results.end, results.nrows, results.public, results.description, results.size, users.username
         FROM results
-        INNER JOIN users ON results.user_id=users.user_id
-        WHERE results.public = ?
+        LEFT JOIN users ON results.user_id=users.user_id
         '''
 
-        rows = database.execute_sql_query(query, sql_var)
+        rows = database.execute_sql_query(query)
 
         queries = []
 
@@ -195,6 +197,31 @@ class ResultsHandler(Params):
                 'public': row[5],
                 'description': row[6],
                 'size': row[7],
-                'user': row[8]
+                'user': row[8] if row[8] else "anonymous"
             })
         return queries
+
+    def delete_older_results(self, delta, deltatype, user_id, status=None):
+        """Delete results older than a specific delta for a specific user_id
+
+        Returns
+        -------
+        List
+           None
+        """
+
+        database = Database(self.app, self.session)
+        date_str = '"%s", "now", "-{} {}"'.format(delta, deltatype)
+        status_substr = ""
+        arg_tuple = (user_id)
+
+        if status:
+            status_substr = "AND status = ?"
+            arg_tuple = (user_id, status)
+
+        query = '''
+        DELETE FROM results
+        WHERE user_id = ? AND start <= strftime({}) {}
+        '''.format(date_str, status_substr)
+
+        database.execute_sql_query(query, arg_tuple)

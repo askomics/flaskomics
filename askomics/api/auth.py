@@ -17,10 +17,34 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         """Login required decorator"""
-        if 'user' in session:
+        if 'user' in session and not session['user'].get('fake', False):
             if not session['user']['blocked']:
                 return f(*args, **kwargs)
             return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
+        return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+    return decorated_function
+
+
+def login_required_query(f):
+    """Login required function"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        """Login required decorator"""
+        if 'user' in session:
+            # If conf has changed, clear session
+            if session['user'].get('fake', False) and not current_app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False):
+                session.pop('user')
+                return jsonify({"error": True, "errorMessage": "Login required"}), 401
+
+            if not session['user']['blocked']:
+                return f(*args, **kwargs)
+
+            return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
+        elif current_app.iniconfig.getboolean('askomics', 'anonymous_query', fallback=False):
+            local_auth = LocalAuth(current_app, session)
+            session['user'] = local_auth.get_anonymous_user()
+            return f(*args, **kwargs)
         return jsonify({"error": True, "errorMessage": "Login required"}), 401
 
     return decorated_function

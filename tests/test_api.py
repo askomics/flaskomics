@@ -13,6 +13,12 @@ class TestApi(AskomicsTestCase):
             front_message = client.get_config('askomics', 'front_message')
         except Exception:
             pass
+
+        contact_message = None
+        try:
+            contact_message = client.get_config('askomics', 'contact_message')
+        except Exception:
+            pass
         # Get ldap password reset link if set
         password_reset_link = None
         try:
@@ -30,6 +36,7 @@ class TestApi(AskomicsTestCase):
         expected_config_nouser = {
             'footerMessage': client.get_config('askomics', 'footer_message'),
             'frontMessage': front_message,
+            'contactMessage': contact_message,
             "version": get_distribution('askomics').version,
             "commit": None,
             "gitUrl": "https://github.com/askomics/flaskomics",
@@ -45,7 +52,8 @@ class TestApi(AskomicsTestCase):
             "logged": False,
             "ontologies": [],
             "singleTenant": False,
-            "autocompleteMaxResults": 20
+            "autocompleteMaxResults": 20,
+            'anonymousQuery': False
         }
         response = client.client.get('/api/start')
         assert response.status_code == 200

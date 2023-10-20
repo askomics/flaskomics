@@ -9,6 +9,8 @@ from askomics.libaskomics.Database import Database
 from askomics.libaskomics.Params import Params
 from askomics.libaskomics.Utils import Utils
 
+from pkg_resources import get_distribution
+
 
 class Result(Params):
     """Result represent a query result file
@@ -29,7 +31,7 @@ class Result(Params):
         results directory path
     """
 
-    def __init__(self, app, session, result_info, force_no_db=False):
+    def __init__(self, app, session, result_info, force_no_db=False, owner=False, admin=False):
         """init object
 
         Parameters
@@ -52,7 +54,7 @@ class Result(Params):
 
         if "id" in result_info and not force_no_db:
             self.id = result_info["id"]
-            if not self.set_info_from_db_with_id():
+            if not self.set_info_from_db_with_id(owner=owner, admin=admin):
                 return None
         else:
             self.id = result_info["id"] if "id" in result_info else None
@@ -243,27 +245,36 @@ class Result(Params):
         """
         self.celery_id = celery_id
 
-    def set_info_from_db_with_id(self):
+    def set_info_from_db_with_id(self, owner=False, admin=False):
         """Set result info from the db"""
         database = Database(self.app, self.session)
 
-        if "user" in self.session:
-            query = '''
-            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
-            FROM results
-            WHERE (user_id = ? OR public = ?) AND id = ?
-            '''
-
-            rows = database.execute_sql_query(query, (self.session["user"]["id"], True, self.id))
-
-        else:
+        if 'user' not in self.session:
+            if owner:
+                return False
             query = '''
             SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
             FROM results
             WHERE public = ? AND id = ?
             '''
-
             rows = database.execute_sql_query(query, (True, self.id))
+        else:
+            if admin:
+                select_subquery = "WHERE id = ?"
+                params = (self.id,)
+            elif owner:
+                select_subquery = "WHERE user_id = ? AND id = ?"
+                params = (self.session["user"]["id"], self.id,)
+            else:
+                select_subquery = "WHERE (user_id = ? OR public = ?) AND id = ?"
+                params = (self.session["user"]["id"], True, self.id,)
+            query = '''
+            SELECT celery_id, path, graph_state, start, end, nrows, sparql_query, graphs_and_endpoints, has_form_attr, template, form
+            FROM results
+            {}
+            '''.format(select_subquery)
+
+            rows = database.execute_sql_query(query, params)
 
         if not rows:
             return False
@@ -343,11 +354,14 @@ class Result(Params):
 
         return os.path.getsize(self.file_path)
 
-    def save_in_db(self):
+    def save_in_db(self, start=None):
         """Save results file info into the database"""
         database = Database(self.app, self.session)
 
-        self.start = int(time.time())
+        if not start:
+            self.start = int(time.time())
+        else:
+            self.start = start
 
         query = '''
         INSERT INTO results VALUES(
@@ -369,6 +383,7 @@ class Result(Params):
             ?,
             ?,
             ?,
+            ?,
             ?
         )
         '''
@@ -384,7 +399,8 @@ class Result(Params):
             json.dumps({"graphs": self.graphs, "endpoints": self.endpoints}),
             False,
             self.session["user"]["admin"] and any([attrib.get("form") for attrib in self.graph_state["attr"]]) if (self.graph_state and self.graph_state.get("attr")) else False,
-            False
+            False,
+            get_distribution('askomics').version
         ), get_id=True)
 
         return self.id
@@ -500,21 +516,28 @@ class Result(Params):
         """Delete file"""
         self.delete_file_from_filesystem()
 
-    def delete_result(self):
+    def delete_result(self, admin=False):
         """Remove results from db and filesystem"""
-        self.delete_db_entry()
+        self.delete_db_entry(admin=admin)
         self.delete_file_from_filesystem()
 
-    def delete_db_entry(self):
+    def delete_db_entry(self, admin=False):
         """Delete results from db"""
         database = Database(self.app, self.session)
+        if admin:
+            query = '''
+            DELETE FROM results
+            WHERE id = ?
+            '''
+            args = (self.id,)
+        else:
+            query = '''
+            DELETE FROM results
+            WHERE id = ? AND user_id = ?
+            '''
+            args = (self.id, self.session["user"]["id"],)
 
-        query = '''
-        DELETE FROM results
-        WHERE id = ? AND user_id = ?
-        '''
-
-        database.execute_sql_query(query, (self.id, self.session["user"]["id"]))
+        database.execute_sql_query(query, args)
 
     def delete_file_from_filesystem(self):
         """Remove result file from filesystem"""
@@ -603,21 +626,32 @@ class Result(Params):
 
         database.execute_sql_query(query, sql_var)
 
-    def update_description(self, description):
+    def update_description(self, description, admin=False):
         """Change the result description"""
         database = Database(self.app, self.session)
+        if admin:
+            query = '''
+            UPDATE results SET
+            description=?
+            WHERE id=?
+            '''
 
-        query = '''
-        UPDATE results SET
-        description=?
-        WHERE user_id=? AND id=?
-        '''
+            database.execute_sql_query(query, (
+                description,
+                self.id
+            ))
+        else:
+            query = '''
+            UPDATE results SET
+            description=?
+            WHERE user_id=? AND id=?
+            '''
 
-        database.execute_sql_query(query, (
-            description,
-            self.session["user"]["id"],
-            self.id
-        ))
+            database.execute_sql_query(query, (
+                description,
+                self.session["user"]["id"],
+                self.id
+            ))
 
     def update_graph(self, newGraph):
         """Change the result description"""

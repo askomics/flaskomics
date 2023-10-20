@@ -53,11 +53,19 @@ From left to right :
 
 - <i class="fa fa-bookmark"></i>: Mark the attribute as a **form** attribute. More information [here](template.md#forms).
 - <i class="fa fa-link"></i>: Link this attribute to another (on a different entity or the same one).
-    - *This will only show rows where both attributes have the same value*.
+    - *This will filtrer based on the linked attribute value, with an optional modifier (See note)*.
 - <i class="fa fa-question-circle"></i>: Show all values for this attribute, including empty values.
 - <i class="fa fa-ban"></i>: Exclude one or more categories, instead of including.
     - *Select where the attribute is not XXX*.
 - <i class="fa fa-eye"></i>: Display the attribute value in the results.
+
+!!! note "Info"
+    The 'link' attribute allows you to filter based on an equality/inequality to the linked query value, with optional modifier depending on the attribute type.
+    - *Numbers have optional numerical modifier*
+    - *Dates have an optional days modifier*
+    - *String have a custom regex, using '$1' as a placeholder for the linked value (ex: $1-suffix)*
+    - *Boolean do not have a modifier*
+    This allows you to do query such as : *All entities where the end position <= start position + 300*
 
 # Filtering on related entities
 
@@ -74,7 +82,7 @@ Explicit relations between entities (defined by the "@" symbol in CSV files, and
 
 ## FALDO relations
 
-All *FALDO* entities will be linked by an implicit *Included_in* relation. This relation is slightly different than *explicit* relations: it relies on the *FALDO* attributes of both entities for the query, instead of a direct link.  
+All *FALDO* entities will be linked by an implicit *Included in* relation. This relation is slightly different than *explicit* relations: it relies on the *FALDO* attributes of both entities for the query, instead of a direct link.  This relation can be customized to either *Included in*, *Overlap with*, or *Distant from*.
 
  FALDO entities are represented with a green circle and FALDO relations have a green arrow.
 
@@ -86,9 +94,21 @@ All *FALDO* entities will be linked by an implicit *Included_in* relation. This 
 !!! note "Info"
     Entity A is *Included_in* Entity B means:
 
-    - **Entity A Start > Entity B Start** *AND* **Entity B End < Entity B End.**
+    - **Entity A Start > Entity B Start** *AND* **Entity A End < Entity B End.**
 
     By default, the inequalities are **Strict**, but it can be changed from the interface.  
+
+!!! note "Info"
+    Entity A *Overlap_with* Entity B means:
+
+    - **(Entity B Start > Entity A Start** *AND* **Entity B Start < Entity A End)** *OR*
+    - **(Entity B End > Entity A Start** *AND* **Entity B End < Entity A End)**
+
+    By default, the inequalities are **Strict**, but it can be changed from the interface.  
+
+!!! note "Info"
+    *Distant from* is a special relation, that allows you to customize the position of the *start* & *stop* of your entity relative to the linked entity, with an optional modifier. This allows you to make queries such as:
+    - *Entity A Start < Entity B End + 300*
 
 !!! Tip
     If both entities have a defined *Reference* and/or *Strand* attribute, you will be able to select the **Same reference** and/or **Same strand** options. (Both are selected by default if available)

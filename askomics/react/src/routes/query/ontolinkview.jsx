@@ -16,6 +16,28 @@ export default class OntoLinkView extends Component {
 
 
   render () {
+
+    let content = (
+      <>
+        <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf">children of</option>
+        <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf*">descendants of</option>
+        <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf">parents of</option>
+        <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf*">ancestors of</option>
+      </>
+    )
+
+    if (this.props.link.uri.includes("http://www.w3.org/2004/02/skos/core")){
+      content = (
+        <>
+          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#broader' ? true : false} value="http://www.w3.org/2004/02/skos/core#broader">children of</option>
+          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#broader*' ? true : false} value="http://www.w3.org/2004/02/skos/core#broader*">descendants of</option>
+          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#narrower' ? true : false} value="http://www.w3.org/2004/02/skos/core#narrower">parents of</option>
+          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#narrower*' ? true : false} value="http://www.w3.org/2004/02/skos/core#narrower*">ancestors of</option>
+        </>
+      )
+    }
+
+
     return (
       <div className="container">
         <h5>Ontological Relation</h5>
@@ -25,10 +47,7 @@ export default class OntoLinkView extends Component {
           <tr>
             <td>
              <CustomInput type="select" id={this.props.link.id} name="ontology_position" onChange={this.handleChangeOntologyType}>
-                <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf">children of</option>
-                <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf*">descendants of</option>
-                <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf">parents of</option>
-                <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf*">ancestors of</option>
+              {content}
               </CustomInput>
             </td>
             <td>&nbsp;a term</td>

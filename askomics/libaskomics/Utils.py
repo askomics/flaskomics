@@ -33,7 +33,7 @@ class Utils():
                 break
             except Exception as e:
                 if i == max_redo:
-                    raise(e)
+                    raise e
                 traceback.print_exc(file=sys.stdout)
                 logger.debug("Fail to execute {}. Retrying in {} sec...".format(call.__name__, sleep_time))
                 time.sleep(sleep_time)
