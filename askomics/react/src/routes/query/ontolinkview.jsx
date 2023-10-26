@@ -11,7 +11,6 @@ import PropTypes from 'prop-types'
 export default class OntoLinkView extends Component {
   constructor (props) {
     super(props)
-    this.handleChangeOntologyType = this.props.handleChangeOntologyType.bind(this)
     this.handleReversibleOntology = this.props.handleReversibleOntology.bind(this)
     this.handleRecursiveOntology = this.props.handleRecursiveOntology.bind(this)
   }

@@ -1362,9 +1362,9 @@ class SparqlQuery(Params):
                 # Classic relation
                 else:
                     # Manage ontology stuff
-                    is_inverse = link["reverse"]
+                    is_inverse = link.get("reverse", False)
                     inverse = ""
-                    is_recursive = link["recursive"]
+                    is_recursive = link.get("recursive", False)
                     recursive = ""
                     relation = link["uri"]
 
