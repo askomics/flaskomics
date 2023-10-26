@@ -279,6 +279,12 @@ export default class Query extends Component {
     })
   }
 
+  nodeHaveDefaultVisibleAttribute (uri) {
+      return this.state.abstraction.entities.map(entity => {
+        return (entity.uri == uri && entity.defaultVisible) ? [entity.defaultVisible] : []
+      })
+  }
+
   getHumanIdFromId(nodeId) {
     return this.graphState.nodes.map(node => {
       if (node.id == nodeId) {
@@ -306,12 +312,13 @@ export default class Query extends Component {
 
     // if label don't exist, donc create a label attribute and set uri visible
     let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
+    let defaultVisible = this.nodeHaveDefaultVisibleAttribute(nodeUri)
 
     // create uri attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: !labelExist,
+        visible: !(labelExist || defaultVisible),
         nodeId: nodeId,
         humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
@@ -365,7 +372,7 @@ export default class Query extends Component {
       if (attr.entityUri == nodeUri && !this.attributeExist(attr.uri, nodeId)) {
         let nodeAttribute = {
           id: this.getId(),
-          visible: firstAttrVisibleForBnode,
+          visible: firstAttrVisibleForBnode || defaultVisible.includes(attr.uri),
           nodeId: nodeId,
           humanNodeId: this.getHumanIdFromId(nodeId),
           uri: attr.uri,
@@ -606,7 +613,11 @@ export default class Query extends Component {
               suggested: true,
               directed: true,
               faldoFilters: this.defaultFaldoFilters,
-              indirect: relation.indirect
+              indirect: relation.indirect,
+              isRecursive: relation.recursive,
+              isReversible: relation.reversible,
+              recursive: false,
+              reversible: false
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -656,7 +667,11 @@ export default class Query extends Component {
               suggested: true,
               directed: true,
               faldoFilters: this.defaultFaldoFilters,
-              indirect: relation.indirect
+              indirect: relation.indirect,
+              isRecursive: relation.recursive,
+              isReversible: relation.reversible,
+              recursive: false,
+              reversible: false
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -705,7 +720,11 @@ export default class Query extends Component {
             suggested: true,
             directed: true,
             faldoFilters: this.defaultFaldoFilters,
-            indirect: false
+            indirect: false,
+            isRecursive: false,
+            isReversible: false,
+            recursive: false,
+            reversible: false
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           if (incrementSpecialNodeGroupId){
@@ -748,7 +767,11 @@ export default class Query extends Component {
           suggested: false,
           directed: link.directed,
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
-          indirect: link.indirect ? link.indirect : false
+          indirect: link.indirect ? link.indirect : false,
+          isRecursive: link.isRecursive ? link.isRecursive : false,
+          isReversible: link.isReversible ? link.isReversible : false,
+          recursive: link.recursive ? link.recursive : false,
+          reversible: link.reversible ? link.reversible: false
         }
       }
 
@@ -769,7 +792,11 @@ export default class Query extends Component {
           suggested: false,
           directed: link.directed,
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
-          indirect: link.indirect ? link.indirect : false
+          indirect: link.indirect ? link.indirect : false,
+          isRecursive: link.isRecursive ? link.isRecursive : false,
+          isReversible: link.isReversible ? link.isReversible : false,
+          recursive: link.recursive ? link.recursive : false,
+          reversible: link.reversible ? link.reversible: false
         }
       }
     })
@@ -1057,7 +1084,11 @@ export default class Query extends Component {
           suggested: link.suggested,
           directed: link.directed,
           faldoFilters: link.faldoFilters,
-          indirect: link.indirect
+          indirect: link.indirect,
+          isRecursive: link.isRecursive,
+          isReversible: link.isReversible,
+          recursive: link.recursive,
+          reversible: link.reversible
         }
       }
     })
@@ -1078,7 +1109,11 @@ export default class Query extends Component {
       selected: false,
       suggested: false,
       directed: false,
-      indirect: false
+      indirect: false,
+      isRecursive: false,
+      isReversible: false,
+      recursive: false,
+      reversible: false,
     }
     this.graphState.links.push(link)
   }
@@ -1536,11 +1571,19 @@ export default class Query extends Component {
 
   // Ontology link methods -----------------------------
 
-  handleChangeOntologyType (event) {
+  handleRecursiveOntology (event) {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
-        link.uri = event.target.value
-        link.label = this.getOntoLabel(event.target.value)
+        link.recursive = event.target.checked
+      }
+    })
+    this.updateGraphState()
+  }
+
+  handleReversibleOntology (event) {
+    this.graphState.links.map(link => {
+      if (link.id == event.target.id) {
+        link.reversible = event.target.checked
       }
     })
     this.updateGraphState()
@@ -1951,7 +1994,8 @@ export default class Query extends Component {
 
           linkView = <OntoLinkView
             link={link}
-            handleChangeOntologyType={p => this.handleChangeOntologyType(p)}
+            handleRecursiveOntology={p => this.handleRecursiveOntology(p)}
+            handleReversibleOntology={p => this.handleReversibleOntology(p)}
           />
         }
       }

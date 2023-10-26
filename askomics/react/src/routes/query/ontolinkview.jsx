@@ -12,47 +12,18 @@ export default class OntoLinkView extends Component {
   constructor (props) {
     super(props)
     this.handleChangeOntologyType = this.props.handleChangeOntologyType.bind(this)
+    this.handleReversibleOntology = this.props.handleReversibleOntology.bind(this)
+    this.handleRecursiveOntology = this.props.handleRecursiveOntology.bind(this)
   }
 
-
   render () {
-
-    let content = (
-      <>
-        <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf">children of</option>
-        <option selected={this.props.link.uri == 'http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="http://www.w3.org/2000/01/rdf-schema#subClassOf*">descendants of</option>
-        <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf">parents of</option>
-        <option selected={this.props.link.uri == '^http://www.w3.org/2000/01/rdf-schema#subClassOf*' ? true : false} value="^http://www.w3.org/2000/01/rdf-schema#subClassOf*">ancestors of</option>
-      </>
-    )
-
-    if (this.props.link.uri.includes("http://www.w3.org/2004/02/skos/core")){
-      content = (
-        <>
-          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#broader' ? true : false} value="http://www.w3.org/2004/02/skos/core#broader">children of</option>
-          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#broader*' ? true : false} value="http://www.w3.org/2004/02/skos/core#broader*">descendants of</option>
-          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#narrower' ? true : false} value="http://www.w3.org/2004/02/skos/core#narrower">parents of</option>
-          <option selected={this.props.link.uri == 'http://www.w3.org/2004/02/skos/core#narrower*' ? true : false} value="http://www.w3.org/2004/02/skos/core#narrower*">ancestors of</option>
-        </>
-      )
-    }
-
 
     return (
       <div className="container">
         <h5>Ontological Relation</h5>
         <hr />
-        <p>Search on ...</p>
-        <table>
-          <tr>
-            <td>
-             <CustomInput type="select" id={this.props.link.id} name="ontology_position" onChange={this.handleChangeOntologyType}>
-              {content}
-              </CustomInput>
-            </td>
-            <td>&nbsp;a term</td>
-          </tr>
-        </table>
+        <CustomInput disabled={!this.props.link.isReversible} onChange={this.handleReversibleOntology} checked={this.props.link.reversible ? true : false} value={this.props.link.reversible ? true : false} type="checkbox" id={"reversible-" + this.props.link.id} label="Reversible" />
+        <CustomInput disabled={!this.props.link.isRecursive} onChange={this.handleRecursiveOntology} checked={this.props.link.recursive ? true : false} value={this.props.link.recursive ? true : false} type="checkbox" id={"recursive-" + this.props.link.id} label="Recursive" />
         <br />
       </div>
     )
@@ -61,5 +32,6 @@ export default class OntoLinkView extends Component {
 
 OntoLinkView.propTypes = {
   link: PropTypes.object,
-  handleChangeOntologyType: PropTypes.func,
+  handleReversibleOntology: PropTypes.func,
+  handleRecursiveOntology: PropTypes.func
 }

@@ -10,6 +10,7 @@ PYTESTOPTS=
 TESTFILE?=tests
 NTASKS?=1
 WORKERS?=1
+TIMEOUT?=300
 
 HOST?=0.0.0.0
 PORT?=5000
@@ -107,7 +108,7 @@ serve-askomics: check-venv build-config create-user
 ifeq ($(MODE), dev)
 	FLASK_ENV=development FLASK_APP=app flask run --host=$(HOST) --port $(PORT)
 else
-	FLASK_ENV=production FLASK_APP=app gunicorn -w $(WORKERS) -b $(HOST):$(PORT) app
+	FLASK_ENV=production FLASK_APP=app gunicorn --timeout $(TIMEOUT) -w $(WORKERS) -b $(HOST):$(PORT) app
 endif
 
 serve-celery: check-venv build-config create-user
