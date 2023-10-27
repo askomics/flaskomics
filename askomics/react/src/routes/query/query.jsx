@@ -280,7 +280,7 @@ export default class Query extends Component {
   }
 
   nodeHaveDefaultVisibleAttribute (uri) {
-      return this.state.abstraction.entities.map(entity => {
+      return this.state.abstraction.entities.flatMap(entity => {
         return (entity.uri == uri && entity.defaultVisible) ? [entity.defaultVisible] : []
       })
   }
@@ -313,6 +313,8 @@ export default class Query extends Component {
     // if label don't exist, donc create a label attribute and set uri visible
     let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
     let defaultVisible = this.nodeHaveDefaultVisibleAttribute(nodeUri)
+
+    console.log(defaultVisible)
 
     // create uri attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
