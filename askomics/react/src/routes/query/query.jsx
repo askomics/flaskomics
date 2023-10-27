@@ -625,7 +625,7 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri && ! isOnto) {
+      if (relation.target == node.uri) {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
