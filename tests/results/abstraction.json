@@ -584,7 +584,6 @@
         "source": "http://askomics.org/test/data/transcript",
         "target": "http://askomics.org/test/data/gene",
         "uri": "http://askomics.org/test/data/Parent",
-        "reversible": false,
         "recursive": false
       }
     ]

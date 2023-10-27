@@ -615,9 +615,7 @@ export default class Query extends Component {
               faldoFilters: this.defaultFaldoFilters,
               indirect: relation.indirect,
               isRecursive: relation.recursive,
-              isReversible: relation.reversible,
               recursive: false,
-              reversible: false
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -669,9 +667,7 @@ export default class Query extends Component {
               faldoFilters: this.defaultFaldoFilters,
               indirect: relation.indirect,
               isRecursive: relation.recursive,
-              isReversible: relation.reversible,
               recursive: false,
-              reversible: false
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -722,9 +718,7 @@ export default class Query extends Component {
             faldoFilters: this.defaultFaldoFilters,
             indirect: false,
             isRecursive: false,
-            isReversible: false,
             recursive: false,
-            reversible: false
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           if (incrementSpecialNodeGroupId){
@@ -769,9 +763,7 @@ export default class Query extends Component {
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
           indirect: link.indirect ? link.indirect : false,
           isRecursive: link.isRecursive ? link.isRecursive : false,
-          isReversible: link.isReversible ? link.isReversible : false,
           recursive: link.recursive ? link.recursive : false,
-          reversible: link.reversible ? link.reversible: false
         }
       }
 
@@ -794,9 +786,7 @@ export default class Query extends Component {
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
           indirect: link.indirect ? link.indirect : false,
           isRecursive: link.isRecursive ? link.isRecursive : false,
-          isReversible: link.isReversible ? link.isReversible : false,
           recursive: link.recursive ? link.recursive : false,
-          reversible: link.reversible ? link.reversible: false
         }
       }
     })
@@ -1086,9 +1076,7 @@ export default class Query extends Component {
           faldoFilters: link.faldoFilters,
           indirect: link.indirect,
           isRecursive: link.isRecursive,
-          isReversible: link.isReversible,
           recursive: link.recursive,
-          reversible: link.reversible
         }
       }
     })
@@ -1111,9 +1099,7 @@ export default class Query extends Component {
       directed: false,
       indirect: false,
       isRecursive: false,
-      isReversible: false,
       recursive: false,
-      reversible: false,
     }
     this.graphState.links.push(link)
   }
@@ -1580,15 +1566,6 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  handleReversibleOntology (event) {
-    this.graphState.links.map(link => {
-      if (link.id == event.target.id) {
-        link.reversible = event.target.checked
-      }
-    })
-    this.updateGraphState()
-  }
-
   getOntoLabel (uri) {
       let labels = {}
       labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is child of"
@@ -1995,7 +1972,6 @@ export default class Query extends Component {
           linkView = <OntoLinkView
             link={link}
             handleRecursiveOntology={p => this.handleRecursiveOntology(p)}
-            handleReversibleOntology={p => this.handleReversibleOntology(p)}
           />
         }
       }

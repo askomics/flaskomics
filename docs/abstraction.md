@@ -40,6 +40,8 @@ The entity is a class. In the query builder, it is represented with a graph node
 :EntityName rdfs:label "EntityName" .
 # Optional (use if no label)
 :EntityName askomics:instancesHaveNoLabels true .
+# Optional (use if you wish to use a specific attribute as label)
+:EntityName askomics:instancesLabel :attributeUri .
 ```
 <br />
 
@@ -47,7 +49,10 @@ The entity is a class. In the query builder, it is represented with a graph node
     `:EntityName rdf:type :startPoint` is not mandatory. If the entity have this triple, a query can be started with this this node.
 
 !!! note "Info"
-    `:EntityName rdfs:label "EntityName"` is optional. If your entity has no label, you can use `:EntityName askomics:instancesHaveNoLabels true` instead. In the query view, the label tab will not be displayed.
+    `:EntityName rdfs:label "EntityName"` is optional. If your entity has no label, you can use `:EntityName askomics:instancesHaveNoLabels true` instead. In the query view, the label tab will not be displayed. The URI attribute will be set visible by default
+
+!!! note "Info"
+    If you set 'askomics:instancesLabel' to an attribute URI, this attribute will be set to 'visible' by default. The 'label' attribute will not be displayed.
 
 # Attributes
 
@@ -274,10 +279,6 @@ Ontologies needs to be are defined as follows:
 
 You will then need to add any relations and attributes using blank nodes:
 
-!!! warning
-    If using "skos:narrower" or "skos:broader", you only need to define one of them.
-    AskOmics will show both options in the UI
-
 ```turtle
 # SubCLassOf relation
 _:blank1 a askomics:AskomicsRelation .
@@ -285,6 +286,8 @@ _:blank1	askomics:uri rdfs:subClassOf .
 _:blank1 rdfs:label "subClassOf" .
 _:blank1	rdfs:domain <ontology_uri> .
 _:blank1	rdfs:range <ontology_uri> .
+# Optional
+_:blank1	askomics:isRecursive true .
 
 # Ontology attribute 'taxon rank'
 _:blank2 a owl:DatatypeProperty .
@@ -293,6 +296,9 @@ _:blank2 rdfs:label "Taxon rank" .
 _:blank2 rdfs:domain <ontology_uri> .
 _:blank2 rdfs:range xsd:string .
 ```
+
+!!! note "Info"
+    `askomics:isRecursive` will let users send a 'recursive' (via property path) query using this relation. (Ex: all descendants of a class, using the 'subClassOf' relation)
 
 With these triples, your ontology will appears in the graph view.
 You can then either add your classes directly, or refer to an external endpoint / graph

@@ -521,7 +521,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label ?indirect_relation ?is_recursive ?is_reversible
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label ?indirect_relation ?is_recursive
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
@@ -537,7 +537,6 @@ class TriplestoreExplorer(Params):
                 OPTIONAL {{?node askomics:uri ?new_property_uri}}
                 BIND( IF(isBlank(?node), ?new_property_uri, ?node) as ?property_uri)
                 OPTIONAL {{?node askomics:isRecursive ?is_recursive}}
-                OPTIONAL {{?node askomics:isReversible ?is_reversible}}
             }}
             # Relation of entity (or motherclass of entity)
             {{
@@ -571,7 +570,6 @@ class TriplestoreExplorer(Params):
                         "target": result["range_uri"],
                         "indirect": result.get("indirect_relation", False),
                         "recursive": result.get("is_recursive", False),
-                        "reversible": result.get("is_reversible", False)
                     }
                     relations.append(relation)
                 else:
