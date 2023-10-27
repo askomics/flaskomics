@@ -339,7 +339,7 @@ class TriplestoreExplorer(Params):
                 # Label
                 OPTIONAL {{ ?entity_uri rdfs:label ?entity_label . }}
                 OPTIONAL {{ ?entity_uri askomics:instancesHaveNoLabels ?have_no_label . }}
-                OPTIONAL {{ ?entity_uri askomics:defaultVisibleAttribute ?default_visible . }}
+                OPTIONAL {{ ?entity_uri askomics:instancesLabel ?default_visible . }}
             }}
             FILTER (
                 ?public = <true>{}

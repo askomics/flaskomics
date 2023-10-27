@@ -314,8 +314,6 @@ export default class Query extends Component {
     let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
     let defaultVisible = this.nodeHaveDefaultVisibleAttribute(nodeUri)
 
-    console.log(defaultVisible)
-
     // create uri attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
@@ -343,7 +341,7 @@ export default class Query extends Component {
     }
 
     // create label attributes
-    if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
+    if (!this.attributeExist('rdfs:label', nodeId) && (labelExist && ! defaultVisible)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
