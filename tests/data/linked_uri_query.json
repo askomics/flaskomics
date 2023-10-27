@@ -169,7 +169,7 @@
 				},
 				"type": "link",
 				"uri": "http://askomics.org/test/data/link",
-				"recursive": false,
+				"recursive": false
 			},
 			{
 				"__controlPoints": null,
@@ -236,7 +236,7 @@
 				},
 				"type": "link",
 				"uri": "http://askomics.org/test/data/link",
-				"recursive": false,
+				"recursive": false
 			}
 		],
 		"nodes": [
