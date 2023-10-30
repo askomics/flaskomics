@@ -626,7 +626,7 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri && (! isOnto || relation.source == node.uri)) {
+      if (relation.target == node.uri)) {
         if (this.entityExist(relation.source)) {
           isOnto = this.isRemoteOnto(relation.source, relation.target)
           if (! isOnto || relation.source == node.uri){
@@ -658,7 +658,7 @@ export default class Query extends Component {
               // push suggested link
               this.graphState.links.push({
                 uri: relation.uri,
-                type: "link",
+                type: isOnto == "endNode" ? "ontoLink" : "link",
                 sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
                 sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
                 id: this.getId(),
@@ -880,7 +880,12 @@ export default class Query extends Component {
         this.selectAndInstanciateLink(clickedLink)
         // instanciate node only if node is suggested
         if (suggested) {
-          this.instanciateNode(clickedLink.target)
+          if (clickedLink.target.suggested){
+            this.instanciateNode(clickedLink.target)
+          }
+          if (clickedLink.source.suggested){
+            this.instanciateNode(clickedLink.source)
+          }
         }
         // reload suggestions
         this.removeAllSuggestion()

@@ -20,7 +20,7 @@ export default class OntoLinkView extends Component {
       <div className="container">
         <h5>Ontological Relation</h5>
         <hr />
-        <CustomInput disabled={!this.props.link.isRecursive} onChange={this.handleRecursiveOntology} checked={this.props.link.recursive ? true : false} value={this.props.link.recursive ? true : false} type="checkbox" id={"recursive-" + this.props.link.id} label="Recursive" />
+        <CustomInput disabled={!this.props.link.isRecursive} onChange={this.handleRecursiveOntology} checked={this.props.link.recursive ? true : false} value={this.props.link.recursive ? true : false} type="checkbox" id={this.props.link.id} label="Recursive" />
         <br />
       </div>
     )
