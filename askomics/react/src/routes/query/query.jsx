@@ -628,52 +628,55 @@ export default class Query extends Component {
 
       if (relation.target == node.uri && (! isOnto || relation.source == node.uri)) {
         if (this.entityExist(relation.source)) {
-          isOnto = this.isRemoteOnto(relation.target, relation.source)
-          sourceId = this.getId()
-          linkId = this.getId()
-          label = this.getLabel(relation.source)
-          resFilterNode = label.toLowerCase().match(reNode)
-          resFilterLink = relation.label.toLowerCase().match(reLink)
-          if (resFilterNode && resFilterLink) {
-            // Push suggested source
-            this.graphState.nodes.push({
-              uri: relation.source,
-              type: this.getType(relation.source),
-              filterNode: "",
-              filterLink: "",
-              graphs: this.getGraphs(relation.source),
-              id: sourceId,
-              humanId: null,
-              specialNodeId: node.specialNodeId,
-              specialNodeGroupId: specialNodeGroupId,
-              specialPreviousIds: node.specialPreviousIds,
-              label: label,
-              faldo: this.isFaldoEntity(relation.source),
-              selected: false,
-              suggested: true,
-              depth: depth
-            })
-            // push suggested link
-            this.graphState.links.push({
-              uri: relation.uri,
-              type: "link",
-              sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
-              sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
-              id: this.getId(),
-              label: relation.label,
-              source: sourceId,
-              target: node.id,
-              selected: false,
-              suggested: true,
-              directed: true,
-              faldoFilters: this.defaultFaldoFilters,
-              indirect: relation.indirect,
-              isRecursive: relation.recursive,
-              recursive: false,
-            })
-            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
-            if (incrementSpecialNodeGroupId){
-              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+          isOnto = this.isRemoteOnto(relation.source, relation.target)
+          if (! isOnto || relation.source == node.uri){
+            sourceId = this.getId()
+            linkId = this.getId()
+            label = this.getLabel(relation.source)
+            resFilterNode = label.toLowerCase().match(reNode)
+            resFilterLink = relation.label.toLowerCase().match(reLink)
+            if (resFilterNode && resFilterLink) {
+              // Push suggested source
+              this.graphState.nodes.push({
+                uri: relation.source,
+                type: this.getType(relation.source),
+                filterNode: "",
+                filterLink: "",
+                graphs: this.getGraphs(relation.source),
+                id: sourceId,
+                humanId: null,
+                specialNodeId: node.specialNodeId,
+                specialNodeGroupId: specialNodeGroupId,
+                specialPreviousIds: node.specialPreviousIds,
+                label: label,
+                faldo: this.isFaldoEntity(relation.source),
+                selected: false,
+                suggested: true,
+                ontology: isOnto,
+                depth: depth
+              })
+              // push suggested link
+              this.graphState.links.push({
+                uri: relation.uri,
+                type: "link",
+                sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
+                sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
+                id: this.getId(),
+                label: relation.label,
+                source: sourceId,
+                target: node.id,
+                selected: false,
+                suggested: true,
+                directed: true,
+                faldoFilters: this.defaultFaldoFilters,
+                indirect: relation.indirect,
+                isRecursive: relation.recursive,
+                recursive: false,
+              })
+              incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+              if (incrementSpecialNodeGroupId){
+                depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+              }
             }
           }
         }
