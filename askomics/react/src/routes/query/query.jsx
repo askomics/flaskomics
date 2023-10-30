@@ -318,7 +318,7 @@ export default class Query extends Component {
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: !(labelExist || defaultVisible),
+        visible: !(labelExist || defaultVisible.length),
         nodeId: nodeId,
         humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
@@ -341,7 +341,7 @@ export default class Query extends Component {
     }
 
     // create label attributes
-    if (!this.attributeExist('rdfs:label', nodeId) && (labelExist && ! defaultVisible)) {
+    if (!this.attributeExist('rdfs:label', nodeId) && (labelExist && !defaultVisible.length)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
@@ -606,7 +606,7 @@ export default class Query extends Component {
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: isOnto == "endNode" ? this.getOntoLabel(relation.uri) : relation.label,
+              label: relation.label,
               source: node.id,
               target: targetId,
               selected: false,
@@ -625,7 +625,7 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri) {
+      if (relation.target == node.uri && (! isOnto || relation.source == node.uri)) {
         if (this.entityExist(relation.source)) {
           sourceId = this.getId()
           linkId = this.getId()
@@ -1564,20 +1564,6 @@ export default class Query extends Component {
       }
     })
     this.updateGraphState()
-  }
-
-  getOntoLabel (uri) {
-      let labels = {}
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is child of"
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parent of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
-
-      labels["http://www.w3.org/2004/02/skos/core#broader"] = "is child of"
-      labels["http://www.w3.org/2004/02/skos/core#broader*"] = "is descendant of"
-      labels["http://www.w3.org/2004/02/skos/core#narrower"] = "is parent of"
-      labels["http://www.w3.org/2004/02/skos/core#narrower*"] = "is ancestor of"
-      return labels[uri]
   }
 
   // Faldo filters -----------------------------

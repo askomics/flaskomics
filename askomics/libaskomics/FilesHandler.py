@@ -425,6 +425,8 @@ class FilesHandler(FilesUtils):
             return 'rdf/xml'
         elif file_ext in ('.nt', ):
             return 'rdf/nt'
+        elif file_ext in ('.owl', ):
+            return 'rdf/xml'
         # Default is csv
         return 'csv/tsv'
 

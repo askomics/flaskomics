@@ -271,7 +271,7 @@ Ontologies needs to be are defined as follows:
 ```turtle
 <ontology_uri> rdf:type askomics:ontology .
 <ontology_uri> rdf:type owl:Ontology .
-:EntityName rdfs:label "OntologyLabel" .
+<ontology_uri> rdfs:label "OntologyLabel" .
 ```
 
 !!! note "Info"
@@ -281,20 +281,21 @@ You will then need to add any relations and attributes using blank nodes:
 
 ```turtle
 # SubCLassOf relation
-_:blank1 a askomics:AskomicsRelation .
+_:blank1  a askomics:AskomicsRelation .
 _:blank1	askomics:uri rdfs:subClassOf .
-_:blank1 rdfs:label "subClassOf" .
+_:blank1  a owl:ObjectProperty .
+_:blank1  rdfs:label "subClassOf" .
 _:blank1	rdfs:domain <ontology_uri> .
 _:blank1	rdfs:range <ontology_uri> .
 # Optional
 _:blank1	askomics:isRecursive true .
 
 # Ontology attribute 'taxon rank'
-_:blank2 a owl:DatatypeProperty .
-_:blank2 askomics:uri <http://purl.bioontology.org/ontology/NCBITAXON/RANK> .
-_:blank2 rdfs:label "Taxon rank" .
-_:blank2 rdfs:domain <ontology_uri> .
-_:blank2 rdfs:range xsd:string .
+_:blank2  a owl:DatatypeProperty .
+_:blank2  askomics:uri <http://purl.bioontology.org/ontology/NCBITAXON/RANK> .
+_:blank2  rdfs:label "Taxon rank" .
+_:blank2  rdfs:domain <ontology_uri> .
+_:blank2  rdfs:range xsd:string .
 ```
 
 !!! note "Info"
