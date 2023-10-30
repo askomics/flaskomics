@@ -570,9 +570,10 @@ export default class Query extends Component {
     }
 
     this.state.abstraction.relations.map(relation => {
-      let isOnto = this.isRemoteOnto(relation.source, relation.target)
+      let isOnto = false
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
+          isOnto = this.isRemoteOnto(relation.source, relation.target)
           targetId = this.getId()
           linkId = this.getId()
           label = this.getLabel(relation.target)
@@ -627,6 +628,7 @@ export default class Query extends Component {
 
       if (relation.target == node.uri && (! isOnto || relation.source == node.uri)) {
         if (this.entityExist(relation.source)) {
+          isOnto = this.isRemoteOnto(relation.target, relation.source)
           sourceId = this.getId()
           linkId = this.getId()
           label = this.getLabel(relation.source)
