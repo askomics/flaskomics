@@ -626,7 +626,7 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri)) {
+      if (relation.target == node.uri) {
         if (this.entityExist(relation.source)) {
           isOnto = this.isRemoteOnto(relation.source, relation.target)
           if (! isOnto || relation.source == node.uri){
