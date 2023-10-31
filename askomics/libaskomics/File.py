@@ -93,6 +93,7 @@ class File(Params):
         self.path = file_info['path']
         self.type = file_info['type']
         self.size = file_info['size']
+        self.status = file_info['status']
         self.preview = json.loads(file_info['preview']) if file_info['preview'] else None
         self.id = file_info['id']
         self.public = False
