@@ -432,7 +432,7 @@ class Database(Params):
 
         query = '''
         ALTER TABLE files
-        ADD error text NULL
+        ADD preview_error text NULL
         DEFAULT(NULL)
         '''
 

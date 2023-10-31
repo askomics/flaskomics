@@ -291,7 +291,7 @@ class Client(object):
         }
 
         files = FilesHandler(self.app, self.session)
-        filepath = files.persist_chunk(file_data)
+        filepath = files.persist_chunk(file_data, skip_preview=True)
         filedate = files.date
 
         return {
