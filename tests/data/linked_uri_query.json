@@ -168,7 +168,8 @@
 					"y": 7.4840022124046435
 				},
 				"type": "link",
-				"uri": "http://askomics.org/test/data/link"
+				"uri": "http://askomics.org/test/data/link",
+				"recursive": false
 			},
 			{
 				"__controlPoints": null,
@@ -234,7 +235,8 @@
 					"y": 7.4840022124046435
 				},
 				"type": "link",
-				"uri": "http://askomics.org/test/data/link"
+				"uri": "http://askomics.org/test/data/link",
+				"recursive": false
 			}
 		],
 		"nodes": [

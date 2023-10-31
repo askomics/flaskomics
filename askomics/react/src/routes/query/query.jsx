@@ -279,6 +279,12 @@ export default class Query extends Component {
     })
   }
 
+  nodeHaveDefaultVisibleAttribute (uri) {
+      return this.state.abstraction.entities.flatMap(entity => {
+        return (entity.uri == uri && entity.defaultVisible) ? [entity.defaultVisible] : []
+      })
+  }
+
   getHumanIdFromId(nodeId) {
     return this.graphState.nodes.map(node => {
       if (node.id == nodeId) {
@@ -306,12 +312,13 @@ export default class Query extends Component {
 
     // if label don't exist, donc create a label attribute and set uri visible
     let labelExist = this.nodeHaveInstancesWithLabel(nodeUri)
+    let defaultVisible = this.nodeHaveDefaultVisibleAttribute(nodeUri)
 
     // create uri attributes
     if (!this.attributeExist('rdf:type', nodeId) && !isBnode) {
       nodeAttributes.push({
         id: this.getId(),
-        visible: !labelExist,
+        visible: !(labelExist || defaultVisible.length),
         nodeId: nodeId,
         humanNodeId: this.getHumanIdFromId(nodeId),
         uri: 'rdf:type',
@@ -334,7 +341,7 @@ export default class Query extends Component {
     }
 
     // create label attributes
-    if (!this.attributeExist('rdfs:label', nodeId) && labelExist) {
+    if (!this.attributeExist('rdfs:label', nodeId) && (labelExist && !defaultVisible.length)) {
       nodeAttributes.push({
         id: this.getId(),
         visible: true,
@@ -365,7 +372,7 @@ export default class Query extends Component {
       if (attr.entityUri == nodeUri && !this.attributeExist(attr.uri, nodeId)) {
         let nodeAttribute = {
           id: this.getId(),
-          visible: firstAttrVisibleForBnode,
+          visible: firstAttrVisibleForBnode || defaultVisible.includes(attr.uri),
           nodeId: nodeId,
           humanNodeId: this.getHumanIdFromId(nodeId),
           uri: attr.uri,
@@ -563,9 +570,10 @@ export default class Query extends Component {
     }
 
     this.state.abstraction.relations.map(relation => {
-      let isOnto = this.isRemoteOnto(relation.source, relation.target)
+      let isOnto = false
       if (relation.source == node.uri) {
         if (this.entityExist(relation.target)) {
+          isOnto = this.isRemoteOnto(relation.source, relation.target)
           targetId = this.getId()
           linkId = this.getId()
           label = this.getLabel(relation.target)
@@ -599,14 +607,16 @@ export default class Query extends Component {
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
               strict: true,
               id: linkId,
-              label: isOnto == "endNode" ? this.getOntoLabel(relation.uri) : relation.label,
+              label: relation.label,
               source: node.id,
               target: targetId,
               selected: false,
               suggested: true,
               directed: true,
               faldoFilters: this.defaultFaldoFilters,
-              indirect: relation.indirect
+              indirect: relation.indirect,
+              isRecursive: relation.recursive,
+              recursive: false,
             })
             incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
             if (incrementSpecialNodeGroupId){
@@ -616,51 +626,57 @@ export default class Query extends Component {
         }
       }
 
-      if (relation.target == node.uri && ! isOnto) {
+      if (relation.target == node.uri) {
         if (this.entityExist(relation.source)) {
-          sourceId = this.getId()
-          linkId = this.getId()
-          label = this.getLabel(relation.source)
-          resFilterNode = label.toLowerCase().match(reNode)
-          resFilterLink = relation.label.toLowerCase().match(reLink)
-          if (resFilterNode && resFilterLink) {
-            // Push suggested source
-            this.graphState.nodes.push({
-              uri: relation.source,
-              type: this.getType(relation.source),
-              filterNode: "",
-              filterLink: "",
-              graphs: this.getGraphs(relation.source),
-              id: sourceId,
-              humanId: null,
-              specialNodeId: node.specialNodeId,
-              specialNodeGroupId: specialNodeGroupId,
-              specialPreviousIds: node.specialPreviousIds,
-              label: label,
-              faldo: this.isFaldoEntity(relation.source),
-              selected: false,
-              suggested: true,
-              depth: depth
-            })
-            // push suggested link
-            this.graphState.links.push({
-              uri: relation.uri,
-              type: "link",
-              sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
-              sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
-              id: this.getId(),
-              label: relation.label,
-              source: sourceId,
-              target: node.id,
-              selected: false,
-              suggested: true,
-              directed: true,
-              faldoFilters: this.defaultFaldoFilters,
-              indirect: relation.indirect
-            })
-            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
-            if (incrementSpecialNodeGroupId){
-              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+          isOnto = this.isRemoteOnto(relation.source, relation.target)
+          if (! isOnto || relation.source == node.uri){
+            sourceId = this.getId()
+            linkId = this.getId()
+            label = this.getLabel(relation.source)
+            resFilterNode = label.toLowerCase().match(reNode)
+            resFilterLink = relation.label.toLowerCase().match(reLink)
+            if (resFilterNode && resFilterLink) {
+              // Push suggested source
+              this.graphState.nodes.push({
+                uri: relation.source,
+                type: this.getType(relation.source),
+                filterNode: "",
+                filterLink: "",
+                graphs: this.getGraphs(relation.source),
+                id: sourceId,
+                humanId: null,
+                specialNodeId: node.specialNodeId,
+                specialNodeGroupId: specialNodeGroupId,
+                specialPreviousIds: node.specialPreviousIds,
+                label: label,
+                faldo: this.isFaldoEntity(relation.source),
+                selected: false,
+                suggested: true,
+                ontology: isOnto,
+                depth: depth
+              })
+              // push suggested link
+              this.graphState.links.push({
+                uri: relation.uri,
+                type: isOnto == "endNode" ? "ontoLink" : "link",
+                sameStrand: this.nodeHaveStrand(node.id) && this.nodeHaveStrand(relation.source),
+                sameRef: this.nodeHaveRef(node.id) && this.nodeHaveRef(relation.source),
+                id: this.getId(),
+                label: relation.label,
+                source: sourceId,
+                target: node.id,
+                selected: false,
+                suggested: true,
+                directed: true,
+                faldoFilters: this.defaultFaldoFilters,
+                indirect: relation.indirect,
+                isRecursive: relation.recursive,
+                recursive: false,
+              })
+              incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+              if (incrementSpecialNodeGroupId){
+                depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+              }
             }
           }
         }
@@ -705,7 +721,9 @@ export default class Query extends Component {
             suggested: true,
             directed: true,
             faldoFilters: this.defaultFaldoFilters,
-            indirect: false
+            indirect: false,
+            isRecursive: false,
+            recursive: false,
           })
           incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
           if (incrementSpecialNodeGroupId){
@@ -748,7 +766,9 @@ export default class Query extends Component {
           suggested: false,
           directed: link.directed,
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
-          indirect: link.indirect ? link.indirect : false
+          indirect: link.indirect ? link.indirect : false,
+          isRecursive: link.isRecursive ? link.isRecursive : false,
+          recursive: link.recursive ? link.recursive : false,
         }
       }
 
@@ -769,7 +789,9 @@ export default class Query extends Component {
           suggested: false,
           directed: link.directed,
           faldoFilters: link.faldoFilters ? link.faldoFilters :  this.defaultFaldoFilters,
-          indirect: link.indirect ? link.indirect : false
+          indirect: link.indirect ? link.indirect : false,
+          isRecursive: link.isRecursive ? link.isRecursive : false,
+          recursive: link.recursive ? link.recursive : false,
         }
       }
     })
@@ -858,7 +880,12 @@ export default class Query extends Component {
         this.selectAndInstanciateLink(clickedLink)
         // instanciate node only if node is suggested
         if (suggested) {
-          this.instanciateNode(clickedLink.target)
+          if (clickedLink.target.suggested){
+            this.instanciateNode(clickedLink.target)
+          }
+          if (clickedLink.source.suggested){
+            this.instanciateNode(clickedLink.source)
+          }
         }
         // reload suggestions
         this.removeAllSuggestion()
@@ -1057,7 +1084,9 @@ export default class Query extends Component {
           suggested: link.suggested,
           directed: link.directed,
           faldoFilters: link.faldoFilters,
-          indirect: link.indirect
+          indirect: link.indirect,
+          isRecursive: link.isRecursive,
+          recursive: link.recursive,
         }
       }
     })
@@ -1078,7 +1107,9 @@ export default class Query extends Component {
       selected: false,
       suggested: false,
       directed: false,
-      indirect: false
+      indirect: false,
+      isRecursive: false,
+      recursive: false,
     }
     this.graphState.links.push(link)
   }
@@ -1536,28 +1567,13 @@ export default class Query extends Component {
 
   // Ontology link methods -----------------------------
 
-  handleChangeOntologyType (event) {
+  handleRecursiveOntology (event) {
     this.graphState.links.map(link => {
       if (link.id == event.target.id) {
-        link.uri = event.target.value
-        link.label = this.getOntoLabel(event.target.value)
+        link.recursive = event.target.checked
       }
     })
     this.updateGraphState()
-  }
-
-  getOntoLabel (uri) {
-      let labels = {}
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is child of"
-      labels["http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is descendant of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf"] = "is parent of"
-      labels["^http://www.w3.org/2000/01/rdf-schema#subClassOf*"] = "is ancestor of"
-
-      labels["http://www.w3.org/2004/02/skos/core#broader"] = "is child of"
-      labels["http://www.w3.org/2004/02/skos/core#broader*"] = "is descendant of"
-      labels["http://www.w3.org/2004/02/skos/core#narrower"] = "is parent of"
-      labels["http://www.w3.org/2004/02/skos/core#narrower*"] = "is ancestor of"
-      return labels[uri]
   }
 
   // Faldo filters -----------------------------
@@ -1951,7 +1967,7 @@ export default class Query extends Component {
 
           linkView = <OntoLinkView
             link={link}
-            handleChangeOntologyType={p => this.handleChangeOntologyType(p)}
+            handleRecursiveOntology={p => this.handleRecursiveOntology(p)}
           />
         }
       }

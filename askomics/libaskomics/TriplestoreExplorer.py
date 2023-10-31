@@ -323,7 +323,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label
+        SELECT DISTINCT ?endpoint ?graph ?entity_uri ?entity_type ?entity_faldo ?entity_label ?have_no_label ?default_visible
         WHERE {{
             ?graph askomics:public ?public .
             ?graph dc:creator ?creator .
@@ -339,6 +339,7 @@ class TriplestoreExplorer(Params):
                 # Label
                 OPTIONAL {{ ?entity_uri rdfs:label ?entity_label . }}
                 OPTIONAL {{ ?entity_uri askomics:instancesHaveNoLabels ?have_no_label . }}
+                OPTIONAL {{ ?entity_uri askomics:instancesLabel ?default_visible . }}
             }}
             FILTER (
                 ?public = <true>{}
@@ -367,6 +368,7 @@ class TriplestoreExplorer(Params):
                     "ontology": True if result["entity_type"] == "{}ontology".format(self.settings.get("triplestore", "namespace_internal")) else False,
                     "endpoints": [result["endpoint"]],
                     "graphs": [result["graph"]],
+                    "defaultVisible": result.get("default_visible")
                 }
 
                 entities.append(entity)
@@ -519,7 +521,7 @@ class TriplestoreExplorer(Params):
         query_builder = SparqlQuery(self.app, self.session)
 
         query = '''
-        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label ?indirect_relation
+        SELECT DISTINCT ?graph ?entity_uri ?entity_faldo ?entity_label ?attribute_uri ?attribute_faldo ?attribute_label ?attribute_range ?property_uri ?property_faldo ?property_label ?range_uri ?category_value_uri ?category_value_label ?indirect_relation ?is_recursive
         WHERE {{
             # Graphs
             ?graph askomics:public ?public .
@@ -534,6 +536,7 @@ class TriplestoreExplorer(Params):
                 # Retrocompatibility
                 OPTIONAL {{?node askomics:uri ?new_property_uri}}
                 BIND( IF(isBlank(?node), ?new_property_uri, ?node) as ?property_uri)
+                OPTIONAL {{?node askomics:isRecursive ?is_recursive}}
             }}
             # Relation of entity (or motherclass of entity)
             {{
@@ -565,7 +568,8 @@ class TriplestoreExplorer(Params):
                         "graphs": [result["graph"], ],
                         "source": result["entity_uri"],
                         "target": result["range_uri"],
-                        "indirect": result.get("indirect_relation", False)
+                        "indirect": result.get("indirect_relation", False),
+                        "recursive": result.get("is_recursive", False),
                     }
                     relations.append(relation)
                 else:

@@ -1362,19 +1362,19 @@ class SparqlQuery(Params):
                 # Classic relation
                 else:
                     # Manage ontology stuff
+                    is_inverse = link.get("reverse", False)
                     inverse = ""
-                    recurrence = ""
+                    is_recursive = link.get("recursive", False)
+                    recursive = ""
                     relation = link["uri"]
 
-                    if relation.startswith("^"):
+                    if is_inverse:
                         inverse = "^"
-                        relation = relation.lstrip("^")
 
-                    if relation.endswith("*"):
-                        recurrence = "*"
-                        relation = relation.rstrip("*")
+                    if is_recursive:
+                        recursive = "*"
 
-                    relation = inverse + "<{}>".format(relation) + recurrence
+                    relation = inverse + "<{}>".format(relation) + recursive
                     triple = {
                         "subject": source,
                         "predicate": relation,
