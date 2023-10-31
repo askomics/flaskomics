@@ -130,6 +130,8 @@ def upload_chunk():
         }), 400
 
     data = request.get_json()
+
+    skip_preview = data.get('skip_preview', False)
     if not (data and all([key in data for key in ["first", "last", "size", "name", "type", "size", "chunk"]])):
         return jsonify({
             "path": '',
@@ -146,7 +148,7 @@ def upload_chunk():
 
     try:
         files = FilesHandler(current_app, session)
-        path = files.persist_chunk(data)
+        path = files.persist_chunk(data, skip_preview)
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({

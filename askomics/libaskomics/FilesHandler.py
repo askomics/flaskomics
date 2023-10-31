@@ -90,7 +90,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview
             FROM files
             WHERE user_id = ?
             AND {}
@@ -102,7 +102,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview
             FROM files
             WHERE user_id = ?
             AND {}
@@ -113,7 +113,7 @@ class FilesHandler(FilesUtils):
         else:
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview
             FROM files
             WHERE user_id = ?
             '''
@@ -128,7 +128,8 @@ class FilesHandler(FilesUtils):
                 'type': row[2],
                 'size': row[3],
                 'date': row[5],
-                'status': row[6]
+                'status': row[6],
+                'preview': row[7]
             }
             if return_path:
                 file['path'] = row[4]
@@ -144,7 +145,7 @@ class FilesHandler(FilesUtils):
         database = Database(self.app, self.session)
 
         query = '''
-        SELECT files.id, files.name, files.type, files.size, files.date, files.status, users.username
+        SELECT files.id, files.name, files.type, files.size, files.date, files.status, users.username, files.preview
         FROM files
         INNER JOIN users ON files.user_id=users.user_id
         '''
@@ -160,7 +161,8 @@ class FilesHandler(FilesUtils):
                 'size': row[3],
                 'date': row[4],
                 'status': row[5],
-                'user': row[6]
+                'user': row[6],
+                'preview': row[7]
             }
             files.append(file)
 
@@ -206,7 +208,7 @@ class FilesHandler(FilesUtils):
         with open(file_path, mode) as file:
             file.write(data)
 
-    def store_file_info_in_db(self, name, filetype, file_name, size, status="available", task_id=None):
+    def store_file_info_in_db(self, name, filetype, file_name, size, status="available", task_id=None, skip_preview=False):
         """Store the file info in the database
 
         Parameters
@@ -243,6 +245,9 @@ class FilesHandler(FilesUtils):
         )
         '''
 
+        if not skip_preview:
+            status = 'processing'
+
         # Type
         if filetype in ('text/tab-separated-values', 'tabular'):
             filetype = 'csv/tsv'
@@ -259,7 +264,11 @@ class FilesHandler(FilesUtils):
 
         self.date = int(time.time())
 
-        return database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
+        id = database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
+
+        if not skip_preview:
+            self.app.celery.send_task('save_preview', (self.session, id))
+        return id
 
     def update_file_info(self, file_id, size=None, status="", task_id=""):
         """Update file size and status
@@ -311,7 +320,7 @@ class FilesHandler(FilesUtils):
 
         database.execute_sql_query(query, tuple(query_vars))
 
-    def persist_chunk(self, chunk_info):
+    def persist_chunk(self, chunk_info, skip_preview=False):
         """Persist a file by chunk. Store info in db if the chunk is the last
 
         Parameters
@@ -331,7 +340,7 @@ class FilesHandler(FilesUtils):
                 file_name = self.get_file_name()
                 self.write_data_into_file(chunk_info["chunk"], file_name, "w")
                 # store file info in db
-                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"], skip_preview)
             # first chunk of large file
             elif chunk_info["first"]:
                 file_name = self.get_file_name()
@@ -340,7 +349,7 @@ class FilesHandler(FilesUtils):
             elif chunk_info["last"]:
                 file_name = chunk_info["path"]
                 self.write_data_into_file(chunk_info["chunk"], file_name, "a")
-                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"], skip_preview)
             # chunk of large file
             else:
                 file_name = chunk_info["path"]

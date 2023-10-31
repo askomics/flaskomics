@@ -1,5 +1,6 @@
 import datetime
 import os
+import json
 import time
 from dateutil import parser
 from urllib.parse import quote
@@ -92,6 +93,7 @@ class File(Params):
         self.path = file_info['path']
         self.type = file_info['type']
         self.size = file_info['size']
+        self.preview = json.loads(file_info['preview'])
         self.id = file_info['id']
         self.public = False
         self.ntriples = 0
@@ -536,3 +538,20 @@ class File(Params):
                     return value
 
         return value
+
+    def save_preview_in_db(self, preview, error):
+        database = Database(self.app, self.session)
+
+        status = "available" if not error else "error"
+        data = json.dumps(preview) if preview else None
+
+        query = '''
+        UPDATE files SET
+        preview = ?,
+        error = ?,
+        status = ?
+        WHERE id= ?
+        '''
+
+        variables = [data, error, status, self.id]
+        database.execute_sql_query(query, tuple(variables))

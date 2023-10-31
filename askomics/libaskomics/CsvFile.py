@@ -59,6 +59,12 @@ class CsvFile(File):
         self.set_preview_and_header()
         self.set_columns_type()
 
+    def save_preview(self):
+        """Save location and endpoint in preview"""
+        data = None
+        error = None
+        self.save_preview_in_db(data, error)
+
     def get_preview(self):
         """Get a preview of the file
 

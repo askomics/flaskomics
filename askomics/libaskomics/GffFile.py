@@ -54,6 +54,11 @@ class GffFile(File):
 
     def set_preview(self):
         """Summary"""
+
+        if self.preview:
+            self.entities = self.preview['entities']
+            return
+
         try:
             exam = GFFExaminer()
             handle = open(self.path, encoding="utf-8", errors="ignore")
@@ -66,6 +71,18 @@ class GffFile(File):
             self.error = True
             self.error_message = "Malformated GFF ({})".format(str(e))
             traceback.print_exc(file=sys.stdout)
+
+    def save_preview(self):
+        """Save location and endpoint in preview"""
+        data = None
+        error = None
+        self.set_preview()
+
+        if self.error:
+            error = self.error_message
+        else:
+            data = {'entities': self.entity_name}
+        self.save_preview_in_db(data, error)
 
     def get_preview(self):
         """Get gff file preview (list of entities)
