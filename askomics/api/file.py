@@ -245,6 +245,9 @@ def get_preview():
 
         results = []
         for file in files_handler.files:
+            if file.status == "error":
+                continue
+
             file.set_preview()
             res = file.get_preview()
             results.append(res)
@@ -256,10 +259,16 @@ def get_preview():
             'errorMessage': str(e)
         }), 500
 
+    errorMessage = ''
+    error = False
+    if not results:
+        errorMessage = "None of the selected files are in an integrable state"
+        error = True
+
     return jsonify({
         'previewFiles': results,
-        'error': False,
-        'errorMessage': ''
+        'error': error,
+        'errorMessage': errorMessage
     })
 
 
@@ -333,6 +342,9 @@ def integrate():
         files_handler.handle_files([data["fileId"], ])
 
         for file in files_handler.files:
+
+            if file.status == "error":
+                continue
 
             data["externalEndpoint"] = data["externalEndpoint"] if (data.get("externalEndpoint") and isinstance(file, RdfFile)) else None
             data["externalGraph"] = data["externalGraph"] if (data.get("externalGraph") and isinstance(file, RdfFile)) else None

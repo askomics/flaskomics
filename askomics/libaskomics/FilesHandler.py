@@ -272,7 +272,7 @@ class FilesHandler(FilesUtils):
             self.app.celery.send_task('save_preview', ({"user": self.session["user"]}, id))
         return id
 
-    def update_file_info(self, file_id, size=None, status="", task_id=""):
+    def update_file_info(self, file_id, size=None, status="", task_id="", error=None):
         """Update file size and status
 
         Parameters
@@ -296,19 +296,24 @@ class FilesHandler(FilesUtils):
         size_query = ""
         status_query = ""
         task_query = ""
+        error_query = ""
 
         # Should be a cleaner way of doing this...
         if size is not None:
-            size_query = "size=?," if (status or task_id) else "size=?"
+            size_query = "size=?," if (status or task_id or error) else "size=?"
             query_vars.append(size)
 
         if status:
-            status_query = "status=?," if task_id else "status=?"
+            status_query = "status=?," if (task_id or error) else "status=?"
             query_vars.append(status)
 
         if task_id:
-            task_query = "task_id=?"
+            task_query = "task_id=?," if error else "task_id=?"
             query_vars.append(task_id)
+
+        if error:
+            error_query = "preview_error=?"
+            query_vars.append(error)
 
         query_vars.append(file_id)
 
@@ -317,8 +322,9 @@ class FilesHandler(FilesUtils):
         {}
         {}
         {}
+        {}
         WHERE id=?
-        '''.format(size_query, status_query, task_query)
+        '''.format(size_query, status_query, task_query, error_query)
 
         database.execute_sql_query(query, tuple(query_vars))
 
@@ -407,8 +413,8 @@ class FilesHandler(FilesUtils):
             # Update final value
             self.update_file_info(file_id, size=os.path.getsize(path), status="available")
 
-        except Exception:
-            self.update_file_info(file_id, size=os.path.getsize(path), status="error")
+        except Exception as e:
+            self.update_file_info(file_id, size=os.path.getsize(path), status="error", error=str(e))
 
     def get_type(self, file_ext):
         """Get files type, based on extension
