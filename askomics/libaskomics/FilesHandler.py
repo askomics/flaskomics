@@ -90,7 +90,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status, preview
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             AND {}
@@ -102,7 +102,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status, preview
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             AND {}
@@ -113,7 +113,7 @@ class FilesHandler(FilesUtils):
         else:
 
             query = '''
-            SELECT id, name, type, size, path, date, status, preview
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             '''
@@ -129,7 +129,8 @@ class FilesHandler(FilesUtils):
                 'size': row[3],
                 'date': row[5],
                 'status': row[6],
-                'preview': row[7]
+                'preview': row[7],
+                'preview_error': row[8]
             }
             if return_path:
                 file['path'] = row[4]
@@ -241,7 +242,7 @@ class FilesHandler(FilesUtils):
             ?,
             ?,
             ?,
-	    ?,
+            ?,
             ?
         )
         '''

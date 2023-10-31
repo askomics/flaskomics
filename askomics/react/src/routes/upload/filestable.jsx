@@ -99,6 +99,9 @@ export default class FilesTable extends Component {
         if (cell == 'available') {
           return <Badge color="success">Available</Badge>
         }
+        if (cell == 'processing') {
+          return <Badge color="secondary">Processing</Badge>
+        }
         return <Badge color="danger">Error</Badge>
       },
       sort: true,

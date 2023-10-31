@@ -548,7 +548,7 @@ class File(Params):
         query = '''
         UPDATE files SET
         preview = ?,
-        error = ?,
+        preview_error = ?,
         status = ?
         WHERE id= ?
         '''

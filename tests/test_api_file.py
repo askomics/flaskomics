@@ -27,8 +27,9 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'transcripts.tsv',
                 'size': 2264,
                 'type': 'csv/tsv',
+                'status': 'available',
                 'preview': None,
-                'status': 'available'
+                'preview_error': None
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
@@ -36,7 +37,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 819,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None,
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
@@ -44,7 +46,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 99,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
@@ -52,7 +55,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2555,
                 'type': 'gff/gff3',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -60,7 +64,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 689,
                 'type': 'bed',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -86,7 +91,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2264,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -119,7 +125,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 369,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -144,7 +151,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2264,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
@@ -152,7 +160,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 819,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
@@ -160,7 +169,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 99,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
@@ -168,7 +178,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2555,
                 'type': 'gff/gff3',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -176,7 +187,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 689,
                 'type': 'bed',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -474,7 +486,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 819,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
@@ -482,7 +495,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 99,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
@@ -490,7 +504,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2555,
                 'type': 'gff/gff3',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -498,7 +513,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 689,
                 'type': 'bed',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -514,7 +530,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 99,
                 'type': 'csv/tsv',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
@@ -522,7 +539,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 2555,
                 'type': 'gff/gff3',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
@@ -530,7 +548,8 @@ class TestApiFile(AskomicsTestCase):
                 'size': 689,
                 'type': 'bed',
                 'status': 'available',
-                'preview': None
+                'preview': None,
+                'preview_error': None
             }]
         }
 
