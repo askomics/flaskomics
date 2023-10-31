@@ -415,8 +415,8 @@ class TestApiFile(AskomicsTestCase):
         response = client.client.post('/api/files/preview', json=fake_data)
         assert response.status_code == 200
         assert response.json == {
-            'error': False,
-            'errorMessage': '',
+            'error': True,
+            'errorMessage': 'None of the selected files are in an integrable state',
             'previewFiles': []
         }
 
