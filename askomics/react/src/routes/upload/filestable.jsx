@@ -3,17 +3,26 @@ import axios from 'axios'
 import BootstrapTable from 'react-bootstrap-table-next'
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import cellEditFactory from 'react-bootstrap-table2-editor'
-import {Badge} from 'reactstrap'
+import {Badge, Modal, ModalHeader, ModalBody, ModalFooter, Button} from 'reactstrap'
 import WaitingDiv from '../../components/waiting'
 import Utils from '../../classes/utils'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { monokai } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import PropTypes from 'prop-types'
 
 export default class FilesTable extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      modalTracebackTitle: "",
+      modalTracebackContent: "",
+      modalTraceback: false
+    }
     this.utils = new Utils()
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSelectionAll = this.handleSelectionAll.bind(this)
+    this.handleClickError = this.handleClickError.bind(this)
+    this.toggleModalTraceback = this.toggleModalTraceback.bind(this)
   }
 
   handleSelection (row, isSelect) {
@@ -39,6 +48,24 @@ export default class FilesTable extends Component {
         selected: []
       }))
     }
+  }
+
+  handleClickError(event) {
+    this.props.files.forEach(file => {
+      if (file.id == event.target.id) {
+        this.setState({
+          modalTracebackTitle: "File processing error",
+          modalTracebackContent: file.preview_error ? file.preview_error : "Internal server error",
+          modalTraceback: true
+        })
+      }
+    })
+  }
+
+  toggleModalTraceback () {
+    this.setState({
+      modalTraceback: !this.state.modalTraceback
+    })
   }
 
   editFileName (oldValue, newValue, row) {
@@ -102,7 +129,7 @@ export default class FilesTable extends Component {
         if (cell == 'processing') {
           return <Badge color="secondary">Processing</Badge>
         }
-        return <Badge color="danger">Error</Badge>
+        return <Badge style={{cursor: "pointer"}} id={row.id} color="danger" onClick={this.handleClickError}>Error</Badge>
       },
       sort: true,
       editable: false
@@ -147,6 +174,19 @@ export default class FilesTable extends Component {
               })}
             />
           </div>
+          <Modal size="lg" isOpen={this.state.modalTraceback} toggle={this.toggleModalTraceback}>
+          <ModalHeader toggle={this.toggleModalTraceback}>{this.state.modalTracebackTitle.substring(0, 100)}</ModalHeader>
+          <ModalBody>
+            <div>
+              <SyntaxHighlighter language="python" style={monokai}>
+                {this.state.modalTracebackContent}
+              </SyntaxHighlighter>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggleModalTraceback  }>Close</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     )
   }

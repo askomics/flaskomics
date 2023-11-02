@@ -261,15 +261,17 @@ def get_preview():
 
     errorMessage = ''
     error = False
+    errorCode = 200
     if not results:
         errorMessage = "None of the selected files are in an integrable state"
         error = True
+        errorCode = 400
 
     return jsonify({
         'previewFiles': results,
         'error': error,
         'errorMessage': errorMessage
-    })
+    }), errorCode
 
 
 @file_bp.route('/api/files/delete', methods=['POST'])

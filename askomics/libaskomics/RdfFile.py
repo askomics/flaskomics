@@ -59,6 +59,10 @@ class RdfFile(File):
         str
             Location
         """
+
+        if self.settings.get('skip_rdf_preview', False):
+            return "", ""
+
         graph = RdfGraph(self.app, self.session)
         graph.parse(self.path, format=self.type_dict[self.type])
         triple_loc = (None, self.prov.atLocation, None)

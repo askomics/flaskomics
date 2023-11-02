@@ -81,7 +81,7 @@ class GffFile(File):
         if self.error:
             error = self.error_message
         else:
-            data = {'entities': self.entity_name}
+            data = {'entities': self.entities}
         self.save_preview_in_db(data, error)
 
     def get_preview(self):

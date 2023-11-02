@@ -26,7 +26,7 @@ app = create_app(config='config/askomics.ini')
 celery = create_celery(app)
 
 
-@celery.task(bind=True, name="set_preview")
+@celery.task(bind=True, name="save_preview")
 def save_preview(self, session, fileId):
     """Compute the file preview in backend and store it in DB
 

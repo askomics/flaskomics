@@ -91,6 +91,9 @@ autocomplete_max_results = 10
 anonymous_query = false
 anonymous_query_cleanup = 60
 
+skip_rdf_preview = false
+
+
 [triplestore]
 # name of the triplestore, can be virtuoso or fuseki
 triplestore = virtuoso
