@@ -152,5 +152,6 @@ export default class UploadForm extends Component {
 
 UploadForm.propTypes = {
   setStateUpload: PropTypes.func,
+  getFiles: PropTypes.func,
   config: PropTypes.object
 }
