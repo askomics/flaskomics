@@ -60,19 +60,7 @@ export default class UploadUrlForm extends Component {
           progressDisplay: "100 %",
           progressColor: "success"
         })
-
-        // load file component
-        let requestUrlFiles = '/api/files'
-        axios.get(requestUrlFiles, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-          .then(response => {
-            console.log(requestUrlFiles, response.data)
-            this.props.setStateUpload({
-              files: response.data.files
-            })
-          })
-          .catch(error => {
-            console.log(error, error.response.data.errorMessage)
-          })
+        this.props.getFiles()
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -106,5 +94,6 @@ export default class UploadUrlForm extends Component {
 
 UploadUrlForm.propTypes = {
   setStateUpload: PropTypes.func,
+  getFiles: PropTypes.func,
   config: PropTypes.object
 }

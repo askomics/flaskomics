@@ -23,15 +23,16 @@ export default class Upload extends Component {
     }
     this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
     this.integrateSelectedFiles = this.integrateSelectedFiles.bind(this)
+    this.getFiles = this.getFiles.bind(this)
     this.cancelRequest
   }
 
   componentDidMount () {
     if (!this.props.waitForStart) {
-      this.getFiles()
       this.interval = setInterval(() => {
         this.getFiles()
       }, 5000)
+      this.getFiles()
     }
   }
 
@@ -53,6 +54,17 @@ export default class Upload extends Component {
           files: response.data.files,
           waiting: false
         })
+        let isProcessing = response.data.files.some(file => file.status == "processing")
+        console.log(isProcessing)
+        if (this.interval && !isProcessing){
+          clearInterval(this.interval)
+          this.interval = ""
+        }
+        if (!this.interval && isProcessing){
+          this.interval = setInterval(() => {
+            this.getFiles()
+          }, 5000)
+        }
       })
       .catch(error => {
         console.log(error, error.response.data.errorMessage)
@@ -145,7 +157,7 @@ export default class Upload extends Component {
         <h2>Upload</h2>
         <hr />
         {warningDiskSpace}
-        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} />
+        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} getFiles={this.getFiles} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} config={this.props.config} />
         <br />

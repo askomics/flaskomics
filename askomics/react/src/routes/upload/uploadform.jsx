@@ -101,23 +101,7 @@ export default class UploadForm extends Component {
                 new_files: update(this.state.new_files, { [i]: { uploadPercentage: { $set: 100 } } })
               })
               // load file component
-              let requestUrlFiles = '/api/files'
-              axios.get(requestUrlFiles, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-                .then(response => {
-                  console.log(requestUrlFiles, response.data)
-                  this.props.setStateUpload({
-                    files: response.data.files
-                  })
-                })
-                .catch(error => {
-                  console.log(error, error.response.data.errorMessage)
-                  this.setState({
-                    new_files: update(this.state.new_files, { [i]: { error: { $set: true } } }, { [i]: { errorMessage: { $set: error.response.data.errorMessage } } }),
-                    error: true,
-                    errorMessage: error.response.data.errorMessage,
-                    status: error.response.status
-                  })
-                })
+              this.props.getFiles()
             }
           }).catch(error => {
             console.log(error, error.response.data.errorMessage)

@@ -67,7 +67,7 @@ export default class UploadModal extends Component {
         <Modal isOpen={this.state.modalComputer} toggle={this.toggleModalComputer}>
           <ModalHeader toggle={this.toggleModalComputer}>Upload files</ModalHeader>
           <ModalBody>
-            <UploadForm config={this.props.config} setStateUpload={this.props.setStateUpload} />
+            <UploadForm config={this.props.config} setStateUpload={this.props.setStateUpload} getFiles={this.props.getFiles} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalComputer}>Close</Button>
@@ -77,7 +77,7 @@ export default class UploadModal extends Component {
         <Modal isOpen={this.state.modalUrl} toggle={this.toggleModalUrl}>
           <ModalHeader toggle={this.toggleModalUrl}>Upload files by URL</ModalHeader>
           <ModalBody>
-            <UploadUrlForm config={this.props.config} setStateUpload={this.props.setStateUpload} />
+            <UploadUrlForm config={this.props.config} setStateUpload={this.props.setStateUpload} getFiles={this.props.getFiles} />
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggleModalUrl}>Close</Button>
@@ -91,6 +91,7 @@ export default class UploadModal extends Component {
 
 UploadModal.propTypes = {
   setStateUpload: PropTypes.func,
+  getFiles: PropTypes.func,
   config: PropTypes.object,
   disabled: PropTypes.bool
 }
