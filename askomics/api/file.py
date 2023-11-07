@@ -130,6 +130,8 @@ def upload_chunk():
         }), 400
 
     data = request.get_json()
+
+    skip_preview = data.get('skip_preview', False)
     if not (data and all([key in data for key in ["first", "last", "size", "name", "type", "size", "chunk"]])):
         return jsonify({
             "path": '',
@@ -146,7 +148,7 @@ def upload_chunk():
 
     try:
         files = FilesHandler(current_app, session)
-        path = files.persist_chunk(data)
+        path = files.persist_chunk(data, skip_preview)
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         return jsonify({
@@ -243,6 +245,9 @@ def get_preview():
 
         results = []
         for file in files_handler.files:
+            if file.status == "error":
+                continue
+
             file.set_preview()
             res = file.get_preview()
             results.append(res)
@@ -254,11 +259,19 @@ def get_preview():
             'errorMessage': str(e)
         }), 500
 
+    errorMessage = ''
+    error = False
+    errorCode = 200
+    if not results:
+        errorMessage = "None of the selected files are in an integrable state"
+        error = True
+        errorCode = 400
+
     return jsonify({
         'previewFiles': results,
-        'error': False,
-        'errorMessage': ''
-    })
+        'error': error,
+        'errorMessage': errorMessage
+    }), errorCode
 
 
 @file_bp.route('/api/files/delete', methods=['POST'])
@@ -331,6 +344,9 @@ def integrate():
         files_handler.handle_files([data["fileId"], ])
 
         for file in files_handler.files:
+
+            if file.status == "error":
+                continue
 
             data["externalEndpoint"] = data["externalEndpoint"] if (data.get("externalEndpoint") and isinstance(file, RdfFile)) else None
             data["externalGraph"] = data["externalGraph"] if (data.get("externalGraph") and isinstance(file, RdfFile)) else None

@@ -27,35 +27,45 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'transcripts.tsv',
                 'size': 2264,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None,
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
                 'type': 'gff/gff3',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -80,7 +90,9 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'transcripts.tsv',
                 'size': 2264,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -112,7 +124,9 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'gene.tsv',
                 'size': 369,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -136,35 +150,45 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'new name.tsv',
                 'size': 2264,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["de"]["upload"]["file_date"],
                 'id': 2,
                 'name': 'de.tsv',
                 'size': 819,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
                 'type': 'gff/gff3',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -389,10 +413,10 @@ class TestApiFile(AskomicsTestCase):
             csv_malformed = json.loads(file.read())
 
         response = client.client.post('/api/files/preview', json=fake_data)
-        assert response.status_code == 200
+        assert response.status_code == 400
         assert response.json == {
-            'error': False,
-            'errorMessage': '',
+            'error': True,
+            'errorMessage': 'None of the selected files are in an integrable state',
             'previewFiles': []
         }
 
@@ -461,28 +485,36 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'de.tsv',
                 'size': 819,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["qtl"]["upload"]["file_date"],
                 'id': 3,
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
                 'type': 'gff/gff3',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 
@@ -497,21 +529,27 @@ class TestApiFile(AskomicsTestCase):
                 'name': 'qtl.tsv',
                 'size': 99,
                 'type': 'csv/tsv',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["gene"]["upload"]["file_date"],
                 'id': 4,
                 'name': 'gene.gff3',
                 'size': 2555,
                 'type': 'gff/gff3',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }, {
                 'date': info["bed"]["upload"]["file_date"],
                 'id': 5,
                 'name': 'gene.bed',
                 'size': 689,
                 'type': 'bed',
-                'status': 'available'
+                'status': 'available',
+                'preview': None,
+                'preview_error': None
             }]
         }
 

@@ -40,6 +40,17 @@ class RdfFile(File):
         """Summary"""
         pass
 
+    def save_preview(self):
+        """Save location and endpoint in preview"""
+        data = None
+        error = None
+        try:
+            location, remote_graph = self.get_location_and_remote_graph()
+            data = {"location": location, "remote_graph": remote_graph}
+        except Exception as e:
+            error = str(e)
+        self.save_preview_in_db(data, error)
+
     def get_location_and_remote_graph(self):
         """Get location of data if specified
 
@@ -48,6 +59,10 @@ class RdfFile(File):
         str
             Location
         """
+
+        if self.settings.get('askomics', 'skip_rdf_preview', fallback=False):
+            return "", ""
+
         graph = RdfGraph(self.app, self.session)
         graph.parse(self.path, format=self.type_dict[self.type])
         triple_loc = (None, self.prov.atLocation, None)
@@ -81,7 +96,11 @@ class RdfFile(File):
         location = None
         remote_graph = None
         try:
-            location, remote_graph = self.get_location_and_remote_graph()
+            if self.preview:
+                location = self.preview['location']
+                remote_graph = self.preview['remote_graph']
+            else:
+                location, remote_graph = self.get_location_and_remote_graph()
         except Exception as e:
             self.error_message = str(e)
             # Todo: Better error management

@@ -419,6 +419,28 @@ class Database(Params):
         except Exception:
             pass
 
+        query = '''
+        ALTER TABLE files
+        ADD preview text NULL
+        DEFAULT(NULL)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
+        query = '''
+        ALTER TABLE files
+        ADD preview_error text NULL
+        DEFAULT(NULL)
+        '''
+
+        try:
+            self.execute_sql_query(query)
+        except Exception:
+            pass
+
     def create_abstraction_table(self):
         """Create abstraction table"""
         query = """

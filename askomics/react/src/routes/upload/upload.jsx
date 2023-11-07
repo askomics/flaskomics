@@ -23,31 +23,16 @@ export default class Upload extends Component {
     }
     this.deleteSelectedFiles = this.deleteSelectedFiles.bind(this)
     this.integrateSelectedFiles = this.integrateSelectedFiles.bind(this)
+    this.getFiles = this.getFiles.bind(this)
     this.cancelRequest
   }
 
   componentDidMount () {
     if (!this.props.waitForStart) {
-      let requestUrl = '/api/files'
-      axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
-        .then(response => {
-          console.log(requestUrl, response.data)
-          this.setState({
-            diskSpace: response.data.diskSpace,
-            exceededQuota: this.props.config.user.quota > 0 && response.data.diskSpace >= this.props.config.user.quota,
-            files: response.data.files,
-            waiting: false
-          })
-        })
-        .catch(error => {
-          console.log(error, error.response.data.errorMessage)
-          this.setState({
-            error: true,
-            errorMessage: error.response.data.errorMessage,
-            status: error.response.status,
-            waiting: false
-          })
-        })
+      this.interval = setInterval(() => {
+        this.getFiles()
+      }, 5000)
+      this.getFiles()
     }
   }
 
@@ -56,6 +41,42 @@ export default class Upload extends Component {
       this.cancelRequest()
     }
   }
+
+
+  getFiles() {
+    let requestUrl = '/api/files'
+    axios.get(requestUrl, { baseURL: this.props.config.proxyPath, cancelToken: new axios.CancelToken((c) => { this.cancelRequest = c }) })
+      .then(response => {
+        console.log(requestUrl, response.data)
+        this.setState({
+          diskSpace: response.data.diskSpace,
+          exceededQuota: this.props.config.user.quota > 0 && response.data.diskSpace >= this.props.config.user.quota,
+          files: response.data.files,
+          waiting: false
+        })
+        let isProcessing = response.data.files.some(file => file.status == "processing")
+        console.log(isProcessing)
+        if (this.interval && !isProcessing){
+          clearInterval(this.interval)
+          this.interval = ""
+        }
+        if (!this.interval && isProcessing){
+          this.interval = setInterval(() => {
+            this.getFiles()
+          }, 5000)
+        }
+      })
+      .catch(error => {
+        console.log(error, error.response.data.errorMessage)
+        this.setState({
+          error: true,
+          errorMessage: error.response.data.errorMessage,
+          status: error.response.status,
+          waiting: false
+        })
+      })
+  }
+
 
   deleteSelectedFiles () {
     let requestUrl = '/api/files/delete'
@@ -92,6 +113,10 @@ export default class Upload extends Component {
 
   isDisabled () {
     return this.state.selected.length == 0
+  }
+
+  isDisabledIntegrate () {
+    return this.state.selected.length == 0 || this.state.files.some(file => this.state.selected.includes(file.id) && file.status == "error")
   }
 
   render () {
@@ -132,13 +157,13 @@ export default class Upload extends Component {
         <h2>Upload</h2>
         <hr />
         {warningDiskSpace}
-        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} />
+        <UploadModal disabled={this.state.exceededQuota} setStateUpload={p => this.setState(p)} config={this.props.config} getFiles={this.getFiles} />
         <hr />
         <FilesTable files={this.state.files} setStateUpload={p => this.setState(p)} selected={this.state.selected} waiting={this.state.waiting} config={this.props.config} />
         <br />
         <ButtonGroup>
           <Button disabled={this.isDisabled()} onClick={this.deleteSelectedFiles} color="danger"><i className="fas fa-trash-alt"></i> Delete</Button>
-          <Button disabled={this.isDisabled()} onClick={this.integrateSelectedFiles} color="secondary"><i className="fas fa-database"></i> Integrate</Button>
+          <Button disabled={this.isDisabledIntegrate()} onClick={this.integrateSelectedFiles} color="secondary"><i className="fas fa-database"></i> Integrate</Button>
         </ButtonGroup>
         <ErrorDiv status={this.state.status} error={this.state.error} errorMessage={this.state.errorMessage} />
       </div>

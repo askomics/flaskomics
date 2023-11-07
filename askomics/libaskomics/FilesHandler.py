@@ -90,7 +90,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['id = ?'] * len(files_id)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             AND {}
@@ -102,7 +102,7 @@ class FilesHandler(FilesUtils):
             subquery_str = '(' + ' OR '.join(['path = ?'] * len(files_path)) + ')'
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             AND {}
@@ -113,7 +113,7 @@ class FilesHandler(FilesUtils):
         else:
 
             query = '''
-            SELECT id, name, type, size, path, date, status
+            SELECT id, name, type, size, path, date, status, preview, preview_error
             FROM files
             WHERE user_id = ?
             '''
@@ -128,7 +128,9 @@ class FilesHandler(FilesUtils):
                 'type': row[2],
                 'size': row[3],
                 'date': row[5],
-                'status': row[6]
+                'status': row[6],
+                'preview': row[7],
+                'preview_error': row[8]
             }
             if return_path:
                 file['path'] = row[4]
@@ -206,7 +208,7 @@ class FilesHandler(FilesUtils):
         with open(file_path, mode) as file:
             file.write(data)
 
-    def store_file_info_in_db(self, name, filetype, file_name, size, status="available", task_id=None):
+    def store_file_info_in_db(self, name, filetype, file_name, size, status="available", task_id=None, skip_preview=False):
         """Store the file info in the database
 
         Parameters
@@ -239,9 +241,14 @@ class FilesHandler(FilesUtils):
             ?,
             ?,
             ?,
+            ?,
+            ?,
             ?
         )
         '''
+
+        if not skip_preview:
+            status = 'processing'
 
         # Type
         if filetype in ('text/tab-separated-values', 'tabular'):
@@ -259,9 +266,13 @@ class FilesHandler(FilesUtils):
 
         self.date = int(time.time())
 
-        return database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id), get_id=True)
+        id = database.execute_sql_query(query, (self.session['user']['id'], name, filetype, file_path, size, self.date, status, task_id, None, None), get_id=True)
 
-    def update_file_info(self, file_id, size=None, status="", task_id=""):
+        if not skip_preview:
+            self.app.celery.send_task('save_preview', ({"user": self.session["user"]}, id))
+        return id
+
+    def update_file_info(self, file_id, size=None, status="", task_id="", error=None):
         """Update file size and status
 
         Parameters
@@ -285,19 +296,24 @@ class FilesHandler(FilesUtils):
         size_query = ""
         status_query = ""
         task_query = ""
+        error_query = ""
 
         # Should be a cleaner way of doing this...
         if size is not None:
-            size_query = "size=?," if (status or task_id) else "size=?"
+            size_query = "size=?," if (status or task_id or error) else "size=?"
             query_vars.append(size)
 
         if status:
-            status_query = "status=?," if task_id else "status=?"
+            status_query = "status=?," if (task_id or error) else "status=?"
             query_vars.append(status)
 
         if task_id:
-            task_query = "task_id=?"
+            task_query = "task_id=?," if error else "task_id=?"
             query_vars.append(task_id)
+
+        if error:
+            error_query = "preview_error=?"
+            query_vars.append(error)
 
         query_vars.append(file_id)
 
@@ -306,12 +322,13 @@ class FilesHandler(FilesUtils):
         {}
         {}
         {}
+        {}
         WHERE id=?
-        '''.format(size_query, status_query, task_query)
+        '''.format(size_query, status_query, task_query, error_query)
 
         database.execute_sql_query(query, tuple(query_vars))
 
-    def persist_chunk(self, chunk_info):
+    def persist_chunk(self, chunk_info, skip_preview=False):
         """Persist a file by chunk. Store info in db if the chunk is the last
 
         Parameters
@@ -324,6 +341,7 @@ class FilesHandler(FilesUtils):
         str
             local filename
         """
+
         try:
             # 1 chunk file
             if chunk_info["first"] and chunk_info["last"]:
@@ -331,7 +349,7 @@ class FilesHandler(FilesUtils):
                 file_name = self.get_file_name()
                 self.write_data_into_file(chunk_info["chunk"], file_name, "w")
                 # store file info in db
-                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"], skip_preview=skip_preview)
             # first chunk of large file
             elif chunk_info["first"]:
                 file_name = self.get_file_name()
@@ -340,7 +358,7 @@ class FilesHandler(FilesUtils):
             elif chunk_info["last"]:
                 file_name = chunk_info["path"]
                 self.write_data_into_file(chunk_info["chunk"], file_name, "a")
-                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"])
+                self.store_file_info_in_db(chunk_info["name"], chunk_info["type"], file_name, chunk_info["size"], skip_preview=skip_preview)
             # chunk of large file
             else:
                 file_name = chunk_info["path"]
@@ -395,8 +413,8 @@ class FilesHandler(FilesUtils):
             # Update final value
             self.update_file_info(file_id, size=os.path.getsize(path), status="available")
 
-        except Exception:
-            self.update_file_info(file_id, size=os.path.getsize(path), status="error")
+        except Exception as e:
+            self.update_file_info(file_id, size=os.path.getsize(path), status="error", error=str(e))
 
     def get_type(self, file_ext):
         """Get files type, based on extension

@@ -39,7 +39,7 @@ export default class ErrorDiv extends Component {
     }
 
     let error
-
+ 
     if (Array.isArray(this.props.errorMessage)) {
       error = (
         <Alert color="danger">
@@ -48,10 +48,16 @@ export default class ErrorDiv extends Component {
           ))}
         </Alert>
       )
-    } else {
+    } else if (! this.props.errorMessage){
       error = (
         <Alert color="danger">
           <div><i className="fas fa-exclamation-circle"></i> {messages[this.props.status.toString()]}</div>
+        </Alert>
+      )
+    } else {
+      error = (
+        <Alert color="danger">
+          <div><i className="fas fa-exclamation-circle"></i> {this.props.errorMessage}</div>
         </Alert>
       )
     }

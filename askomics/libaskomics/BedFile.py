@@ -41,6 +41,11 @@ class BedFile(File):
 
     def set_preview(self):
         """Set entity name preview"""
+
+        if self.preview:
+            self.entity_name = self.preview['entity_name']
+            return
+
         try:
             BedTool(self.path).count()
             self.entity_name = self.human_name
@@ -48,6 +53,18 @@ class BedFile(File):
             self.error = True
             self.error_message = "Malformated BED ({})".format(str(e))
             traceback.print_exc(file=sys.stdout)
+
+    def save_preview(self):
+        """Save location and endpoint in preview"""
+        data = None
+        error = None
+        self.set_preview()
+
+        if self.error:
+            error = self.error_message
+        else:
+            data = {'entity_name': self.entity_name}
+        self.save_preview_in_db(data, error)
 
     def get_preview(self):
         """Get file preview

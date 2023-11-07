@@ -26,6 +26,28 @@ app = create_app(config='config/askomics.ini')
 celery = create_celery(app)
 
 
+@celery.task(bind=True, name="save_preview")
+def save_preview(self, session, fileId):
+    """Compute the file preview in backend and store it in DB
+
+    Parameters
+    ----------
+    session : dict
+        AskOmics session
+    fileId : string
+        file to integrate
+    """
+    files_handler = FilesHandler(app, session)
+    files_handler.handle_files([fileId, ])
+    for file in files_handler.files:
+        file.save_preview()
+
+    return {
+        'error': False,
+        'errorMessage': ''
+    }
+
+
 @celery.task(bind=True, name="integrate")
 def integrate(self, session, data, host_url):
     """Integrate a file into the triplestore

@@ -14,9 +14,11 @@ This changelog was started for release 4.2.0.
 - "askomics:instancesLabel" predicate can be defined at the entity-level, to set a specific attribute URI as the 'label' (ie, visible by default)
   - Play the same role as 'askomics:instancesHaveNoLabels', except a specific attribute is visible instead of the URI attribute.
 - Added the *TIMEOUT* env variable, which will set the web workers tiemout value. Default 300s
+- Added the 'skip_rdf_preview' config option. This will skip loading RDF files in memory to get the location and remote graph. Warning: This means you must enter the values at the integration step yourself.
 
 ### Changed
 
+- Now pre-process files to store integration parameters (column, entities, etc...) in DB, to avoid re-processing every time.
 - Rewrote the ontology part. Instead of specifying 'children of' and other values, users can tick the 'recursive' button to customize the query. While this is less intuitive, this change is more flexible for the various types of ontological relations
 
 ## [4.5.0] - 2023-10-20
