@@ -4,16 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-werkzeug = "==0.16.1"
-flask = "<2"
-flask-reverse-proxy-fix = "*"
+werkzeug = "*"
+flask = "*"
 validate-email = "*"
 gunicorn = "*"
 python-magic = "*"
 rdflib = "*"
 sparqlwrapper = "*"
 requests = "*"
-celery = "==5.0.5"
+celery = "*"
 redis = "*"
 watchdog = "*"
 gitpython = "*"
@@ -29,7 +28,7 @@ tld = "*"
 argh = "*"
 python-ldap = "*"
 python-dateutil = "*"
-markupsafe = "==2.0.1"
+markupsafe = "*"
 
 [dev-packages]
 pytest = "*"

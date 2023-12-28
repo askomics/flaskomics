@@ -20,13 +20,12 @@ from askomics.api.view import view_bp
 from askomics.api.results import results_bp
 from askomics.api.galaxy import galaxy_bp
 from askomics.api.ontology import onto_bp
+from askomics.middleware import PrefixMiddleware
 
 from celery import Celery
 from kombu import Exchange, Queue
 
 from flask import Flask
-
-from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
 
 from pkg_resources import get_distribution
 
@@ -116,7 +115,7 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
             app.logger.setLevel(log_level)
 
     if proxy_path:
-        ReverseProxyPrefixFix(app)
+        app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=proxy_path.rstrip("/"))
 
     return app
 
