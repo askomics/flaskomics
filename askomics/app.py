@@ -7,6 +7,7 @@ BLUEPRINTS : Tuple
 """
 
 import configparser
+import os
 
 from askomics.api.admin import admin_bp
 from askomics.api.auth import auth_bp
@@ -108,7 +109,9 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
         for blueprint in blueprints:
             app.register_blueprint(blueprint)
 
-        if app.config['ENV'] == "production":
+        is_gunicorn = "gunicorn" in os.environ.get("SERVER_SOFTWARE", "")
+
+        if is_gunicorn:
             log_level = 10 if app.config['DEBUG'] else 20
             gunicorn_logger = logging.getLogger('gunicorn.error')
             app.logger.handlers = gunicorn_logger.handlers
