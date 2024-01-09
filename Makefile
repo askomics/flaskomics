@@ -106,9 +106,9 @@ serve-askomics: check-venv build-config create-user
 	@echo 'Serving AskOmics...'
 	. $(ACTIVATE)
 ifeq ($(MODE), dev)
-	FLASK_ENV=development FLASK_APP=app flask run --host=$(HOST) --port $(PORT)
+	FLASK_DEBUG=development FLASK_APP=app flask run --host=$(HOST) --port $(PORT)
 else
-	FLASK_ENV=production FLASK_APP=app gunicorn --timeout $(TIMEOUT) -w $(WORKERS) -b $(HOST):$(PORT) app
+	FLASK_APP=app gunicorn --timeout $(TIMEOUT) -w $(WORKERS) -b $(HOST):$(PORT) app
 endif
 
 serve-celery: check-venv build-config create-user
