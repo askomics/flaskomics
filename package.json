@@ -42,7 +42,7 @@
     "axios": "^1.6.0",
     "babel-preset-env": "^1.7.0",
     "bootstrap": "^4.5.2",
-    "css-loader": "^4.3.0",
+    "css-loader": "^6.8.1",
     "dedent": "^0.7.0",
     "dompurify": "^2.0.17",
     "file-loader": "^6.1.0",
