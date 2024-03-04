@@ -4,7 +4,7 @@
     "dev": "webpack --mode development --watch"
   },
   "keywords": [
-    "Sementic web",
+    "Semantic web",
     "ontology"
   ],
   "name": "AskOmics",
@@ -32,7 +32,7 @@
     "npm-check-updates": "^16.3.4",
     "terser-webpack-plugin": "^4.2.2",
     "webpack": "^5.74.0",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",
