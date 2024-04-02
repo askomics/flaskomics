@@ -78,13 +78,13 @@ export default class Integration extends Component {
               return <CsvTable config={this.state.config} key={file.name} file={file} ontologies={this.state.ontologies} />
             }
             if (["rdf/ttl", "rdf/xml", "rdf/nt"].includes(file.type)) {
-              return <RdfPreview config={this.state.config} file={file} />
+              return <RdfPreview key={file.name} config={this.state.config} file={file} />
             }
             if (file.type == 'gff/gff3') {
-              return <GffPreview config={this.state.config} file={file} />
+              return <GffPreview key={file.name} config={this.state.config} file={file} />
             }
             if (file.type == 'bed') {
-              return <BedPreview config={this.state.config} file={file} />
+              return <BedPreview key={file.name} config={this.state.config} file={file} />
             }
           })
         }

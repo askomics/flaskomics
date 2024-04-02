@@ -1889,6 +1889,7 @@ export default class Query extends Component {
           if (attribute.nodeId == this.currentSelected.id && this.currentSelected.type == "node") {
             return (
               <AttributeBox
+                key={attribute.id}
                 attribute={attribute}
                 graph={this.state.graphState}
                 handleChangeLink={p => this.handleChangeLink(p)}

@@ -219,7 +219,7 @@ export default class UploadGalaxyForm extends Component {
             <Label for="histories">Select a galaxy history</Label>
             <CustomInput onChange={this.handleChange} type="select" id="histories" name="histories">
             {this.state.histories.map((history, index) => (
-              <option key={index} value={history.id} history_id={history.id} selected={history.selected}>{history.name}</option>
+              <option key={index} value={history.id} selected={history.selected}>{history.name}</option>
             ))}
             </CustomInput>
           </FormGroup>
