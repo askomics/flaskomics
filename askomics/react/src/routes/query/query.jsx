@@ -688,46 +688,50 @@ export default class Query extends Component {
       this.state.abstraction.entities.map(entity => {
         if (entity.faldo) {
           let new_id = this.getId()
+          resFilterNode = entity.label.toLowerCase().match(reNode)
+          resFilterLink = "Included in".toLowerCase().match(reLink)
+          if (resFilterNode && resFilterLink) {
           // Push suggested target
-          this.graphState.nodes.push({
-            uri: entity.uri,
-            type: this.getType(entity.uri),
-            filterNode: "",
-            filterLink: "",
-            graphs: this.getGraphs(entity.uri),
-            id: new_id,
-            humanId: null,
-            specialNodeId: node.specialNodeId,
-            specialNodeGroupId: specialNodeGroupId,
-            specialPreviousIds: node.specialPreviousIds,
-            label: entity.label,
-            faldo: entity.faldo,
-            selected: false,
-            suggested: true,
-            depth: depth
-          })
-          // push suggested link
-          this.graphState.links.push({
-            uri: "included_in",
-            type: "posLink",
-            id: this.getId(),
-            sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
-            sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
-            strict: true,
-            label: "Included in",
-            source: node.id,
-            target: new_id,
-            selected: false,
-            suggested: true,
-            directed: true,
-            faldoFilters: this.defaultFaldoFilters,
-            indirect: false,
-            isRecursive: false,
-            recursive: false,
-          })
-          incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
-          if (incrementSpecialNodeGroupId){
-            depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            this.graphState.nodes.push({
+              uri: entity.uri,
+              type: this.getType(entity.uri),
+              filterNode: "",
+              filterLink: "",
+              graphs: this.getGraphs(entity.uri),
+              id: new_id,
+              humanId: null,
+              specialNodeId: node.specialNodeId,
+              specialNodeGroupId: specialNodeGroupId,
+              specialPreviousIds: node.specialPreviousIds,
+              label: entity.label,
+              faldo: entity.faldo,
+              selected: false,
+              suggested: true,
+              depth: depth
+            })
+            // push suggested link
+            this.graphState.links.push({
+              uri: "included_in",
+              type: "posLink",
+              id: this.getId(),
+              sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
+              sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
+              strict: true,
+              label: "Included in",
+              source: node.id,
+              target: new_id,
+              selected: false,
+              suggested: true,
+              directed: true,
+              faldoFilters: this.defaultFaldoFilters,
+              indirect: false,
+              isRecursive: false,
+              recursive: false,
+            })
+            incrementSpecialNodeGroupId ? specialNodeGroupId += 1 : specialNodeGroupId = specialNodeGroupId
+            if (incrementSpecialNodeGroupId){
+              depth = [...node.depth, node.specialNodeId, node.specialNodeId + "_" + incrementSpecialNodeGroupId]
+            }
           }
         }
       })
