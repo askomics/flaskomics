@@ -162,6 +162,8 @@ class SparqlQueryLauncher(Params):
             file_name
         )
 
+        file_url = file_url + "?key={}".format(self.session['user']['apikey'])
+
         query = "LOAD <{}> INTO GRAPH <{}>".format(file_url, graph)
         return self.execute_query(query, is_update=True)
 
