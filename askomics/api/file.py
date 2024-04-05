@@ -339,6 +339,13 @@ def integrate():
     task = None
     dataset_ids = []
 
+    if current_app.iniconfig.getboolean('askomics', 'disable_integration') and not session['user']['admin']:
+        return jsonify({
+            'error': True,
+            'errorMessage': "Integration was disabled by the administrator",
+            'dataset_ids': None
+        }), 400
+
     try:
 
         files_handler = FilesHandler(current_app, session, host_url=request.host_url)
