@@ -623,6 +623,7 @@ class TestApiFile(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jdoe")
         client.upload()
+        client.logout()
 
         # Generate random name and content
         alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -638,6 +639,7 @@ class TestApiFile(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jdoe")
         client.upload()
+        client.logout()
 
         ttl_dir = "{}/1_jdoe/ttl".format(client.dir_path)
 
@@ -660,6 +662,7 @@ class TestApiFile(AskomicsTestCase):
         client.create_two_users()
         client.log_user("jdoe")
         client.upload()
+        client.logout()
 
         ttl_dir = "{}/1_jdoe/ttl".format(client.dir_path)
 
@@ -674,5 +677,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.get('/api/files/ttl/1/jdoe/{}?key={}'.format(filename, "0000000001"))
 
+
+        print(response.json)
         assert response.status_code == 200
         assert response.data.decode("utf-8") == content

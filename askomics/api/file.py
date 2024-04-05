@@ -422,7 +422,7 @@ def serve_file(path, user_id, username):
     if session['user'].get('fake', False):
         return jsonify({"error": True, "errorMessage": "Invalid account"}), 401
 
-    if not session['user']['id'] == user_id and session['user']['username'] == username:
+    if not (str(session['user']['id']) == user_id and session['user']['username'] == username):
         return jsonify({"error": True, "errorMessage": "Incorrect user"}), 401
 
     # Re-encode the path because we stored the encoded file name
