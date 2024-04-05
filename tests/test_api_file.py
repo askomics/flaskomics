@@ -677,7 +677,5 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.get('/api/files/ttl/1/jdoe/{}?key={}'.format(filename, "0000000001"))
 
-
-        print(response.json)
         assert response.status_code == 200
         assert response.data.decode("utf-8") == content
