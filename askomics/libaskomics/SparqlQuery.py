@@ -1297,6 +1297,15 @@ class SparqlQuery(Params):
                             end2=end_2,
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids, depth)
+                    elif link["uri"] == "strictly_included_in":
+                        self.store_filter("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}) || ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}))".format(
+                            start1=start_1,
+                            start2=start_2,
+                            end1=end_1,
+                            end2=end_2,
+                            equalsign=""
+                        ), block_id, sblock_id, pblock_ids, depth)
+
                     else:
                         if link["sameRef"]:
                             if link['sameStrand']:

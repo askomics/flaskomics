@@ -605,7 +605,7 @@ export default class Query extends Component {
               type: isOnto == "endNode" ? "ontoLink" : "link",
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(relation.target),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(relation.target),
-              strict: true,
+              strict: false,
               id: linkId,
               label: relation.label,
               source: node.id,
@@ -716,7 +716,7 @@ export default class Query extends Component {
               id: this.getId(),
               sameStrand: this.nodeHaveStrand(node.uri) && this.nodeHaveStrand(entity.uri),
               sameRef: this.nodeHaveRef(node.uri) && this.nodeHaveRef(entity.uri),
-              strict: true,
+              strict: false,
               label: "Included in",
               source: node.id,
               target: new_id,
@@ -761,7 +761,7 @@ export default class Query extends Component {
           type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
-          strict: true,
+          strict: false,
           id: this.getId(),
           label: link.label,
           source: node1.id,
@@ -784,7 +784,7 @@ export default class Query extends Component {
           type: link.type,
           sameStrand: this.nodeHaveStrand(node1.uri) && this.nodeHaveStrand(node2.uri),
           sameRef: this.nodeHaveRef(node1.uri) && this.nodeHaveRef(node2.uri),
-          strict: true,
+          strict: false,
           id: this.getId(),
           label: link.label,
           source: node2.id,
@@ -1520,15 +1520,6 @@ export default class Query extends Component {
     this.updateGraphState()
   }
 
-  handleChangeStrict (event) {
-    this.graphState.links.map(link => {
-      if ("strict-" + link.id == event.target.id) {
-        link.strict = event.target.checked
-      }
-    })
-    this.updateGraphState()
-  }
-
   nodesHaveRefs (link) {
     let result = this.nodeHaveRef(link.source.uri) && this.nodeHaveRef(link.target.uri)
     if (! result) {
@@ -1945,7 +1936,6 @@ export default class Query extends Component {
             handleClickReverse={p => this.handleClickReverse(p)}
             handleChangeSameRef={p => this.handleChangeSameRef(p)}
             handleChangeSameStrand={p => this.handleChangeSameStrand(p)}
-            handleChangeStrict={p => this.handleChangeStrict(p)}
             nodesHaveRefs={p => this.nodesHaveRefs(p)}
             nodesHaveStrands={p => this.nodesHaveStrands(p)}
             toggleAddFaldoFilter={p => this.toggleAddFaldoFilter(p)}
