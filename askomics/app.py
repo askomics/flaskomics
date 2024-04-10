@@ -112,7 +112,6 @@ def create_app(config='config/askomics.ini', app_name='askomics', blueprints=Non
         is_gunicorn = "gunicorn" in os.environ.get("SERVER_SOFTWARE", "")
         app.config['DEBUG'] = app.iniconfig.getboolean('askomics', 'debug')
 
-
         if is_gunicorn:
             log_level = 10 if app.config['DEBUG'] else 20
             gunicorn_logger = logging.getLogger('gunicorn.error')
