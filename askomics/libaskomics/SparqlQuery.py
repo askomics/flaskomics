@@ -1223,7 +1223,7 @@ class SparqlQuery(Params):
                         depth = link["source"].get("depth", [])
 
                 # Position
-                if link["uri"] in ('included_in', 'overlap_with', 'distance_from'):
+                if link["uri"] in ('included_in', 'overlap_with', 'distance_from', 'strictly_included_in'):
 
                     # If source of target is a special node, replace the id with the id of the concerned node
                     source_id = link["source"]["id"]
@@ -1261,7 +1261,7 @@ class SparqlQuery(Params):
                     elif link["sameStrand"]:
                         block_uri = "includeInStrand"
 
-                    if link["uri"] in ('included_in', 'overlap_with'):
+                    if link["uri"] in ('included_in', 'overlap_with', 'strictly_included_in'):
                         self.store_triple({
                             "subject": source,
                             "predicate": "askomics:{}".format(block_uri),
@@ -1298,12 +1298,11 @@ class SparqlQuery(Params):
                             equalsign=equal_sign
                         ), block_id, sblock_id, pblock_ids, depth)
                     elif link["uri"] == "strictly_included_in":
-                        self.store_filter("FILTER (({start2} >{equalsign} {start1} && {start2} <{equalsign} {end1}) || ({end2} >{equalsign} {start1} && {end2} <{equalsign} {end1}) || ({start1} >{equalsign} {start2} && {end1} <{equalsign} {end2}))".format(
+                        self.store_filter("FILTER ({start1} > {start2} && {end1} < {end2}) .".format(
                             start1=start_1,
                             start2=start_2,
                             end1=end_1,
                             end2=end_2,
-                            equalsign=""
                         ), block_id, sblock_id, pblock_ids, depth)
 
                     else:
