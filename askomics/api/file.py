@@ -5,6 +5,7 @@ import traceback
 import urllib
 
 from askomics.api.auth import login_required, api_auth
+from askomics.libaskomics.LocalAuth import LocalAuth
 from askomics.libaskomics.FilesHandler import FilesHandler
 from askomics.libaskomics.FilesUtils import FilesUtils
 from askomics.libaskomics.Dataset import Dataset
@@ -338,6 +339,13 @@ def integrate():
     task = None
     dataset_ids = []
 
+    if current_app.iniconfig.getboolean('askomics', 'disable_integration') and not session['user']['admin']:
+        return jsonify({
+            'error': True,
+            'errorMessage': "Integration was disabled by the administrator",
+            'dataset_ids': None
+        }), 400
+
     try:
 
         files_handler = FilesHandler(current_app, session, host_url=request.host_url)
@@ -404,6 +412,26 @@ def serve_file(path, user_id, username):
     file
         the file
     """
+
+    # Case1: API auth
+    if 'user' not in session:
+        api_key = request.args.get("key")
+        if not api_key:
+            return jsonify({"error": True, "errorMessage": "Login required"}), 401
+        local_auth = LocalAuth(current_app, session)
+        authentication = local_auth.authenticate_user_with_apikey(api_key)
+        if authentication["error"]:
+            return jsonify({"error": True, "errorMessage": "Invalid account"}), 401
+        session["user"] = authentication["user"]
+
+    if session['user']['blocked']:
+        return jsonify({"error": True, "errorMessage": "Blocked account"}), 401
+    if session['user'].get('fake', False):
+        return jsonify({"error": True, "errorMessage": "Invalid account"}), 401
+
+    if not (str(session['user']['id']) == user_id and session['user']['username'] == username):
+        return jsonify({"error": True, "errorMessage": "Incorrect user"}), 401
+
     # Re-encode the path because we stored the encoded file name
     path = urllib.parse.quote(path)
 

@@ -294,7 +294,7 @@ export default class AttributeBox extends Component {
           <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
             {this.props.attribute.filterValues.map(value => {
               let selected = this.props.attribute.filterSelectedValues.includes(value.uri)
-              return (<option key={value.uri} attrId={this.props.attribute.uri} value={value.uri} selected={selected}>{value.label}</option>)
+              return (<option key={value.uri} value={value.uri} selected={selected}>{value.label}</option>)
             })}
           </CustomInput>
         </FormGroup>
@@ -339,8 +339,8 @@ export default class AttributeBox extends Component {
       form = (
         <FormGroup>
           <CustomInput disabled={this.props.attribute.optional} style={{ height: '60px' }} className="attr-select" type="select" id={this.props.attribute.id} onChange={this.handleFilterCategory} multiple>
-            <option key="true" attrId={this.props.attribute.uri} value="true" selected={this.props.attribute.filterSelectedValues.includes("true")}>True</option>
-            <option key="false" attrId={this.props.attribute.uri} value="false" selected={this.props.attribute.filterSelectedValues.includes("false")}>False</option>
+            <option key="true" value="true" selected={this.props.attribute.filterSelectedValues.includes("true")}>True</option>
+            <option key="false" value="false" selected={this.props.attribute.filterSelectedValues.includes("false")}>False</option>
           </CustomInput>
         </FormGroup>
       )

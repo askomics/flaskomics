@@ -618,11 +618,28 @@ class TestApiFile(AskomicsTestCase):
         assert response.json["errorMessage"] == ''
         assert response.json["dataset_ids"]
 
-    def test_serve_file(self, client):
+    def test_serve_file_anonymous(self, client):
         """Test /api/files/ttl/<userid>/<username>/<filepath> route"""
         client.create_two_users()
         client.log_user("jdoe")
         client.upload()
+        client.logout()
+
+        # Generate random name and content
+        alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        filename = ''.join(random.choice(alpabet) for i in range(10))
+
+        response = client.client.get('/api/files/ttl/1/jdoe/{}'.format(filename))
+
+        assert response.status_code == 401
+        assert response.json['errorMessage'] == "Login required"
+
+    def test_serve_file_wrong_user(self, client):
+        """Test /api/files/ttl/<userid>/<username>/<filepath> route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload()
+        client.logout()
 
         ttl_dir = "{}/1_jdoe/ttl".format(client.dir_path)
 
@@ -635,7 +652,30 @@ class TestApiFile(AskomicsTestCase):
         with open("{}/{}".format(ttl_dir, filename), "w+") as f:
             f.write(content)
 
-        response = client.client.get('/api/files/ttl/1/jdoe/{}'.format(filename))
+        response = client.client.get('/api/files/ttl/1/jdoe/{}?key={}'.format(filename, "0000000002"))
+
+        assert response.status_code == 401
+        assert response.json['errorMessage'] == "Incorrect user"
+
+    def test_serve_file(self, client):
+        """Test /api/files/ttl/<userid>/<username>/<filepath> route"""
+        client.create_two_users()
+        client.log_user("jdoe")
+        client.upload()
+        client.logout()
+
+        ttl_dir = "{}/1_jdoe/ttl".format(client.dir_path)
+
+        # Generate random name and content
+        alpabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        content = "{}\n".format(''.join(random.choice(alpabet) for i in range(100)))
+        filename = ''.join(random.choice(alpabet) for i in range(10))
+
+        # Write file
+        with open("{}/{}".format(ttl_dir, filename), "w+") as f:
+            f.write(content)
+
+        response = client.client.get('/api/files/ttl/1/jdoe/{}?key={}'.format(filename, "0000000001"))
 
         assert response.status_code == 200
         assert response.data.decode("utf-8") == content

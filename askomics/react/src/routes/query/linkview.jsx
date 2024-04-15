@@ -15,7 +15,6 @@ export default class LinkView extends Component {
     this.handleClickReverse = this.props.handleClickReverse.bind(this)
     this.handleChangeSameRef = this.props.handleChangeSameRef.bind(this)
     this.handleChangeSameStrand = this.props.handleChangeSameStrand.bind(this)
-    this.handleChangeStrict = this.props.handleChangeStrict.bind(this)
     this.nodesHaveRefs = this.props.nodesHaveRefs.bind(this)
     this.nodesHaveStrands = this.props.nodesHaveStrands.bind(this)
     this.toggleAddFaldoFilter = this.props.toggleAddFaldoFilter.bind(this)
@@ -61,7 +60,7 @@ export default class LinkView extends Component {
 
     const numberOfFilters = this.props.link.faldoFilters.length - 1
 
-    let modifier = <CustomInput onChange={this.handleChangeStrict} checked={this.props.link.strict ? true : false} value={this.props.link.strict ? true : false} type="checkbox" id={"strict-" + this.props.link.id} label="Strict" />
+    let modifier
     if (this.props.link.uri == 'distance_from'){
       modifier = (
         <table style={{ width: '100%' }}>
@@ -120,6 +119,7 @@ export default class LinkView extends Component {
             <td>
              <CustomInput type="select" id={this.props.link.id} name="position" onChange={this.handleChangePosition}>
                 <option selected={this.props.link.uri == 'included_in' ? true : false} value="included_in">included in</option>
+                <option selected={this.props.link.uri == 'strictly_included_in' ? true : false} value="strictly_included_in">stricly included in</option>
                 <option selected={this.props.link.uri == 'overlap_with' ? true : false} value="overlap_with">overlap with</option>
                 <option selected={this.props.link.uri == 'distance_from' ? true : false} value="distance_from">distant from</option>
               </CustomInput>
@@ -151,7 +151,6 @@ LinkView.propTypes = {
   handleClickReverse: PropTypes.func,
   handleChangeSameRef: PropTypes.func,
   handleChangeSameStrand: PropTypes.func,
-  handleChangeStrict: PropTypes.func,
   nodesHaveRefs: PropTypes.func,
   nodesHaveStrands: PropTypes.func,
   toggleAddFaldoFilter: PropTypes.func,
