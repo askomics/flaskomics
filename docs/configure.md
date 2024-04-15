@@ -23,7 +23,6 @@ All AskOmics configuration is set in `config/askomics.ini` files. When AskOmics 
 
 - `flask`
 
-    - `debug` (`true` or `false`): Set to true if you run AskOmics in development mode, or for debug purpose
     - `secret_key` (string): AskOmics secret key for session.
     - `session_timeout` (int): timeout for the session cookie (in minutes)
 
