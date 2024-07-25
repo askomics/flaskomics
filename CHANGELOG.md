@@ -20,6 +20,11 @@ This changelog was started for release 4.2.0.
 
 - Now pre-process files to store integration parameters (column, entities, etc...) in DB, to avoid re-processing every time.
 - Rewrote the ontology part. Instead of specifying 'children of' and other values, users can tick the 'recursive' button to customize the query. While this is less intuitive, this change is more flexible for the various types of ontological relations
+- Impreved numberic attribute management (now recognize decimal/integer/numeric/float as attribute when integrating rdf)
+- Now display all endpoints by default
+- Better error management when missing federation configuration in the config file
+- Fixed 'phantom' relations created by indirect relations
+
 
 ## [4.5.0] - 2023-10-20
 

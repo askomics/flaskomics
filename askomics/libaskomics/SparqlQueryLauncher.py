@@ -1,3 +1,4 @@
+import configparser
 import time
 import traceback
 import sys
@@ -49,9 +50,12 @@ class SparqlQueryLauncher(Params):
         if federated:
             self.federated = True
             self.local_query = False
-            self.url_endpoint = self.settings.get('federation', 'endpoint')
-            self.url_updatepoint = self.settings.get('federation', 'endpoint')
-            self.triplestore = self.settings.get('federation', 'query_engine')
+            try:
+                self.url_endpoint = self.settings.get('federation', 'endpoint')
+                self.url_updatepoint = self.settings.get('federation', 'endpoint')
+                self.triplestore = self.settings.get('federation', 'query_engine')
+            except configparser.Error:
+                raise Exception("Federation engine is not properly setup in the AskOmics config file. Check that federation endpoint and federation query_engine are both set.")
         # use the external endpoint
         elif endpoints is not None and endpoints != [self.local_endpoint_f]:
             self.federated = False
