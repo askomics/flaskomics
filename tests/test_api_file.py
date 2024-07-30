@@ -435,6 +435,7 @@ class TestApiFile(AskomicsTestCase):
             'errorMessage': '',
             'previewFiles': [{
                 'data': {
+                    'attributes': [],
                     'entities': [
                         'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS',
                         'three_prime_UTR'

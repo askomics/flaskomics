@@ -165,15 +165,17 @@ export default class GffPreview extends Component {
                 })}
               </FormGroup>
             </div>
-            <hr>
-            <FormGroup check>
-              {this.state.availableAttributes &&
-                <h3>Select attributes to integrate</h3>
-              }
-              {this.state.availableAttributes.map((attribute, index) => {
-                return (<p key={attribute + "_" + index}><Input value={attribute} onClick={this.handleAttributeSelection} type="checkbox" /> {attribute}</p>)
-              })}
-            </FormGroup>
+            <hr />
+            <div>
+              <FormGroup check>
+                {this.state.availableAttributes &&
+                  <h3>Select attributes to integrate</h3>
+                }
+                {this.state.availableAttributes.map((attribute, index) => {
+                  return (<p key={attribute + "_" + index}><Input value={attribute} onClick={this.handleAttributeSelection} type="checkbox" /> {attribute}</p>)
+                })}
+              </FormGroup>
+            </div>
           <br />
         <AdvancedOptions
           config={this.props.config}

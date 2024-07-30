@@ -71,7 +71,7 @@ class GffFile(File):
                     if line.startswith("#"):
                         continue
                     content = line.strip().split("\t")
-                    if not content.length == 9:
+                    if not len(content) == 9:
                         raise Exception("Error parsing GFF file: number of columns is not 9")
                     entities.add(content[2])
                     for attr in content[8].split(";"):
