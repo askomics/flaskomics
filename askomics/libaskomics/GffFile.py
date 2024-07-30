@@ -3,7 +3,6 @@ import sys
 import traceback
 
 from rdflib import BNode
-from BCBio.GFF import GFFExaminer
 from BCBio import GFF
 
 from askomics.libaskomics.File import File
@@ -35,7 +34,10 @@ class GffFile(File):
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.entities = []
+        self.preview_attributes = []
+
         self.entities_to_integrate = []
+        self.attributes_to_integrate = set()
 
         self.category_values = {}
 
@@ -57,16 +59,27 @@ class GffFile(File):
 
         if self.preview:
             self.entities = self.preview['entities']
+            self.preview_attributes = self.preview.get("attributes", [])
             return
 
         try:
-            exam = GFFExaminer()
-            handle = open(self.path, encoding="utf-8", errors="ignore")
-            gff_type = exam.available_limits(handle)['gff_type']
-            for entity in gff_type:
-                self.entities.append(entity[0])
+            entities = set()
+            attributes = set()
 
-            handle.close()
+            with open(self.path, encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if line.startswith("#"):
+                        continue
+                    content = line.strip().split("\t")
+                    if not content.length == 9:
+                        raise Exception("Error parsing GFF file: number of columns is not 9")
+                    entities.add(content[2])
+                    for attr in content[8].split(";"):
+                        attributes.add(attr.split("=")[0])
+
+            self.entities = list(entities)
+            self.preview_attributes = list(attributes)
+
         except Exception as e:
             self.error = True
             self.error_message = "Malformated GFF ({})".format(str(e))
@@ -81,7 +94,7 @@ class GffFile(File):
         if self.error:
             error = self.error_message
         else:
-            data = {'entities': self.entities}
+            data = {'entities': self.entities, "attributes": self.preview_attributes}
         self.save_preview_in_db(data, error)
 
     def get_preview(self):
@@ -99,11 +112,12 @@ class GffFile(File):
             'error': self.error,
             'error_message': self.error_message,
             'data': {
-                'entities': self.entities
+                'entities': self.entities,
+                'attributes': self.preview_attributes
             }
         }
 
-    def integrate(self, dataset_id, entities=[], public=True):
+    def integrate(self, dataset_id, entities=[], attributes=[], public=True):
         """Integrate GFF file
 
         Parameters
@@ -119,6 +133,9 @@ class GffFile(File):
         else:
             self.set_preview()
             self.entities_to_integrate = self.entities
+
+        if attributes:
+            self.attributes_to_integrate = set(attributes)
 
         File.integrate(self, dataset_id=dataset_id)
 
@@ -348,6 +365,9 @@ class GffFile(File):
 
                 # Qualifiers (9th columns)
                 for qualifier_key, qualifier_value in feature.qualifiers.items():
+
+                    if self.attributes_to_integrate and qualifier_key not in self.attributes_to_integrate:
+                        continue
 
                     for value in qualifier_value:
                         skip = False

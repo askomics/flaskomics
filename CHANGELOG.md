@@ -24,6 +24,7 @@ This changelog was started for release 4.2.0.
 - Now display all endpoints by default
 - Better error management when missing federation configuration in the config file
 - Fixed 'phantom' relations created by indirect relations
+- Added a way to select GFF attributes (9th column) during integration
 
 
 ## [4.5.0] - 2023-10-20

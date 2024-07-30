@@ -12,7 +12,9 @@ export default class GffPreview extends Component {
     this.state = {
       name: props.file.name,
       availableEntities: props.file.data.entities,
+      availableAttributes: props.file.data.attributes,
       entitiesToIntegrate: new Set(),
+      attributesToIntegrate: new Set(),
       id: props.file.id,
       integrated: false,
       publicTick: false,
@@ -24,6 +26,7 @@ export default class GffPreview extends Component {
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
     this.handleSelection = this.handleSelection.bind(this)
+    this.handleAttributeSelection = this.handleAttributeSelection.bind(this)
   }
 
   integrate (event) {
@@ -32,6 +35,7 @@ export default class GffPreview extends Component {
     let data = {
       fileId: this.state.id,
       entities: [...this.state.entitiesToIntegrate],
+      attributes: [...this.state.attributesToIntegrate],
       public: event.target.value == 'public',
       type: 'gff/gff3',
       customUri: this.state.customUri,
@@ -69,6 +73,26 @@ export default class GffPreview extends Component {
       this.state.entitiesToIntegrate.delete(value)
       this.setState({
         entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]),
+        publicTick: false,
+        privateTick: false
+      })
+    }
+  }
+
+  handleAttributeSelection (event) {
+
+    let value = event.target.value
+
+    if (!this.state.attributesToIntegrate.has(value)) {
+      this.setState({
+        attributesToIntegrate: new Set([...this.state.attributesToIntegrate]).add(value),
+        publicTick: false,
+        privateTick: false
+      })
+    }else {
+      this.state.attributesToIntegrate.delete(value)
+      this.setState({
+        attributesToIntegrate: new Set([...this.state.attributesToIntegrate]),
         publicTick: false,
         privateTick: false
       })
@@ -134,12 +158,22 @@ export default class GffPreview extends Component {
         <div>
           <br />
             <div>
+              <h3>Select entities to integrate</h3>
               <FormGroup check>
                 {this.state.availableEntities.map((entity, index) => {
                   return (<p key={entity + "_" + index}><Input value={entity} onClick={this.handleSelection} type="checkbox" /> {entity}</p>)
                 })}
               </FormGroup>
             </div>
+            <hr>
+            <FormGroup check>
+              {this.state.availableAttributes &&
+                <h3>Select attributes to integrate</h3>
+              }
+              {this.state.availableAttributes.map((attribute, index) => {
+                return (<p key={attribute + "_" + index}><Input value={attribute} onClick={this.handleAttributeSelection} type="checkbox" /> {attribute}</p>)
+              })}
+            </FormGroup>
           <br />
         <AdvancedOptions
           config={this.props.config}
