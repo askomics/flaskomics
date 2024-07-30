@@ -34,10 +34,10 @@ class GffFile(File):
         File.__init__(self, app, session, file_info, host_url, external_endpoint=external_endpoint, custom_uri=custom_uri, external_graph=external_graph)
 
         self.entities = []
-        self.preview_attributes = []
+        self.preview_attributes = {}
 
         self.entities_to_integrate = []
-        self.attributes_to_integrate = set()
+        self.attributes_to_integrate = {}
 
         self.category_values = {}
 
@@ -59,12 +59,12 @@ class GffFile(File):
 
         if self.preview:
             self.entities = self.preview['entities']
-            self.preview_attributes = self.preview.get("attributes", [])
+            self.preview_attributes = self.preview.get("attributes", {})
             return
 
         try:
             entities = set()
-            attributes = set()
+            attributes = {}
 
             with open(self.path, encoding="utf-8", errors="ignore") as f:
                 for line in f:
@@ -73,12 +73,20 @@ class GffFile(File):
                     content = line.strip().split("\t")
                     if not len(content) == 9:
                         raise Exception("Error parsing GFF file: number of columns is not 9")
-                    entities.add(content[2])
+                    entity = content[2].strip()
+                    entities.add(entity)
+                    if entity not in attributes:
+                        attributes[entity] = set()
+
                     for attr in content[8].split(";"):
-                        attributes.add(attr.split("=")[0])
+                        key = attr.split("=")[0]
+                        # We need to integrate it in all cases (relations, not attributes)
+                        if key in ["Parent", "Derives_from"]:
+                            continue
+                        attributes[entity](attr.split("=")[0])
 
             self.entities = list(entities)
-            self.preview_attributes = list(attributes)
+            self.preview_attributes = attributes
 
         except Exception as e:
             self.error = True
@@ -366,7 +374,7 @@ class GffFile(File):
                 # Qualifiers (9th columns)
                 for qualifier_key, qualifier_value in feature.qualifiers.items():
 
-                    if self.attributes_to_integrate and qualifier_key not in self.attributes_to_integrate:
+                    if self.attributes_to_integrate and (qualifier_key not in ("Parent", "Derives_from") and qualifier_key not in self.attributes_to_integrate.get(feature.type, [])):
                         continue
 
                     for value in qualifier_value:

@@ -430,7 +430,7 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.post('/api/files/preview', json=gff_data)
         assert response.status_code == 200
-        assert response.json == {
+        assert self.equal_objects(response.json, {
             'error': False,
             'errorMessage': '',
             'previewFiles': [{
@@ -461,7 +461,7 @@ class TestApiFile(AskomicsTestCase):
                 'error': False,
                 'error_message': ''
             }]
-        }
+        })
 
     def test_delete_files(self, client):
         """Test /api/files/delete route"""
