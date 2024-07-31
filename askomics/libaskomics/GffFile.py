@@ -83,9 +83,11 @@ class GffFile(File):
                         # We need to integrate it in all cases (relations, not attributes)
                         if key in ["Parent", "Derives_from"]:
                             continue
-                        attributes[entity](attr.split("=")[0])
+                        attributes[entity].add(key)
 
             self.entities = list(entities)
+            for key, value in attributes.items():
+                attributes[key] = list(value)
             self.preview_attributes = attributes
 
         except Exception as e:
