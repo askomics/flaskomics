@@ -435,24 +435,16 @@ class TestApiFile(AskomicsTestCase):
             'errorMessage': '',
             'previewFiles': [{
                 'data': {
-                    'attributes': [
-                        'ID',
-                        'Parent',
-                        'constitutive',
-                        'ensembl_phase',
-                        'logic_name',
-                        'exon_id',
-                        'rank',
-                        'ensembl_end_phase',
-                        'Name',
-                        'protein_id',
-                        'biotype',
-                        'description',
-                        'transcript_id'
-                    ],
+                    'attributes': {
+                        'CDS': ['protein_id', 'ID'],
+                        'exon': ['exon_id', 'ensembl_phase', 'ensembl_end_phase', 'Name', 'rank', 'constitutive'],
+                        'five_prime_UTR': [],
+                        'gene': ['ID', 'description', 'biotype', 'Name', 'logic_name', 'gene_id'],
+                        'three_prime_UTR': [],
+                        'transcript': ['Name', 'transcript_id', 'biotype', 'ID']
+                    },
                     'entities': [
-                        'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS',
-                        'three_prime_UTR'
+                        'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS', 'three_prime_UTR'
                     ]
                 },
                 'id': 4,

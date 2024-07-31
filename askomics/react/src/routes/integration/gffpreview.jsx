@@ -14,7 +14,7 @@ export default class GffPreview extends Component {
       availableEntities: props.file.data.entities,
       availableAttributes: props.file.data.attributes,
       entitiesToIntegrate: new Set(),
-      attributesToIntegrate: new Set(),
+      attributesToIntegrate: Object.entries(props.file.data.attributes).map(([key, value]) => [key, new Set(value)]),
       id: props.file.id,
       integrated: false,
       publicTick: false,
@@ -79,20 +79,22 @@ export default class GffPreview extends Component {
     }
   }
 
-  handleAttributeSelection (event) {
+  handleAttributeSelection (event, entity) {
 
     let value = event.target.value
+    let newAttr = {...this.state.attributesToIntegrate}
 
-    if (!this.state.attributesToIntegrate.has(value)) {
+    if (!this.state.attributesToIntegrate[entity].has(value)) {
+      newAttr[entity].add(value)
       this.setState({
-        attributesToIntegrate: new Set([...this.state.attributesToIntegrate]).add(value),
+        attributesToIntegrate: newAttr,
         publicTick: false,
         privateTick: false
       })
     }else {
-      this.state.attributesToIntegrate.delete(value)
+      newAttr[entity].delete(value)
       this.setState({
-        attributesToIntegrate: new Set([...this.state.attributesToIntegrate]),
+        attributesToIntegrate: newAttr,
         publicTick: false,
         privateTick: false
       })
@@ -167,12 +169,18 @@ export default class GffPreview extends Component {
             </div>
             <hr />
             <div>
+              <h3>Select attributes to integrate for the selected entities</h3>
               <FormGroup check>
-                {this.state.availableAttributes &&
-                  <h3>Select attributes to integrate</h3>
-                }
-                {this.state.availableAttributes.map((attribute, index) => {
-                  return (<p key={attribute + "_" + index}><Input value={attribute} onClick={this.handleAttributeSelection} type="checkbox" /> {attribute}</p>)
+                {this.state.entitiesToIntegrate.map((entity) => {
+                  let attr_div = this.state.availableAttributes[entity].map((attribute, indexA) => {
+                    return (<p key={entity + attribute + "_" + index}><Input checked={this.state.attributesToIntegrate[entity].has(attribute)} value={attribute} onClick={(event) => this.handleAttributeSelection(event, entity)} type="checkbox" /> {attribute}</p>)
+                  })
+                  return (
+                    <>
+                    <h4>{entity}</h4>
+                    {attr_div}
+                    </>
+                  )
                 })}
               </FormGroup>
             </div>
