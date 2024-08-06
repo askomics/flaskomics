@@ -171,7 +171,7 @@ export default class GffPreview extends Component {
             <div>
               <h3>Select attributes to integrate for the selected entities</h3>
               <FormGroup check>
-                {this.state.entitiesToIntegrate.map((entity) => {
+                {[...this.state.entitiesToIntegrate].map((entity) => {
                   let attr_div = this.state.availableAttributes[entity].map((attribute, indexA) => {
                     return (<p key={entity + attribute + "_" + index}><Input checked={this.state.attributesToIntegrate[entity].has(attribute)} value={attribute} onClick={(event) => this.handleAttributeSelection(event, entity)} type="checkbox" /> {attribute}</p>)
                   })
