@@ -173,7 +173,8 @@ export default class GffPreview extends Component {
             <hr />
             { (Object.keys(this.state.availableAttributes).length !== 0 && this.state.entitiesToIntegrate.size !== 0) &&
             <div>
-              <h3>Select attributes to integrate for the selected entities</h3>
+              <h4>Attributes to integrate for the selected entities</h4>
+              <br/>
               <FormGroup check>
                 {[...this.state.entitiesToIntegrate].map((entity) => {
                   let attr_div = this.state.availableAttributes[entity].map((attribute, indexA) => {
@@ -181,7 +182,10 @@ export default class GffPreview extends Component {
                   })
                   return (
                     <>
-                    <h4>{entity}</h4>
+                    <p><b>{entity}</b></p>
+                    {this.state.availableAttributes[entity].length === 0 && 
+                    <p>No attributes available for this entity</p>
+                    }
                     {attr_div}
                     </>
                   )
