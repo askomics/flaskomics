@@ -63,7 +63,7 @@ class GffFile(File):
             return
 
         try:
-            entities = set()
+            entities = []
             attributes = {}
 
             with open(self.path, encoding="utf-8", errors="ignore") as f:
@@ -74,7 +74,7 @@ class GffFile(File):
                     if not len(content) == 9:
                         raise Exception("Error parsing GFF file: number of columns is not 9")
                     entity = content[2].strip()
-                    entities.add(entity)
+                    entities.append(entity)
                     if entity not in attributes:
                         attributes[entity] = set()
 
@@ -85,7 +85,7 @@ class GffFile(File):
                             continue
                         attributes[entity].add(key)
 
-            self.entities = list(entities)
+            self.entities = list(dict.fromkeys(entities))
             for key, value in attributes.items():
                 attributes[key] = list(value)
             self.preview_attributes = attributes
