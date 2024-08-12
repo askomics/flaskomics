@@ -205,7 +205,15 @@ export default class Query extends Component {
 
   getAttributeType (typeUri) {
     // FIXME: don't hardcode uri
-    if (typeUri == 'http://www.w3.org/2001/XMLSchema#decimal') {
+
+    const numURI = [
+      "http://www.w3.org/2001/XMLSchema#decimal",
+      "http://www.w3.org/2001/XMLSchema#integer",
+      "http://www.w3.org/2001/XMLSchema#numeric",
+      "http://www.w3.org/2001/XMLSchema#float",
+    ]
+
+    if (numURI.includes(typeUri)) {
       return 'decimal'
     }
     if (typeUri == this.state.config.namespaceInternal + 'AskomicsCategory') {
@@ -220,6 +228,8 @@ export default class Query extends Component {
     if (typeUri == "http://www.w3.org/2001/XMLSchema#date") {
       return "date"
     }
+    // Default to text (Fallback for ttl integration with non-managed entity types)
+    return "text"
   }
 
   attributeExistInAbstraction (attrUri, entityUri) {

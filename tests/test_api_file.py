@@ -430,14 +430,21 @@ class TestApiFile(AskomicsTestCase):
 
         response = client.client.post('/api/files/preview', json=gff_data)
         assert response.status_code == 200
-        assert response.json == {
+        assert self.equal_objects(response.json, {
             'error': False,
             'errorMessage': '',
             'previewFiles': [{
                 'data': {
+                    'attributes': {
+                        'CDS': ['protein_id', 'ID'],
+                        'exon': ['exon_id', 'ensembl_phase', 'ensembl_end_phase', 'Name', 'rank', 'constitutive'],
+                        'five_prime_UTR': [],
+                        'gene': ['ID', 'description', 'biotype', 'Name', 'logic_name', 'gene_id'],
+                        'three_prime_UTR': [],
+                        'transcript': ['Name', 'transcript_id', 'biotype', 'ID']
+                    },
                     'entities': [
-                        'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS',
-                        'three_prime_UTR'
+                        'gene', 'transcript', 'five_prime_UTR', 'exon', 'CDS', 'three_prime_UTR'
                     ]
                 },
                 'id': 4,
@@ -446,7 +453,7 @@ class TestApiFile(AskomicsTestCase):
                 'error': False,
                 'error_message': ''
             }]
-        }
+        })
 
     def test_delete_files(self, client):
         """Test /api/files/delete route"""

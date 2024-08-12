@@ -12,7 +12,9 @@ export default class GffPreview extends Component {
     this.state = {
       name: props.file.name,
       availableEntities: props.file.data.entities,
+      availableAttributes: props.file.data.attributes,
       entitiesToIntegrate: new Set(),
+      attributesToIntegrate: props.file.data.attributes,
       id: props.file.id,
       integrated: false,
       publicTick: false,
@@ -24,14 +26,18 @@ export default class GffPreview extends Component {
     this.cancelRequest
     this.integrate = this.integrate.bind(this)
     this.handleSelection = this.handleSelection.bind(this)
+    this.handleAttributeSelection = this.handleAttributeSelection.bind(this)
+
   }
 
   integrate (event) {
     let requestUrl = '/api/files/integrate'
     let tick = event.target.value == 'public' ? 'publicTick' : 'privateTick'
+
     let data = {
       fileId: this.state.id,
       entities: [...this.state.entitiesToIntegrate],
+      attributes: {...this.state.attributesToIntegrate},
       public: event.target.value == 'public',
       type: 'gff/gff3',
       customUri: this.state.customUri,
@@ -69,6 +75,29 @@ export default class GffPreview extends Component {
       this.state.entitiesToIntegrate.delete(value)
       this.setState({
         entitiesToIntegrate: new Set([...this.state.entitiesToIntegrate]),
+        publicTick: false,
+        privateTick: false
+      })
+    }
+  }
+
+  handleAttributeSelection (event, entity) {
+
+    let value = event.target.value
+    let newAttr = {...this.state.attributesToIntegrate}
+
+
+    if (!this.state.attributesToIntegrate[entity].includes(value)) {
+      newAttr[entity].push(value)
+      this.setState({
+        attributesToIntegrate: newAttr,
+        publicTick: false,
+        privateTick: false
+      })
+    }else {
+      newAttr[entity] = newAttr[entity].filter(item => item !== value)
+      this.setState({
+        attributesToIntegrate: newAttr,
         publicTick: false,
         privateTick: false
       })
@@ -134,12 +163,36 @@ export default class GffPreview extends Component {
         <div>
           <br />
             <div>
+              <h3>Select entities to integrate</h3>
               <FormGroup check>
                 {this.state.availableEntities.map((entity, index) => {
                   return (<p key={entity + "_" + index}><Input value={entity} onClick={this.handleSelection} type="checkbox" /> {entity}</p>)
                 })}
               </FormGroup>
             </div>
+            <hr />
+            { (Object.keys(this.state.availableAttributes).length !== 0 && this.state.entitiesToIntegrate.size !== 0) &&
+            <div>
+              <h4>Attributes to integrate for the selected entities</h4>
+              <br/>
+              <FormGroup check>
+                {[...this.state.entitiesToIntegrate].map((entity) => {
+                  let attr_div = this.state.availableAttributes[entity].map((attribute, indexA) => {
+                    return (<p key={entity + attribute + "_" + indexA}><Input checked={this.state.attributesToIntegrate[entity].includes(attribute)} value={attribute} onChange={(event) => this.handleAttributeSelection(event, entity)} type="checkbox" /> {attribute}</p>)
+                  })
+                  return (
+                    <>
+                    <p><b>{entity}</b></p>
+                    {this.state.availableAttributes[entity].length === 0 && 
+                    <p>No attributes available for this entity</p>
+                    }
+                    {attr_div}
+                    </>
+                  )
+                })}
+              </FormGroup>
+            </div>
+            }
           <br />
         <AdvancedOptions
           config={this.props.config}

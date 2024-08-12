@@ -444,8 +444,17 @@ class CsvFile(File):
                 self.graph_abstraction_dk.add((blank, rdflib.DCAT.endpointURL, endpoint))
                 self.graph_abstraction_dk.add((blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
                 if symetric_relation:
-                    self.graph_abstraction_dk.add((blank, rdflib.RDFS.domain, rdf_range))
-                    self.graph_abstraction_dk.add((blank, rdflib.RDFS.range, entity))
+                    # Add reverted relation
+                    sym_blank = BNode()
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.RDF.type, rdflib.OWL.ObjectProperty))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.RDF.type, self.namespace_internal["AskomicsRelation"]))
+                    self.graph_abstraction_dk.add((sym_blank, self.namespace_internal["uri"], attribute))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.RDFS.label, label))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.DCAT.endpointURL, endpoint))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.DCAT.dataset, rdflib.Literal(self.name)))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.RDFS.domain, rdf_range))
+                    self.graph_abstraction_dk.add((sym_blank, rdflib.RDFS.range, entity))
+
                 if indirect_relation:
                     self.graph_abstraction_dk.add((blank, self.namespace_internal["isIndirectRelation"], rdflib.Literal("true", datatype=rdflib.XSD.boolean)))
 

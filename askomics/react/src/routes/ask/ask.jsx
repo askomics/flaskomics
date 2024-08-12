@@ -66,16 +66,9 @@ export default class Ask extends Component {
             })
           })
           endpoints = [...new Set(endpoints)]
-
-          if (endpoints.includes("local")) {
-            this.setState({
-              selectedEndpoint: ["local"]
-            })
-          } else {
-            this.setState({
-              selectedEndpoint: endpoints
-            })
-          }
+          this.setState({
+            selectedEndpoint: endpoints
+          })
 
           this.setState({
             waiting: false,
