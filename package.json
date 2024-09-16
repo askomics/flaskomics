@@ -44,7 +44,7 @@
     "bootstrap": "^4.5.2",
     "css-loader": "^6.8.1",
     "dedent": "^0.7.0",
-    "dompurify": "^2.0.17",
+    "dompurify": "^2.5.4",
     "file-loader": "^6.1.0",
     "history": "^5.0.0",
     "immutability-helper": "^3.1.1",
