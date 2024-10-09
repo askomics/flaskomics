@@ -39,7 +39,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.14.0",
     "@fortawesome/free-regular-svg-icons": "^5.14.0",
     "@sentry/browser": "^7.119.1",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "babel-preset-env": "^1.7.0",
     "bootstrap": "^4.5.2",
     "css-loader": "^6.8.1",
