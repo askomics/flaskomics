@@ -60,7 +60,7 @@ class RdfFile(File):
             Location
         """
 
-        if self.settings.get('askomics', 'skip_rdf_preview', fallback=False):
+        if self.settings.getboolean('askomics', 'skip_rdf_preview', fallback=False):
             return "", ""
 
         graph = RdfGraph(self.app, self.session)

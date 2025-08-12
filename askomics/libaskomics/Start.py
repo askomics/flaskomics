@@ -55,7 +55,7 @@ class Start(Params):
     def create_anonymous(self):
         """Create anonymous data folder if required
         """
-        if self.settings.get('askomics', 'anonymous_query', fallback=False):
+        if self.settings.getboolean('askomics', 'anonymous_query', fallback=False):
             data_path = "{}/{}_{}/results".format(
                 self.data_directory,
                 "0",
