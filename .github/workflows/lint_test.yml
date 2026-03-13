@@ -30,14 +30,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+      uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
       with:
-        python-version: 3.11
+        python-version: '3.11'
     - name: Update apt cache
       run: sudo apt-get update
     - name: Install python-ldap deps
-      run: sudo apt-get install libldap2-dev libsasl2-dev python3-setuptools
+      run: sudo apt-get install libldap2-dev libsasl2-dev
     - name: Install python dev deps
       run: pip install ephemeris coveralls
     - name: Install deps
