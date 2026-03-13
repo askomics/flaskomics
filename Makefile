@@ -176,7 +176,7 @@ install-python: check-python
 	. $(ACTIVATE) || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 	@echo -n 'Upgrading pip...                                             '
-	$(PIP) install --upgrade pip setuptools wheel > /dev/null || { echo "ERROR"; exit 1; }
+	$(PIP) install --upgrade pip setuptools wheel || { echo "ERROR"; exit 1; }
 	@echo 'Done'
 	@echo 'Installing Python dependencies inside virtual environment... '
 	$(PIP) install -e . > /dev/null || { echo "ERROR"; exit 1; }
