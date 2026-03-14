@@ -51,7 +51,7 @@
     "js-file-download": "^0.4.12",
     "pretty-time": "^1.1.0",
     "prismjs": "^1.27.0",
-    "qs": "^6.10.3",
+    "qs": "^6.14.2",
     "rc-switch": "^4.1.0",
     "react": "^16.13.1",
     "react-ace": "^9.1.3",
