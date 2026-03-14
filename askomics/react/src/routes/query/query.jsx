@@ -1356,18 +1356,16 @@ export default class Query extends Component {
   }
 
   handleLinkedNumericModifierSign (event) {
-    if (!isNaN(event.target.value)) {
-      this.graphState.attr.map(attr => {
-        if (attr.id == event.target.id) {
-          attr.linkedFilters.map((filter, index) => {
-            if (index == event.target.dataset.index) {
-              filter.filterModifier = event.target.value
-            }
-          })
-        }
-      })
-      this.updateGraphState()
-    }
+    this.graphState.attr.map(attr => {
+      if (attr.id == event.target.id) {
+        attr.linkedFilters.map((filter, index) => {
+          if (index == event.target.dataset.index) {
+            filter.filterModifier = event.target.value
+          }
+        })
+      }
+    })
+    this.updateGraphState()
   }
 
   handleLinkedNumericValue (event) {
