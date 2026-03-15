@@ -41,7 +41,7 @@
     "@sentry/browser": "^7.119.1",
     "axios": "^1.6.0",
     "babel-preset-env": "^1.7.0",
-    "bootstrap": "^4.5.2",
+    "bootstrap": "^5.0.0",
     "css-loader": "^6.8.1",
     "dedent": "^0.7.0",
     "dompurify": "^2.0.17",
