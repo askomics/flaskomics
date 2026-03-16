@@ -31,7 +31,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "npm-check-updates": "^19.6.3",
     "terser-webpack-plugin": "^5.4.0",
-    "webpack": "^5.94.0",
+    "webpack": "^5.105.4",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
