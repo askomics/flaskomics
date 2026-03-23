@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: registry.hub.docker.com
-  IMAGE_NAME: flaskomics
+  IMAGE_NAME: celery-flaskomics
 
 jobs:
   build-and-push-image:
@@ -44,7 +44,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: mboudet
-          password: ${{ secrets.DOCKER_TOKEN }}
+          password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
       -
         name: Set up QEMU
