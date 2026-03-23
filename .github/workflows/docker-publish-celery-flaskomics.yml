@@ -29,7 +29,7 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
-          images: registry.hub.docker.com/askomics/flaskomics
+          images: registry.hub.docker.com/askomics/celery-flaskomics
           # generate Docker tags based on the following events/attributes
           tags: |
             type=ref,event=branch
