@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-setuptools = "<81.0"
+setuptools = "<84.0"
 werkzeug = "*"
 flask = "<3"
 validate-email = "*"
