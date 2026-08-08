@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 setuptools = "<81.0"
 werkzeug = "*"
-flask = "<3"
+flask = "<4"
 validate-email = "*"
 gunicorn = "*"
 python-magic = "*"
