@@ -589,12 +589,12 @@
         },
         "gitpython": {
             "hashes": [
-                "sha256:79a36ee1f83523214a3f72d56cf1c4e490d577dc61af77e43dfe5862bd9da01a",
-                "sha256:de0a8ad86274c6e75ae8b37dd055ba68f19818c813108642263227b20775b48e"
+                "sha256:0a1475cfdc38a5bfba1a3e9a4a9da52a39749ecec322b772915c019f94e5b7e4",
+                "sha256:67a82f537384578643624c8b2c531938a9b82be431663e575dcf638526631d4c"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.7'",
-            "version": "==3.1.52"
+            "version": "==3.1.59"
         },
         "gunicorn": {
             "hashes": [
